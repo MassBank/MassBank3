@@ -1,0 +1,107 @@
+type: object
+required:
+properties:
+  accession:
+    type: string
+  deprecated:
+    type: object
+    properties:
+      date:
+        type: string
+        format: date-time
+      reason:
+        type: string
+  title:
+    type: string
+  date:
+    type: object
+    properties:
+      updated:
+        type: string
+        format: date-time
+      created:
+        type: string
+        format: date-time
+      modified:
+        type: string
+        format: date-time
+  authors:
+    type: array
+    items:
+      type: object
+      properties:
+        name: string
+      marc-relator:
+        type: string
+  license:
+    type: string
+  copyright:
+    type: string
+  publication:
+    type: string
+  project:
+    type: string
+  comments:
+    type: array
+    items:
+      type: string
+  compound:
+    type: object
+    properties:
+      names:
+        type: array
+        items:
+          type: string
+      classes:
+        type: array
+        items:
+          type: string
+      formula:
+        type: string
+      cdk_depict:
+        type: array
+        items:
+          type: string
+      mass:
+        type: number
+        format: double
+      similes:
+        type: string
+      inchi:
+        type: string
+      link:
+        type: array
+        items:
+          $ref: "./DatabaseObject.yaml"
+  species:
+    type: object
+    properties:
+      name:
+        type string
+      lineage:
+        type: array
+        items:
+          type: string
+      link:
+        type: array
+        items:
+          $ref: "./DatabaseObject.yaml"
+      sample:
+        type: array
+        items:
+          type: string
+  acquisition:
+    instrument:
+    instrumenttype:
+    massspectrometry:
+    chromatography:
+    general:
+
+
+
+
+
+
+
+
+

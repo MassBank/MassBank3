@@ -1,0 +1,39 @@
+openapi: "3.1.0"
+info:
+  title: "API Title"
+  version: "1.0"
+servers:
+  - url: "https://api.server.test/v1"
+paths:
+  /records:
+    get:
+      summary: Get a list of records
+      operationId: getRecords
+      responses:
+        '200':
+          description: A list of records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: schemas/MBRecord.yaml
+
+  '/records/{accession}':
+    parameters:
+      - name: accession
+        in: path
+        description: The accession id of the record
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a list of records
+      operationId: getRecord
+      responses:
+        '200':
+          description: A list of records
+          content:
+            application/json:
+              schema:
+                $ref: schemas/MBRecord.yaml
