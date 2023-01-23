@@ -2,100 +2,270 @@ type: object
 required:
 properties:
   accession:
+    description: "Record identifier"
     type: string
+    pattern: "MSBNK-[A-Z0–9_]{1,32}-[A-Z0–9_]{1,64}"
+    required: true
   deprecated:
+    description: "Mark the record as deprecated"
     type: object
     properties:
       date:
+        description: "Date of deprecation"
         type: string
-        format: date-time
+        format: date
       reason:
+        description: "reason for deprecation"
         type: string
   title:
+    description: "Short title of the record. It is composed as 
+        'compound.names[0]; acquisition.instrument_type; acquisition.mass_spectrometry.ms_type'"
     type: string
+    required: true
   date:
+    description: "Date of creation or last modification of record"
     type: object
     properties:
       updated:
+        description: "Date of last update to record"
         type: string
-        format: date-time
+        format: date
       created:
+        description: "Date of record creation"
         type: string
-        format: date-time
+        format: date
       modified:
+        description: "Date of last (automatic) modification to record"
         type: string
-        format: date-time
+        format: date
+    required: true
   authors:
-    type: array
-    items:
-      type: object
-      properties:
-        name: string
-      marc-relator:
-        type: string
+    description: "Name and affiliation of authors"
+    $ref: "./Authors.yaml"
   license:
+    description: "Creative Commons License or its compatible terms"
     type: string
+    enum:
+      - "CC0"
+      - "CC BY"
+      - "CC BY-NC"
+      - "CC BY-NC-SA"
+      - "CC BY-SA"
+    required: true
   copyright:
+    description: "Copyright"
     type: string
+    required: false
   publication:
+    description: "Bibliographic information of reference"
     type: string
+    required: false
   project:
+    description: "Information on a related project"
     type: string
+    required: false
   comments:
+    description: "Comments"
     type: array
     items:
-      type: string
+      oneOf:
+        - description: "A pure comment string"
+          type: string
+        - description: "A annotated comment"
+          type: object
+          properties:
+            subtag:
+              description: "The subtag to describe the comment"
+              type: string
+              enum:
+                - "[MS2]"
+                - "[Merging]"
+                - "[Merged]"
+                - "[Mass spectrometry]"
+                - "[Chromatography]"
+                - "[Profile]"
+                - "CONFIDENCE"
+                - "INTERNAL_ID"
+            value:
+              description: "The comment"
+              type: string
+    required: false
   compound:
+    description: "Information of Chemical Compound Analyzed"
     type: object
     properties:
       names:
+        description: "Chemical names"
         type: array
         items:
+          description: "Chemical name"
           type: string
+        required: true
       classes:
+        description: "Chemical category"
         type: array
         items:
+          description: "Compound class"
           type: string
+        required: true
       formula:
+        description: "Chemical formula"
         type: string
+        required: true
       cdk_depict:
+        description: "Partially defined structures with CDK depict"
         type: array
         items:
+          description: "CDK depict structure"
           type: string
+        required: false
       mass:
+        description: "Exact mass"
         type: number
         format: double
-      similes:
+        required: true
+      smiles:
+        description: "SMILES code"
         type: string
+        required: true
       inchi:
+        description: "InChI code"
         type: string
+        required: true
       link:
+        description: "External database name with identifier"
         type: array
         items:
           $ref: "./DatabaseObject.yaml"
+        required: false
   species:
+    description: "Information of Biological Sample"
     type: object
     properties:
       name:
-        type string
+        description: "Scientific name of biological species"
+        type: string
+        required: false
       lineage:
+        description: "Lineage of species"
         type: array
         items:
+          description: "A lineage class item"
           type: string
+        required: false
       link:
+        description: "External database name with identifier"
         type: array
         items:
           $ref: "./DatabaseObject.yaml"
+        required: false
       sample:
+        description: "Information of sample preparation"
         type: array
         items:
+          description: "Tissue or Cell, from which Sample was Prepared"
           type: string
+        required: false
   acquisition:
-    instrument:
-    instrumenttype:
-    massspectrometry:
-    chromatography:
-    general:
+    description: ""
+    type: object
+    properties:
+      instrument:
+        description: "Commercial name and manufacturer of instrument"
+        type: string
+        required: true
+      instrument_type:
+        description: "Type of instrument"
+        type: string
+        pattern: "((CE|GC|LC)-)?(APCI|APPI|EI|ESI|FAB|MALDI,FD|CI|FISIMS)-(B|E|FT|IT|Q|TOF)(B|E|FT|IT|Q|TOF)?"
+        required: true
+      mass_spectrometry:
+        description: "Analytical conditions of mass spectrometry"
+        $ref: "./AcMassSpec.yaml"
+        required: true
+      chromatography:
+        description: "Analytical conditions of chromatographic separation"
+        $ref: "./AcChromatography.yaml"
+        required: false
+      general:
+        description: "General analytical conditions and information"
+        $ref: "./AcGeneral.yaml"
+        required: false
+      ion_mobility:
+        description: "Experimental Methods and Conditions of Ion Mobility Separation"
+        $ref: "./AcIonMobility.yaml"
+        required: false
+  mass_spectrometry:
+    type: object
+    properties:
+      focused_ion:
+        description: ""
+        $ref: "./MsFocusedIon.yaml"
+      data_processing:
+        description: "Data Processing Method of Peak Detection"
+        $ref: "./MsDataProcessing.yaml"
+  peak:
+    splash:
+      description: "Hashed Identifier of Mass Spectra"
+      type: string
+      required: true
+    annotation:
+      description: "Chemical Annotation of Peaks with Molecular Formula"
+      type: object
+      properties:
+        header:
+          description: "Record format of the annotation blocks"
+          type: array
+          items:
+            type: string
+        values:
+          description: "Annotation blocks"
+          type: array
+          items:
+            description: "Values corresponding to header"
+            type: array
+            items:
+              type:
+                AnyOf:
+                  - string
+                  - number
+                  - integer
+      required: false
+    numPeak:
+      description: "Total Number of Peaks"
+      type: integer
+      minimum: 1
+      required: true
+    peak:
+      description: "Peak Data"
+      type: object
+      properties:
+        header:
+          description: "Fixed header"
+          type: array
+          const: ["m/z", "int.", "rel.int."]
+        values:
+          description: "Peak values"
+          type: array
+          items:
+            description: "Values for a single peak"
+            type: array
+            prefixItems:
+              mz:
+                description: "m/z of the peak"
+                type: number
+                format: double
+              intensity:
+                description: "intensity of the peak"
+                type: number
+                format: double
+              rel:
+                description: "Relative intensity of the peak"
+                type: integer
+                minimum: 1
+                maximum: 999
+            items: false
+      required: true
 
 
 

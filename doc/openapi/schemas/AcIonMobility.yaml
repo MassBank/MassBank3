@@ -1,0 +1,14 @@
+type: array
+items:
+  type: object
+  properties:
+    subtag:
+      type: string
+      enum:
+        - CCS
+        - DRIFT_GAS
+        - DRIFT_TIME
+        - INSTRUMENT_TYPE
+        - INVERSE_REDUCED_ION_MOBILITY
+    value:
+      type: string
