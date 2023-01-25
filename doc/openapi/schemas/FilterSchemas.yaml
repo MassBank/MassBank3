@@ -1,0 +1,91 @@
+components:
+  schemas:
+    InstrumentType:
+      type: array
+      items:
+        type: string
+    Splash:
+      type: string
+    MSType:
+      type: array
+      items:
+        type: string
+        enum: [ MS,MS2,MS3,MS4 ]
+    IonMode:
+      type: string
+      enum: [ POSITIVE, NEGATIVE ]
+    CompoundName:
+      type: string
+    ExactMass:
+      type: object
+      properties:
+        operator:
+          schema:
+            type: string
+            enum: [ and,or ]
+        mass:
+          schema:
+            type: number
+            format: double
+        tolerance:
+          schema:
+            type: number
+            format: double
+            default: 0.3
+    Formula:
+      type: object
+      properties:
+        operator:
+          type: string
+          enum: [ and,or ]
+        formula:
+          type: string
+    Peaks:
+      type: object
+      properties:
+        peaks:
+          type: array
+          items:
+            type: object
+            properties:
+              operator:
+                type: string
+                enum: [ and,or ]
+              mz:
+                type: number
+        tolerance:
+          type: number
+          default: 0.3
+          minimum: 0.0
+        intensity:
+          type: integer
+          default: 100
+          minimum: 1
+          maximum: 100
+    PeakList:
+      type: object
+      properties:
+        peaks:
+          type: array
+          items:
+            type: object
+            properties:
+              mz:
+                type: number
+                minimum: 0.0
+              intensity:
+                type: integer
+                minimum: 1
+                maximum: 100
+        intensity_cutoff:
+          type: integer
+          default: 5
+          minimum: 1
+          maximum: 100
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 500
+          default: 20
+    InChIKey:
+      type: string

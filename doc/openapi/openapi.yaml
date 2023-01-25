@@ -6,6 +6,61 @@ servers:
   - url: "https://api.server.test/v1"
 paths:
   /records:
+    parameters:
+      - in: query
+        name: instrument_type
+        description: Filter by a list of instrument type, which will be associated by OR.
+        $ref: "./schemas/FilterSchemas.yaml#/components/schemas/InstrumentType"
+        required: false
+      - in: query
+        description: Filter by SPLASH.
+        name: splash
+        $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Splash"
+        required: false
+      - in: query
+        description: Filter by a List of MS types, which are associated by OR. If none is given, all is assumed.
+        name: ms_type
+        $ref: "./schemas/FilterSchemas.yaml#/components/schemas/MSType"
+        required: false
+      - in: query
+        name: ion-mode
+        description: Filter by ion mode. If none is given, both is assumed.
+        $ref: "./schemas/FilterSchemas.yaml#/components/schemas/IonMode"
+        required: false
+      - in: query
+        name: compound_name
+        description: Filter by compound name
+        $ref: "./schemas/FilterSchemas.yaml#/components/schemas/CompoundName"
+        required: false
+      - in: query
+        name: exact_mass
+        description: Filter by exact mass.
+        $ref: "./schemas/FilterSchemas.yaml#/components/schemas/ExactMass"
+      - in: query
+        name: formula
+        description: Filter by formula.
+        $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Formula"
+        required: false
+      - in: query
+        name: peaks
+        description: Filter by peaks.
+        $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Peaks"
+        required: false
+      - in: query
+        name: peak_differences
+        description: Filter by peak difference
+        $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Peaks"
+        required: false
+      - in: query
+        name: peak_list
+        description: Filter by peak list.
+        $ref: "./schemas/FilterSchemas.yaml#/components/schemas/PeakList"
+        required: false
+      - in: query
+        name: inchi_key
+        description: Filter by InChIKey. Complete or Partial
+        $ref: "./schemas/FilterSchemas.yaml#/components/schemas/InChIKey"
+        required: false
     get:
       summary: Get a list of records
       operationId: getRecords
@@ -17,7 +72,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "./schemas/MBRecord.yaml"
+                  $ref: "./schemas/SearchResult.yaml"
 
   '/records/{accession}':
     parameters:
@@ -33,7 +88,7 @@ paths:
       responses:
         '200':
           content:
-            description: "A Massbank record"
+            description: "A MassBank record"
             application/json:
               schema:
                 $ref: "./schemas/MBRecord.yaml"
