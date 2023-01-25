@@ -1,4 +1,4 @@
-type array:
+type: array
 description: A list of compounds with associated spectra.
 items:
   description: Data for a single compound.

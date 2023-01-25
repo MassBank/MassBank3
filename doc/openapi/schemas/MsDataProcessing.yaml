@@ -16,4 +16,3 @@ items:
     value:
       description: "The value for the subtag"
       type: string
-required: false
