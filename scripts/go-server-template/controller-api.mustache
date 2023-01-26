@@ -2,7 +2,6 @@
 package {{packageName}}
 
 import (
-	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -106,7 +105,7 @@ func (c *{{classname}}Controller) {{nickname}}(w http.ResponseWriter, r *http.Re
 	{{^isLong}}
 	{{^isInteger}}
 	{{paramName}}Param := {{#routers}}{{#mux}}params["{{baseName}}"]{{/mux}}{{#chi}}chi.URLParam(r, "{{baseName}}"){{/chi}}{{/routers}}
-	{{/isInteger}}{{/isLong}}
+    {{/isInteger}}{{/isLong}}
 	{{/isPathParam}}
 	{{#isQueryParam}}
 	{{#isLong}}
@@ -123,6 +122,13 @@ func (c *{{classname}}Controller) {{nickname}}(w http.ResponseWriter, r *http.Re
 		return
 	}
 	{{/isInteger}}
+    {{#isDouble}}
+    {{paramName}}Param, err := parseFloat64Parameter(query.Get("{{baseName}}"), {{required}})
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+    {{/isDouble}}
 	{{#isBoolean}}
 	{{paramName}}Param, err := parseBoolParameter(query.Get("{{baseName}}"))
 	if err != nil {
@@ -147,7 +153,9 @@ func (c *{{classname}}Controller) {{nickname}}(w http.ResponseWriter, r *http.Re
 	{{/items.isInteger}}
 	{{^items.isLong}}
 	{{^items.isInteger}}
-	{{paramName}}Param := strings.Split(query.Get("{{baseName}}"), ",")
+
+    {{paramName}}Param := strings.Split(query.Get("{{baseName}}"), ",")
+
 	{{/items.isInteger}}
 	{{/items.isLong}}
 	{{/isArray}}
@@ -155,8 +163,10 @@ func (c *{{classname}}Controller) {{nickname}}(w http.ResponseWriter, r *http.Re
 	{{^isInteger}}
 	{{^isBoolean}}
 	{{^isArray}}
-	{{paramName}}Param := query.Get("{{baseName}}")
-	{{/isArray}}
+    {{^isDouble}}
+    {{paramName}}Param := query.Get("{{baseName}}")
+    {{/isDouble}}
+    {{/isArray}}
 	{{/isBoolean}}
 	{{/isInteger}}
 	{{/isLong}}

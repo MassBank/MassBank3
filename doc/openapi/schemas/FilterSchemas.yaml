@@ -13,76 +13,48 @@ components:
         enum: [ MS,MS2,MS3,MS4 ]
     IonMode:
       type: string
-      enum: [ POSITIVE, NEGATIVE ]
+      desciption: "enum: [ POSITIVE, NEGATIVE ]"
     CompoundName:
       type: string
     ExactMass:
-      type: object
-      properties:
-        operator:
-          type: string
-          enum: [ and,or ]
-        mass:
-          type: number
-          format: double
-        tolerance:
-          type: number
-          format: double
-          default: 0.3
+      description: 'A mass prefixed with "and" or "or" before a colon, e.g. "or:122.0".'
+      type: string
+      pattern: "(and|or):[0-9]+(\\.[0-9]*)?"
+    MassTolerance:
+      type: number
+      format: double
+      default: 0.3
     Formula:
-      type: object
-      properties:
-        operator:
-          type: string
-          enum: [ and,or ]
-        formula:
-          type: string
+      description: 'A chemical formula prefixed with "and" or "or" before a colon, e.g. "or:C6H7N5".'
+      type: string
+      pattern: "(and|or):(([A-Z][a-z]*[0-9]*)|\\*)*"
     Peaks:
-      type: object
-      properties:
-        peaks:
-          type: array
-          items:
-            type: object
-            properties:
-              operator:
-                type: string
-                enum: [ and,or ]
-              mz:
-                type: number
-        tolerance:
-          type: number
-          default: 0.3
-          minimum: 0.0
-        intensity:
-          type: integer
-          default: 100
-          minimum: 1
-          maximum: 100
+      type: array
+      items:
+        type: string
+        description: 'A m/z prefixed with "and" or "or" before a colon, e.g. "or:143.0".'
+        pattern: "(and|or):[0-9]+(\\.[0-9]*)?"
+    Intensity:
+      description: "Releative intensity for peak search"
+      type: integer
+      default: 100
+      minimum: 1
+      maximum: 100
     PeakList:
-      type: object
-      properties:
-        peaks:
-          type: array
-          items:
-            type: object
-            properties:
-              mz:
-                type: number
-                minimum: 0.0
-              intensity:
-                type: integer
-                minimum: 1
-                maximum: 100
-        intensity_cutoff:
-          type: integer
-          default: 5
-          minimum: 1
-          maximum: 100
-        limit:
-          type: integer
-          minimum: 1
-          maximum: 500
-          default: 20
+      type: array
+      items:
+        type: string
+        description: "A tuple of m/z and intensity, e.g. (193.4,57)"
+        pattern: "\\([0-9]+(\\.[0-9]*)?,[0-9]+\\)"
+    IntensityCutoff:
+      type: integer
+      default: 5
+      minimum: 1
+      maximum: 100
+    Limit:
+      type: integer
+      minimum: 1
+      maximum: 500
+      default: 20
     InChIKey:
       type: string

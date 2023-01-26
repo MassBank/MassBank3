@@ -43,6 +43,11 @@ paths:
         schema:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/ExactMass"
       - in: query
+        name: mass_tolerance
+        description: "Tolerance for mass filters. Default: 0.3"
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/MassTolerance"
+      - in: query
         name: formula
         description: Filter by formula.
         schema:
@@ -55,6 +60,12 @@ paths:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Peaks"
         required: false
       - in: query
+        name: intensity
+        description: Intensity for peak search, defaults to 100.
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Intensity"
+        required: false
+      - in: query
         name: peak_differences
         description: Filter by peak difference
         schema:
@@ -65,6 +76,18 @@ paths:
         description: Filter by peak list.
         schema:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/PeakList"
+        required: false
+      - in: query
+        name: limit
+        description: "Maximum number of results. Default: 20"
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Limit"
+        required: false
+      - in: query
+        name: intensity_cutoff
+        description: "The Instensity cutoff for Peaklist search. Default: 5"
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/IntensityCutoff"
         required: false
       - in: query
         name: inchi_key

@@ -168,6 +168,19 @@ func readFileHeaderToTempFile(fileHeader *multipart.FileHeader) (*os.File, error
 }
 
 // parseInt64Parameter parses a string parameter to an int64.
+func parseFloat64Parameter(param string, required bool) (float64, error) {
+if param == "" {
+if required {
+return 0, errors.New(errMsgRequiredMissing)
+}
+
+return 0, nil
+}
+
+return strconv.ParseFloat(param, 64)
+}
+
+// parseInt64Parameter parses a string parameter to an int64.
 func parseInt64Parameter(param string, required bool) (int64, error) {
 	if param == "" {
 		if required {
