@@ -10,7 +10,7 @@ packageName: mb3server
 packageVersion: 0.1.0
 router: chi
 sourceFolder: src
-inputSpec: ../doc/openapi/openapi.yml
+inputSpec: ../api/openapi.yml
 templateDir: ./go-server-template
 gitUserId: MassBank
 gitRepoId: MassBank3/cmd/mb3server
