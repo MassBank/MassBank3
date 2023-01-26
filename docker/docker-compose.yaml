@@ -1,0 +1,19 @@
+version: '3.1'
+
+services:
+
+  mongodb:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PWD}
+
+  mb3server:
+    build: ../
+    restart: always
+    ports:
+      - "${MB3_API_PORT}:8080"
+    environment:
+      MONGO_URI: "mongodb://${MONGODB_USER}:${MONGODB_PWD}@mongo:27017"
+      MONGO_DB_NAME: "massbank3"
