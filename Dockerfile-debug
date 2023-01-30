@@ -11,10 +11,10 @@ RUN go get -d -v ./...
 
 RUN go build -a -gcflags="all=-N -l"  -installsuffix cgo -o mb3server ./cmd/mb3server
 
-FROM scratch AS runtime
+FROM alpine AS runtime
 VOLUME /var/log
 COPY --from=build /go/src/mb3server ./
 COPY --from=build /go/bin/dlv /
 EXPOSE 8080/tcp 40000
-CMD ["/dlv", "--listen=:40000", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "./mb3server"]
+CMD ["/dlv", "--log", "--log-dest", "/var/log/delve.log", "--log-output", "rpc","--listen=:40000", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "./mb3server"]
 

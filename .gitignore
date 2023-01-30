@@ -15,3 +15,4 @@
 # vendor/
 /docker/.env
 /.idea/
+/docker/debuglog/
