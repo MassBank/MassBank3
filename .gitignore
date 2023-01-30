@@ -16,3 +16,4 @@
 /docker/.env
 /.idea/
 /docker/debuglog/
+/scripts/bin/
