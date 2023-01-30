@@ -50,7 +50,7 @@ func (self *Mb3MongoDB) UpdateRecord(record massbank.Massbank, add bool) error {
 	panic("implement me")
 }
 
-func newMongoDB() (*Mb3MongoDB, error) {
+func NewMongoDB() (*Mb3MongoDB, error) {
 	return &Mb3MongoDB{
 		user:     "massbank3",
 		pwd:      "massbank3password",
