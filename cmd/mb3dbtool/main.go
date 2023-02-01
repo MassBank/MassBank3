@@ -68,7 +68,7 @@ func getConfig() config {
 	c.DbName = getEnv("DB_NAME", "massbank3")
 	c.DbConnStr = getEnv("DB_CONN_STRING", "")
 	c.gitRepo = getEnv("MB_GIT_REPO", "https://github.com/MassBank/MassBank-data")
-	c.dataDir = getEnv("MB_DATA_DIRECTORY", "/home/david/Projekte/MassBank/MassBank-data")
+	c.dataDir = getEnv("MB_DATA_DIRECTORY", "")
 	var dbPortEnv = getEnv("DB_PORT", "27017")
 	dbPort, err := strconv.ParseUint(dbPortEnv, 10, 16)
 	if err != nil {
