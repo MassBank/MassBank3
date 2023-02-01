@@ -5,6 +5,15 @@ import "github.com/MassBank/MassBank3/pkg/massbank"
 type Filters struct {
 }
 
+type DBConfig struct {
+	DbUser    string
+	DbPwd     string
+	DbHost    string
+	DbName    string
+	DbPort    uint
+	DbConnStr string
+}
+
 type MB3Database interface {
 	Connect() error
 	Disconnect() error

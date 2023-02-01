@@ -7,6 +7,7 @@ require github.com/go-chi/chi/v5 v5.0.3
 require (
 	github.com/go-chi/cors v1.2.0
 	go.mongodb.org/mongo-driver v1.11.1
+	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2
 )
 
 require (

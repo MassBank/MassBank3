@@ -50,17 +50,16 @@ func (self *Mb3MongoDB) UpdateRecord(record massbank.Massbank, add bool) error {
 	panic("implement me")
 }
 
-func NewMongoDB() (*Mb3MongoDB, error) {
+func NewMongoDB(config DBConfig) (*Mb3MongoDB, error) {
 	return &Mb3MongoDB{
-		user:     "massbank3",
-		pwd:      "massbank3password",
-		host:     "localhost",
-		dbname:   "massbank3",
-		port:     27017,
+		user:     config.DbUser,
+		pwd:      config.DbPwd,
+		host:     config.DbHost,
+		dbname:   config.DbName,
+		port:     uint16(config.DbPort),
 		database: nil,
 		dirty:    true,
 	}, nil
-
 }
 
 func (self *Mb3MongoDB) SetUser(user string) *Mb3MongoDB {
