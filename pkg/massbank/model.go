@@ -11,8 +11,6 @@ const deprecatedDateFormat = "2006-01-02"
 var lastTag string
 
 type Property interface {
-	Validate() (bool, error)
-	Output() string
 	Parse(string) error
 }
 

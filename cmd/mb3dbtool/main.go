@@ -1,11 +1,20 @@
 package main
 
 import (
+	"archive/zip"
+	"bytes"
 	"errors"
 	"flag"
+	"fmt"
 	"github.com/MassBank/MassBank3/pkg/database"
+	"github.com/MassBank/MassBank3/pkg/massbank"
+	"io"
+	"log"
+	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 type config struct {
@@ -26,6 +35,22 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	var mbfiles []*massbank.Massbank
+	if len(userConfig.dataDir) > 0 {
+		mbfiles, err = readDirectoryData(userConfig.dataDir)
+		if err != nil {
+			println(err.Error())
+		}
+	}
+	if mbfiles == nil && len(userConfig.gitRepo) > 0 {
+		mbfiles, err = readGitData(userConfig.gitRepo, "main")
+		if err != nil {
+			panic(err)
+		}
+	}
+	if mbfiles == nil {
+		panic("No files found")
+	}
 }
 
 func getEnv(name string, fallback string) string {
@@ -42,8 +67,8 @@ func getConfig() config {
 	c.DbHost = getEnv("DB_HOST", "localhost")
 	c.DbName = getEnv("DB_NAME", "massbank3")
 	c.DbConnStr = getEnv("DB_CONN_STRING", "")
-	c.gitRepo = getEnv("MB_GIT_REPO", "https://github.com/MassBank/MassBank-data.git")
-	c.dataDir = getEnv("MB_DATA_DIRECTORY", "")
+	c.gitRepo = getEnv("MB_GIT_REPO", "https://github.com/MassBank/MassBank-data")
+	c.dataDir = getEnv("MB_DATA_DIRECTORY", "/home/david/Projekte/MassBank/MassBank-data")
 	var dbPortEnv = getEnv("DB_PORT", "27017")
 	dbPort, err := strconv.ParseUint(dbPortEnv, 10, 16)
 	if err != nil {
@@ -63,4 +88,52 @@ func getConfig() config {
 		println("Git repo and data directory are set. Using data directory as default and git repo as fallback.")
 	}
 	return c
+}
+
+func readDirectoryData(dir string) ([]*massbank.Massbank, error) {
+	filesNames, err := filepath.Glob(dir + "/**/*.txt")
+	if err != nil {
+		return nil, err
+	}
+	var mbfiles = []*massbank.Massbank{}
+	for _, name := range filesNames {
+		file, err := os.Open(name)
+		if err != nil {
+			return nil, err
+		}
+		mb, err := massbank.ScanMbFile(file, name)
+		mbfiles = append(mbfiles, mb)
+	}
+	return mbfiles, nil
+}
+
+func readGitData(repo string, branch string) ([]*massbank.Massbank, error) {
+	c := http.Client{}
+	var url = fmt.Sprintf("%v/archive/refs/heads/%v.zip", repo, branch)
+	println("Downloading file " + url)
+	resp, err := c.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	body, err := io.ReadAll(resp.Body)
+	println("Download finished")
+	if err != nil {
+		return nil, err
+	}
+	zReader, err := zip.NewReader(bytes.NewReader(body), int64(len(body)))
+	if err != nil {
+		log.Panicln(err)
+	}
+	var mbfiles = []*massbank.Massbank{}
+	for _, zFile := range zReader.File {
+		if strings.HasSuffix(zFile.Name, ".txt") {
+			file, err := zFile.Open()
+			if err != nil {
+				return nil, err
+			}
+			mb, err := massbank.ScanMbFile(file, zFile.Name)
+			mbfiles = append(mbfiles, mb)
+		}
+	}
+	return mbfiles, nil
 }
