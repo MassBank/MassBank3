@@ -95,7 +95,7 @@ func (p *RecordDeprecated) Parse(s string) error {
 		}
 		return nil
 	}
-	return errors.New("Could not parse DEPRECATED tag.")
+	return errors.New("could not parse DEPRECATED tag")
 }
 
 func (names *RecordAuthorNames) Parse(s string) error {
@@ -242,13 +242,13 @@ func (mb *Massbank) parsePeakValue(line string, lineNum int) error {
 	var err error
 	var rel uint64
 	if mz, err = strconv.ParseFloat(svals[0], 32); err != nil {
-		return errors.New("Could not parse mz value")
+		return errors.New("could not parse mz value")
 	}
 	if intens, err = strconv.ParseFloat(svals[1], 32); err != nil {
-		return errors.New("Could not parse intensity value")
+		return errors.New("could not parse intensity value")
 	}
 	if rel, err = strconv.ParseUint(svals[2], 10, 32); err != nil {
-		return errors.New("Could not parse relative intensity")
+		return errors.New("could not parse relative intensity")
 	}
 	mb.Peak.Peak.Mz = append(mb.Peak.Peak.Mz, mz)
 	mb.Peak.Peak.Intensity = append(mb.Peak.Peak.Intensity, intens)
