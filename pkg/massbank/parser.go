@@ -215,7 +215,11 @@ func (mb *Massbank) ReadLine(line string, lineNum int) {
 		// ignore comment
 	} else if strings.HasPrefix(line, "  ") {
 		if lastTag == "PK$PEAK" {
-			mb.parsePeakValue(line, lineNum)
+			err := mb.parsePeakValue(line, lineNum)
+			if err != nil {
+				println("Error while reading peaks: " + err.Error())
+			}
+
 		} else if lastTag == "PK$ANNOTATION" {
 			mb.parseAnnotationValue(line, lineNum)
 		} else {
@@ -225,7 +229,10 @@ func (mb *Massbank) ReadLine(line string, lineNum int) {
 		s := strings.SplitN(line, ":", 2)
 		if len(s) == 2 {
 			tag := strings.TrimSpace(s[0])
-			mb.addValue(tag, strings.TrimSpace(s[1]), lineNum)
+			err := mb.addValue(tag, strings.TrimSpace(s[1]), lineNum)
+			if err != nil {
+				println("Error while adding value " + tag + " record.")
+			}
 			lastTag = tag
 		} else {
 			println("The line is not a valid massbank tag line: \n", line)

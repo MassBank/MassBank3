@@ -95,7 +95,10 @@ func (db *Mb3MongoDB) SetPort(port uint16) *Mb3MongoDB {
 func (db *Mb3MongoDB) Connect() error {
 	ctx := context.TODO()
 	if db.dirty && db.database != nil {
-		db.database.Client().Disconnect(ctx)
+		err := db.database.Client().Disconnect(ctx)
+		if err != nil {
+			println("Database connection probably not closed: " + err.Error())
+		}
 		db.database = nil
 	}
 	if db.database == nil {
