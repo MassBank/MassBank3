@@ -82,13 +82,9 @@ func (c *DefaultApiController) GetRecord(w http.ResponseWriter, r *http.Request)
 // GetRecords - Get a list of records
 func (c *DefaultApiController) GetRecords(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
-
 	instrumentTypeParam := strings.Split(query.Get("instrument_type"), ",")
-
 	splashParam := query.Get("splash")
-
 	msTypeParam := strings.Split(query.Get("ms_type"), ",")
-
 	ionModeParam := query.Get("ion-mode")
 	compoundNameParam := query.Get("compound_name")
 	exactMassParam := query.Get("exact_mass")
@@ -98,19 +94,14 @@ func (c *DefaultApiController) GetRecords(w http.ResponseWriter, r *http.Request
 		return
 	}
 	formulaParam := query.Get("formula")
-
 	peaksParam := strings.Split(query.Get("peaks"), ",")
-
 	intensityParam, err := parseInt32Parameter(query.Get("intensity"), false)
 	if err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-
 	peakDifferencesParam := strings.Split(query.Get("peak_differences"), ",")
-
 	peakListParam := strings.Split(query.Get("peak_list"), ",")
-
 	limitParam, err := parseInt32Parameter(query.Get("limit"), false)
 	if err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)

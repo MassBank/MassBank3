@@ -15,7 +15,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"io/ioutil"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -116,12 +116,12 @@ func readFileHeaderToTempFile(fileHeader *multipart.FileHeader) (*os.File, error
 
 	defer formFile.Close()
 
-	fileBytes, err := ioutil.ReadAll(formFile)
+	fileBytes, err := io.ReadAll(formFile)
 	if err != nil {
 		return nil, err
 	}
 
-	file, err := ioutil.TempFile("", fileHeader.Filename)
+	file, err := os.CreateTemp("", fileHeader.Filename)
 	if err != nil {
 		return nil, err
 	}
@@ -178,13 +178,21 @@ func parseInt32Parameter(param string, required bool) (int32, error) {
 }
 
 // parseBoolParameter parses a string parameter to a bool
-func parseBoolParameter(param string) (bool, error) {
+func parseBoolParameter(param string, required bool) (bool, error) {
+	if param == "" {
+		if required {
+			return false, errors.New(errMsgRequiredMissing)
+		}
+
+		return false, nil
+	}
+
 	val, err := strconv.ParseBool(param)
 	if err != nil {
 		return false, err
 	}
 
-	return val, nil
+	return bool(val), nil
 }
 
 // parseInt64ArrayParameter parses a string parameter containing array of values to []int64.
