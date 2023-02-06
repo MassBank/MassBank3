@@ -1,10 +1,13 @@
 package database
 
 import (
+	"errors"
 	"github.com/MassBank/MassBank3/pkg/massbank"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/net/context"
+	"log"
 	"strconv"
 )
 
@@ -30,9 +33,20 @@ func (db *Mb3MongoDB) GetRecords(filters Filters, limit uint64) ([]massbank.Mass
 	panic("implement me")
 }
 
-func (db *Mb3MongoDB) AddRecords(records []massbank.Massbank) error {
-	//TODO implement me
-	panic("implement me")
+func (db *Mb3MongoDB) AddRecords(records []*massbank.Massbank) error {
+	if db.database == nil {
+		return errors.New("database not ready")
+	}
+	var recordsI = make([]interface{}, len(records))
+	for i, record := range records {
+		recordsI[i] = record
+	}
+	_, err := db.database.Collection("massbank").InsertMany(context.Background(), recordsI)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
 }
 
 func (db *Mb3MongoDB) UpdateRecords(records []massbank.Massbank, add bool) (uint64, error) {
@@ -40,9 +54,16 @@ func (db *Mb3MongoDB) UpdateRecords(records []massbank.Massbank, add bool) (uint
 	panic("implement me")
 }
 
-func (db *Mb3MongoDB) AddRecord(record massbank.Massbank) error {
-	//TODO implement me
-	panic("implement me")
+func (db *Mb3MongoDB) AddRecord(record *massbank.Massbank) error {
+	if db.database == nil {
+		return errors.New("database not ready")
+	}
+	_, err := db.database.Collection("massbank").InsertOne(context.Background(), *record)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
 }
 
 func (db *Mb3MongoDB) UpdateRecord(record massbank.Massbank, add bool) error {
@@ -118,7 +139,21 @@ func (db *Mb3MongoDB) Connect() error {
 		db.database = mongoDb
 		db.dirty = false
 	}
+	db.init()
 	return db.database.Client().Ping(ctx, nil)
+}
+
+func (db *Mb3MongoDB) init() error {
+	opt := options.IndexOptions{}
+	_, err := db.database.Collection("massbank").Indexes().CreateOne(context.Background(),
+		mongo.IndexModel{bson.D{{"accession", 1}},
+			opt.SetName("accession_1").SetUnique(true)})
+	indeces := []string{"compound.names", "compound.mass", "compound.formula", "acquisition.instrumenttype", "acquisition.massspectrometry.ION_MODE", "acquisition.massspectrometry.MS_TYPE"}
+	for _, index := range indeces {
+		db.database.Collection("massbank").Indexes().CreateOne(context.Background(), mongo.IndexModel{bson.D{{index, 1}}, &options.IndexOptions{}})
+
+	}
+	return err
 }
 
 func (db *Mb3MongoDB) Disconnect() error {

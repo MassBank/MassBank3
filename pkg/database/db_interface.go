@@ -19,8 +19,8 @@ type MB3Database interface {
 	Disconnect() error
 	GetRecord(*string) (massbank.Massbank, error)
 	GetRecords(filters Filters, limit uint64) ([]massbank.Massbank, error)
-	AddRecords(records []massbank.Massbank) error
+	AddRecords(records []*massbank.Massbank) error
 	UpdateRecords(records []massbank.Massbank, add bool) (uint64, error)
-	AddRecord(record massbank.Massbank) error
+	AddRecord(record *massbank.Massbank) error
 	UpdateRecord(record massbank.Massbank, add bool) error
 }

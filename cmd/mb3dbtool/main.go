@@ -48,6 +48,10 @@ func main() {
 			panic(err)
 		}
 	}
+	err = db.AddRecords(mbfiles)
+	if err != nil {
+		println("Could not add records: " + err.Error())
+	}
 	if mbfiles == nil {
 		panic("No files found")
 	}
