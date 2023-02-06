@@ -12,6 +12,7 @@ import (
 )
 
 const connectionURIDefault = "mongodb://massbank3:massbank3password@localhost:27017"
+const MB_COLLECTION = "massbank"
 
 type Mb3MongoDB struct {
 	user     string
@@ -21,6 +22,17 @@ type Mb3MongoDB struct {
 	port     uint16
 	database *mongo.Database
 	dirty    bool
+}
+
+func (db *Mb3MongoDB) IsEmpty() (bool, error) {
+	if db.database == nil {
+		return true, errors.New("database not ready")
+	}
+	count, err := db.database.Collection(MB_COLLECTION).CountDocuments(context.Background(), bson.D{})
+	if count < 1 || err != nil {
+		return true, err
+	}
+	return false, nil
 }
 
 func (db *Mb3MongoDB) GetRecord(s *string) (massbank.Massbank, error) {
@@ -41,7 +53,7 @@ func (db *Mb3MongoDB) AddRecords(records []*massbank.Massbank) error {
 	for i, record := range records {
 		recordsI[i] = record
 	}
-	_, err := db.database.Collection("massbank").InsertMany(context.Background(), recordsI)
+	_, err := db.database.Collection(MB_COLLECTION).InsertMany(context.Background(), recordsI)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -49,16 +61,28 @@ func (db *Mb3MongoDB) AddRecords(records []*massbank.Massbank) error {
 	return nil
 }
 
-func (db *Mb3MongoDB) UpdateRecords(records []massbank.Massbank, add bool) (uint64, error) {
-	//TODO implement me
-	panic("implement me")
+func (db *Mb3MongoDB) UpdateRecords(records []*massbank.Massbank, upsert bool) (uint64, uint64, error) {
+	if db.database == nil {
+		return 0, 0, errors.New("database not ready")
+	}
+	var upserted uint64 = 0
+	var modified uint64 = 0
+	for _, record := range records {
+		u, m, err := db.UpdateRecord(record, upsert)
+		if err != nil {
+			log.Println(err)
+		}
+		upserted += u
+		modified += m
+	}
+	return upserted, modified, nil
 }
 
 func (db *Mb3MongoDB) AddRecord(record *massbank.Massbank) error {
 	if db.database == nil {
 		return errors.New("database not ready")
 	}
-	_, err := db.database.Collection("massbank").InsertOne(context.Background(), *record)
+	_, err := db.database.Collection(MB_COLLECTION).InsertOne(context.Background(), *record)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -66,9 +90,17 @@ func (db *Mb3MongoDB) AddRecord(record *massbank.Massbank) error {
 	return nil
 }
 
-func (db *Mb3MongoDB) UpdateRecord(record massbank.Massbank, add bool) error {
-	//TODO implement me
-	panic("implement me")
+func (db *Mb3MongoDB) UpdateRecord(record *massbank.Massbank, upsert bool) (uint64, uint64, error) {
+	if db.database == nil {
+		return 0, 0, errors.New("database not ready")
+	}
+	opt := options.ReplaceOptions{}
+	res, err := db.database.Collection(MB_COLLECTION).ReplaceOne(context.Background(), bson.D{{"accession", record.Accession.String}}, record, opt.SetUpsert(upsert))
+	if err != nil {
+		log.Println(err)
+		return 0, 0, err
+	}
+	return uint64(res.ModifiedCount), uint64(res.UpsertedCount), nil
 }
 
 func NewMongoDB(config DBConfig) (*Mb3MongoDB, error) {
@@ -139,18 +171,21 @@ func (db *Mb3MongoDB) Connect() error {
 		db.database = mongoDb
 		db.dirty = false
 	}
-	db.init()
+	err := db.init()
+	if err != nil {
+		return err
+	}
 	return db.database.Client().Ping(ctx, nil)
 }
 
 func (db *Mb3MongoDB) init() error {
 	opt := options.IndexOptions{}
-	_, err := db.database.Collection("massbank").Indexes().CreateOne(context.Background(),
+	_, err := db.database.Collection(MB_COLLECTION).Indexes().CreateOne(context.Background(),
 		mongo.IndexModel{bson.D{{"accession", 1}},
 			opt.SetName("accession_1").SetUnique(true)})
 	indeces := []string{"compound.names", "compound.mass", "compound.formula", "acquisition.instrumenttype", "acquisition.massspectrometry.ION_MODE", "acquisition.massspectrometry.MS_TYPE"}
 	for _, index := range indeces {
-		db.database.Collection("massbank").Indexes().CreateOne(context.Background(), mongo.IndexModel{bson.D{{index, 1}}, &options.IndexOptions{}})
+		db.database.Collection(MB_COLLECTION).Indexes().CreateOne(context.Background(), mongo.IndexModel{bson.D{{index, 1}}, &options.IndexOptions{}})
 
 	}
 	return err

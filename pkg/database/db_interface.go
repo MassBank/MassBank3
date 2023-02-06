@@ -20,7 +20,8 @@ type MB3Database interface {
 	GetRecord(*string) (massbank.Massbank, error)
 	GetRecords(filters Filters, limit uint64) ([]massbank.Massbank, error)
 	AddRecords(records []*massbank.Massbank) error
-	UpdateRecords(records []massbank.Massbank, add bool) (uint64, error)
+	UpdateRecords(records []*massbank.Massbank, upsert bool) (uint64, uint64, error)
 	AddRecord(record *massbank.Massbank) error
-	UpdateRecord(record massbank.Massbank, add bool) error
+	UpdateRecord(record *massbank.Massbank, upsert bool) (uint64, uint64, error)
+	IsEmpty() (bool, error)
 }

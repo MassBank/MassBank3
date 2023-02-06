@@ -7,11 +7,11 @@ import (
 )
 
 func (p StringProperty) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	return bson.MarshalValue(p.string)
+	return bson.MarshalValue(p.String)
 }
 
 func (p SubtagProperty) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	m := map[string]string{p.subtag: p.string}
+	m := map[string]string{p.Subtag: p.String}
 	return bson.MarshalValue(m)
 }
 

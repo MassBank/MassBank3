@@ -18,13 +18,13 @@ type DefaultProperty struct {
 }
 
 type StringProperty struct {
-	string
+	String string
 	DefaultProperty
 }
 
 type SubtagProperty struct {
 	StringProperty
-	subtag string
+	Subtag string
 }
 
 type DatabaseProperty struct {

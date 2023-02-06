@@ -18,15 +18,15 @@ func (p *DefaultProperty) Parse(string) error {
 }
 
 func (p *StringProperty) Parse(s string) error {
-	p.string = s
+	p.String = s
 	return nil
 }
 
 func (p *SubtagProperty) Parse(s string) error {
 	ss := strings.SplitN(s, " ", 2)
 	if len(ss) > 1 {
-		p.subtag = ss[0]
-		p.string = ss[1]
+		p.Subtag = ss[0]
+		p.String = ss[1]
 	} else {
 		return errors.New("Subtag error: " + s)
 	}
@@ -44,7 +44,7 @@ func (p *DatabaseProperty) Parse(s string) error {
 	return nil
 }
 
-func (d *RecordDate) Parse(s string) error {
+func (p *RecordDate) Parse(s string) error {
 	var err error
 	ss := strings.SplitN(s, " ", 2)
 	if len(ss) > 1 {
@@ -53,29 +53,29 @@ func (d *RecordDate) Parse(s string) error {
 		if len(ss2) == 2 {
 			ss3 := strings.SplitN(ss2[1], ",", 2)
 			if len(ss3) > 1 {
-				if d.Created, err = time.Parse(dateFormat, ss3[0]); err != nil {
+				if p.Created, err = time.Parse(dateFormat, ss3[0]); err != nil {
 					return err
 				}
 				ss4 := strings.SplitN(strings.TrimSpace(ss3[1]), " ", 2)
 				if len(ss4) > 1 {
-					if d.Modified, err = time.Parse(dateFormat, ss4[1]); strings.TrimSpace(ss4[0]) != "modified" || err != nil {
+					if p.Modified, err = time.Parse(dateFormat, ss4[1]); strings.TrimSpace(ss4[0]) != "modified" || err != nil {
 						return err
 					}
 				} else {
 					return err
 				}
 			} else {
-				if d.Created, err = time.Parse(dateFormat, ss2[1]); err != nil {
+				if p.Created, err = time.Parse(dateFormat, ss2[1]); err != nil {
 					return err
 				}
 			}
 		}
 	} else {
-		if d.Created, err = time.Parse(dateFormat, ss[0]); err != nil {
+		if p.Created, err = time.Parse(dateFormat, ss[0]); err != nil {
 			return err
 		}
 	}
-	d.Updated, err = time.Parse(dateFormat, ss[0])
+	p.Updated, err = time.Parse(dateFormat, ss[0])
 	if err != nil {
 		return err
 	}
@@ -162,7 +162,7 @@ func (p *SpLineage) Parse(s string) error {
 	ss := strings.Split(s, ";")
 	for _, es := range ss {
 		element := SpLineageElement{}
-		element.string = strings.TrimSpace(es)
+		element.String = strings.TrimSpace(es)
 		p.value = append(p.value, element)
 	}
 	return nil
@@ -171,10 +171,10 @@ func (p *SpLineage) Parse(s string) error {
 func (p *RecordComment) Parse(s string) error {
 	ss := strings.SplitN(s, " ", 2)
 	if len(ss) > 1 && contains(commentSubtagList, strings.TrimSpace(ss[0])) {
-		p.subtag = ss[0]
-		p.string = ss[1]
+		p.Subtag = ss[0]
+		p.String = ss[1]
 	} else if len(s) > 0 {
-		p.string = s
+		p.String = s
 	} else {
 		return errors.New("Subtag error: " + s)
 	}
