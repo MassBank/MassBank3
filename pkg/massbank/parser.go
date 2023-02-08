@@ -199,7 +199,7 @@ func ScanMbFile(mb2Reader io.Reader, fileName string) (*Massbank, error) {
 		buildTags()
 	}
 	var mb = Massbank{}
-	mb.File.FileName = fileName
+	mb.Metadata.FileName = fileName
 	scanner := bufio.NewScanner(mb2Reader)
 	lineNum := 0
 	for scanner.Scan() {
@@ -302,7 +302,7 @@ func (mb *Massbank) addValue(tagname string, value string, lineNum int) error {
 	propInt := newInterf.(Property)
 	err := propInt.Parse(value)
 	if err != nil {
-		log.Println(err.Error(), "Tag: ", tagname, "File: ", mb.File.FileName, "Line: ", lineNum)
+		log.Println(err.Error(), "Tag: ", tagname, "File: ", mb.Metadata.FileName, "Line: ", lineNum)
 	}
 	if prop.Kind() == reflect.Slice {
 		prop.Set(reflect.Append(prop, newPro))

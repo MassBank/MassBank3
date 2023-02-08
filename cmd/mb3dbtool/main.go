@@ -2,12 +2,14 @@ package main
 
 import (
 	"archive/zip"
+	"bufio"
 	"bytes"
 	"errors"
 	"flag"
 	"fmt"
 	"github.com/MassBank/MassBank3/pkg/database"
 	"github.com/MassBank/MassBank3/pkg/massbank"
+	"github.com/go-git/go-git/v5"
 	"io"
 	"log"
 	"net/http"
@@ -49,14 +51,15 @@ func main() {
 		panic(err)
 	}
 	var mbfiles []*massbank.Massbank
+	var versionData *massbank.MbMetaData
 	if len(userConfig.dataDir) > 0 {
-		mbfiles, err = readDirectoryData(userConfig.dataDir)
+		mbfiles, versionData, err = readDirectoryData(userConfig.dataDir)
 		if err != nil {
 			println(err.Error())
 		}
 	}
 	if mbfiles == nil && len(userConfig.gitRepo) > 0 {
-		mbfiles, err = readGitData(userConfig.gitRepo, userConfig.gitBranch)
+		mbfiles, versionData, err = readGitData(userConfig.gitRepo, userConfig.gitBranch)
 		if err != nil {
 			panic(err)
 		}
@@ -65,13 +68,14 @@ func main() {
 	if err != nil {
 		println(err.Error())
 	}
+	metaId, err := db.UpdateMetadata(versionData)
 	if empty {
-		err = db.AddRecords(mbfiles)
+		err = db.AddRecords(mbfiles, metaId)
 		if err != nil {
 			panic(err)
 		}
 	} else {
-		_, _, err := db.UpdateRecords(mbfiles, true)
+		_, _, err := db.UpdateRecords(mbfiles, metaId, true)
 		if err != nil {
 			panic(err)
 		}
@@ -123,50 +127,93 @@ func getConfig() config {
 	return c
 }
 
-func readDirectoryData(dir string) ([]*massbank.Massbank, error) {
+func readDirectoryData(dir string) ([]*massbank.Massbank, *massbank.MbMetaData, error) {
+	println("Reading files from directory " + dir + " ...")
 	filesNames, err := filepath.Glob(dir + "/**/*.txt")
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+	var mbmeta = massbank.MbMetaData{}
+	verFile, err := os.Open(dir + "/VERSION")
+	readVersionFile(verFile, &mbmeta)
+	if err != nil {
+		return nil, nil, err
+	}
+	repo, err := git.PlainOpen(dir)
+
+	if err != nil {
+		println(err.Error())
+	} else {
+		head, err := repo.Head()
+		if err != nil {
+			println(err.Error())
+		} else {
+			mbmeta.Commit = head.Hash().String()
+		}
 	}
 	var mbfiles = []*massbank.Massbank{}
 	for _, name := range filesNames {
 		file, err := os.Open(name)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		mb, err := massbank.ScanMbFile(file, name)
 		mbfiles = append(mbfiles, mb)
 	}
-	return mbfiles, nil
+	return mbfiles, &mbmeta, nil
 }
 
-func readGitData(repo string, branch string) ([]*massbank.Massbank, error) {
+func readGitData(repo string, branch string) ([]*massbank.Massbank, *massbank.MbMetaData, error) {
 	c := http.Client{}
 	var url = fmt.Sprintf("%v/archive/refs/heads/%v.zip", repo, branch)
 	println("Downloading file " + url)
 	resp, err := c.Get(url)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	body, err := io.ReadAll(resp.Body)
 	println("Download finished")
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	zReader, err := zip.NewReader(bytes.NewReader(body), int64(len(body)))
 	if err != nil {
 		log.Panicln(err)
 	}
 	var mbfiles = []*massbank.Massbank{}
+	var mbmeta = massbank.MbMetaData{Commit: zReader.Comment}
 	for _, zFile := range zReader.File {
+		if strings.HasSuffix(zFile.Name, "VERSION") {
+			file, err := zFile.Open()
+			if err != nil {
+				println("Could not read VERSION file: " + err.Error())
+			}
+			readVersionFile(file, &mbmeta)
+		}
 		if strings.HasSuffix(zFile.Name, ".txt") {
 			file, err := zFile.Open()
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 			mb, err := massbank.ScanMbFile(file, zFile.Name)
 			mbfiles = append(mbfiles, mb)
 		}
 	}
-	return mbfiles, nil
+	return mbfiles, &mbmeta, nil
+}
+
+func readVersionFile(file io.Reader, mbmeta *massbank.MbMetaData) {
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.Split(scanner.Text(), "=")
+		if len(line) == 2 {
+			switch strings.TrimSpace(line[0]) {
+			case "version":
+				mbmeta.Version = strings.TrimSpace(line[1])
+			case "timestamp":
+				mbmeta.Timestamp = strings.TrimSpace(line[1])
+
+			}
+		}
+	}
 }

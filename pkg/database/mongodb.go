@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/net/context"
@@ -11,8 +12,10 @@ import (
 	"strconv"
 )
 
-const connectionURIDefault = "mongodb://massbank3:massbank3password@localhost:27017"
-const MB_COLLECTION = "massbank"
+const (
+	MB_COLLECTION      = "massbank"
+	MB_META_COLLECTION = "mb_metadata"
+)
 
 type Mb3MongoDB struct {
 	user     string
@@ -22,6 +25,23 @@ type Mb3MongoDB struct {
 	port     uint16
 	database *mongo.Database
 	dirty    bool
+}
+
+func (db *Mb3MongoDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error) {
+	if db.database == nil {
+		return "", errors.New("database not ready")
+	}
+	var res bson.M
+	err := db.database.Collection(MB_META_COLLECTION).FindOne(context.Background(), bson.D{{"commit", meta.Commit}, {"timestamp", meta.Timestamp}}, options.FindOne().SetProjection(bson.D{{"_id", 1}})).Decode(&res)
+	if err != nil {
+		iRes, err := db.database.Collection(MB_META_COLLECTION).InsertOne(context.Background(), meta)
+		if err != nil {
+			return "", err
+		}
+		return iRes.InsertedID.(primitive.ObjectID).Hex(), nil
+
+	}
+	return res["_id"].(primitive.ObjectID).Hex(), nil
 }
 
 func (db *Mb3MongoDB) IsEmpty() (bool, error) {
@@ -35,22 +55,23 @@ func (db *Mb3MongoDB) IsEmpty() (bool, error) {
 	return false, nil
 }
 
-func (db *Mb3MongoDB) GetRecord(s *string) (massbank.Massbank, error) {
+func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.Massbank, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (db *Mb3MongoDB) GetRecords(filters Filters, limit uint64) ([]massbank.Massbank, error) {
+func (db *Mb3MongoDB) GetRecords(filters Filters, limit uint64) ([]*massbank.Massbank, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (db *Mb3MongoDB) AddRecords(records []*massbank.Massbank) error {
+func (db *Mb3MongoDB) AddRecords(records []*massbank.Massbank, metadataId string) error {
 	if db.database == nil {
 		return errors.New("database not ready")
 	}
 	var recordsI = make([]interface{}, len(records))
 	for i, record := range records {
+		record.Metadata.VersionRef = massbank.MbReference(metadataId)
 		recordsI[i] = record
 	}
 	_, err := db.database.Collection(MB_COLLECTION).InsertMany(context.Background(), recordsI)
@@ -61,14 +82,14 @@ func (db *Mb3MongoDB) AddRecords(records []*massbank.Massbank) error {
 	return nil
 }
 
-func (db *Mb3MongoDB) UpdateRecords(records []*massbank.Massbank, upsert bool) (uint64, uint64, error) {
+func (db *Mb3MongoDB) UpdateRecords(records []*massbank.Massbank, metadataId string, upsert bool) (uint64, uint64, error) {
 	if db.database == nil {
 		return 0, 0, errors.New("database not ready")
 	}
 	var upserted uint64 = 0
 	var modified uint64 = 0
 	for _, record := range records {
-		u, m, err := db.UpdateRecord(record, upsert)
+		u, m, err := db.UpdateRecord(record, metadataId, upsert)
 		if err != nil {
 			log.Println(err)
 		}
@@ -78,10 +99,11 @@ func (db *Mb3MongoDB) UpdateRecords(records []*massbank.Massbank, upsert bool) (
 	return upserted, modified, nil
 }
 
-func (db *Mb3MongoDB) AddRecord(record *massbank.Massbank) error {
+func (db *Mb3MongoDB) AddRecord(record *massbank.Massbank, metadataId string) error {
 	if db.database == nil {
 		return errors.New("database not ready")
 	}
+	record.Metadata.VersionRef = massbank.MbReference(metadataId)
 	_, err := db.database.Collection(MB_COLLECTION).InsertOne(context.Background(), *record)
 	if err != nil {
 		log.Println(err)
@@ -90,10 +112,11 @@ func (db *Mb3MongoDB) AddRecord(record *massbank.Massbank) error {
 	return nil
 }
 
-func (db *Mb3MongoDB) UpdateRecord(record *massbank.Massbank, upsert bool) (uint64, uint64, error) {
+func (db *Mb3MongoDB) UpdateRecord(record *massbank.Massbank, metadataId string, upsert bool) (uint64, uint64, error) {
 	if db.database == nil {
 		return 0, 0, errors.New("database not ready")
 	}
+	record.Metadata.VersionRef = massbank.MbReference(metadataId)
 	opt := options.ReplaceOptions{}
 	res, err := db.database.Collection(MB_COLLECTION).ReplaceOne(context.Background(), bson.D{{"accession", record.Accession.String}}, record, opt.SetUpsert(upsert))
 	if err != nil {
@@ -188,6 +211,8 @@ func (db *Mb3MongoDB) init() error {
 		db.database.Collection(MB_COLLECTION).Indexes().CreateOne(context.Background(), mongo.IndexModel{bson.D{{index, 1}}, &options.IndexOptions{}})
 
 	}
+	opt = options.IndexOptions{}
+	db.database.Collection(MB_META_COLLECTION).Indexes().CreateOne(context.Background(), mongo.IndexModel{bson.D{{"version", 1}, {"commit", 1}, {"timestamp", 1}}, opt.SetUnique(true)})
 	return err
 }
 

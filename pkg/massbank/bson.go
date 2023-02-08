@@ -3,6 +3,7 @@ package massbank
 import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/bsontype"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 )
 
@@ -68,4 +69,12 @@ func (p PkAnnotation) MarshalBSONValue() (bsontype.Type, []byte, error) {
 		Header []string
 		Values map[string][]interface{}
 	}{p.Header, p.Values})
+}
+
+func (p MbReference) MarshalBSONValue() (bsontype.Type, []byte, error) {
+	id, err := primitive.ObjectIDFromHex(string(p))
+	if err != nil {
+		return bsontype.Null, nil, err
+	}
+	return bson.MarshalValue(id)
 }
