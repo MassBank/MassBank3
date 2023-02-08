@@ -99,6 +99,12 @@ paths:
         schema:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/InChIKey"
         required: false
+      - in: query
+        name: contributor
+        description: a contributor (institution)
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Contributor"
+        required: false
     get:
       summary: Get a list of records
       operationId: getRecords

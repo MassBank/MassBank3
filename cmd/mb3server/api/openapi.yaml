@@ -138,6 +138,14 @@ paths:
         schema:
           $ref: '#/components/schemas/InChIKey'
         style: form
+      - description: a contributor (institution)
+        explode: true
+        in: query
+        name: contributor
+        required: false
+        schema:
+          $ref: '#/components/schemas/Contributor'
+        style: form
       responses:
         "200":
           content:
@@ -268,6 +276,8 @@ components:
       minimum: 1
       type: integer
     InChIKey:
+      type: string
+    Contributor:
       type: string
     SearchResult:
       example:

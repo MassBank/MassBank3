@@ -34,5 +34,5 @@ type DefaultApiServicer interface {
 	GetFilterOptions(context.Context) (ImplResponse, error)
 	GetMetadata(context.Context) (ImplResponse, error)
 	GetRecord(context.Context, string) (ImplResponse, error)
-	GetRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, int32, int32, string) (ImplResponse, error)
+	GetRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, int32, int32, string, string) (ImplResponse, error)
 }

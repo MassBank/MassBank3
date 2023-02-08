@@ -175,7 +175,8 @@ func (c *DefaultApiController) GetRecords(w http.ResponseWriter, r *http.Request
 		return
 	}
 	inchiKeyParam := query.Get("inchi_key")
-	result, err := c.service.GetRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, limitParam, pageParam, intensityCutoffParam, inchiKeyParam)
+	contributorParam := query.Get("contributor")
+	result, err := c.service.GetRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, limitParam, pageParam, intensityCutoffParam, inchiKeyParam, contributorParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
