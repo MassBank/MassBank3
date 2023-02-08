@@ -76,9 +76,22 @@ components:
           type: string
         spectra_count:
           type: integer
+          minimum: 0
         compound_count:
           type: integer
+          minimum: 0
         isomer_count:
           type: integer
+          minimum: 0
+        result_count:
+          type: integer
+          minimum: 0
+        page:
+          type: integer
+          minimum: 1
+        limit:
+          type: integer
+          minimum: 1
+
 
 

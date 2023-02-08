@@ -26,6 +26,39 @@ func NewDefaultApiService() DefaultApiServicer {
 	return &DefaultApiService{}
 }
 
+// GetBrowseOptions - get browse options
+func (s *DefaultApiService) GetBrowseOptions(ctx context.Context) (ImplResponse, error) {
+	// TODO - update GetBrowseOptions with the required logic for this service method.
+	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, BrowseOptions{}) or use other options such as http.Ok ...
+	//return Response(200, BrowseOptions{}), nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("GetBrowseOptions method not implemented")
+}
+
+// GetFilterOptions - get filter options
+func (s *DefaultApiService) GetFilterOptions(ctx context.Context) (ImplResponse, error) {
+	// TODO - update GetFilterOptions with the required logic for this service method.
+	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, FilterOptions{}) or use other options such as http.Ok ...
+	//return Response(200, FilterOptions{}), nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("GetFilterOptions method not implemented")
+}
+
+// GetMetadata - get massbank metadata
+func (s *DefaultApiService) GetMetadata(ctx context.Context) (ImplResponse, error) {
+	// TODO - update GetMetadata with the required logic for this service method.
+	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, Metadata{}) or use other options such as http.Ok ...
+	//return Response(200, Metadata{}), nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("GetMetadata method not implemented")
+}
+
 // GetRecord - Get a MassBank record
 func (s *DefaultApiService) GetRecord(ctx context.Context, accession string) (ImplResponse, error) {
 	// TODO - update GetRecord with the required logic for this service method.
@@ -38,7 +71,7 @@ func (s *DefaultApiService) GetRecord(ctx context.Context, accession string) (Im
 }
 
 // GetRecords - Get a list of records
-func (s *DefaultApiService) GetRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, limit int32, intensityCutoff int32, inchiKey string) (ImplResponse, error) {
+func (s *DefaultApiService) GetRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, limit int32, page int32, intensityCutoff int32, inchiKey string) (ImplResponse, error) {
 	// TODO - update GetRecords with the required logic for this service method.
 	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 

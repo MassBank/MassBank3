@@ -21,6 +21,12 @@ type Metadata struct {
 	CompoundCount int32 `json:"compound_count,omitempty"`
 
 	IsomerCount int32 `json:"isomer_count,omitempty"`
+
+	ResultCount int32 `json:"result_count,omitempty"`
+
+	Page int32 `json:"page,omitempty"`
+
+	Limit int32 `json:"limit,omitempty"`
 }
 
 // AssertMetadataRequired checks if the required fields are not zero-ed

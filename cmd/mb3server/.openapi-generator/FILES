@@ -3,6 +3,7 @@ api/openapi.yaml
 main.go
 src/api.go
 src/api_default.go
+src/api_default_service.go
 src/error.go
 src/helpers.go
 src/impl.go

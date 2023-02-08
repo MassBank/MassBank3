@@ -449,22 +449,25 @@ components:
     FilterOptions:
       example:
         intensity:
-          maximum: 7
-          minimum: 2
+          maximum: 5
+          minimum: 1
         max_limit: 1
         metadata:
-          isomer_count: 1
+          isomer_count: 0
           git_commit: git_commit
-          compound_count: 6
+          compound_count: 0
           spectra_count: 0
+          limit: 1
+          page: 1
           version: version
+          result_count: 0
           timestamp: timestamp
         ms_type:
         - ms_type
         - ms_type
         mass:
-          maximum: 5.637376656633329
-          minimum: 5.962133916683182
+          maximum: 6.027456183070403
+          minimum: 0.8008281904610115
         ion_mode:
         - ion_mode
         - ion_mode
@@ -496,11 +499,14 @@ components:
       type: object
     Metadata:
       example:
-        isomer_count: 1
+        isomer_count: 0
         git_commit: git_commit
-        compound_count: 6
+        compound_count: 0
         spectra_count: 0
+        limit: 1
+        page: 1
         version: version
+        result_count: 0
         timestamp: timestamp
       properties:
         version:
@@ -510,20 +516,35 @@ components:
         git_commit:
           type: string
         spectra_count:
+          minimum: 0
           type: integer
         compound_count:
+          minimum: 0
           type: integer
         isomer_count:
+          minimum: 0
+          type: integer
+        result_count:
+          minimum: 0
+          type: integer
+        page:
+          minimum: 1
+          type: integer
+        limit:
+          minimum: 1
           type: integer
       type: object
     BrowseOptions:
       example:
         metadata:
-          isomer_count: 1
+          isomer_count: 0
           git_commit: git_commit
-          compound_count: 6
+          compound_count: 0
           spectra_count: 0
+          limit: 1
+          page: 1
           version: version
+          result_count: 0
           timestamp: timestamp
         compound_start:
           values:
@@ -682,11 +703,26 @@ components:
           title: title
         - id: id
           title: title
+        metadata:
+          isomer_count: 0
+          git_commit: git_commit
+          compound_count: 0
+          spectra_count: 0
+          limit: 1
+          page: 1
+          version: version
+          result_count: 0
+          timestamp: timestamp
+        data: "{}"
         smiles: smiles
-        mass: 0.8008281904610115
+        mass: 7.061401241503109
         name: name
         formula: formula
       properties:
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        data:
+          type: object
         name:
           description: Compound name.
           type: string
@@ -1059,8 +1095,8 @@ components:
       type: object
     FilterOptions_mass:
       example:
-        maximum: 5.637376656633329
-        minimum: 5.962133916683182
+        maximum: 6.027456183070403
+        minimum: 0.8008281904610115
       properties:
         minimum:
           default: 0
@@ -1073,8 +1109,8 @@ components:
       type: object
     FilterOptions_intensity:
       example:
-        maximum: 7
-        minimum: 2
+        maximum: 5
+        minimum: 1
       properties:
         minimum:
           default: 0

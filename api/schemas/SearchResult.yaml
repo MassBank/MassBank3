@@ -4,6 +4,10 @@ items:
   description: Data for a single compound.
   type: object
   properties:
+    metadata:
+      $ref: "./FilterOptions.yaml#/components/schemas/Metadata"
+    data:
+      type: object
     name:
       description: Compound name.
       type: string
