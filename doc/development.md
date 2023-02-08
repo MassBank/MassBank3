@@ -45,6 +45,43 @@ Execute the server:
     
     ./mb3server 
 
+### Building the database tool
+
+To database tool is build with the command:
+
+    > go build -o mb3dbtool cmd/mb3dbtool/main.go 
+
+Get help with:
+
+    > ./mb3dbtool --help
+    Usage of ./mb3dbtool:
+        -branch string
+              git branch. Overwrites environment variable MB_GIT_BRANCH 
+              (default "main")
+        -connstr string
+              database connection string. Overwrites environment variable 
+              DB_CONN_STRING
+        -db string
+              database name. Overwrites environment variable DB_NAME 
+              (default "massbank3")
+        -dir string
+              data directory. Overwrites environment variable MB_DATA_DIRECTORY
+        -git string
+              git repository. Overwrites environment variable MB_GIT_REPO 
+              (default "https://github.com/MassBank/MassBank-data")
+        -host string
+              database host. Overwrites environment variable DB_HOST 
+              (default "localhost")
+        -port uint
+              database port. Overwrites environment variable DB_PORT 
+              (default 27017)
+        -pwd string
+              database user password. Overwrites environment variable 
+              DB_PASSWORD (default "massbank3password")
+        -user string
+              database user name. Overwrites environment variable 
+              DB_USER (default "massbank3")
+
 ### Using docker
 
 To run the server in docker containers you need docker and docker-compose. 
