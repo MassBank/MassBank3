@@ -1,36 +1,40 @@
-type: array
-description: A list of compounds with associated spectra.
-items:
-  description: Data for a single compound.
-  type: object
-  properties:
-    metadata:
-      $ref: "./FilterOptions.yaml#/components/schemas/Metadata"
-    data:
+type: object
+properties:
+  metadata:
+    $ref: "./FilterOptions.yaml#/components/schemas/Metadata"
+  data:
+    type: array
+    description: A list of compounds with associated spectra.
+    items:
+      description: Data for a single compound.
       type: object
-    name:
-      description: Compound name.
-      type: string
-    formula:
-      description: Formula of the compound.
-      type: string
-    mass:
-      description: Exact Mass of the compound.
-      type: number
-      format: double
-    smiles:
-      description: Smiles to generate structure.
-      type: string
-    spectra:
-      description: A list of spectra for the compound
-      type: array
-      items:
-        description: Spectra for the given compound
-        type: object
-        properties:
-          title:
-            description: Record title
-            type: string
-          id:
-            description: MassBank ID.
-            type: string
+      properties:
+
+        data:
+          type: object
+        name:
+          description: Compound name.
+          type: string
+        formula:
+          description: Formula of the compound.
+          type: string
+        mass:
+          description: Exact Mass of the compound.
+          type: number
+          format: double
+        smiles:
+          description: Smiles to generate structure.
+          type: string
+        spectra:
+          description: A list of spectra for the compound
+          type: array
+          items:
+            description: Spectra for the given compound
+            type: object
+            properties:
+              title:
+                description: Record title
+                type: string
+              id:
+                description: MassBank ID.
+                type: string

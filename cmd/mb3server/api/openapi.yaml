@@ -270,10 +270,47 @@ components:
     InChIKey:
       type: string
     SearchResult:
-      description: A list of compounds with associated spectra.
-      items:
-        $ref: '#/components/schemas/SearchResult_inner'
-      type: array
+      example:
+        metadata:
+          isomer_count: 0
+          git_commit: git_commit
+          compound_count: 0
+          spectra_count: 0
+          limit: 1
+          page: 1
+          version: version
+          result_count: 0
+          timestamp: timestamp
+        data:
+        - spectra:
+          - id: id
+            title: title
+          - id: id
+            title: title
+          data: "{}"
+          smiles: smiles
+          mass: 7.061401241503109
+          name: name
+          formula: formula
+        - spectra:
+          - id: id
+            title: title
+          - id: id
+            title: title
+          data: "{}"
+          smiles: smiles
+          mass: 7.061401241503109
+          name: name
+          formula: formula
+      properties:
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        data:
+          description: A list of compounds with associated spectra.
+          items:
+            $ref: '#/components/schemas/SearchResult_data_inner'
+          type: array
+      type: object
     MBRecord:
       example:
         date:
@@ -682,7 +719,7 @@ components:
       items:
         $ref: '#/components/schemas/MsDataProcessing_inner'
       type: array
-    SearchResult_inner_spectra_inner:
+    SearchResult_data_inner_spectra_inner:
       description: Spectra for the given compound
       example:
         id: id
@@ -695,7 +732,7 @@ components:
           description: MassBank ID.
           type: string
       type: object
-    SearchResult_inner:
+    SearchResult_data_inner:
       description: Data for a single compound.
       example:
         spectra:
@@ -703,24 +740,12 @@ components:
           title: title
         - id: id
           title: title
-        metadata:
-          isomer_count: 0
-          git_commit: git_commit
-          compound_count: 0
-          spectra_count: 0
-          limit: 1
-          page: 1
-          version: version
-          result_count: 0
-          timestamp: timestamp
         data: "{}"
         smiles: smiles
         mass: 7.061401241503109
         name: name
         formula: formula
       properties:
-        metadata:
-          $ref: '#/components/schemas/Metadata'
         data:
           type: object
         name:
@@ -739,7 +764,7 @@ components:
         spectra:
           description: A list of spectra for the compound
           items:
-            $ref: '#/components/schemas/SearchResult_inner_spectra_inner'
+            $ref: '#/components/schemas/SearchResult_data_inner_spectra_inner'
           type: array
       type: object
     MBRecord_deprecated:
