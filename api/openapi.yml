@@ -128,6 +128,38 @@ paths:
             application/json:
               schema:
                 $ref: "./schemas/MBRecord.yaml"
-
+  /filter/options:
+    get:
+      summary: get filter options
+      operationId: getFilterOptions
+      responses:
+        '200':
+          description: "All Filter options"
+          content:
+            application/json:
+              schema:
+                $ref: "./schemas/FilterOptions.yaml#/components/schemas/FilterOptions"
+  /filter/browse:
+    get:
+      summary: get browse options
+      operationId: getBrowseOptions
+      responses:
+        '200':
+          description: "All browse options"
+          content:
+            application/json:
+              schema:
+                $ref: "./schemas/FilterOptions.yaml#/components/schemas/BrowseOptions"
+  /metadata:
+    get:
+      summary: get massbank metadata
+      operationId: getMetadata
+      responses:
+        '200':
+          description: "Metadata for database and datasets"
+          content:
+            application/json:
+              schema:
+                $ref: "./schemas/FilterOptions.yaml#/components/schemas/Metadata"
 
 

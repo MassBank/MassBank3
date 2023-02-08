@@ -18,6 +18,9 @@ import (
 // The DefaultApiRouter implementation should parse necessary information from the http request,
 // pass the data to a DefaultApiServicer to perform the required actions, then write the service results to the http response.
 type DefaultApiRouter interface {
+	GetBrowseOptions(http.ResponseWriter, *http.Request)
+	GetFilterOptions(http.ResponseWriter, *http.Request)
+	GetMetadata(http.ResponseWriter, *http.Request)
 	GetRecord(http.ResponseWriter, *http.Request)
 	GetRecords(http.ResponseWriter, *http.Request)
 }
@@ -27,6 +30,9 @@ type DefaultApiRouter interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type DefaultApiServicer interface {
+	GetBrowseOptions(context.Context) (ImplResponse, error)
+	GetFilterOptions(context.Context) (ImplResponse, error)
+	GetMetadata(context.Context) (ImplResponse, error)
 	GetRecord(context.Context, string) (ImplResponse, error)
-	GetRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, int32, string) (ImplResponse, error)
+	GetRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, int32, int32, string) (ImplResponse, error)
 }

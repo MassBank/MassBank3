@@ -115,6 +115,13 @@ paths:
         schema:
           $ref: '#/components/schemas/Limit'
         style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          $ref: '#/components/schemas/Page'
+        style: form
       - description: "The Instensity cutoff for Peaklist search. Default: 5"
         explode: true
         in: query
@@ -159,6 +166,39 @@ paths:
                 $ref: '#/components/schemas/MBRecord'
           description: A MassBank record
       summary: Get a MassBank record
+  /filter/options:
+    get:
+      operationId: getFilterOptions
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilterOptions'
+          description: All Filter options
+      summary: get filter options
+  /filter/browse:
+    get:
+      operationId: getBrowseOptions
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrowseOptions'
+          description: All browse options
+      summary: get browse options
+  /metadata:
+    get:
+      operationId: getMetadata
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+          description: Metadata for database and datasets
+      summary: get massbank metadata
 components:
   schemas:
     InstrumentType:
@@ -216,6 +256,10 @@ components:
     Limit:
       default: 20
       maximum: 500
+      minimum: 1
+      type: integer
+    Page:
+      default: 1
       minimum: 1
       type: integer
     IntensityCutoff:
@@ -401,6 +445,139 @@ components:
       - date
       - license
       - title
+      type: object
+    FilterOptions:
+      example:
+        intensity:
+          maximum: 7
+          minimum: 2
+        max_limit: 1
+        metadata:
+          isomer_count: 1
+          git_commit: git_commit
+          compound_count: 6
+          spectra_count: 0
+          version: version
+          timestamp: timestamp
+        ms_type:
+        - ms_type
+        - ms_type
+        mass:
+          maximum: 5.637376656633329
+          minimum: 5.962133916683182
+        ion_mode:
+        - ion_mode
+        - ion_mode
+        instrument_type:
+        - instrument_type
+        - instrument_type
+      properties:
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        instrument_type:
+          items:
+            type: string
+          type: array
+        ms_type:
+          items:
+            type: string
+          type: array
+        ion_mode:
+          items:
+            type: string
+          type: array
+        mass:
+          $ref: '#/components/schemas/FilterOptions_mass'
+        intensity:
+          $ref: '#/components/schemas/FilterOptions_intensity'
+        max_limit:
+          minimum: 1
+          type: integer
+      type: object
+    Metadata:
+      example:
+        isomer_count: 1
+        git_commit: git_commit
+        compound_count: 6
+        spectra_count: 0
+        version: version
+        timestamp: timestamp
+      properties:
+        version:
+          type: string
+        timestamp:
+          type: string
+        git_commit:
+          type: string
+        spectra_count:
+          type: integer
+        compound_count:
+          type: integer
+        isomer_count:
+          type: integer
+      type: object
+    BrowseOptions:
+      example:
+        metadata:
+          isomer_count: 1
+          git_commit: git_commit
+          compound_count: 6
+          spectra_count: 0
+          version: version
+          timestamp: timestamp
+        compound_start:
+          values:
+          - values
+          - values
+          count: 0
+        contributor:
+          values:
+          - values
+          - values
+          count: 0
+        ms_type:
+          values:
+          - values
+          - values
+          count: 0
+        ion_mode:
+          values:
+          - values
+          - values
+          count: 0
+        instrument_type:
+          values:
+          - values
+          - values
+          count: 0
+      properties:
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        contributor:
+          $ref: '#/components/schemas/StringCount'
+        instrument_type:
+          $ref: '#/components/schemas/StringCount'
+        ms_type:
+          $ref: '#/components/schemas/StringCount'
+        ion_mode:
+          $ref: '#/components/schemas/StringCount'
+        compound_start:
+          $ref: '#/components/schemas/StringCount'
+      type: object
+    StringCount:
+      example:
+        values:
+        - values
+        - values
+        count: 0
+      properties:
+        values:
+          items:
+            type: string
+          type: array
+        count:
+          minimum: 0
+          type: integer
       type: object
     Authors:
       items:
@@ -879,6 +1056,32 @@ components:
       - numPeak
       - peak
       - splash
+      type: object
+    FilterOptions_mass:
+      example:
+        maximum: 5.637376656633329
+        minimum: 5.962133916683182
+      properties:
+        minimum:
+          default: 0
+          format: double
+          type: number
+        maximum:
+          default: 10000
+          format: double
+          type: number
+      type: object
+    FilterOptions_intensity:
+      example:
+        maximum: 7
+        minimum: 2
+      properties:
+        minimum:
+          default: 0
+          type: integer
+        maximum:
+          default: 100
+          type: integer
       type: object
     Authors_inner:
       description: Name of the author or affiliation

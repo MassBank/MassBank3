@@ -50,6 +50,24 @@ func NewDefaultApiController(s DefaultApiServicer, opts ...DefaultApiOption) Rou
 func (c *DefaultApiController) Routes() Routes {
 	return Routes{
 		{
+			"GetBrowseOptions",
+			strings.ToUpper("Get"),
+			"/v1/filter/browse",
+			c.GetBrowseOptions,
+		},
+		{
+			"GetFilterOptions",
+			strings.ToUpper("Get"),
+			"/v1/filter/options",
+			c.GetFilterOptions,
+		},
+		{
+			"GetMetadata",
+			strings.ToUpper("Get"),
+			"/v1/metadata",
+			c.GetMetadata,
+		},
+		{
 			"GetRecord",
 			strings.ToUpper("Get"),
 			"/v1/records/{accession}",
@@ -62,6 +80,45 @@ func (c *DefaultApiController) Routes() Routes {
 			c.GetRecords,
 		},
 	}
+}
+
+// GetBrowseOptions - get browse options
+func (c *DefaultApiController) GetBrowseOptions(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetBrowseOptions(r.Context())
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+
+}
+
+// GetFilterOptions - get filter options
+func (c *DefaultApiController) GetFilterOptions(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetFilterOptions(r.Context())
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+
+}
+
+// GetMetadata - get massbank metadata
+func (c *DefaultApiController) GetMetadata(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetMetadata(r.Context())
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+
 }
 
 // GetRecord - Get a MassBank record
@@ -107,13 +164,18 @@ func (c *DefaultApiController) GetRecords(w http.ResponseWriter, r *http.Request
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
+	pageParam, err := parseInt32Parameter(query.Get("page"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
 	intensityCutoffParam, err := parseInt32Parameter(query.Get("intensity_cutoff"), false)
 	if err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
 	inchiKeyParam := query.Get("inchi_key")
-	result, err := c.service.GetRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, limitParam, intensityCutoffParam, inchiKeyParam)
+	result, err := c.service.GetRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, limitParam, pageParam, intensityCutoffParam, inchiKeyParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
