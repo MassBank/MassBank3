@@ -1177,7 +1177,6 @@ components:
           enum:
           - MS_TYPE
           - ION_MODE
-          - CAPILLARY_VOLTAGE
           - COLLISION_ENERGY
           - COLLISION_GAS
           - DATE

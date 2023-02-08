@@ -84,6 +84,10 @@ paths:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Limit"
         required: false
       - in: query
+        name: page
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Page"
+      - in: query
         name: intensity_cutoff
         description: "The Instensity cutoff for Peaklist search. Default: 5"
         schema:

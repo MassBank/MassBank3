@@ -10,9 +10,13 @@ const deprecatedDateFormat = "2006-01-02"
 
 var lastTag string
 
+type MbMetaData struct {
+	Commit    string
+	Version   string
+	Timestamp string
+}
+
 type Property interface {
-	Validate() (bool, error)
-	Output() string
 	Parse(string) error
 }
 
@@ -20,13 +24,13 @@ type DefaultProperty struct {
 }
 
 type StringProperty struct {
-	string
+	String string
 	DefaultProperty
 }
 
 type SubtagProperty struct {
 	StringProperty
-	subtag string
+	Subtag string
 }
 
 type DatabaseProperty struct {
@@ -43,9 +47,12 @@ type tagProperties struct {
 
 var TagMap = map[string]tagProperties{}
 
+type MbReference string
+
 type Massbank struct {
-	File struct {
-		FileName string
+	Metadata struct {
+		FileName   string
+		VersionRef MbReference
 	}
 	Accession   *RecordAccession   `mb2:"ACCESSION"`
 	Deprecated  *RecordDeprecated  `mb2:"DEPRECATED" optional:"true"`

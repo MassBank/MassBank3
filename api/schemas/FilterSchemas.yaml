@@ -58,3 +58,7 @@ components:
       default: 20
     InChIKey:
       type: string
+    Page:
+      type: integer
+      minimum: 1
+      default: 1

@@ -105,7 +105,7 @@ func (c *{{classname}}Controller) {{nickname}}(w http.ResponseWriter, r *http.Re
 	{{^isLong}}
 	{{^isInteger}}
 	{{paramName}}Param := {{#routers}}{{#mux}}params["{{baseName}}"]{{/mux}}{{#chi}}chi.URLParam(r, "{{baseName}}"){{/chi}}{{/routers}}
-    {{/isInteger}}{{/isLong}}
+	{{/isInteger}}{{/isLong}}
 	{{/isPathParam}}
 	{{#isQueryParam}}
 	{{#isLong}}
@@ -130,7 +130,7 @@ func (c *{{classname}}Controller) {{nickname}}(w http.ResponseWriter, r *http.Re
 	}
     {{/isDouble}}
 	{{#isBoolean}}
-	{{paramName}}Param, err := parseBoolParameter(query.Get("{{baseName}}"))
+	{{paramName}}Param, err := parseBoolParameter(query.Get("{{baseName}}"), {{required}})
 	if err != nil {
 		w.WriteHeader(500)
 		return
@@ -153,9 +153,7 @@ func (c *{{classname}}Controller) {{nickname}}(w http.ResponseWriter, r *http.Re
 	{{/items.isInteger}}
 	{{^items.isLong}}
 	{{^items.isInteger}}
-
-    {{paramName}}Param := strings.Split(query.Get("{{baseName}}"), ",")
-
+	{{paramName}}Param := strings.Split(query.Get("{{baseName}}"), ",")
 	{{/items.isInteger}}
 	{{/items.isLong}}
 	{{/isArray}}

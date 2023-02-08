@@ -16,3 +16,4 @@ gitUserId: MassBank
 gitRepoId: MassBank3/cmd/mb3server
 enablePostProcessFile: true
 generateAliasAsModel: false
+hideGenerationTimestamp: true
