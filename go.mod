@@ -7,6 +7,7 @@ require github.com/go-chi/chi/v5 v5.0.3
 require (
 	github.com/go-chi/cors v1.2.0
 	github.com/go-git/go-git/v5 v5.5.2
+	github.com/lib/pq v1.10.7
 	go.mongodb.org/mongo-driver v1.11.1
 	golang.org/x/net v0.2.0
 )

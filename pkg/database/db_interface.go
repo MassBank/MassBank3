@@ -5,7 +5,15 @@ import "github.com/MassBank/MassBank3/pkg/massbank"
 type Filters struct {
 }
 
+type DatabaseType int
+
+const (
+	MongoDB  DatabaseType = 0
+	Postgres              = 1
+)
+
 type DBConfig struct {
+	Database  DatabaseType
 	DbUser    string
 	DbPwd     string
 	DbHost    string

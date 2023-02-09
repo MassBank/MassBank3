@@ -27,10 +27,11 @@ type config struct {
 }
 
 const (
+	DB_DEFAULT                = "postgres"
 	DB_USER_DEFAULT           = "massbank3"
 	DB_PASSWORD_DEFAULT       = "massbank3password"
 	DB_HOST_DEFAULT           = "localhost"
-	DB_PORT_DEFAULT           = "27017"
+	DB_PORT_DEFAULT           = "0"
 	DB_NAME_DEFAULT           = "massbank3"
 	DB_CONN_STRING_DEFAULT    = ""
 	MB_GIT_REPO_DEFAULT       = "https://github.com/MassBank/MassBank-data"
@@ -42,9 +43,13 @@ func main() {
 	var userConfig = getConfig()
 	var db database.MB3Database
 	var err error
-	db, err = database.NewMongoDB(userConfig.DBConfig)
-	if err != nil {
-		panic(err)
+	if userConfig.Database == database.MongoDB {
+		db, err = database.NewMongoDB(userConfig.DBConfig)
+		if err != nil {
+			panic(err)
+		}
+	} else if userConfig.Database == database.Postgres {
+		db = database.NewPostgresSQLDb(userConfig.DBConfig)
 	}
 	err = db.Connect()
 	if err != nil {
@@ -105,12 +110,14 @@ func getConfig() config {
 	c.gitRepo = getEnv("MB_GIT_REPO", MB_GIT_REPO_DEFAULT)
 	c.gitBranch = getEnv("MB_GIT_BRANCH", MB_GIT_BRANCH_DEFAULT)
 	c.dataDir = getEnv("MB_DATA_DIRECTORY", MB_DATA_DIRECTORY_DEFAULT)
+	var databaseType = getEnv("DB_TYPE", DB_DEFAULT)
 	var dbPortEnv = getEnv("DB_PORT", DB_PORT_DEFAULT)
 	dbPort, err := strconv.ParseUint(dbPortEnv, 10, 16)
 	if err != nil {
 		panic(errors.New("Could not read port variable: DB_PORT=" + dbPortEnv))
 	}
 	c.DbPort = uint(dbPort)
+	flag.StringVar(&databaseType, "db_type", databaseType, "Database type must be postgres or mongodb. Overwrites environment variable DB_DEFAULT")
 	flag.StringVar(&c.DbUser, "user", c.DbUser, "database user name. Overwrites environment variable DB_USER")
 	flag.StringVar(&c.DbPwd, "pwd", c.DbPwd, "database user password. Overwrites environment variable DB_PASSWORD")
 	flag.StringVar(&c.DbHost, "host", c.DbHost, "database host. Overwrites environment variable DB_HOST")
@@ -121,6 +128,20 @@ func getConfig() config {
 	flag.StringVar(&c.gitBranch, "branch", c.gitBranch, "git branch. Overwrites environment variable MB_GIT_BRANCH")
 	flag.StringVar(&c.dataDir, "dir", c.dataDir, "data directory. Overwrites environment variable MB_DATA_DIRECTORY")
 	flag.Parse()
+	if databaseType == "postgres" {
+		c.Database = database.Postgres
+	} else if databaseType == "mongodb" {
+		c.Database = database.MongoDB
+	} else {
+		panic("Database must be postgres or mongodb")
+	}
+	if c.DbPort == 0 {
+		if c.Database == database.Postgres {
+			c.DbPort = 5432
+		} else {
+			c.DbPort = 27017
+		}
+	}
 	if len(c.gitRepo) > 0 && len(c.dataDir) > 0 {
 		println("Git repo and data directory are set. Using data directory as default and git repo as fallback.")
 	}
