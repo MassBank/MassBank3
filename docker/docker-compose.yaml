@@ -25,3 +25,6 @@ services:
     environment:
       MONGO_URI: "mongodb://${MONGODB_USER}:${MONGODB_PWD}@mongo:27017"
       MONGO_DB_NAME: "massbank3"
+    depends_on:
+      - mongodb
+      - postgres
