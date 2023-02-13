@@ -1,12 +1,12 @@
 package database
 
 import (
-	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/MassBank/MassBank3/pkg/massbank"
+	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"strconv"
 )
@@ -19,6 +19,31 @@ type PostgresSQLDB struct {
 	port       uint
 	connString string
 	database   *sql.DB
+}
+
+func (p *PostgresSQLDB) DropAllRecords() error {
+	var err error
+	if err = p.CheckDatabase(); err != nil {
+		return err
+	}
+	q := "DROP TABLE massbank;"
+	_, err = p.database.Exec(q)
+	if err != nil {
+		return err
+	}
+	q = "DROP TABLE metadata;"
+	_, err = p.database.Exec(q)
+	if err != nil {
+		return err
+	}
+	return p.init()
+}
+
+func (p *PostgresSQLDB) CheckDatabase() error {
+	if p.database == nil {
+		return errors.New("database not ready")
+	}
+	return p.database.Ping()
 }
 
 func NewPostgresSQLDb(config DBConfig) *PostgresSQLDB {
@@ -42,21 +67,15 @@ func (p *PostgresSQLDB) Connect() error {
 		return err
 	}
 	p.database = db
+	if err = p.CheckDatabase(); err != nil {
+		return err
+	}
 	return p.init()
 }
 
 func (p *PostgresSQLDB) init() error {
-	conn, err := p.database.Conn(context.Background())
-	println(conn)
-	if err := p.database.Ping(); err != nil {
-		return err
-	}
-	q := "DROP TABLE massbank;"
-	_, err = p.database.Exec(q)
-
-	q = "DROP TABLE metadata;"
-	_, err = p.database.Exec(q)
-	q = `
+	var err error
+	q := `
 		CREATE TABLE IF NOT EXISTS metadata
 			(id INT GENERATED ALWAYS AS IDENTITY,
 			commit char(40),
@@ -84,6 +103,9 @@ func (p *PostgresSQLDB) init() error {
 }
 
 func (p *PostgresSQLDB) Disconnect() error {
+	if err := p.CheckDatabase(); err != nil {
+		return err
+	}
 	if p.database == nil {
 		return errors.New("database not set")
 	}
@@ -101,10 +123,15 @@ func (p *PostgresSQLDB) GetRecords(filters Filters, limit uint64) ([]*massbank.M
 }
 
 func (p *PostgresSQLDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error) {
+	if err := p.CheckDatabase(); err != nil {
+		return "", err
+	}
 	var id = 0
-	err := p.database.QueryRow(
-		"INSERT INTO metadata(commit,timestamp,version) VALUES  ($1,$2,$3)  "+
-			"ON CONFLICT DO NOTHING RETURNING id;", meta.Commit, meta.Timestamp, meta.Version).Scan(&id)
+	q := `INSERT INTO metadata(commit,timestamp,version) 
+			VALUES  ($1,$2,$3)  
+			ON CONFLICT DO NOTHING 
+			RETURNING id;`
+	err := p.database.QueryRow(q, meta.Commit, meta.Timestamp, meta.Version).Scan(&id)
 	return strconv.Itoa(id), err
 
 }
@@ -115,11 +142,19 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.Massbank, metaDataId string) 
 }
 
 func (p *PostgresSQLDB) AddRecords(records []*massbank.Massbank, metaDataId string) error {
+	if err := p.CheckDatabase(); err != nil {
+		return err
+	}
 	tx, err := p.database.Begin()
 	if err != nil {
 		return err
 	}
-	pStmt, err := tx.Prepare("INSERT INTO massbank(filename,document,metadataid) VALUES ($1,$2,$3);")
+	q := `INSERT INTO massbank(
+                     filename,
+                     document,
+                     metadataid) 
+			VALUES ($1,$2,$3);`
+	pStmt, err := tx.Prepare(q)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -156,9 +191,16 @@ func (p *PostgresSQLDB) UpdateRecords(records []*massbank.Massbank, metaDataId s
 }
 
 func (p *PostgresSQLDB) IsEmpty() (bool, error) {
+	var err error
+	if err = p.CheckDatabase(); err != nil {
+		return false, err
+	}
 	var count uint
 	res := p.database.QueryRow(`SELECT COUNT(*) FROM massbank;`)
-	err := res.Scan(&count)
+	err = res.Scan(&count)
+	if err != nil && err.(*pq.Error).Code == "42P01" {
+		return true, nil
+	}
 	if err != nil {
 		return false, err
 	}

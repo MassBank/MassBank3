@@ -24,6 +24,7 @@ type config struct {
 	gitRepo   string
 	gitBranch string
 	dataDir   string
+	drop      bool
 }
 
 const (
@@ -37,6 +38,7 @@ const (
 	MB_GIT_REPO_DEFAULT       = "https://github.com/MassBank/MassBank-data"
 	MB_GIT_BRANCH_DEFAULT     = "main"
 	MB_DATA_DIRECTORY_DEFAULT = ""
+	MB_DROP_ALL_DEFAULT       = "true"
 )
 
 func main() {
@@ -52,6 +54,12 @@ func main() {
 		db = database.NewPostgresSQLDb(userConfig.DBConfig)
 	}
 	err = db.Connect()
+	if userConfig.drop {
+		err := db.DropAllRecords()
+		if err != nil {
+			println(err.Error())
+		}
+	}
 	if err != nil {
 		panic(err)
 	}
@@ -102,6 +110,7 @@ func getEnv(name string, fallback string) string {
 
 func getConfig() config {
 	var c = config{}
+	var err error
 	c.DbUser = getEnv("DB_USER", DB_USER_DEFAULT)
 	c.DbPwd = getEnv("DB_PASSWORD", DB_PASSWORD_DEFAULT)
 	c.DbHost = getEnv("DB_HOST", DB_HOST_DEFAULT)
@@ -110,9 +119,15 @@ func getConfig() config {
 	c.gitRepo = getEnv("MB_GIT_REPO", MB_GIT_REPO_DEFAULT)
 	c.gitBranch = getEnv("MB_GIT_BRANCH", MB_GIT_BRANCH_DEFAULT)
 	c.dataDir = getEnv("MB_DATA_DIRECTORY", MB_DATA_DIRECTORY_DEFAULT)
+	var drop = getEnv("MB_DROP_ALL", MB_DROP_ALL_DEFAULT)
+	c.drop, err = strconv.ParseBool(drop)
+	if err != nil {
+		println(err.Error())
+	}
 	var databaseType = getEnv("DB_TYPE", DB_DEFAULT)
 	var dbPortEnv = getEnv("DB_PORT", DB_PORT_DEFAULT)
-	dbPort, err := strconv.ParseUint(dbPortEnv, 10, 16)
+	var dbPort uint64
+	dbPort, err = strconv.ParseUint(dbPortEnv, 10, 16)
 	if err != nil {
 		panic(errors.New("Could not read port variable: DB_PORT=" + dbPortEnv))
 	}
@@ -127,6 +142,7 @@ func getConfig() config {
 	flag.StringVar(&c.gitRepo, "git", c.gitRepo, "git repository. Overwrites environment variable MB_GIT_REPO")
 	flag.StringVar(&c.gitBranch, "branch", c.gitBranch, "git branch. Overwrites environment variable MB_GIT_BRANCH")
 	flag.StringVar(&c.dataDir, "dir", c.dataDir, "data directory. Overwrites environment variable MB_DATA_DIRECTORY")
+	flag.BoolVar(&c.drop, "dropall", c.drop, "drop all data. Overwrites environment variable MB_DROP_ALL")
 	flag.Parse()
 	if databaseType == "postgres" {
 		c.Database = database.Postgres

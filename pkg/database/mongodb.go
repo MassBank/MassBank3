@@ -27,6 +27,11 @@ type Mb3MongoDB struct {
 	dirty    bool
 }
 
+func (db *Mb3MongoDB) DropAllRecords() error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (db *Mb3MongoDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error) {
 	if db.database == nil {
 		return "", errors.New("database not ready")

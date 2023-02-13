@@ -25,6 +25,7 @@ type DBConfig struct {
 type MB3Database interface {
 	Connect() error
 	Disconnect() error
+	DropAllRecords() error
 	GetRecord(*string) (*massbank.Massbank, error)
 	GetRecords(filters Filters, limit uint64) ([]*massbank.Massbank, error)
 	UpdateMetadata(meta *massbank.MbMetaData) (string, error)
