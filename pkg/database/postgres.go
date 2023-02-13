@@ -53,11 +53,13 @@ func NewPostgresSQLDb(config DBConfig) *PostgresSQLDB {
 		password:   config.DbPwd,
 		host:       config.DbHost,
 		port:       config.DbPort,
-		connString: "",
+		connString: config.DbConnStr,
 		database:   nil,
 	}
-	postgres.connString = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		config.DbHost, config.DbPort, config.DbUser, config.DbPwd, config.DbName)
+	if len(config.DbConnStr) < 1 {
+		postgres.connString = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+			config.DbHost, config.DbPort, config.DbUser, config.DbPwd, config.DbName)
+	}
 	return &postgres
 }
 
@@ -95,9 +97,20 @@ func (p *PostgresSQLDB) init() error {
 			 filename VARCHAR, 
 			 document jsonb,
 			 metadataId INT,
-			 FOREIGN KEY  (metadataId) REFERENCES metadata(id), 
-			 PRIMARY KEY (id))
+			 FOREIGN KEY  (metadataId) REFERENCES metadata(id))
  	`
+	_, err = p.database.Exec(q)
+	if err != nil {
+		return err
+	}
+	q = `
+		CREATE INDEX ON massbank((document->'Accession'))`
+	_, err = p.database.Exec(q)
+	if err != nil {
+		return err
+	}
+	q = `
+		CREATE UNIQUE INDEX ON massbank((document->'Accession'),metadataid)`
 	_, err = p.database.Exec(q)
 	return err
 }
@@ -132,13 +145,17 @@ func (p *PostgresSQLDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error
 			ON CONFLICT DO NOTHING 
 			RETURNING id;`
 	err := p.database.QueryRow(q, meta.Commit, meta.Timestamp, meta.Version).Scan(&id)
+	if err != nil {
+		err = p.database.QueryRow("SELECT id FROM metadata WHERE commit = $1 AND timestamp = $2 AND  version = $3", meta.Commit, meta.Timestamp, meta.Version).Scan(&id)
+
+	}
 	return strconv.Itoa(id), err
 
 }
 
 func (p *PostgresSQLDB) AddRecord(record *massbank.Massbank, metaDataId string) error {
-	//TODO implement me
-	panic("implement me")
+	records := []*massbank.Massbank{record}
+	return p.AddRecords(records, metaDataId)
 }
 
 func (p *PostgresSQLDB) AddRecords(records []*massbank.Massbank, metaDataId string) error {
@@ -181,13 +198,79 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.Massbank, metaDataId stri
 }
 
 func (p *PostgresSQLDB) UpdateRecord(record *massbank.Massbank, metaDataId string, upsert bool) (uint64, uint64, error) {
-	//TODO implement me
-	panic("implement me")
+	records := []*massbank.Massbank{record}
+	return p.UpdateRecords(records, metaDataId, upsert)
 }
 
 func (p *PostgresSQLDB) UpdateRecords(records []*massbank.Massbank, metaDataId string, upsert bool) (uint64, uint64, error) {
-	//TODO implement me
-	panic("implement me")
+	var err error
+	if err = p.CheckDatabase(); err != nil {
+		return 0, 0, err
+	}
+	tx, err := p.database.Begin()
+	if err != nil {
+		return 0, 0, err
+	}
+	mid, err := strconv.ParseInt(metaDataId, 10, 64)
+	if err != nil {
+		return 0, 0, err
+	}
+	var inserted int64 = 0
+	var modified int64 = 0
+	var last int64 = 0
+	var q string
+	if upsert {
+		q = `
+		INSERT INTO massbank(
+                     filename,
+                     document,
+                     metadataid)
+			VALUES ($1,$2,$3)
+			ON CONFLICT ((document->'Accession'),metadataid) DO UPDATE 
+				SET filename = $1,
+				    document = $2;
+		`
+
+	} else {
+		q = `
+		UPDATE massbank 
+			SET filename = $1,
+			    document = $2
+			WHERE (document->'Accession') == $3 
+			  AND  metadataid= $3 `
+	}
+	stmt, err := tx.Prepare(q)
+	if err != nil {
+		return 0, 0, err
+	}
+	for _, r := range records {
+		js, err := json.Marshal(r)
+		if err != nil {
+			tx.Rollback()
+			return uint64(modified), uint64(inserted), err
+		}
+		var res sql.Result
+		if upsert {
+			res, err = stmt.Exec(r.Metadata.FileName, js, mid)
+		} else {
+			res, err = stmt.Exec(r.Metadata.FileName, js, mid, r.Accession.String)
+		}
+		if err != nil {
+			println(err.Error())
+		}
+		if res != nil {
+			mod, _ := res.RowsAffected()
+			modified += mod
+			l, _ := res.LastInsertId()
+			if last != l {
+				last = l
+				inserted += 1
+			}
+		}
+
+	}
+	return uint64(modified), uint64(inserted), tx.Commit()
+
 }
 
 func (p *PostgresSQLDB) IsEmpty() (bool, error) {

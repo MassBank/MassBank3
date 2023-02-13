@@ -28,8 +28,10 @@ type Mb3MongoDB struct {
 }
 
 func (db *Mb3MongoDB) DropAllRecords() error {
-	//TODO implement me
-	panic("implement me")
+	if err := db.database.Drop(context.Background()); err != nil {
+		return err
+	}
+	return db.init()
 }
 
 func (db *Mb3MongoDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error) {

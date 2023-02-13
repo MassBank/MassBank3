@@ -82,6 +82,9 @@ func main() {
 		println(err.Error())
 	}
 	metaId, err := db.UpdateMetadata(versionData)
+	if err != nil {
+		panic(err)
+	}
 	if empty {
 		err = db.AddRecords(mbfiles, metaId)
 		if err != nil {
