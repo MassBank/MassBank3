@@ -6,16 +6,16 @@ services:
     image: mongo:latest
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PWD}
+      MONGO_INITDB_ROOT_USERNAME: "mbtestuser"
+      MONGO_INITDB_ROOT_PASSWORD: "mbtestpwd"
 
   testpostgres:
     image: postgres:latest
     restart: always
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PWD}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_DB: ${POSTGRES_DB_NAME}
+      POSTGRES_PASSWORD: "mbtestpwd"
+      POSTGRES_USER:     "mbtestuser"
+      POSTGRES_DB:       "mbtestdb"
 
   mb3test:
     build:

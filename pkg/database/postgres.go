@@ -78,20 +78,25 @@ func NewPostgresSQLDb(config DBConfig) (*PostgresSQLDB, error) {
 }
 
 func (p *PostgresSQLDB) Connect() error {
-	db, err := sql.Open("postgres", p.connString)
-	if err != nil {
-		return err
+	if p.database != nil {
+		return errors.New("database already connected")
 	}
-	p.database = db
-	if err = p.CheckDatabase(); err != nil {
+	if db, err := sql.Open("postgres", p.connString); err != nil {
 		return err
+	} else {
+		if err := db.Ping(); err != nil {
+			return err
+		} else {
+			p.database = db
+		}
 	}
 	return p.init()
 }
 
 func (p *PostgresSQLDB) init() error {
 	var err error
-	q := `
+	var queries = []string{
+		`
 		CREATE TABLE IF NOT EXISTS metadata
 			(id INT GENERATED ALWAYS AS IDENTITY,
 			commit char(40),
@@ -99,44 +104,35 @@ func (p *PostgresSQLDB) init() error {
 			version varchar(10) NOT NULL,
 		    PRIMARY KEY (id),
 		    UNIQUE (commit,timestamp,version))
-		
-	`
-	_, err = p.database.Exec(q)
-	if err != nil {
-		return err
-	}
-	q = `
+		`,
+		`
 		CREATE TABLE IF NOT EXISTS massbank 
 			(id INT GENERATED ALWAYS AS IDENTITY, 
 			 filename VARCHAR, 
 			 document jsonb,
 			 metadataId INT,
 			 FOREIGN KEY  (metadataId) REFERENCES metadata(id))
- 	`
-	_, err = p.database.Exec(q)
-	if err != nil {
-		return err
+ 		`,
+		`CREATE INDEX IF NOT EXISTS mb_accession_idx ON massbank((document->'Accession'))`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS mb_accession_metadata_idx ON massbank((document->'Accession'),metadataid)`,
 	}
-	q = `
-		CREATE INDEX ON massbank((document->'Accession'))`
-	_, err = p.database.Exec(q)
-	if err != nil {
-		return err
+	for _, q := range queries {
+		if _, err = p.database.Exec(q); err != nil {
+			return err
+		}
 	}
-	q = `
-		CREATE UNIQUE INDEX ON massbank((document->'Accession'),metadataid)`
-	_, err = p.database.Exec(q)
-	return err
+	return nil
 }
 
 func (p *PostgresSQLDB) Disconnect() error {
-	if err := p.CheckDatabase(); err != nil {
-		return err
-	}
 	if p.database == nil {
 		return errors.New("database not set")
 	}
-	return p.database.Close()
+	if err := p.database.Close(); err != nil {
+		return err
+	}
+	p.database = nil
+	return nil
 }
 
 func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.Massbank, error) {

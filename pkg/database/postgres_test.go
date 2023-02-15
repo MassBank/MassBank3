@@ -21,6 +21,140 @@ func run(m *testing.M) (code int, err error) {
 	return m.Run(), nil
 }
 
+func TestNewPostgresSQLDb(t *testing.T) {
+	type args struct {
+		config DBConfig
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    MB3Database
+		wantErr bool
+	}{
+		{
+			"Working config",
+			args{TestDbConfigs["workingPostgres"]},
+			TestDbConfigPostgres["working"],
+			false,
+		},
+		{
+			"Working config with connection string",
+			args{TestDbConfigs["workingPostgresConnString"]},
+			TestDbConfigPostgres["workingConnString"],
+			false,
+		},
+		{
+			"Valid wrong config",
+			args{TestDbConfigs["wrongPostgres"]},
+			TestDbConfigPostgres["wrongHost"],
+			false,
+		},
+		{
+			"MongoDb config",
+			args{TestDbConfigs["workingMongo"]},
+			nil,
+			true,
+		},
+		{
+			"Empty config",
+			args{TestDbConfigs["emptyPostgres"]},
+			nil,
+			true,
+		},
+		{
+			"Config with host only",
+			args{TestDbConfigs["onlyHostPostgres"]},
+			nil,
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got, err := NewPostgresSQLDb(tt.args.config); (tt.want != nil && !reflect.DeepEqual(got, tt.want)) || (err != nil) != tt.wantErr {
+				t.Errorf("NewPostgresSQLDb() = %v, want %v, error %v, wantErr %v", got, tt.want, err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestPostgresSQLDB_Connect(t *testing.T) {
+	tests := []struct {
+		name    string
+		db      MB3Database
+		wantErr bool
+	}{
+		{"working",
+			TestDbConfigPostgres["working"],
+			false,
+		},
+		{"connString working",
+			TestDbConfigPostgres["workingConnString"],
+			false,
+		},
+		{
+			"wrongHost",
+			TestDbConfigPostgres["wrongHost"],
+			true,
+		},
+		{"workingMongo",
+			TestDbConfigPostgres["workingMongo"],
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.db.Connect(); (err != nil) != tt.wantErr {
+				t.Errorf("Connect() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestPostgresSQLDB_Disconnect(t *testing.T) {
+	tests := []struct {
+		name    string
+		db      MB3Database
+		wantErr bool
+	}{
+		{"working",
+			TestDbConfigPostgres["working"],
+			false,
+		},
+		{"working again",
+			TestDbConfigPostgres["working"],
+			true,
+		},
+		{"connString working",
+			TestDbConfigPostgres["workingConnString"],
+			false,
+		},
+		{"connString working again",
+			TestDbConfigPostgres["workingConnString"],
+			true,
+		},
+		{
+			"wrongHost",
+			TestDbConfigPostgres["wrongHost"],
+			true,
+		},
+		{"workingMongo",
+			TestDbConfigPostgres["workingMongo"],
+			false,
+		},
+		{"workingMongo again",
+			TestDbConfigPostgres["workingMongo"],
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.db.Disconnect(); (err != nil) != tt.wantErr {
+				t.Errorf("Disconnect() error = %v, wantErr %v, db %v", err, tt.wantErr, tt.db)
+			}
+		})
+	}
+}
+
 func TestPostgresSQLDB_AddRecord(t *testing.T) {
 	type fields struct {
 		user       string
@@ -131,76 +265,6 @@ func TestPostgresSQLDB_CheckDatabase(t *testing.T) {
 			}
 			if err := p.CheckDatabase(); (err != nil) != tt.wantErr {
 				t.Errorf("CheckDatabase() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestPostgresSQLDB_Connect(t *testing.T) {
-	type fields struct {
-		user       string
-		dbname     string
-		password   string
-		host       string
-		port       uint
-		connString string
-		database   *sql.DB
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &PostgresSQLDB{
-				user:       tt.fields.user,
-				dbname:     tt.fields.dbname,
-				password:   tt.fields.password,
-				host:       tt.fields.host,
-				port:       tt.fields.port,
-				connString: tt.fields.connString,
-				database:   tt.fields.database,
-			}
-			if err := p.Connect(); (err != nil) != tt.wantErr {
-				t.Errorf("Connect() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestPostgresSQLDB_Disconnect(t *testing.T) {
-	type fields struct {
-		user       string
-		dbname     string
-		password   string
-		host       string
-		port       uint
-		connString string
-		database   *sql.DB
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &PostgresSQLDB{
-				user:       tt.fields.user,
-				dbname:     tt.fields.dbname,
-				password:   tt.fields.password,
-				host:       tt.fields.host,
-				port:       tt.fields.port,
-				connString: tt.fields.connString,
-				database:   tt.fields.database,
-			}
-			if err := p.Disconnect(); (err != nil) != tt.wantErr {
-				t.Errorf("Disconnect() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -515,97 +579,6 @@ func TestPostgresSQLDB_UpdateRecords(t *testing.T) {
 			}
 			if got1 != tt.want1 {
 				t.Errorf("UpdateRecords() got1 = %v, want %v", got1, tt.want1)
-			}
-		})
-	}
-}
-
-func TestPostgresSQLDB_init(t *testing.T) {
-	type fields struct {
-		user       string
-		dbname     string
-		password   string
-		host       string
-		port       uint
-		connString string
-		database   *sql.DB
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &PostgresSQLDB{
-				user:       tt.fields.user,
-				dbname:     tt.fields.dbname,
-				password:   tt.fields.password,
-				host:       tt.fields.host,
-				port:       tt.fields.port,
-				connString: tt.fields.connString,
-				database:   tt.fields.database,
-			}
-			if err := p.init(); (err != nil) != tt.wantErr {
-				t.Errorf("init() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestNewPostgresSQLDb(t *testing.T) {
-	type args struct {
-		config DBConfig
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *PostgresSQLDB
-		wantErr bool
-	}{
-		{
-			"Working config",
-			args{TestDbConfigs["workingPostgres"]},
-			TestDbConfigPostgres["working"],
-			false,
-		},
-		{
-			"Working config with connection string",
-			args{TestDbConfigs["workingPostgresConnString"]},
-			TestDbConfigPostgres["workingConnString"],
-			false,
-		},
-		{
-			"Valid wrong config",
-			args{TestDbConfigs["wrongPostgres"]},
-			TestDbConfigPostgres["wrongHost"],
-			false,
-		},
-		{
-			"MongoDb config",
-			args{TestDbConfigs["workingMongo"]},
-			nil,
-			true,
-		},
-		{
-			"Empty config",
-			args{TestDbConfigs["emptyPostgres"]},
-			nil,
-			true,
-		},
-		{
-			"Config with host only",
-			args{TestDbConfigs["onlyHostPostgres"]},
-			nil,
-			true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got, err := NewPostgresSQLDb(tt.args.config); !reflect.DeepEqual(got, tt.want) || (err != nil) != tt.wantErr {
-				t.Errorf("NewPostgresSQLDb() = %v, want %v, error %v, wantErr %v", got, tt.want, err, tt.wantErr)
 			}
 		})
 	}

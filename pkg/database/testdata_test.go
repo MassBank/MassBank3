@@ -46,8 +46,8 @@ var TestDbConfigs = map[string]DBConfig{
 	},
 }
 
-var TestDbConfigPostgres = map[string]*PostgresSQLDB{
-	"working": {
+var TestDbConfigPostgres = map[string]MB3Database{
+	"working": &PostgresSQLDB{
 		user:       "mbtestuser",
 		dbname:     "mbtestdb",
 		password:   "mbtestpwd",
@@ -56,7 +56,7 @@ var TestDbConfigPostgres = map[string]*PostgresSQLDB{
 		connString: "host=testpostgres port=5432 user=mbtestuser password=mbtestpwd dbname=mbtestdb sslmode=disable",
 		database:   nil,
 	},
-	"wrongHost": {
+	"wrongHost": &PostgresSQLDB{
 		user:       "mbtestuser",
 		dbname:     "mbtestdb",
 		password:   "mbtestpwd",
@@ -65,7 +65,7 @@ var TestDbConfigPostgres = map[string]*PostgresSQLDB{
 		connString: "host=wronghost port=5432 user=mbtestuser password=mbtestpwd dbname=mbtestdb sslmode=disable",
 		database:   nil,
 	},
-	"workingConnString": {
+	"workingConnString": &PostgresSQLDB{
 		user:       "",
 		dbname:     "",
 		password:   "",
@@ -73,5 +73,14 @@ var TestDbConfigPostgres = map[string]*PostgresSQLDB{
 		port:       0,
 		connString: "host=testpostgres port=5432 user=mbtestuser password=mbtestpwd dbname=mbtestdb sslmode=disable",
 		database:   nil,
+	},
+	"workingMongo": &Mb3MongoDB{
+		user:     "mbtestuser",
+		pwd:      "mbtestpwd",
+		host:     "testmongo",
+		dbname:   "mbtestdb",
+		port:     27017,
+		database: nil,
+		dirty:    true,
 	},
 }
