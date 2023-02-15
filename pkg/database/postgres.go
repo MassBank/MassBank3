@@ -8,6 +8,7 @@ import (
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
+	"log"
 	"strconv"
 )
 
@@ -46,7 +47,20 @@ func (p *PostgresSQLDB) CheckDatabase() error {
 	return p.database.Ping()
 }
 
-func NewPostgresSQLDb(config DBConfig) *PostgresSQLDB {
+func NewPostgresSQLDb(config DBConfig) (*PostgresSQLDB, error) {
+	if config.Database != Postgres {
+		return nil, errors.New("database type must be Postgres")
+	}
+	if len(config.DbConnStr) < 1 &&
+		(len(config.DbHost) < 1 ||
+			len(config.DbName) < 1 ||
+			config.DbPort == 0 ||
+			config.DbPort > uint(^uint16(0))) {
+		return nil, errors.New("database host and port and name not in config, but DbConnStr is also empty")
+	}
+	if len(config.DbConnStr) > 0 {
+		log.Print("Using connection string for database connection, ignoring other values")
+	}
 	var postgres = PostgresSQLDB{
 		user:       config.DbUser,
 		dbname:     config.DbName,
@@ -60,7 +74,7 @@ func NewPostgresSQLDb(config DBConfig) *PostgresSQLDB {
 		postgres.connString = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 			config.DbHost, config.DbPort, config.DbUser, config.DbPwd, config.DbName)
 	}
-	return &postgres
+	return &postgres, nil
 }
 
 func (p *PostgresSQLDB) Connect() error {

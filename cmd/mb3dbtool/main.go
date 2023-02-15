@@ -51,7 +51,10 @@ func main() {
 			panic(err)
 		}
 	} else if userConfig.Database == database.Postgres {
-		db = database.NewPostgresSQLDb(userConfig.DBConfig)
+		db, err = database.NewPostgresSQLDb(userConfig.DBConfig)
+		if err != nil {
+			panic(err)
+		}
 	}
 	err = db.Connect()
 	if userConfig.drop {

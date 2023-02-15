@@ -21,32 +21,6 @@ func run(m *testing.M) (code int, err error) {
 	return m.Run(), nil
 }
 
-func TestNewPostgresSQLDb(t *testing.T) {
-	dbConfig := DBConfig{
-		Database:  Postgres,
-		DbUser:    "mbtestuser",
-		DbPwd:     "mbtestpwd",
-		DbHost:    "localhost",
-		DbName:    "mbtestdb",
-		DbPort:    5432,
-		DbConnStr: "",
-	}
-	got := NewPostgresSQLDb(dbConfig)
-	expect := &PostgresSQLDB{
-		user:       "mbtestuser",
-		dbname:     "mbtestdb",
-		password:   "mbtestpwd",
-		host:       "localhost",
-		port:       5432,
-		connString: "host=localhost port=5432 user=mbtestuser password=mbtestpwd dbname=mbtestdb sslmode=disable",
-		database:   nil,
-	}
-	if !reflect.DeepEqual(got, expect) {
-		t.Errorf("TestNewPostgresSQLDb expected %v, got %v", expect, got)
-	}
-
-}
-
 func TestPostgresSQLDB_AddRecord(t *testing.T) {
 	type fields struct {
 		user       string
@@ -576,6 +550,62 @@ func TestPostgresSQLDB_init(t *testing.T) {
 			}
 			if err := p.init(); (err != nil) != tt.wantErr {
 				t.Errorf("init() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestNewPostgresSQLDb(t *testing.T) {
+	type args struct {
+		config DBConfig
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *PostgresSQLDB
+		wantErr bool
+	}{
+		{
+			"Working config",
+			args{TestDbConfigs["workingPostgres"]},
+			TestDbConfigPostgres["working"],
+			false,
+		},
+		{
+			"Working config with connection string",
+			args{TestDbConfigs["workingPostgresConnString"]},
+			TestDbConfigPostgres["workingConnString"],
+			false,
+		},
+		{
+			"Valid wrong config",
+			args{TestDbConfigs["wrongPostgres"]},
+			TestDbConfigPostgres["wrongHost"],
+			false,
+		},
+		{
+			"MongoDb config",
+			args{TestDbConfigs["workingMongo"]},
+			nil,
+			true,
+		},
+		{
+			"Empty config",
+			args{TestDbConfigs["emptyPostgres"]},
+			nil,
+			true,
+		},
+		{
+			"Config with host only",
+			args{TestDbConfigs["onlyHostPostgres"]},
+			nil,
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got, err := NewPostgresSQLDb(tt.args.config); !reflect.DeepEqual(got, tt.want) || (err != nil) != tt.wantErr {
+				t.Errorf("NewPostgresSQLDb() = %v, want %v, error %v, wantErr %v", got, tt.want, err, tt.wantErr)
 			}
 		})
 	}
