@@ -1,0 +1,28 @@
+version: '3.1'
+
+services:
+
+  testmongo:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PWD}
+
+  testpostgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PWD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
+
+  mb3test:
+    build:
+      context: ..
+      dockerfile: Dockerfile-test
+    volumes:
+      - ./testout:/go/src/out
+    depends_on:
+      - testmongo
+      - testpostgres
