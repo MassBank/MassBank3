@@ -21,6 +21,31 @@ func run(m *testing.M) (code int, err error) {
 	return m.Run(), nil
 }
 
+func initPostgresDB() error {
+	files := []string{
+		"/go/src/test-data/massbank.sql",
+		"/go/src/test-data/massbank.sql",
+	}
+	db, err := NewPostgresSQLDb(TestDbConfigs["pg valid"])
+	if err != nil {
+		return err
+	}
+	err = db.Connect()
+	if err != nil {
+		return err
+	}
+	db.DropAllRecords()
+	for _, f := range files {
+		buf, err := os.ReadFile(f)
+		if err != nil {
+			return err
+		}
+		sqlStr := string(buf)
+		_, err = db.database.Exec(sqlStr)
+	}
+	return err
+}
+
 func TestMB3Database_Connect(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -235,6 +260,10 @@ func TestMB3Database_CheckDatabase(t *testing.T) {
 }
 
 func TestMB3Database_DropAllRecords(t *testing.T) {
+	err := initPostgresDB()
+	if err != nil {
+		t.Error("Could not setup Postgre DB: ", err.Error())
+	}
 	type fields struct {
 		user       string
 		dbname     string
