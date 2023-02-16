@@ -10,6 +10,7 @@ import (
 	"golang.org/x/net/context"
 	"log"
 	"strconv"
+	"time"
 )
 
 const (
@@ -23,8 +24,14 @@ type Mb3MongoDB struct {
 	host     string
 	dbname   string
 	port     uint16
+	connStr  string
 	database *mongo.Database
 	dirty    bool
+}
+
+func (db *Mb3MongoDB) Reset() {
+	db.database = nil
+	db.dirty = true
 }
 
 func (db *Mb3MongoDB) DropAllRecords() error {
@@ -134,49 +141,34 @@ func (db *Mb3MongoDB) UpdateRecord(record *massbank.Massbank, metadataId string,
 }
 
 func NewMongoDB(config DBConfig) (*Mb3MongoDB, error) {
+	if config.Database != MongoDB {
+		return nil, errors.New("database type must be Postgres")
+	}
+	if len(config.DbName) < 1 ||
+		len(config.DbConnStr) < 1 &&
+			(len(config.DbHost) < 1 ||
+				config.DbPort == 0 ||
+				config.DbPort > uint(^uint16(0))) {
+		return nil, errors.New("database name, host and port not in config, but DbConnStr is also empty")
+	}
+	if len(config.DbConnStr) > 0 {
+		log.Print("Using connection string for database connection, ignoring other values")
+	}
 	return &Mb3MongoDB{
 		user:     config.DbUser,
 		pwd:      config.DbPwd,
 		host:     config.DbHost,
 		dbname:   config.DbName,
 		port:     uint16(config.DbPort),
+		connStr:  config.DbConnStr,
 		database: nil,
 		dirty:    true,
 	}, nil
 }
 
-func (db *Mb3MongoDB) SetUser(user string) *Mb3MongoDB {
-	db.dirty = db.dirty || user != db.user
-	db.user = user
-	return db
-}
-
-func (db *Mb3MongoDB) SetPassword(password string) *Mb3MongoDB {
-	db.dirty = db.dirty || password != db.pwd
-	db.pwd = password
-	return db
-}
-
-func (db *Mb3MongoDB) SetHost(host string) *Mb3MongoDB {
-	db.dirty = db.dirty || host != db.host
-	db.host = host
-	return db
-}
-
-func (db *Mb3MongoDB) SetDbName(dbname string) *Mb3MongoDB {
-	db.dirty = db.dirty || dbname == db.dbname
-	db.dbname = dbname
-	return db
-}
-
-func (db *Mb3MongoDB) SetPort(port uint16) *Mb3MongoDB {
-	db.dirty = db.dirty || port == db.port
-	db.port = port
-	return db
-}
-
 func (db *Mb3MongoDB) Connect() error {
-	ctx := context.TODO()
+	timeout, _ := time.ParseDuration("200ms")
+	ctx := context.Background()
 	if db.dirty && db.database != nil {
 		err := db.database.Client().Disconnect(ctx)
 		if err != nil {
@@ -185,15 +177,26 @@ func (db *Mb3MongoDB) Connect() error {
 		db.database = nil
 	}
 	if db.database == nil {
-		clOptions := options.Client().SetAuth(options.Credential{
-			AuthMechanism:           "SCRAM-SHA-256",
-			AuthMechanismProperties: nil,
-			AuthSource:              "admin",
-			Username:                db.user,
-			Password:                db.pwd,
-			PasswordSet:             true,
-		}).SetAppName("Massbank3API").SetHosts([]string{db.host + ":" + strconv.FormatInt(int64(db.port), 10)})
-		dbclient, err := mongo.Connect(ctx, clOptions)
+		var err error
+		var dbclient *mongo.Client
+		if len(db.connStr) > 0 {
+			if dbclient, err = mongo.Connect(ctx, options.Client().ApplyURI(db.connStr).SetTimeout(timeout)); err != nil {
+				return err
+			}
+		} else {
+
+			clOptions := options.Client().SetAuth(options.Credential{
+				AuthMechanism:           "SCRAM-SHA-256",
+				AuthMechanismProperties: nil,
+				AuthSource:              "admin",
+				Username:                db.user,
+				Password:                db.pwd,
+				PasswordSet:             true,
+			}).SetAppName("Massbank3API").SetHosts([]string{db.host + ":" + strconv.FormatInt(int64(db.port), 10)}).SetTimeout(timeout)
+			if dbclient, err = mongo.Connect(ctx, clOptions); err != nil {
+				return err
+			}
+		}
 		mongoDb := dbclient.Database(db.dbname)
 		if err != nil {
 			return err
@@ -203,8 +206,10 @@ func (db *Mb3MongoDB) Connect() error {
 	}
 	err := db.init()
 	if err != nil {
+		db.database = nil
 		return err
 	}
+
 	return db.database.Client().Ping(ctx, nil)
 }
 
@@ -224,5 +229,10 @@ func (db *Mb3MongoDB) init() error {
 }
 
 func (db *Mb3MongoDB) Disconnect() error {
-	return db.database.Client().Disconnect(context.TODO())
+	if db.database == nil {
+		return errors.New("Database not connected")
+	}
+	err := db.database.Client().Disconnect(context.TODO())
+	db.database = nil
+	return err
 }
