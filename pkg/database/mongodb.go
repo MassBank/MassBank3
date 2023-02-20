@@ -2,6 +2,8 @@ package database
 
 import (
 	"errors"
+	"fmt"
+	"github.com/Code-Hex/dd"
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -99,7 +101,7 @@ func (db *Mb3MongoDB) GetRecords(filters Filters, limit uint64) ([]*massbank.Mas
 		}
 		mbResult = append(mbResult, &mb)
 	}
-
+	fmt.Println(dd.Dump(mbResult))
 	return mbResult, nil
 }
 

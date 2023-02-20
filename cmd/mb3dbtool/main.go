@@ -59,6 +59,8 @@ func main() {
 	if err = db.Connect(); err != nil {
 		panic(err)
 	}
+	db.GetRecords(database.Filters{}, 0)
+	return
 	if userConfig.drop {
 		if err := db.DropAllRecords(); err != nil {
 			println(err.Error())
