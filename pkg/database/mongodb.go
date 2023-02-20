@@ -180,7 +180,7 @@ func (db *Mb3MongoDB) Connect() error {
 		var err error
 		var dbclient *mongo.Client
 		if len(db.connStr) > 0 {
-			if dbclient, err = mongo.Connect(ctx, options.Client().ApplyURI(db.connStr).SetTimeout(timeout)); err != nil {
+			if dbclient, err = mongo.Connect(ctx, options.Client().ApplyURI(db.connStr).SetConnectTimeout(timeout)); err != nil {
 				return err
 			}
 		} else {
@@ -192,7 +192,7 @@ func (db *Mb3MongoDB) Connect() error {
 				Username:                db.user,
 				Password:                db.pwd,
 				PasswordSet:             true,
-			}).SetAppName("Massbank3API").SetHosts([]string{db.host + ":" + strconv.FormatInt(int64(db.port), 10)}).SetTimeout(timeout)
+			}).SetAppName("Massbank3API").SetHosts([]string{db.host + ":" + strconv.FormatInt(int64(db.port), 10)}).SetConnectTimeout(timeout).SetTLSConfig(nil)
 			if dbclient, err = mongo.Connect(ctx, clOptions); err != nil {
 				return err
 			}
@@ -204,13 +204,13 @@ func (db *Mb3MongoDB) Connect() error {
 		db.database = mongoDb
 		db.dirty = false
 	}
-	err := db.init()
-	if err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	if err := db.database.Client().Ping(ctx, nil); err != nil {
 		db.database = nil
 		return err
 	}
-
-	return db.database.Client().Ping(ctx, nil)
+	return db.init()
 }
 
 func (db *Mb3MongoDB) init() error {

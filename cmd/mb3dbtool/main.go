@@ -56,15 +56,13 @@ func main() {
 			panic(err)
 		}
 	}
-	err = db.Connect()
+	if err = db.Connect(); err != nil {
+		panic(err)
+	}
 	if userConfig.drop {
-		err := db.DropAllRecords()
-		if err != nil {
+		if err := db.DropAllRecords(); err != nil {
 			println(err.Error())
 		}
-	}
-	if err != nil {
-		panic(err)
 	}
 	var mbfiles []*massbank.Massbank
 	var versionData *massbank.MbMetaData
