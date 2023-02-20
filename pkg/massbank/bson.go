@@ -1,6 +1,7 @@
 package massbank
 
 import (
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/bsontype"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -12,27 +13,31 @@ func (p StringProperty) MarshalBSONValue() (bsontype.Type, []byte, error) {
 }
 
 func (p SubtagProperty) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	m := map[string]string{p.Subtag: p.String}
-	return bson.MarshalValue(m)
+	return bson.MarshalValue(bson.E{
+		Key:   p.Subtag,
+		Value: p.String,
+	})
 }
 
 func (p DatabaseProperty) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	m := map[string]string{p.Database: p.Identifier}
-	return bson.MarshalValue(m)
+	return bson.MarshalValue(bson.E{
+		Key:   p.Database,
+		Value: p.Identifier,
+	})
 }
 
 func (p RecordDeprecated) MarshalBSONValue() (bsontype.Type, []byte, error) {
 	return bson.MarshalValue(struct {
 		Date   time.Time
-		reason string
+		Reason string
 	}{p.Date, p.Reason})
 }
 
 func (p RecordDate) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	return bson.MarshalValue(struct {
-		updated time.Time
-		created time.Time
-	}{p.Updated, p.Created})
+	return bson.MarshalValue(bson.D{
+		{"updated", p.Updated},
+		{"created", p.Created},
+		{"modified", p.Modified}})
 }
 
 func (p RecordAuthorNames) MarshalBSONValue() (bsontype.Type, []byte, error) {
@@ -77,4 +82,145 @@ func (p MbReference) MarshalBSONValue() (bsontype.Type, []byte, error) {
 		return bsontype.Null, nil, err
 	}
 	return bson.MarshalValue(id)
+}
+
+func (p *StringProperty) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
+	var raw = bson.RawValue{Type: t, Value: b}
+	p.String = raw.String()
+	return nil
+}
+
+func (p *RecordAuthorNames) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
+	var raw = bson.RawValue{Type: t, Value: b}
+	if err := raw.Unmarshal(&p.value); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *ChCompoundClasses) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
+	var raw = bson.RawValue{Type: t, Value: b}
+	if err := raw.Unmarshal(&p.value); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *ChMass) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
+	var raw = bson.RawValue{Type: t, Value: b}
+	if err := raw.Unmarshal(&p.value); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *SubtagProperty) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
+	var raw = bson.RawValue{Type: t, Value: b}
+	var doc bson.E
+	if err := raw.Unmarshal(&doc); err != nil {
+		return err
+	}
+	p.Subtag = doc.Key
+	p.String = fmt.Sprintf("%v", doc.Value)
+	return nil
+}
+
+func (p *DatabaseProperty) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
+	var raw = bson.RawValue{Type: t, Value: b}
+	var doc bson.E
+	if err := raw.Unmarshal(&doc); err != nil {
+		return err
+	}
+	p.Database = doc.Key
+	p.Identifier = fmt.Sprintf("%v", doc.Value)
+	return nil
+}
+
+func (p *RecordDeprecated) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
+	var raw = bson.RawValue{Type: t, Value: b}
+	var v struct {
+		Date   time.Time
+		Reason string
+	}
+	if t != bsontype.Null {
+		if err := raw.Unmarshal(&v); err != nil {
+			return err
+		}
+	}
+	*p = RecordDeprecated{
+		Date:            v.Date,
+		Reason:          v.Reason,
+		DefaultProperty: DefaultProperty{},
+	}
+	return nil
+}
+
+func (p *RecordDate) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
+	var raw = bson.RawValue{Type: t, Value: b}.Document()
+	u, _ := raw.Lookup("updated").TimeOK()
+	c, _ := raw.Lookup("created").TimeOK()
+	m, _ := raw.Lookup("modified").TimeOK()
+	*p = RecordDate{
+		DefaultProperty: DefaultProperty{},
+		Updated:         u,
+		Created:         c,
+		Modified:        m,
+	}
+	return nil
+}
+
+func (p *SpLineage) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
+	var raw = bson.RawValue{Type: t, Value: b}
+	if err := raw.Unmarshal(&p.value); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PkPeak) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
+	var raw = bson.RawValue{Type: t, Value: b}
+	var v struct {
+		Header    []string
+		Mz        []float64
+		Intensity []float64
+		Rel       []uint
+	}
+
+	if err := raw.Unmarshal(&v); err != nil {
+		return err
+	}
+	*p = PkPeak{DefaultProperty{}, v.Header, v.Mz, v.Intensity, v.Rel}
+	return nil
+}
+
+func (p *PkNumPeak) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
+	var raw = bson.RawValue{Type: t, Value: b}
+	if err := raw.Unmarshal(&p.Value); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PkAnnotation) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
+	var raw = bson.RawValue{Type: t, Value: b}
+	var v struct {
+		Header []string
+		Values map[string][]interface{}
+	}
+	if err := raw.Unmarshal(&v); err != nil {
+		return err
+	}
+	p.Header = v.Header
+	p.Values = v.Values
+	return nil
+}
+
+func (p *MbReference) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
+	var raw = bson.RawValue{Type: t, Value: b}
+	var id primitive.ObjectID
+	if err := raw.Unmarshal(&id); err != nil {
+		return err
+	}
+	*p = MbReference(id.Hex())
+	return nil
 }

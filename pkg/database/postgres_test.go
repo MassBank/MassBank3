@@ -1,6 +1,7 @@
 package database
 
 import (
+	"os"
 	"reflect"
 	"testing"
 )
@@ -59,4 +60,29 @@ func TestNewPostgresSQLDb(t *testing.T) {
 			}
 		})
 	}
+}
+
+func initPostgresDB() error {
+	files := []string{
+		"/go/src/test-data/massbank.sql",
+		"/go/src/test-data/massbank.sql",
+	}
+	db, err := NewPostgresSQLDb(TestDbConfigs["pg valid"])
+	if err != nil {
+		return err
+	}
+	err = db.Connect()
+	if err != nil {
+		return err
+	}
+	db.DropAllRecords()
+	for _, f := range files {
+		buf, err := os.ReadFile(f)
+		if err != nil {
+			return err
+		}
+		sqlStr := string(buf)
+		_, err = db.database.Exec(sqlStr)
+	}
+	return err
 }

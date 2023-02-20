@@ -1,6 +1,9 @@
 package database
 
 import (
+	"context"
+	"encoding/json"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -61,4 +64,35 @@ func TestNewMongoDB(t *testing.T) {
 			}
 		})
 	}
+}
+
+func initMongoDB() error {
+	files := map[string]string{
+		"massbank":    "/go/src/test-data/massbank.json",
+		"mb_metadata": "/go/src/test-data/mb_metadata.json",
+	}
+	db, err := NewMongoDB(TestDbConfigs["mg valid"])
+	if err != nil {
+		return err
+	}
+	if err = db.Connect(); err != nil {
+		return err
+	}
+	if err = db.database.Drop(context.Background()); err != nil {
+		return err
+	}
+	for col, file := range files {
+
+		buf, err := os.ReadFile(file)
+		if err != nil {
+			return err
+		}
+		jsonStr := string(buf)
+		var m []interface{}
+		if err := json.Unmarshal([]byte(jsonStr), &m); err != nil {
+			return err
+		}
+		_, err = db.database.Collection(col).InsertMany(context.Background(), m)
+	}
+	return err
 }

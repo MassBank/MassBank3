@@ -75,8 +75,32 @@ func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.Massbank, error) {
 }
 
 func (db *Mb3MongoDB) GetRecords(filters Filters, limit uint64) ([]*massbank.Massbank, error) {
-	//TODO implement me
-	panic("implement me")
+	if db.database == nil {
+		return nil, errors.New("database not ready")
+	}
+	cur, err := db.database.Collection("massbank").Find(context.Background(), bson.D{})
+	if err != nil {
+		return nil, err
+	}
+	var bsonResult []bson.D
+	if err := cur.All(context.Background(), &bsonResult); err != nil {
+		return nil, err
+	}
+	println(bsonResult)
+	var mbResult = []*massbank.Massbank{}
+	for _, val := range bsonResult {
+		b, err := bson.Marshal(val)
+		if err != nil {
+			return nil, err
+		}
+		var mb massbank.Massbank
+		if err = bson.Unmarshal(b, &mb); err != nil {
+			return nil, err
+		}
+		mbResult = append(mbResult, &mb)
+	}
+
+	return mbResult, nil
 }
 
 func (db *Mb3MongoDB) AddRecords(records []*massbank.Massbank, metadataId string) error {
