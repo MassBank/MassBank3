@@ -41,19 +41,19 @@ func (p RecordDate) MarshalBSONValue() (bsontype.Type, []byte, error) {
 }
 
 func (p RecordAuthorNames) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	return bson.MarshalValue(p.value)
+	return bson.MarshalValue(p.Value)
 }
 
 func (p ChCompoundClasses) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	return bson.MarshalValue(p.value)
+	return bson.MarshalValue(p.Value)
 }
 
 func (p ChMass) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	return bson.MarshalValue(p.value)
+	return bson.MarshalValue(p.Value)
 }
 
 func (p SpLineage) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	return bson.MarshalValue(p.value)
+	return bson.MarshalValue(p.Value)
 }
 
 func (p PkPeak) MarshalBSONValue() (bsontype.Type, []byte, error) {
@@ -92,7 +92,7 @@ func (p *StringProperty) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
 
 func (p *RecordAuthorNames) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
 	var raw = bson.RawValue{Type: t, Value: b}
-	if err := raw.Unmarshal(&p.value); err != nil {
+	if err := raw.Unmarshal(&p.Value); err != nil {
 		return err
 	}
 	return nil
@@ -100,7 +100,7 @@ func (p *RecordAuthorNames) UnmarshalBSONValue(t bsontype.Type, b []byte) error 
 
 func (p *ChCompoundClasses) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
 	var raw = bson.RawValue{Type: t, Value: b}
-	if err := raw.Unmarshal(&p.value); err != nil {
+	if err := raw.Unmarshal(&p.Value); err != nil {
 		return err
 	}
 	return nil
@@ -108,7 +108,7 @@ func (p *ChCompoundClasses) UnmarshalBSONValue(t bsontype.Type, b []byte) error 
 
 func (p *ChMass) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
 	var raw = bson.RawValue{Type: t, Value: b}
-	if err := raw.Unmarshal(&p.value); err != nil {
+	if err := raw.Unmarshal(&p.Value); err != nil {
 		return err
 	}
 	return nil
@@ -171,7 +171,7 @@ func (p *RecordDate) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
 
 func (p *SpLineage) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
 	var raw = bson.RawValue{Type: t, Value: b}
-	if err := raw.Unmarshal(&p.value); err != nil {
+	if err := raw.Unmarshal(&p.Value); err != nil {
 		return err
 	}
 	return nil

@@ -108,7 +108,7 @@ func (names *RecordAuthorNames) Parse(s string) error {
 			marc = ss1[2]
 		}
 		if len(ss1) > 1 {
-			names.value = append(names.value, RecordAuthorName{ss1[1], marc})
+			names.Value = append(names.Value, RecordAuthorName{ss1[1], marc})
 		}
 	}
 	return nil
@@ -118,14 +118,14 @@ func (cc *ChCompoundClasses) Parse(s string) error {
 	ss := strings.Split(s, ";")
 	for _, s1 := range ss {
 		var c = ChCompoundClass(strings.TrimSpace(s1))
-		cc.value = append(cc.value, c)
+		cc.Value = append(cc.Value, c)
 	}
 	return nil
 }
 
 func (mass *ChMass) Parse(s string) error {
 	var err error
-	mass.value, err = strconv.ParseFloat(s, 64)
+	mass.Value, err = strconv.ParseFloat(s, 64)
 	if err != nil {
 		return err
 	}
@@ -163,7 +163,7 @@ func (p *SpLineage) Parse(s string) error {
 	for _, es := range ss {
 		element := SpLineageElement{}
 		element.String = strings.TrimSpace(es)
-		p.value = append(p.value, element)
+		p.Value = append(p.Value, element)
 	}
 	return nil
 }
@@ -231,7 +231,7 @@ func (mb *Massbank) ReadLine(line string, lineNum int) {
 			tag := strings.TrimSpace(s[0])
 			err := mb.addValue(tag, strings.TrimSpace(s[1]), lineNum)
 			if err != nil {
-				println("Error while adding value " + tag + " record.")
+				println("Error while adding Value " + tag + " record.")
 			}
 			lastTag = tag
 		} else {
@@ -249,10 +249,10 @@ func (mb *Massbank) parsePeakValue(line string, lineNum int) error {
 	var err error
 	var rel uint64
 	if mz, err = strconv.ParseFloat(svals[0], 32); err != nil {
-		return errors.New("could not parse mz value")
+		return errors.New("could not parse mz Value")
 	}
 	if intens, err = strconv.ParseFloat(svals[1], 32); err != nil {
-		return errors.New("could not parse intensity value")
+		return errors.New("could not parse intensity Value")
 	}
 	if rel, err = strconv.ParseUint(svals[2], 10, 32); err != nil {
 		return errors.New("could not parse relative intensity")

@@ -122,7 +122,7 @@ type RecordDate struct {
 
 type RecordAuthorNames struct {
 	DefaultProperty
-	value []RecordAuthorName
+	Value []RecordAuthorName
 }
 
 type RecordAuthorName struct {
@@ -160,7 +160,7 @@ type ChName struct {
 
 type ChCompoundClasses struct {
 	DefaultProperty
-	value []ChCompoundClass
+	Value []ChCompoundClass
 }
 
 type ChCompoundClass string
@@ -171,7 +171,7 @@ type ChFormula struct {
 
 type ChMass struct {
 	DefaultProperty
-	value float64
+	Value float64
 }
 
 type ChSmiles struct {
@@ -200,7 +200,7 @@ type SpName struct {
 
 type SpLineage struct {
 	DefaultProperty
-	value []SpLineageElement
+	Value []SpLineageElement
 }
 
 type SpLineageElement struct {
