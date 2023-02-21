@@ -4596,4 +4596,1582 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 		},
 	},
+	"minimal": {
+		Metadata: struct {
+			FileName   string
+			VersionRef massbank.MbReference
+		}{
+			FileName:   "/home/uly55e5/Projekte/ipb/MassBank3/test-data/MSBNK-test-TST00001.txt",
+			VersionRef: "63f50065841fc1dec65402fe",
+		},
+		Accession: &massbank.RecordAccession{
+			StringProperty: massbank.StringProperty{
+				String:          "\"MSBNK-test-TST00001\"",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Deprecated: &massbank.RecordDeprecated{
+			Date:            time.Time{},
+			Reason:          "",
+			DefaultProperty: massbank.DefaultProperty{},
+		},
+		RecordTitle: &massbank.RecordTitle{
+			StringProperty: massbank.StringProperty{
+				String:          "\"Fiscalin C; LC-ESI-ITFT; MS2; CE: 30; R=17500; [M+H]+\"",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Date: &massbank.RecordDate{
+			DefaultProperty: massbank.DefaultProperty{},
+			Updated:         parseTimeWoErr("2017-07-07T00:00:00Z"),
+			Created:         parseTimeWoErr("2017-07-07T00:00:00Z"),
+			Modified:        time.Time{},
+		},
+		Authors: &massbank.RecordAuthorNames{
+			DefaultProperty: massbank.DefaultProperty{},
+			Value: []massbank.RecordAuthorName{
+				{
+					Name:        "Megan J. Kelman",
+					MarcRelator: "",
+				},
+				{
+					Name:        " Justin B. Renaud",
+					MarcRelator: "",
+				},
+				{
+					Name:        " Mark W. Sumarah",
+					MarcRelator: "",
+				},
+				{
+					Name:        " Agriculture and Agri-Food Canada",
+					MarcRelator: "",
+				},
+			},
+		},
+		License: &massbank.RecordLicense{
+			StringProperty: massbank.StringProperty{
+				String:          "\"CC BY-SA\"",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Copyright: &massbank.RecordCopyright{
+			StringProperty: massbank.StringProperty{
+				String:          "null",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Publication: &massbank.RecordPublication{
+			StringProperty: massbank.StringProperty{
+				String:          "null",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Project: &massbank.RecordProject{
+			StringProperty: massbank.StringProperty{
+				String:          "null",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Comments: ([]*massbank.RecordComment)(nil),
+		Compound: struct {
+			Names     []*massbank.ChName          "mb2:\"CH$NAME\" json:\"name\""
+			Classes   *massbank.ChCompoundClasses "mb2:\"CH$COMPOUND_CLASS\" json:\"classes\""
+			Formula   *massbank.ChFormula         "mb2:\"CH$FORMULA\" json:\"formula\""
+			CdkDepict []*massbank.CdkDepict       "mb2:\"CH$CDK_DEPICT\" json:\"cdk-depict\""
+			Mass      *massbank.ChMass            "mb2:\"CH$EXACT_MASS\" json:\"mass\""
+			Smiles    *massbank.ChSmiles          "mb2:\"CH$SMILES\" json:\"smiles\""
+			Inchi     *massbank.ChInchi           "mb2:\"CH$IUPAC\" json:\"inchi\""
+			Link      []*massbank.ChLink          "mb2:\"CH$LINK\" optional:\"true\" json:\"link\""
+		}{
+			Names: []*massbank.ChName{
+				{
+					StringProperty: massbank.StringProperty{
+						String:          "\"Fiscalin C\"",
+						DefaultProperty: massbank.DefaultProperty{},
+					},
+				},
+			},
+			Classes: &massbank.ChCompoundClasses{
+				DefaultProperty: massbank.DefaultProperty{},
+				Value: []massbank.ChCompoundClass{
+					"Natural Product",
+				},
+			},
+			Formula: &massbank.ChFormula{
+				StringProperty: massbank.StringProperty{
+					String:          "\"C27H29N5O4\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			CdkDepict: ([]*massbank.CdkDepict)(nil),
+			Mass: &massbank.ChMass{
+				DefaultProperty: massbank.DefaultProperty{},
+				Value:           487.221940,
+			},
+			Smiles: &massbank.ChSmiles{
+				StringProperty: massbank.StringProperty{
+					String:          "\"CC(C)[C@H]1C2=NC3=CC=CC=C3C(=O)N2[C@@H](C(=O)N1)C[C@@]4([C@@H]5NC(C(=O)N5C6=CC=CC=C64)(C)C)O\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			Inchi: &massbank.ChInchi{
+				StringProperty: massbank.StringProperty{
+					String:          "\"InChI=1S/C27H29N5O4/c1-14(2)20-21-28-17-11-7-5-9-15(17)23(34)31(21)19(22(33)29-20)13-27(36)16-10-6-8-12-18(16)32-24(27)30-26(3,4)25(32)35/h5-12,14,19-20,24,30,36H,13H2,1-4H3,(H,29,33)/t19-,20+,24-,27-/m1/s1\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			Link: ([]*massbank.ChLink)(nil),
+		},
+		Species: struct {
+			Name    *massbank.SpName              "mb2:\"SP$SCIENTIFIC_NAME\" optional:\"true\""
+			Lineage *massbank.SpLineage           "mb2:\"SP$LINEAGE\" optional:\"true\""
+			Link    []*massbank.SpLink            "mb2:\"SP$LINK\" optional:\"true\""
+			Sample  []*massbank.SampleInformation "mb2:\"SP$SAMPLE\" optional:\"true\""
+		}{
+			Name: &massbank.SpName{
+				StringProperty: massbank.StringProperty{
+					String:          "null",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			Lineage: &massbank.SpLineage{
+				DefaultProperty: massbank.DefaultProperty{},
+				Value:           ([]massbank.SpLineageElement)(nil),
+			},
+			Link:   ([]*massbank.SpLink)(nil),
+			Sample: ([]*massbank.SampleInformation)(nil),
+		},
+		Acquisition: struct {
+			Instrument       *massbank.AcInstrument         "mb2:\"AC$INSTRUMENT\""
+			InstrumentType   *massbank.AcInstrumentType     "mb2:\"AC$INSTRUMENT_TYPE\""
+			MassSpectrometry []*massbank.AcMassSpectrometry "mb2:\"AC$MASS_SPECTROMETRY\" optional:\"true\""
+			Chromatography   []*massbank.AcChromatography   "mb2:\"AC$CHROMATOGRAPHY\" optional:\"true\""
+			General          []*massbank.AcGeneral          "mb2:\"AC$GENERAL\" optional:\"true\""
+		}{
+			Instrument: &massbank.AcInstrument{
+				StringProperty: massbank.StringProperty{
+					String:          "\"Q-Exactive Orbitrap Thermo Scientific\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			InstrumentType: &massbank.AcInstrumentType{
+				StringProperty: massbank.StringProperty{
+					String:          "\"LC-ESI-ITFT\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			MassSpectrometry: []*massbank.AcMassSpectrometry{
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "MS2",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "MS_TYPE",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "POSITIVE",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "ION_MODE",
+					},
+				},
+			},
+			Chromatography: ([]*massbank.AcChromatography)(nil),
+			General:        ([]*massbank.AcGeneral)(nil),
+		},
+		MassSpectrometry: struct {
+			FocusedIon     []*massbank.MsFocusedIon     "mb2:\"MS$FOCUSED_ION\" optional:\"true\""
+			DataProcessing []*massbank.MsDataProcessing "mb2:\"MS$DATA_PROCESSING\" optional:\"true\""
+		}{
+			FocusedIon:     ([]*massbank.MsFocusedIon)(nil),
+			DataProcessing: ([]*massbank.MsDataProcessing)(nil),
+		},
+		Peak: struct {
+			Splash     *massbank.PkSplash     "mb2:\"PK$SPLASH\""
+			Annotation *massbank.PkAnnotation "mb2:\"PK$ANNOTATION\" optional:\"true\""
+			NumPeak    *massbank.PkNumPeak    "mb2:\"PK$NUM_PEAK\""
+			Peak       *massbank.PkPeak       "mb2:\"PK$PEAK\""
+		}{
+			Splash: &massbank.PkSplash{
+				StringProperty: massbank.StringProperty{
+					String:          "\"splash10-03di-0290000000-8035e4fe85235c78b955\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			Annotation: &massbank.PkAnnotation{
+				DefaultProperty: massbank.DefaultProperty{},
+				Header:          ([]string)(nil),
+				Values:          (map[string][]interface{})(nil),
+			},
+			NumPeak: &massbank.PkNumPeak{
+				DefaultProperty: massbank.DefaultProperty{},
+				Value:           3,
+			},
+			Peak: &massbank.PkPeak{
+				DefaultProperty: massbank.DefaultProperty{},
+				Header: []string{
+					"m/z",
+					"int.",
+					"rel.int.",
+				},
+				Mz: []float64{
+					185.107300,
+					213.102203,
+					258.123688,
+				},
+				Intensity: []float64{
+					73653728.000000,
+					235010720.000000,
+					52446636.000000,
+				},
+				Rel: []uint{
+					312,
+					999,
+					222,
+				},
+			},
+		},
+	},
+	"maximal": {
+		Metadata: struct {
+			FileName   string
+			VersionRef massbank.MbReference
+		}{
+			FileName:   "/home/uly55e5/Projekte/ipb/MassBank3/test-data/MSBNK-test-TST00002.txt",
+			VersionRef: "63f50065841fc1dec65402fe",
+		},
+		Accession: &massbank.RecordAccession{
+			StringProperty: massbank.StringProperty{
+				String:          "\"MSBNK-test-TST00002\"",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Deprecated: &massbank.RecordDeprecated{
+			Date:            time.Time{},
+			Reason:          "",
+			DefaultProperty: massbank.DefaultProperty{},
+		},
+		RecordTitle: &massbank.RecordTitle{
+			StringProperty: massbank.StringProperty{
+				String:          "\"Disialoganglioside GD1a; MALDI-TOF; MS; Pos\"",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Date: &massbank.RecordDate{
+			DefaultProperty: massbank.DefaultProperty{},
+			Updated:         parseTimeWoErr("2016-01-19T00:00:00Z"),
+			Created:         parseTimeWoErr("2009-11-24T00:00:00Z"),
+			Modified:        parseTimeWoErr("2011-05-11T00:00:00Z"),
+		},
+		Authors: &massbank.RecordAuthorNames{
+			DefaultProperty: massbank.DefaultProperty{},
+			Value: []massbank.RecordAuthorName{
+				{
+					Name:        "Wada Y",
+					MarcRelator: "",
+				},
+				{
+					Name:        " Osaka Medical Center for Maternal and Child Health",
+					MarcRelator: "",
+				},
+			},
+		},
+		License: &massbank.RecordLicense{
+			StringProperty: massbank.StringProperty{
+				String:          "\"CC BY-SA\"",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Copyright: &massbank.RecordCopyright{
+			StringProperty: massbank.StringProperty{
+				String:          "\"Copyright (C) 2019 just a test\"",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Publication: &massbank.RecordPublication{
+			StringProperty: massbank.StringProperty{
+				String:          "\"Beisken S et al (2014) Scientific Data, 1:140029, DOI:10.1038/sdata.2014.29. http://www.ebi.ac.uk/metabolights/MTBLS38\"",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Project: &massbank.RecordProject{
+			StringProperty: massbank.StringProperty{
+				String:          "\"my test project\"",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Comments: []*massbank.RecordComment{
+			{
+				SubtagProperty: massbank.SubtagProperty{
+					StringProperty: massbank.StringProperty{
+						String:          "[Chemical] The ceramide part has 38 carbons and 1 double bond (38:1), but its structure cannot be decided.  The displaying structure is GD1a d18:1-20:0.",
+						DefaultProperty: massbank.DefaultProperty{},
+					},
+					Subtag: "",
+				},
+			},
+			{
+				SubtagProperty: massbank.SubtagProperty{
+					StringProperty: massbank.StringProperty{
+						String:          "Profile spectrum of this record is given as a JPEG file.",
+						DefaultProperty: massbank.DefaultProperty{},
+					},
+					Subtag: "",
+				},
+			},
+			{
+				SubtagProperty: massbank.SubtagProperty{
+					StringProperty: massbank.StringProperty{
+						String:          "MCH00001.jpg",
+						DefaultProperty: massbank.DefaultProperty{},
+					},
+					Subtag: "[Profile]",
+				},
+			},
+		},
+		Compound: struct {
+			Names     []*massbank.ChName          "mb2:\"CH$NAME\" json:\"name\""
+			Classes   *massbank.ChCompoundClasses "mb2:\"CH$COMPOUND_CLASS\" json:\"classes\""
+			Formula   *massbank.ChFormula         "mb2:\"CH$FORMULA\" json:\"formula\""
+			CdkDepict []*massbank.CdkDepict       "mb2:\"CH$CDK_DEPICT\" json:\"cdk-depict\""
+			Mass      *massbank.ChMass            "mb2:\"CH$EXACT_MASS\" json:\"mass\""
+			Smiles    *massbank.ChSmiles          "mb2:\"CH$SMILES\" json:\"smiles\""
+			Inchi     *massbank.ChInchi           "mb2:\"CH$IUPAC\" json:\"inchi\""
+			Link      []*massbank.ChLink          "mb2:\"CH$LINK\" optional:\"true\" json:\"link\""
+		}{
+			Names: []*massbank.ChName{
+				{
+					StringProperty: massbank.StringProperty{
+						String:          "\"Disialoganglioside GD1a\"",
+						DefaultProperty: massbank.DefaultProperty{},
+					},
+				},
+				{
+					StringProperty: massbank.StringProperty{
+						String:          "\"another name\"",
+						DefaultProperty: massbank.DefaultProperty{},
+					},
+				},
+			},
+			Classes: &massbank.ChCompoundClasses{
+				DefaultProperty: massbank.DefaultProperty{},
+				Value: []massbank.ChCompoundClass{
+					"Natural Product, Glycolipid",
+					"Ceramide",
+					"Ganglioside",
+				},
+			},
+			Formula: &massbank.ChFormula{
+				StringProperty: massbank.StringProperty{
+					String:          "\"C86H152N4O39\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			CdkDepict: ([]*massbank.CdkDepict)(nil),
+			Mass: &massbank.ChMass{
+				DefaultProperty: massbank.DefaultProperty{},
+				Value:           1865.003370,
+			},
+			Smiles: &massbank.ChSmiles{
+				StringProperty: massbank.StringProperty{
+					String:          "\"CCCCCCCCCCCCCCCCCCCC(=O)N[C@@H](CO[C@H]1[C@@H]([C@H]([C@@H]([C@H](O1)CO)O[C@H]2[C@@H]([C@H]([C@H]([C@H](O2)CO)O[C@H]3[C@@H]([C@H]([C@H]([C@H](O3)CO)O)O[C@H]4[C@@H]([C@H]([C@H]([C@H](O4)CO)O)O[C@@]5(C[C@@H]([C@H]([C@@H](O5)C([C@@H](CO)O)O)NC(=O)C)O)C(=O)O)O)NC(=O)C)O[C@@]6(C[C@@H]([C@H]([C@@H](O6)C([C@@H](CO)O)O)NC(=O)C)O)C(=O)O)O)O)O)[C@@H](/C=C/CCCCCCCCCCCCC)O\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			Inchi: &massbank.ChInchi{
+				StringProperty: massbank.StringProperty{
+					String:          "\"InChI=1S/C86H152N4O39/c1-6-8-10-12-14-16-18-20-21-22-23-25-27-29-31-33-35-37-60(105)90-50(51(100)36-34-32-30-28-26-24-19-17-15-13-11-9-7-2)46-118-80-69(111)68(110)72(58(44-95)121-80)123-82-71(113)78(129-86(84(116)117)39-53(102)62(88-48(4)98)76(127-86)65(107)55(104)41-92)73(59(45-96)122-82)124-79-63(89-49(5)99)74(66(108)56(42-93)119-79)125-81-70(112)77(67(109)57(43-94)120-81)128-85(83(114)115)38-52(101)61(87-47(3)97)75(126-85)64(106)54(103)40-91/h34,36,50-59,61-82,91-96,100-104,106-113H,6-33,35,37-46H2,1-5H3,(H,87,97)(H,88,98)(H,89,99)(H,90,105)(H,114,115)(H,116,117)/b36-34+/t50-,51+,52-,53-,54+,55+,56+,57+,58+,59+,61+,62+,63+,64?,65?,66-,67-,68+,69+,70+,71+,72+,73-,74+,75+,76+,77-,78+,79-,80+,81-,82-,85-,86-/m0/s1\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			Link: []*massbank.ChLink{
+				{
+					DatabaseProperty: massbank.DatabaseProperty{
+						DefaultProperty: massbank.DefaultProperty{},
+						Database:        "INCHIKEY",
+						Identifier:      "UPMLUBZFFWELOX-IOFMCULOSA-N",
+					},
+				},
+				{
+					DatabaseProperty: massbank.DatabaseProperty{
+						DefaultProperty: massbank.DefaultProperty{},
+						Database:        "PUBCHEM",
+						Identifier:      "CID:137628549",
+					},
+				},
+			},
+		},
+		Species: struct {
+			Name    *massbank.SpName              "mb2:\"SP$SCIENTIFIC_NAME\" optional:\"true\""
+			Lineage *massbank.SpLineage           "mb2:\"SP$LINEAGE\" optional:\"true\""
+			Link    []*massbank.SpLink            "mb2:\"SP$LINK\" optional:\"true\""
+			Sample  []*massbank.SampleInformation "mb2:\"SP$SAMPLE\" optional:\"true\""
+		}{
+			Name: &massbank.SpName{
+				StringProperty: massbank.StringProperty{
+					String:          "\"Bos taurus\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			Lineage: &massbank.SpLineage{
+				DefaultProperty: massbank.DefaultProperty{},
+				Value: []massbank.SpLineageElement{
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"cellular organisms\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Eukaryota\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Fungi/Metazoa group\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Metazoa\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Eumetazoa\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Bilateria\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Coelomata\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Deuterostomia\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Chordata\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Craniata\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Vertebrata\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Gnathostomata\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Teleostomi\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Euteleostomi\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Sarcopterygii\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Tetrapoda\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Amniota\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Mammalia\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Theria\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Eutheria\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Laurasiatheria\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Cetartiodactyla\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Ruminantia\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Pecora\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Bovidae\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Bovinae\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+					{
+						StringProperty: massbank.StringProperty{
+							String:          "\"Bos\"",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+					},
+				},
+			},
+			Link: []*massbank.SpLink{
+				{
+					DatabaseProperty: massbank.DatabaseProperty{
+						DefaultProperty: massbank.DefaultProperty{},
+						Database:        "NCBI-TAXONOMY",
+						Identifier:      "9913",
+					},
+				},
+			},
+			Sample: []*massbank.SampleInformation{
+				{
+					StringProperty: massbank.StringProperty{
+						String:          "\"brain\"",
+						DefaultProperty: massbank.DefaultProperty{},
+					},
+				},
+			},
+		},
+		Acquisition: struct {
+			Instrument       *massbank.AcInstrument         "mb2:\"AC$INSTRUMENT\""
+			InstrumentType   *massbank.AcInstrumentType     "mb2:\"AC$INSTRUMENT_TYPE\""
+			MassSpectrometry []*massbank.AcMassSpectrometry "mb2:\"AC$MASS_SPECTROMETRY\" optional:\"true\""
+			Chromatography   []*massbank.AcChromatography   "mb2:\"AC$CHROMATOGRAPHY\" optional:\"true\""
+			General          []*massbank.AcGeneral          "mb2:\"AC$GENERAL\" optional:\"true\""
+		}{
+			Instrument: &massbank.AcInstrument{
+				StringProperty: massbank.StringProperty{
+					String:          "\"Voyager DE-PRO, Applied Biosystems\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			InstrumentType: &massbank.AcInstrumentType{
+				StringProperty: massbank.StringProperty{
+					String:          "\"MALDI-TOF\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			MassSpectrometry: []*massbank.AcMassSpectrometry{
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "MS",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "MS_TYPE",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "POSITIVE",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "ION_MODE",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "UV 337 nm nitrogen lazer, 20 Hz, 10 nsec",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "LASER",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "DHB",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "MATRIX",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "500 pmol",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "SAMPLE_DRIPPING",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "[MS, MS:1003294, electron activated dissociation, ]",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "FRAGMENTATION_MODE",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "15 eV",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "KINETIC_ENERGY",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "6500 nA",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "ELECTRON_CURRENT",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "65 ms",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "REACTION_TIME",
+					},
+				},
+			},
+			Chromatography: []*massbank.AcChromatography{
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "Acclaim RSLC C18 2.2um, 2.1x100mm, Thermo",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "COLUMN_NAME",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "99/1 at 0-1 min, 61/39 at 3 min, 0.1/99.9 at 14-16 min, 99/1 at 16.1-20 min",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "FLOW_GRADIENT",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "200 uL/min at 0-3 min, 400 uL/min at 14 min, 480 uL/min at 16-19 min, 200 uL/min at 19.1-20 min",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "FLOW_RATE",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "5.680 min",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "RETENTION_TIME",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "A 90:10 water:methanol with 0.01% formic acid and 5mM ammonium formate",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "SOLVENT",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "B methanol with 0.01% formic acid and 5mM ammonium formate",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "SOLVENT",
+					},
+				},
+			},
+			General: ([]*massbank.AcGeneral)(nil),
+		},
+		MassSpectrometry: struct {
+			FocusedIon     []*massbank.MsFocusedIon     "mb2:\"MS$FOCUSED_ION\" optional:\"true\""
+			DataProcessing []*massbank.MsDataProcessing "mb2:\"MS$DATA_PROCESSING\" optional:\"true\""
+		}{
+			FocusedIon: []*massbank.MsFocusedIon{
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "324.2092",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "BASE_PEAK",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "324.207",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "PRECURSOR_M/Z",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "[M+H]+",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "PRECURSOR_TYPE",
+					},
+				},
+			},
+			DataProcessing: []*massbank.MsDataProcessing{
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "identity on assigned fragments and MS1",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "RECALIBRATE",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "RMassBank 1.99.10",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "WHOLE",
+					},
+				},
+			},
+		},
+		Peak: struct {
+			Splash     *massbank.PkSplash     "mb2:\"PK$SPLASH\""
+			Annotation *massbank.PkAnnotation "mb2:\"PK$ANNOTATION\" optional:\"true\""
+			NumPeak    *massbank.PkNumPeak    "mb2:\"PK$NUM_PEAK\""
+			Peak       *massbank.PkPeak       "mb2:\"PK$PEAK\""
+		}{
+			Splash: &massbank.PkSplash{
+				StringProperty: massbank.StringProperty{
+					String:          "\"splash10-03dr-0000010098-a1f70871442a6d6662d3\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			Annotation: &massbank.PkAnnotation{
+				DefaultProperty: massbank.DefaultProperty{},
+				Header: []string{
+					"m/z",
+					"ion",
+				},
+				Values: map[string][]interface{}{
+					"ion": {
+						"[LH-2NeuAc+Na]+",
+						"[M-2NeuAc+Na]+",
+						"[M-NeuAc+Na]+",
+						"[LH+Na]+",
+						"[LH+K]+",
+						"[LH-H+2Na]+",
+						"[M+Na]+",
+						"[LH-H+K+Na]+",
+						"[M+K]+",
+						"[M-H+2Na]+",
+						"[LH-2H+K+2Na]+",
+						"[M-H+K+Na]+",
+						"[M-2H+3Na]+",
+						"[M-2H+K+2Na]+",
+					},
+					"m/z": {
+						1278.120000,
+						1306.210000,
+						1597.120000,
+						1860.160000,
+						1876.140000,
+						1882.180000,
+						1888.200000,
+						1898.150000,
+						1904.190000,
+						1910.210000,
+						1920.180000,
+						1926.200000,
+						1932.220000,
+						1948.240000,
+					},
+				},
+			},
+			NumPeak: &massbank.PkNumPeak{
+				DefaultProperty: massbank.DefaultProperty{},
+				Value:           84,
+			},
+			Peak: &massbank.PkPeak{
+				DefaultProperty: massbank.DefaultProperty{},
+				Header: []string{
+					"m/z",
+					"int.",
+					"rel.int.",
+				},
+				Mz: []float64{
+					1278.119995,
+					1279.109985,
+					1279.180054,
+					1306.209961,
+					1309.130005,
+					1366.030029,
+					1375.229980,
+					1527.599976,
+					1569.079956,
+					1591.140015,
+					1595.209961,
+					1597.119995,
+					1598.109985,
+					1599.069946,
+					1620.300049,
+					1620.800049,
+					1621.180054,
+					1843.209961,
+					1860.160034,
+					1861.170044,
+					1862.180054,
+					1863.189941,
+					1864.219971,
+					1866.260010,
+					1867.229980,
+					1871.180054,
+					1876.140015,
+					1877.140015,
+					1878.130005,
+					1879.189941,
+					1882.180054,
+					1883.180054,
+					1884.180054,
+					1885.199951,
+					1886.189941,
+					1888.199951,
+					1889.209961,
+					1890.209961,
+					1891.219971,
+					1892.239990,
+					1893.229980,
+					1894.239990,
+					1895.209961,
+					1897.140015,
+					1898.150024,
+					1899.160034,
+					1900.170044,
+					1902.160034,
+					1903.199951,
+					1904.189941,
+					1905.199951,
+					1906.199951,
+					1907.229980,
+					1908.189941,
+					1910.209961,
+					1911.209961,
+					1912.209961,
+					1913.219971,
+					1914.209961,
+					1915.199951,
+					1920.180054,
+					1921.209961,
+					1922.189941,
+					1926.199951,
+					1927.189941,
+					1928.199951,
+					1929.209961,
+					1930.199951,
+					1931.319946,
+					1932.219971,
+					1933.229980,
+					1934.229980,
+					1935.219971,
+					1943.199951,
+					1948.239990,
+					1949.219971,
+					1950.219971,
+					1960.260010,
+					1965.229980,
+					1971.319946,
+					2064.290039,
+					2091.320068,
+					2092.300049,
+					2136.330078,
+				},
+				Intensity: []float64{
+					205.000000,
+					177.000000,
+					186.000000,
+					242.000000,
+					168.000000,
+					162.000000,
+					291.000000,
+					181.000000,
+					187.000000,
+					198.000000,
+					177.000000,
+					261.000000,
+					228.000000,
+					185.000000,
+					272.000000,
+					266.000000,
+					367.000000,
+					198.000000,
+					905.000000,
+					822.000000,
+					531.000000,
+					284.000000,
+					219.000000,
+					183.000000,
+					162.000000,
+					168.000000,
+					297.000000,
+					280.000000,
+					192.000000,
+					165.000000,
+					497.000000,
+					545.000000,
+					349.000000,
+					242.000000,
+					181.000000,
+					1311.000000,
+					1127.000000,
+					844.000000,
+					413.000000,
+					240.000000,
+					185.000000,
+					175.000000,
+					146.000000,
+					165.000000,
+					320.000000,
+					260.000000,
+					218.000000,
+					191.000000,
+					188.000000,
+					574.000000,
+					509.000000,
+					383.000000,
+					222.000000,
+					186.000000,
+					795.000000,
+					674.000000,
+					478.000000,
+					264.000000,
+					194.000000,
+					187.000000,
+					284.000000,
+					215.000000,
+					179.000000,
+					368.000000,
+					363.000000,
+					254.000000,
+					207.000000,
+					187.000000,
+					170.000000,
+					532.000000,
+					495.000000,
+					352.000000,
+					261.000000,
+					194.000000,
+					274.000000,
+					255.000000,
+					226.000000,
+					151.000000,
+					185.000000,
+					168.000000,
+					176.000000,
+					180.000000,
+					206.000000,
+					162.000000,
+				},
+				Rel: []uint{
+					156,
+					135,
+					142,
+					184,
+					128,
+					123,
+					222,
+					138,
+					142,
+					151,
+					135,
+					199,
+					174,
+					141,
+					207,
+					203,
+					280,
+					151,
+					690,
+					626,
+					405,
+					216,
+					167,
+					139,
+					123,
+					128,
+					226,
+					213,
+					146,
+					126,
+					379,
+					415,
+					266,
+					184,
+					138,
+					999,
+					859,
+					643,
+					315,
+					183,
+					141,
+					133,
+					111,
+					126,
+					244,
+					198,
+					166,
+					146,
+					143,
+					437,
+					388,
+					292,
+					169,
+					142,
+					606,
+					514,
+					364,
+					201,
+					148,
+					142,
+					216,
+					164,
+					136,
+					280,
+					277,
+					194,
+					158,
+					142,
+					130,
+					405,
+					377,
+					268,
+					199,
+					148,
+					209,
+					194,
+					172,
+					115,
+					141,
+					128,
+					134,
+					137,
+					157,
+					123,
+				},
+			},
+		},
+	},
+	"deprecated": {
+		Metadata: struct {
+			FileName   string
+			VersionRef massbank.MbReference
+		}{
+			FileName:   "/home/uly55e5/Projekte/ipb/MassBank3/test-data/MSBNK-test-TST00003.txt",
+			VersionRef: "63f50065841fc1dec65402fe",
+		},
+		Accession: &massbank.RecordAccession{
+			StringProperty: massbank.StringProperty{
+				String:          "\"MSBNK-test-TST00003\"",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Deprecated: &massbank.RecordDeprecated{
+			Date:            parseTimeWoErr("2019-11-25T00:00:00Z"),
+			Reason:          "Wrong MS measurement assigned",
+			DefaultProperty: massbank.DefaultProperty{},
+		},
+		RecordTitle: &massbank.RecordTitle{
+			StringProperty: massbank.StringProperty{
+				String:          "\"11-HDoHE; LC-ESI-QTOF; MS2; CE: 20.0; R=N/A; [M-H]-\"",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Date: &massbank.RecordDate{
+			DefaultProperty: massbank.DefaultProperty{},
+			Updated:         parseTimeWoErr("2018-11-21T00:00:00Z"),
+			Created:         parseTimeWoErr("2018-11-21T00:00:00Z"),
+			Modified:        time.Time{},
+		},
+		Authors: &massbank.RecordAuthorNames{
+			DefaultProperty: massbank.DefaultProperty{},
+			Value: []massbank.RecordAuthorName{
+				{
+					Name:        "Nils Hoffmann",
+					MarcRelator: "",
+				},
+				{
+					Name:        " Dominik Kopczynski",
+					MarcRelator: "",
+				},
+				{
+					Name:        " Bing Peng",
+					MarcRelator: "",
+				},
+			},
+		},
+		License: &massbank.RecordLicense{
+			StringProperty: massbank.StringProperty{
+				String:          "\"CC BY-SA\"",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Copyright: &massbank.RecordCopyright{
+			StringProperty: massbank.StringProperty{
+				String:          "\"Copyright (C) 2019, Leibniz Institut fuer Analytische Wissenschaften - ISAS - e.V., Dortmund, Germany\"",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Publication: &massbank.RecordPublication{
+			StringProperty: massbank.StringProperty{
+				String:          "null",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Project: &massbank.RecordProject{
+			StringProperty: massbank.StringProperty{
+				String:          "null",
+				DefaultProperty: massbank.DefaultProperty{},
+			},
+		},
+		Comments: []*massbank.RecordComment{
+			{
+				SubtagProperty: massbank.SubtagProperty{
+					StringProperty: massbank.StringProperty{
+						String:          "standard compound",
+						DefaultProperty: massbank.DefaultProperty{},
+					},
+					Subtag: "CONFIDENCE",
+				},
+			},
+			{
+				SubtagProperty: massbank.SubtagProperty{
+					StringProperty: massbank.StringProperty{
+						String:          "NATIVE_RUN_ID QExHF03_NM_0001275.mzML",
+						DefaultProperty: massbank.DefaultProperty{},
+					},
+					Subtag: "",
+				},
+			},
+			{
+				SubtagProperty: massbank.SubtagProperty{
+					StringProperty: massbank.StringProperty{
+						String:          "PROCESSING averaging of repeated ion fragments at 20.0 eV within 5 ppm window [MS, MS:1000575, mean of spectra, ]",
+						DefaultProperty: massbank.DefaultProperty{},
+					},
+					Subtag: "",
+				},
+			},
+		},
+		Compound: struct {
+			Names     []*massbank.ChName          "mb2:\"CH$NAME\" json:\"name\""
+			Classes   *massbank.ChCompoundClasses "mb2:\"CH$COMPOUND_CLASS\" json:\"classes\""
+			Formula   *massbank.ChFormula         "mb2:\"CH$FORMULA\" json:\"formula\""
+			CdkDepict []*massbank.CdkDepict       "mb2:\"CH$CDK_DEPICT\" json:\"cdk-depict\""
+			Mass      *massbank.ChMass            "mb2:\"CH$EXACT_MASS\" json:\"mass\""
+			Smiles    *massbank.ChSmiles          "mb2:\"CH$SMILES\" json:\"smiles\""
+			Inchi     *massbank.ChInchi           "mb2:\"CH$IUPAC\" json:\"inchi\""
+			Link      []*massbank.ChLink          "mb2:\"CH$LINK\" optional:\"true\" json:\"link\""
+		}{
+			Names: []*massbank.ChName{
+				{
+					StringProperty: massbank.StringProperty{
+						String:          "\"11-HDoHE\"",
+						DefaultProperty: massbank.DefaultProperty{},
+					},
+				},
+			},
+			Classes: &massbank.ChCompoundClasses{
+				DefaultProperty: massbank.DefaultProperty{},
+				Value: []massbank.ChCompoundClass{
+					"Natural Product",
+					"Lipid Standard",
+				},
+			},
+			Formula: &massbank.ChFormula{
+				StringProperty: massbank.StringProperty{
+					String:          "\"C22H32O3\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			CdkDepict: ([]*massbank.CdkDepict)(nil),
+			Mass: &massbank.ChMass{
+				DefaultProperty: massbank.DefaultProperty{},
+				Value:           344.235140,
+			},
+			Smiles: &massbank.ChSmiles{
+				StringProperty: massbank.StringProperty{
+					String:          "\"CC\\\\C=C/C\\\\C=C/C\\\\C=C/CC(O)\\\\C=C\\\\C=C/C\\\\C=C/CCC(O)=O\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			Inchi: &massbank.ChInchi{
+				StringProperty: massbank.StringProperty{
+					String:          "\"InChI=1S/C22H32O3/c1-2-3-4-5-6-7-9-12-15-18-21(23)19-16-13-10-8-11-14-17-20-22(24)25/h3-4,6-7,10-16,19,21,23H,2,5,8-9,17-18,20H2,1H3,(H,24,25)/b4-3-,7-6-,13-10-,14-11-,15-12-,19-16+\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			Link: []*massbank.ChLink{
+				{
+					DatabaseProperty: massbank.DatabaseProperty{
+						DefaultProperty: massbank.DefaultProperty{},
+						Database:        "CHEBI",
+						Identifier:      "CHEBI:72794",
+					},
+				},
+				{
+					DatabaseProperty: massbank.DatabaseProperty{
+						DefaultProperty: massbank.DefaultProperty{},
+						Database:        "LIPIDMAPS",
+						Identifier:      "LMFA04000028",
+					},
+				},
+				{
+					DatabaseProperty: massbank.DatabaseProperty{
+						DefaultProperty: massbank.DefaultProperty{},
+						Database:        "INCHIKEY",
+						Identifier:      "LTERDCBCHFKFRI-BGKMTWLOSA-N",
+					},
+				},
+				{
+					DatabaseProperty: massbank.DatabaseProperty{
+						DefaultProperty: massbank.DefaultProperty{},
+						Database:        "PUBCHEM",
+						Identifier:      "CID:11631564",
+					},
+				},
+			},
+		},
+		Species: struct {
+			Name    *massbank.SpName              "mb2:\"SP$SCIENTIFIC_NAME\" optional:\"true\""
+			Lineage *massbank.SpLineage           "mb2:\"SP$LINEAGE\" optional:\"true\""
+			Link    []*massbank.SpLink            "mb2:\"SP$LINK\" optional:\"true\""
+			Sample  []*massbank.SampleInformation "mb2:\"SP$SAMPLE\" optional:\"true\""
+		}{
+			Name: &massbank.SpName{
+				StringProperty: massbank.StringProperty{
+					String:          "null",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			Lineage: &massbank.SpLineage{
+				DefaultProperty: massbank.DefaultProperty{},
+				Value:           ([]massbank.SpLineageElement)(nil),
+			},
+			Link:   ([]*massbank.SpLink)(nil),
+			Sample: ([]*massbank.SampleInformation)(nil),
+		},
+		Acquisition: struct {
+			Instrument       *massbank.AcInstrument         "mb2:\"AC$INSTRUMENT\""
+			InstrumentType   *massbank.AcInstrumentType     "mb2:\"AC$INSTRUMENT_TYPE\""
+			MassSpectrometry []*massbank.AcMassSpectrometry "mb2:\"AC$MASS_SPECTROMETRY\" optional:\"true\""
+			Chromatography   []*massbank.AcChromatography   "mb2:\"AC$CHROMATOGRAPHY\" optional:\"true\""
+			General          []*massbank.AcGeneral          "mb2:\"AC$GENERAL\" optional:\"true\""
+		}{
+			Instrument: &massbank.AcInstrument{
+				StringProperty: massbank.StringProperty{
+					String:          "\"Q-Exactive HF, Thermo Scientific [MS:1002523]\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			InstrumentType: &massbank.AcInstrumentType{
+				StringProperty: massbank.StringProperty{
+					String:          "\"LC-ESI-QTOF\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			MassSpectrometry: []*massbank.AcMassSpectrometry{
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "MS2",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "MS_TYPE",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "NEGATIVE",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "ION_MODE",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "ESI",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "IONIZATION",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "HCD",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "FRAGMENTATION_MODE",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "20.0 eV",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "COLLISION_ENERGY",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "N/A",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "RESOLUTION",
+					},
+				},
+			},
+			Chromatography: ([]*massbank.AcChromatography)(nil),
+			General:        ([]*massbank.AcGeneral)(nil),
+		},
+		MassSpectrometry: struct {
+			FocusedIon     []*massbank.MsFocusedIon     "mb2:\"MS$FOCUSED_ION\" optional:\"true\""
+			DataProcessing []*massbank.MsDataProcessing "mb2:\"MS$DATA_PROCESSING\" optional:\"true\""
+		}{
+			FocusedIon: []*massbank.MsFocusedIon{
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "343.2279",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "BASE_PEAK",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "343.2279",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "PRECURSOR_M/Z",
+					},
+				},
+				{
+					SubtagProperty: massbank.SubtagProperty{
+						StringProperty: massbank.StringProperty{
+							String:          "[M-H]-",
+							DefaultProperty: massbank.DefaultProperty{},
+						},
+						Subtag: "PRECURSOR_TYPE",
+					},
+				},
+			},
+			DataProcessing: ([]*massbank.MsDataProcessing)(nil),
+		},
+		Peak: struct {
+			Splash     *massbank.PkSplash     "mb2:\"PK$SPLASH\""
+			Annotation *massbank.PkAnnotation "mb2:\"PK$ANNOTATION\" optional:\"true\""
+			NumPeak    *massbank.PkNumPeak    "mb2:\"PK$NUM_PEAK\""
+			Peak       *massbank.PkPeak       "mb2:\"PK$PEAK\""
+		}{
+			Splash: &massbank.PkSplash{
+				StringProperty: massbank.StringProperty{
+					String:          "\"splash10-00dl-0914000000-bad728fe323f6890656d\"",
+					DefaultProperty: massbank.DefaultProperty{},
+				},
+			},
+			Annotation: &massbank.PkAnnotation{
+				DefaultProperty: massbank.DefaultProperty{},
+				Header: []string{
+					"m/z",
+					"annotation",
+					"exact_mass",
+					"error(ppm)",
+				},
+				Values: map[string][]interface{}{
+					"annotation": {
+						59.013000,
+						95.050000,
+						121.102000,
+						149.133000,
+						165.092000,
+						194.095000,
+						281.227000,
+						299.238000,
+						325.217000,
+						"precursor",
+					},
+					"error(ppm)": {
+						2.913263,
+						0.409544,
+						0.290319,
+						1.122193,
+						0.707823,
+						0.743784,
+						-0.135616,
+						0.112482,
+						-0.267387,
+						-1.189675,
+					},
+					"exact_mass": {
+						59.013300,
+						95.050200,
+						121.102200,
+						149.133300,
+						165.091900,
+						194.094600,
+						281.227300,
+						299.237800,
+						325.217100,
+						343.227869,
+					},
+					"m/z": {
+						59.013472,
+						95.050239,
+						121.102235,
+						149.133467,
+						165.092017,
+						194.094744,
+						281.227262,
+						299.237834,
+						325.217013,
+						343.227460,
+					},
+				},
+			},
+			NumPeak: &massbank.PkNumPeak{
+				DefaultProperty: massbank.DefaultProperty{},
+				Value:           10,
+			},
+			Peak: &massbank.PkPeak{
+				DefaultProperty: massbank.DefaultProperty{},
+				Header: []string{
+					"m/z",
+					"int.",
+					"rel.int.",
+				},
+				Mz: []float64{
+					59.013474,
+					95.050240,
+					121.102234,
+					149.133469,
+					165.092010,
+					194.094742,
+					281.227264,
+					299.237823,
+					325.217010,
+					343.227448,
+				},
+				Intensity: []float64{
+					47825.664062,
+					123675.156250,
+					2119825.250000,
+					538442.937500,
+					717616.000000,
+					348560.281250,
+					577177.750000,
+					162688.843750,
+					246360.687500,
+					1749842.500000,
+				},
+				Rel: []uint{
+					22,
+					58,
+					999,
+					254,
+					338,
+					164,
+					271,
+					76,
+					115,
+					824,
+				},
+			},
+		},
+	},
 }
