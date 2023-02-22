@@ -5,6 +5,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/bsontype"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"strings"
 	"time"
 )
 
@@ -157,16 +158,30 @@ func (p *RecordDeprecated) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
 
 func (p *RecordDate) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
 	var raw = bson.RawValue{Type: t, Value: b}.Document()
-	u, _ := raw.Lookup("updated").TimeOK()
-	c, _ := raw.Lookup("created").TimeOK()
-	m, _ := raw.Lookup("modified").TimeOK()
-	*p = RecordDate{
-		DefaultProperty: DefaultProperty{},
-		Updated:         u,
-		Created:         c,
-		Modified:        m,
+	var err error
+	if p.Created, err = getTime(raw, "created"); err != nil {
+		return err
 	}
-	return nil
+	p.Updated, err = getTime(raw, "updated")
+	if err != nil {
+		return err
+	}
+	p.Modified, err = getTime(raw, "modified")
+	return err
+}
+
+func getTime(raw bson.Raw, key string) (time.Time, error) {
+	var t time.Time
+	var ok bool
+	var err error
+	t, ok = raw.Lookup(key).TimeOK()
+	if !ok {
+		s := strings.Trim(raw.Lookup(key).String(), "\"")
+		if t, err = time.Parse(time.RFC3339, s); err != nil {
+			return t, err
+		}
+	}
+	return t, nil
 }
 
 func (p *SpLineage) UnmarshalBSONValue(t bsontype.Type, b []byte) error {

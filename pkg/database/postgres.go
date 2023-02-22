@@ -142,8 +142,11 @@ func (p *PostgresSQLDB) Disconnect() error {
 }
 
 func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.Massbank, error) {
-	//TODO implement me
-	panic("implement me")
+	var result massbank.Massbank
+	var b []byte
+	err := p.database.QueryRow("SELECT document FROM massbank WHERE document->'Accession'->>'String' = $1", *s).Scan(&b)
+	json.Unmarshal(b, &result)
+	return &result, err
 }
 
 func (p *PostgresSQLDB) GetRecords(filters Filters, limit uint64) ([]*massbank.Massbank, error) {

@@ -76,8 +76,21 @@ func (db *Mb3MongoDB) IsEmpty() (bool, error) {
 }
 
 func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.Massbank, error) {
-	//TODO implement me
-	panic("implement me")
+	var bsonResult bson.M
+	var mb massbank.Massbank
+	err := db.database.Collection(MB_COLLECTION).FindOne(context.Background(), bson.D{{"accession", s}}).Decode(&bsonResult)
+	if err != nil {
+		return nil, err
+	}
+	b, err := bson.Marshal(bsonResult)
+	if err != nil {
+		return nil, err
+	}
+	if err = bson.Unmarshal(b, &mb); err != nil {
+		return nil, err
+	}
+
+	return &mb, err
 }
 
 func (db *Mb3MongoDB) GetRecords(filters Filters, limit uint64) ([]*massbank.Massbank, error) {
@@ -92,7 +105,6 @@ func (db *Mb3MongoDB) GetRecords(filters Filters, limit uint64) ([]*massbank.Mas
 	if err := cur.All(context.Background(), &bsonResult); err != nil {
 		return nil, err
 	}
-	println(bsonResult)
 	var mbResult = []*massbank.Massbank{}
 	for _, val := range bsonResult {
 		b, err := bson.Marshal(val)

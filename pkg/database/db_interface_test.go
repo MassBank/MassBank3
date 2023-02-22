@@ -2,10 +2,10 @@ package database
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"os"
-	"reflect"
 	"testing"
 )
 
@@ -45,6 +45,12 @@ func initDBs() ([]testDB, error) {
 		result = append(result, testDB{d.name, db})
 	}
 	return result, nil
+}
+
+func (db testDB) checkCount(t *testing.T, expect int64) {
+	if g, err := db.db.Count(); g != expect || err != nil {
+		t.Errorf("%s: Count not does not match: expected %d, got %d: %v", db.name, expect, g, err)
+	}
 }
 
 func TestMB3Database_Connect(t *testing.T) {
@@ -145,6 +151,103 @@ func TestMB3Database_Disconnect(t *testing.T) {
 	}
 }
 
+func TestMb3MongoDB_Count(t *testing.T) {
+	DBs, err := initDBs()
+	if err != nil {
+		t.Fatal("Could not init Databases: ", err.Error())
+	}
+	for _, db := range DBs {
+		if c, err := db.db.Count(); c != 5 || err != nil {
+			t.Errorf("%s: Could not count: %v", db.name, err)
+		}
+		if c, err := db.db.Count(); c != 5 || err != nil {
+			t.Errorf("%s: Could not count second time: %v", db.name, err)
+		}
+	}
+}
+
+func TestMB3Database_DropAllRecords(t *testing.T) {
+	DBs, err := initDBs()
+	if err != nil {
+		t.Fatal("Could not init Databases: ", err.Error())
+	}
+	for _, db := range DBs {
+		db.checkCount(t, 5)
+		if err := db.db.DropAllRecords(); err != nil {
+			t.Errorf("%s: Could not drop: %v", db.name, err)
+		}
+		db.checkCount(t, 0)
+		if err := db.db.DropAllRecords(); err != nil {
+			t.Errorf("%s: Could not drop on empty db: %v", db.name, err)
+		}
+		db.checkCount(t, 0)
+	}
+}
+
+func TestMb3MongoDB_IsEmpty(t *testing.T) {
+	DBs, err := initDBs()
+	if err != nil {
+		t.Fatal("Could not init Databases: ", err.Error())
+	}
+	for _, db := range DBs {
+		if ok, err := db.db.IsEmpty(); ok || err != nil {
+			t.Errorf("%s: error on no-nempty database: %v", db.name, err)
+		}
+		if err := db.db.DropAllRecords(); err != nil {
+			t.Errorf("%s: Could not drop on empty db: %v", db.name, err)
+		}
+		if ok, err := db.db.IsEmpty(); !ok || err != nil {
+			t.Errorf("%s: error on nempty database: %v", db.name, err)
+		}
+	}
+}
+
+func TestMB3Database_GetRecord(t *testing.T) {
+	type args struct {
+		s string
+	}
+	DBs, err := initDBs()
+	if err != nil {
+		t.Fatal("Could not init Databases: ", err.Error())
+	}
+	for _, db := range DBs {
+
+		tests := []struct {
+			db      testDB
+			name    string
+			args    args
+			want    massbank.Massbank
+			wantErr bool
+		}{
+			{db,
+				db.name + " MSBNK-AAFC-AC000005",
+				args{"MSBNK-AAFC-AC000005"},
+				mbTestRecords["MSBNK-AAFC-AC000005"],
+				false,
+			},
+		}
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				got, err := tt.db.db.GetRecord(&tt.args.s)
+				if (err != nil) != tt.wantErr {
+					t.Errorf("%s: GetRecord() error = %v, wantErr %v", tt.db.name, err, tt.wantErr)
+					return
+				}
+				got.Metadata.VersionRef = tt.want.Metadata.VersionRef
+				bg, errg := json.Marshal(got)
+				bw, errw := json.Marshal(tt.want)
+				if string(bg) != string(bw) || errg != nil || errw != nil {
+					t.Errorf("\nwant: %v \ngot : %v\n", string(bw), string(bg))
+				}
+			})
+		}
+	}
+}
+
+func TestMB3Database_GetRecords(t *testing.T) {
+
+}
+
 func TestMB3Database_AddRecord(t *testing.T) {
 	type fields struct {
 		user       string
@@ -220,197 +323,6 @@ func TestMB3Database_AddRecords(t *testing.T) {
 			}
 			if err := p.AddRecords(tt.args.records, tt.args.metaDataId); (err != nil) != tt.wantErr {
 				t.Errorf("AddRecords() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestMB3Database_CheckDatabase(t *testing.T) {
-	type fields struct {
-		user       string
-		dbname     string
-		password   string
-		host       string
-		port       uint
-		connString string
-		database   *sql.DB
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &PostgresSQLDB{
-				user:       tt.fields.user,
-				dbname:     tt.fields.dbname,
-				password:   tt.fields.password,
-				host:       tt.fields.host,
-				port:       tt.fields.port,
-				connString: tt.fields.connString,
-				database:   tt.fields.database,
-			}
-			if err := p.CheckDatabase(); (err != nil) != tt.wantErr {
-				t.Errorf("CheckDatabase() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestMB3Database_DropAllRecords(t *testing.T) {
-	DBs, err := initDBs()
-	if err != nil {
-		t.Fatal("Could not init Databases: ", err.Error())
-	}
-	for _, db := range DBs {
-		db.checkCount(t, 5)
-		if err := db.db.DropAllRecords(); err != nil {
-			t.Errorf("%s: Could not drop: %v", db.name, err)
-		}
-		db.checkCount(t, 0)
-		if err := db.db.DropAllRecords(); err != nil {
-			t.Errorf("%s: Could not drop: %v", db.name, err)
-		}
-		db.checkCount(t, 0)
-	}
-}
-
-func (db testDB) checkCount(t *testing.T, expect int64) {
-	if g, err := db.db.Count(); g != expect || err != nil {
-		t.Errorf("%s: Count not does not match: expected %d, got %d: %v", db.name, expect, g, err)
-	}
-}
-
-func TestMB3Database_GetRecord(t *testing.T) {
-	type fields struct {
-		user       string
-		dbname     string
-		password   string
-		host       string
-		port       uint
-		connString string
-		database   *sql.DB
-	}
-	type args struct {
-		s *string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *massbank.Massbank
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &PostgresSQLDB{
-				user:       tt.fields.user,
-				dbname:     tt.fields.dbname,
-				password:   tt.fields.password,
-				host:       tt.fields.host,
-				port:       tt.fields.port,
-				connString: tt.fields.connString,
-				database:   tt.fields.database,
-			}
-			got, err := p.GetRecord(tt.args.s)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetRecord() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetRecord() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestMB3Database_GetRecords(t *testing.T) {
-	type fields struct {
-		user       string
-		dbname     string
-		password   string
-		host       string
-		port       uint
-		connString string
-		database   *sql.DB
-	}
-	type args struct {
-		filters Filters
-		limit   uint64
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    []*massbank.Massbank
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &PostgresSQLDB{
-				user:       tt.fields.user,
-				dbname:     tt.fields.dbname,
-				password:   tt.fields.password,
-				host:       tt.fields.host,
-				port:       tt.fields.port,
-				connString: tt.fields.connString,
-				database:   tt.fields.database,
-			}
-			got, err := p.GetRecords(tt.args.filters, tt.args.limit)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetRecords() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetRecords() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestMB3Database_IsEmpty(t *testing.T) {
-	type fields struct {
-		user       string
-		dbname     string
-		password   string
-		host       string
-		port       uint
-		connString string
-		database   *sql.DB
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		want    bool
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &PostgresSQLDB{
-				user:       tt.fields.user,
-				dbname:     tt.fields.dbname,
-				password:   tt.fields.password,
-				host:       tt.fields.host,
-				port:       tt.fields.port,
-				connString: tt.fields.connString,
-				database:   tt.fields.database,
-			}
-			got, err := p.IsEmpty()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("IsEmpty() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("IsEmpty() got = %v, want %v", got, tt.want)
 			}
 		})
 	}

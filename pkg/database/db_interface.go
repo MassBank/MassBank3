@@ -25,6 +25,8 @@ type DBConfig struct {
 type MB3Database interface {
 	Connect() error
 	Disconnect() error
+	Count() (int64, error)
+	IsEmpty() (bool, error)
 	DropAllRecords() error
 	GetRecord(*string) (*massbank.Massbank, error)
 	GetRecords(filters Filters, limit uint64) ([]*massbank.Massbank, error)
@@ -33,6 +35,4 @@ type MB3Database interface {
 	AddRecords(records []*massbank.Massbank, metaDataId string) error
 	UpdateRecord(record *massbank.Massbank, metaDataId string, upsert bool) (uint64, uint64, error)
 	UpdateRecords(records []*massbank.Massbank, metaDataId string, upsert bool) (uint64, uint64, error)
-	Count() (int64, error)
-	IsEmpty() (bool, error)
 }
