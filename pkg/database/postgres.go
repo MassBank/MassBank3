@@ -22,6 +22,12 @@ type PostgresSQLDB struct {
 	database   *sql.DB
 }
 
+func (p *PostgresSQLDB) Count() (int64, error) {
+	var count int64
+	err := p.database.QueryRow("SELECT COUNT(*) FROM  massbank").Scan(&count)
+	return count, err
+}
+
 func (p *PostgresSQLDB) DropAllRecords() error {
 	var err error
 	if err = p.CheckDatabase(); err != nil {
@@ -98,7 +104,7 @@ func (p *PostgresSQLDB) init() error {
 	var queries = []string{
 		`
 		CREATE TABLE IF NOT EXISTS metadata
-			(id INT GENERATED ALWAYS AS IDENTITY,
+			(id SERIAL,
 			commit char(40),
 			timestamp timestamp NOT NULL,
 			version varchar(10) NOT NULL,
@@ -107,7 +113,7 @@ func (p *PostgresSQLDB) init() error {
 		`,
 		`
 		CREATE TABLE IF NOT EXISTS massbank 
-			(id INT GENERATED ALWAYS AS IDENTITY, 
+			(id SERIAL, 
 			 filename VARCHAR, 
 			 document jsonb,
 			 metadataId INT,

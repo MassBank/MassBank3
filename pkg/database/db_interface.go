@@ -33,5 +33,6 @@ type MB3Database interface {
 	AddRecords(records []*massbank.Massbank, metaDataId string) error
 	UpdateRecord(record *massbank.Massbank, metaDataId string, upsert bool) (uint64, uint64, error)
 	UpdateRecords(records []*massbank.Massbank, metaDataId string, upsert bool) (uint64, uint64, error)
+	Count() (int64, error)
 	IsEmpty() (bool, error)
 }

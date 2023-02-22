@@ -21,6 +21,32 @@ func run(m *testing.M) (code int, err error) {
 	return m.Run(), nil
 }
 
+type testDBinit struct {
+	name   string
+	initFn func() (MB3Database, error)
+}
+
+type testDB struct {
+	name string
+	db   MB3Database
+}
+
+func initDBs() ([]testDB, error) {
+	var testDBs = []testDBinit{
+		{"mongodb", initMongoTestDB},
+		{"postgres", initPostgresTestDB},
+	}
+	var result = []testDB{}
+	for _, d := range testDBs {
+		db, err := d.initFn()
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, testDB{d.name, db})
+	}
+	return result, nil
+}
+
 func TestMB3Database_Connect(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -235,41 +261,26 @@ func TestMB3Database_CheckDatabase(t *testing.T) {
 }
 
 func TestMB3Database_DropAllRecords(t *testing.T) {
-	err := initPostgresDB()
+	DBs, err := initDBs()
 	if err != nil {
-		t.Error("Could not setup Postgre DB: ", err.Error())
+		t.Fatal("Could not init Databases: ", err.Error())
 	}
-	type fields struct {
-		user       string
-		dbname     string
-		password   string
-		host       string
-		port       uint
-		connString string
-		database   *sql.DB
+	for _, db := range DBs {
+		db.checkCount(t, 5)
+		if err := db.db.DropAllRecords(); err != nil {
+			t.Errorf("%s: Could not drop: %v", db.name, err)
+		}
+		db.checkCount(t, 0)
+		if err := db.db.DropAllRecords(); err != nil {
+			t.Errorf("%s: Could not drop: %v", db.name, err)
+		}
+		db.checkCount(t, 0)
 	}
-	tests := []struct {
-		name    string
-		fields  fields
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &PostgresSQLDB{
-				user:       tt.fields.user,
-				dbname:     tt.fields.dbname,
-				password:   tt.fields.password,
-				host:       tt.fields.host,
-				port:       tt.fields.port,
-				connString: tt.fields.connString,
-				database:   tt.fields.database,
-			}
-			if err := p.DropAllRecords(); (err != nil) != tt.wantErr {
-				t.Errorf("DropAllRecords() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
+}
+
+func (db testDB) checkCount(t *testing.T, expect int64) {
+	if g, err := db.db.Count(); g != expect || err != nil {
+		t.Errorf("%s: Count not does not match: expected %d, got %d: %v", db.name, expect, g, err)
 	}
 }
 

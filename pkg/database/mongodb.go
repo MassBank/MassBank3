@@ -31,6 +31,10 @@ type Mb3MongoDB struct {
 	dirty    bool
 }
 
+func (db *Mb3MongoDB) Count() (int64, error) {
+	return db.database.Collection(MB_COLLECTION).EstimatedDocumentCount(context.Background())
+}
+
 func (db *Mb3MongoDB) Reset() {
 	db.database = nil
 	db.dirty = true

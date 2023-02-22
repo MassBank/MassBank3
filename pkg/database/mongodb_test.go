@@ -66,33 +66,35 @@ func TestNewMongoDB(t *testing.T) {
 	}
 }
 
-func initMongoDB() error {
+func initMongoTestDB() (MB3Database, error) {
 	files := map[string]string{
-		"massbank":    "/go/src/test-data/massbank.json",
 		"mb_metadata": "/go/src/test-data/mb_metadata.json",
+		"massbank":    "/go/src/test-data/massbank.json",
 	}
 	db, err := NewMongoDB(TestDbConfigs["mg valid"])
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if err = db.Connect(); err != nil {
-		return err
+		return nil, err
 	}
 	if err = db.database.Drop(context.Background()); err != nil {
-		return err
+		return nil, err
 	}
 	for col, file := range files {
 
 		buf, err := os.ReadFile(file)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		jsonStr := string(buf)
 		var m []interface{}
 		if err := json.Unmarshal([]byte(jsonStr), &m); err != nil {
-			return err
+			return nil, err
 		}
-		_, err = db.database.Collection(col).InsertMany(context.Background(), m)
+		if _, err = db.database.Collection(col).InsertMany(context.Background(), m); err != nil {
+			return nil, err
+		}
 	}
-	return err
+	return db, nil
 }

@@ -62,27 +62,40 @@ func TestNewPostgresSQLDb(t *testing.T) {
 	}
 }
 
-func initPostgresDB() error {
+func initPostgresTestDB() (MB3Database, error) {
 	files := []string{
-		"/go/src/test-data/massbank.sql",
+		"/go/src/test-data/metadata.sql",
 		"/go/src/test-data/massbank.sql",
 	}
 	db, err := NewPostgresSQLDb(TestDbConfigs["pg valid"])
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = db.Connect()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	db.DropAllRecords()
+	if _, err = db.database.Exec("DELETE FROM massbank"); err != nil {
+		return nil, err
+	}
+	if _, err = db.database.Exec("ALTER SEQUENCE massbank_id_seq RESTART WITH 1"); err != nil {
+		return nil, err
+	}
+	if _, err = db.database.Exec("DELETE FROM metadata"); err != nil {
+		return nil, err
+	}
+	if _, err = db.database.Exec("ALTER SEQUENCE metadata_id_seq RESTART WITH 1"); err != nil {
+		return nil, err
+	}
 	for _, f := range files {
 		buf, err := os.ReadFile(f)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		sqlStr := string(buf)
-		_, err = db.database.Exec(sqlStr)
+		if _, err = db.database.Exec(sqlStr); err != nil {
+			return nil, err
+		}
 	}
-	return err
+	return db, nil
 }
