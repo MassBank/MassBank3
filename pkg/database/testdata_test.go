@@ -140,18 +140,14 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		Accession: &massbank.RecordAccession{
 			StringProperty: massbank.StringProperty{
-				String:          "\"MSBNK-AAFC-AC000005\"",
+				String:          "MSBNK-AAFC-AC000005",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Deprecated: &massbank.RecordDeprecated{
-			Date:            time.Time{},
-			Reason:          "",
-			DefaultProperty: massbank.DefaultProperty{},
-		},
+		Deprecated: nil,
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Mellein; LC-ESI-ITFT; MS2; CE: 50; R=17500; [M+H]+\"",
+				String:          "Mellein; LC-ESI-ITFT; MS2; CE: 50; R=17500; [M+H]+",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -180,19 +176,19 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		License: &massbank.RecordLicense{
 			StringProperty: massbank.StringProperty{
-				String:          "\"CC BY-SA\"",
+				String:          "CC BY-SA",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
 		Copyright: &massbank.RecordCopyright{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Copyright (C) 2017\"",
+				String:          "Copyright (C) 2017",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
 		Publication: &massbank.RecordPublication{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Renaud, J. B.; Sumarah, M. W. Data Independent Acquisition-Digital Archiving Mass Spectrometry: Application to Single Kernel Mycotoxin Analysis of Fusarium Graminearum Infected Maize. Analytical and Bioanalytical Chemistry 2016, 408 (12), 3083–91. DOI:10.1007/s00216-016-9391-5\"",
+				String:          "Renaud, J. B.; Sumarah, M. W. Data Independent Acquisition-Digital Archiving Mass Spectrometry: Application to Single Kernel Mycotoxin Analysis of Fusarium Graminearum Infected Maize. Analytical and Bioanalytical Chemistry 2016, 408 (12), 3083–91. DOI:10.1007/s00216-016-9391-5",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -226,19 +222,19 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Names: []*massbank.ChName{
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"Mellein\"",
+						String:          "Mellein",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"Ochracin\"",
+						String:          "Ochracin",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"8-hydroxy-3-methyl-3,4-dihydroisochromen-1-one\"",
+						String:          "8-hydroxy-3-methyl-3,4-dihydroisochromen-1-one",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
@@ -252,7 +248,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Formula: &massbank.ChFormula{
 				StringProperty: massbank.StringProperty{
-					String:          "\"C10H10O3\"",
+					String:          "C10H10O3",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -263,13 +259,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
-					String:          "\"CC1CC2=C(C(=CC=C2)O)C(=O)O1\"",
+					String:          "CC1CC2=C(C(=CC=C2)O)C(=O)O1",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			Inchi: &massbank.ChInchi{
 				StringProperty: massbank.StringProperty{
-					String:          "\"InChI=1S/C10H10O3/c1-6-5-7-3-2-4-8(11)9(7)10(12)13-6/h2-4,6,11H,5H2,1H3\"",
+					String:          "InChI=1S/C10H10O3/c1-6-5-7-3-2-4-8(11)9(7)10(12)13-6/h2-4,6,11H,5H2,1H3",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -346,13 +342,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Instrument: &massbank.AcInstrument{
 				StringProperty: massbank.StringProperty{
-					String:          "\"Q-Exactive Orbitrap Thermo Scientific\"",
+					String:          "Q-Exactive Orbitrap Thermo Scientific",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			InstrumentType: &massbank.AcInstrumentType{
 				StringProperty: massbank.StringProperty{
-					String:          "\"LC-ESI-ITFT\"",
+					String:          "LC-ESI-ITFT",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -559,7 +555,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Splash: &massbank.PkSplash{
 				StringProperty: massbank.StringProperty{
-					String:          "\"splash10-01q9-0900000000-f556e9b53553d12b44b5\"",
+					String:          "splash10-01q9-0900000000-f556e9b53553d12b44b5",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -645,7 +641,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		Accession: &massbank.RecordAccession{
 			StringProperty: massbank.StringProperty{
-				String:          "\"MSBNK-Athens_Univ-AU229201\"",
+				String:          "MSBNK-Athens_Univ-AU229201",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -656,7 +652,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
-				String:          "\"2-Amino-3,8-dimethylimidazo-[4,5-f]quinoxaline (MeIQx); LC-ESI-QTOF; MS2; CE: 10 eV; R=35000; [M+H]+\"",
+				String:          "2-Amino-3,8-dimethylimidazo-[4,5-f]quinoxaline (MeIQx); LC-ESI-QTOF; MS2; CE: 10 eV; R=35000; [M+H]+",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -689,13 +685,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		License: &massbank.RecordLicense{
 			StringProperty: massbank.StringProperty{
-				String:          "\"CC BY\"",
+				String:          "CC BY",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
 		Copyright: &massbank.RecordCopyright{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Copyright (C) 2019 Department of Chemistry, University of Athens\"",
+				String:          "Copyright (C) 2019 Department of Chemistry, University of Athens",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -744,19 +740,19 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Names: []*massbank.ChName{
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"2-Amino-3,8-dimethylimidazo-[4,5-f]quinoxaline (MeIQx)\"",
+						String:          "2-Amino-3,8-dimethylimidazo-[4,5-f]quinoxaline (MeIQx)",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"MeIQx\"",
+						String:          "MeIQx",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"3,8-dimethylimidazo[4,5-f]quinoxalin-2-amine\"",
+						String:          "3,8-dimethylimidazo[4,5-f]quinoxalin-2-amine",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
@@ -770,7 +766,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Formula: &massbank.ChFormula{
 				StringProperty: massbank.StringProperty{
-					String:          "\"C11H11N5\"",
+					String:          "C11H11N5",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -781,13 +777,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
-					String:          "\"CN1C(N)=NC2=C1C=CC1=NC=C(C)N=C21\"",
+					String:          "CN1C(N)=NC2=C1C=CC1=NC=C(C)N=C21",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			Inchi: &massbank.ChInchi{
 				StringProperty: massbank.StringProperty{
-					String:          "\"InChI=1S/C11H11N5/c1-6-5-13-7-3-4-8-10(9(7)14-6)15-11(12)16(8)2/h3-5H,1-2H3,(H2,12,15)\"",
+					String:          "InChI=1S/C11H11N5/c1-6-5-13-7-3-4-8-10(9(7)14-6)15-11(12)16(8)2/h3-5H,1-2H3,(H2,12,15)",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -871,13 +867,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Instrument: &massbank.AcInstrument{
 				StringProperty: massbank.StringProperty{
-					String:          "\"Bruker maXis Impact\"",
+					String:          "Bruker maXis Impact",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			InstrumentType: &massbank.AcInstrumentType{
 				StringProperty: massbank.StringProperty{
-					String:          "\"LC-ESI-QTOF\"",
+					String:          "LC-ESI-QTOF",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -1057,7 +1053,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Splash: &massbank.PkSplash{
 				StringProperty: massbank.StringProperty{
-					String:          "\"splash10-03di-0090000000-4ca5f2773c0d659574ef\"",
+					String:          "splash10-03di-0090000000-4ca5f2773c0d659574ef",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -1137,7 +1133,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		Accession: &massbank.RecordAccession{
 			StringProperty: massbank.StringProperty{
-				String:          "\"MSBNK-Eawag-EA018353\"",
+				String:          "MSBNK-Eawag-EA018353",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -1148,7 +1144,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Sulfadimethoxine; LC-ESI-ITFT; MS2; CE: 30%; R=7500; [M-H]-\"",
+				String:          "Sulfadimethoxine; LC-ESI-ITFT; MS2; CE: 30%; R=7500; [M-H]-",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -1185,13 +1181,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		License: &massbank.RecordLicense{
 			StringProperty: massbank.StringProperty{
-				String:          "\"CC BY\"",
+				String:          "CC BY",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
 		Copyright: &massbank.RecordCopyright{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Copyright (C) 2012 Eawag, Duebendorf, Switzerland\"",
+				String:          "Copyright (C) 2012 Eawag, Duebendorf, Switzerland",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -1240,13 +1236,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Names: []*massbank.ChName{
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"Sulfadimethoxine\"",
+						String:          "Sulfadimethoxine",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"4-amino-N-(2,6-dimethoxy-4-pyrimidinyl)benzenesulfonamide\"",
+						String:          "4-amino-N-(2,6-dimethoxy-4-pyrimidinyl)benzenesulfonamide",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
@@ -1260,7 +1256,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Formula: &massbank.ChFormula{
 				StringProperty: massbank.StringProperty{
-					String:          "\"C12H14N4O4S\"",
+					String:          "C12H14N4O4S",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -1271,13 +1267,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
-					String:          "\"c1(NS(c2ccc(N)cc2)(=O)=O)cc(nc(n1)OC)OC\"",
+					String:          "c1(NS(c2ccc(N)cc2)(=O)=O)cc(nc(n1)OC)OC",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			Inchi: &massbank.ChInchi{
 				StringProperty: massbank.StringProperty{
-					String:          "\"InChI=1S/C12H14N4O4S/c1-19-11-7-10(14-12(15-11)20-2)16-21(17,18)9-5-3-8(13)4-6-9/h3-7H,13H2,1-2H3,(H,14,15,16)\"",
+					String:          "InChI=1S/C12H14N4O4S/c1-19-11-7-10(14-12(15-11)20-2)16-21(17,18)9-5-3-8(13)4-6-9/h3-7H,13H2,1-2H3,(H,14,15,16)",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -1361,13 +1357,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Instrument: &massbank.AcInstrument{
 				StringProperty: massbank.StringProperty{
-					String:          "\"LTQ Orbitrap XL Thermo Scientific\"",
+					String:          "LTQ Orbitrap XL Thermo Scientific",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			InstrumentType: &massbank.AcInstrumentType{
 				StringProperty: massbank.StringProperty{
-					String:          "\"LC-ESI-ITFT\"",
+					String:          "LC-ESI-ITFT",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -1565,7 +1561,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Splash: &massbank.PkSplash{
 				StringProperty: massbank.StringProperty{
-					String:          "\"splash10-0a4i-0009000000-ccda245feefab7d2bd86\"",
+					String:          "splash10-0a4i-0009000000-ccda245feefab7d2bd86",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -1653,7 +1649,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		Accession: &massbank.RecordAccession{
 			StringProperty: massbank.StringProperty{
-				String:          "\"MSBNK-Eawag_Additional_Specs-ET060401\"",
+				String:          "MSBNK-Eawag_Additional_Specs-ET060401",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -1664,7 +1660,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
-				String:          "\"FEN_246.1101_16.1; LC-ESI-QFT; MS2; CE: 15; R=17500; [M+H]+\"",
+				String:          "FEN_246.1101_16.1; LC-ESI-QFT; MS2; CE: 15; R=17500; [M+H]+",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -1701,19 +1697,19 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		License: &massbank.RecordLicense{
 			StringProperty: massbank.StringProperty{
-				String:          "\"CC BY\"",
+				String:          "CC BY",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
 		Copyright: &massbank.RecordCopyright{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Copyright (C) 2016 Eawag, Duebendorf, Switzerland\"",
+				String:          "Copyright (C) 2016 Eawag, Duebendorf, Switzerland",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
 		Publication: &massbank.RecordPublication{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Gulde, R.; Meier, U.; Schymanski, E. L.; Kohler, H.-P. E.; Helbling, D. E.; Derrer, S.; Rentsch, D.; Fenner, K. Systematic Exploration of Biotransformation Reactions of Amine-Containing Micropollutants in Activated Sludge. Environmental Science \\u0026 Technology 2016, 50 (6), 2908–20. DOI:10.1021/acs.est.5b05186\"",
+				String:          "Gulde, R.; Meier, U.; Schymanski, E. L.; Kohler, H.-P. E.; Helbling, D. E.; Derrer, S.; Rentsch, D.; Fenner, K. Systematic Exploration of Biotransformation Reactions of Amine-Containing Micropollutants in Activated Sludge. Environmental Science \\u0026 Technology 2016, 50 (6), 2908–20. DOI:10.1021/acs.est.5b05186",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -1756,19 +1752,19 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Names: []*massbank.ChName{
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"FEN_246.1101_16.1\"",
+						String:          "FEN_246.1101_16.1",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"N-desethyl-N-acetylfeniramine\"",
+						String:          "N-desethyl-N-acetylfeniramine",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"N-[1-[3-(trifluoromethyl)phenyl]propan-2-yl]acetamide\"",
+						String:          "N-[1-[3-(trifluoromethyl)phenyl]propan-2-yl]acetamide",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
@@ -1782,7 +1778,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Formula: &massbank.ChFormula{
 				StringProperty: massbank.StringProperty{
-					String:          "\"C12H14F3NO\"",
+					String:          "C12H14F3NO",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -1793,13 +1789,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
-					String:          "\"CC(CC1=CC(=CC=C1)C(F)(F)F)NC(C)=O\"",
+					String:          "CC(CC1=CC(=CC=C1)C(F)(F)F)NC(C)=O",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			Inchi: &massbank.ChInchi{
 				StringProperty: massbank.StringProperty{
-					String:          "\"InChI=1S/C12H14F3NO/c1-8(16-9(2)17)6-10-4-3-5-11(7-10)12(13,14)15/h3-5,7-8H,6H2,1-2H3,(H,16,17)\"",
+					String:          "InChI=1S/C12H14F3NO/c1-8(16-9(2)17)6-10-4-3-5-11(7-10)12(13,14)15/h3-5,7-8H,6H2,1-2H3,(H,16,17)",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -1869,13 +1865,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Instrument: &massbank.AcInstrument{
 				StringProperty: massbank.StringProperty{
-					String:          "\"Q Exactive Plus Orbitrap Thermo Scientific\"",
+					String:          "Q Exactive Plus Orbitrap Thermo Scientific",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			InstrumentType: &massbank.AcInstrumentType{
 				StringProperty: massbank.StringProperty{
-					String:          "\"LC-ESI-QFT\"",
+					String:          "LC-ESI-QFT",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -2064,7 +2060,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Splash: &massbank.PkSplash{
 				StringProperty: massbank.StringProperty{
-					String:          "\"splash10-052s-1940000000-a515d02f980838cad28d\"",
+					String:          "splash10-052s-1940000000-a515d02f980838cad28d",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -2187,7 +2183,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		Accession: &massbank.RecordAccession{
 			StringProperty: massbank.StringProperty{
-				String:          "\"MSBNK-Fac_Eng_Univ_Tokyo-JP009132\"",
+				String:          "MSBNK-Fac_Eng_Univ_Tokyo-JP009132",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -2198,7 +2194,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
-				String:          "\"METHYL PHENYL SULFIDE; EI-B; MS\"",
+				String:          "METHYL PHENYL SULFIDE; EI-B; MS",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -2223,7 +2219,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		License: &massbank.RecordLicense{
 			StringProperty: massbank.StringProperty{
-				String:          "\"CC BY-NC-SA\"",
+				String:          "CC BY-NC-SA",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -2259,7 +2255,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Names: []*massbank.ChName{
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"METHYL PHENYL SULFIDE\"",
+						String:          "METHYL PHENYL SULFIDE",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
@@ -2272,7 +2268,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Formula: &massbank.ChFormula{
 				StringProperty: massbank.StringProperty{
-					String:          "\"C7H8S\"",
+					String:          "C7H8S",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -2283,13 +2279,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
-					String:          "\"CSc(c1)cccc1\"",
+					String:          "CSc(c1)cccc1",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			Inchi: &massbank.ChInchi{
 				StringProperty: massbank.StringProperty{
-					String:          "\"InChI=1S/C7H8S/c1-8-7-5-3-2-4-6-7/h2-6H,1H3\"",
+					String:          "InChI=1S/C7H8S/c1-8-7-5-3-2-4-6-7/h2-6H,1H3",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -2338,13 +2334,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Instrument: &massbank.AcInstrument{
 				StringProperty: massbank.StringProperty{
-					String:          "\"HITACHI M-80B\"",
+					String:          "HITACHI M-80B",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			InstrumentType: &massbank.AcInstrumentType{
 				StringProperty: massbank.StringProperty{
-					String:          "\"EI-B\"",
+					String:          "EI-B",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -2405,7 +2401,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Splash: &massbank.PkSplash{
 				StringProperty: massbank.StringProperty{
-					String:          "\"splash10-0fk9-9500000000-e5cde2928e0b7e33c1cc\"",
+					String:          "splash10-0fk9-9500000000-e5cde2928e0b7e33c1cc",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -2573,7 +2569,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		Accession: &massbank.RecordAccession{
 			StringProperty: massbank.StringProperty{
-				String:          "\"MSBNK-Keio_Univ-KO009105\"",
+				String:          "MSBNK-Keio_Univ-KO009105",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -2584,7 +2580,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Desthiobiotin; LC-ESI-IT; MS4; m/z: 215/197/179; [M+H]+\"",
+				String:          "Desthiobiotin; LC-ESI-IT; MS4; m/z: 215/197/179; [M+H]+",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -2625,7 +2621,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		License: &massbank.RecordLicense{
 			StringProperty: massbank.StringProperty{
-				String:          "\"CC BY-NC-SA\"",
+				String:          "CC BY-NC-SA",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -2680,13 +2676,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Names: []*massbank.ChName{
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"Desthiobiotin\"",
+						String:          "Desthiobiotin",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"Dethiobiotin\"",
+						String:          "Dethiobiotin",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
@@ -2699,7 +2695,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Formula: &massbank.ChFormula{
 				StringProperty: massbank.StringProperty{
-					String:          "\"C10H18N2O3\"",
+					String:          "C10H18N2O3",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -2710,13 +2706,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
-					String:          "\"OC(=O)CCCCCC(N1)C(C)NC(=O)1\"",
+					String:          "OC(=O)CCCCCC(N1)C(C)NC(=O)1",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			Inchi: &massbank.ChInchi{
 				StringProperty: massbank.StringProperty{
-					String:          "\"InChI=1S/C10H18N2O3/c1-7-8(12-10(15)11-7)5-3-2-4-6-9(13)14/h7-8H,2-6H2,1H3,(H,13,14)(H2,11,12,15)/t7-,8+/m0/s1\"",
+					String:          "InChI=1S/C10H18N2O3/c1-7-8(12-10(15)11-7)5-3-2-4-6-9(13)14/h7-8H,2-6H2,1H3,(H,13,14)(H2,11,12,15)/t7-,8+/m0/s1",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -2800,13 +2796,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Instrument: &massbank.AcInstrument{
 				StringProperty: massbank.StringProperty{
-					String:          "\"LC/MSD Trap XCT, Agilent Technologies\"",
+					String:          "LC/MSD Trap XCT, Agilent Technologies",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			InstrumentType: &massbank.AcInstrumentType{
 				StringProperty: massbank.StringProperty{
-					String:          "\"LC-ESI-IT\"",
+					String:          "LC-ESI-IT",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -2886,7 +2882,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Splash: &massbank.PkSplash{
 				StringProperty: massbank.StringProperty{
-					String:          "\"splash10-000j-5900000000-8ad8423e2b359b500863\"",
+					String:          "splash10-000j-5900000000-8ad8423e2b359b500863",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -3024,7 +3020,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		Accession: &massbank.RecordAccession{
 			StringProperty: massbank.StringProperty{
-				String:          "\"MSBNK-MSSJ-MSJ00284\"",
+				String:          "MSBNK-MSSJ-MSJ00284",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -3035,7 +3031,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Pentoxazone; ESI-QTOF; MS2; NEGATIVE; [M-H]-; CID; 60 V\"",
+				String:          "Pentoxazone; ESI-QTOF; MS2; NEGATIVE; [M-H]-; CID; 60 V",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -3084,13 +3080,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		License: &massbank.RecordLicense{
 			StringProperty: massbank.StringProperty{
-				String:          "\"CC BY\"",
+				String:          "CC BY",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
 		Copyright: &massbank.RecordCopyright{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Atsushi Yamamoto, Faculty of Environmental Studies, Tottori University of Environmental Studies, 1-1, Wakabadai-kita, Tottori City, Tottori 689-1111, Japan.\"",
+				String:          "Atsushi Yamamoto, Faculty of Environmental Studies, Tottori University of Environmental Studies, 1-1, Wakabadai-kita, Tottori City, Tottori 689-1111, Japan.",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -3139,7 +3135,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Names: []*massbank.ChName{
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"Pentoxazone\"",
+						String:          "Pentoxazone",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
@@ -3152,7 +3148,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Formula: &massbank.ChFormula{
 				StringProperty: massbank.StringProperty{
-					String:          "\"C17H17ClFNO4\"",
+					String:          "C17H17ClFNO4",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -3163,13 +3159,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
-					String:          "\"CC(=C1C(=O)N(C(=O)O1)c2cc(c(cc2F)Cl)OC3CCCC3)C\"",
+					String:          "CC(=C1C(=O)N(C(=O)O1)c2cc(c(cc2F)Cl)OC3CCCC3)C",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			Inchi: &massbank.ChInchi{
 				StringProperty: massbank.StringProperty{
-					String:          "\"InChI=1S/C17H17ClFNO4/c1-9(2)15-16(21)20(17(22)24-15)13-8-14(11(18)7-12(13)19)23-10-5-3-4-6-10/h7-8,10H,3-6H2,1-2H3\"",
+					String:          "InChI=1S/C17H17ClFNO4/c1-9(2)15-16(21)20(17(22)24-15)13-8-14(11(18)7-12(13)19)23-10-5-3-4-6-10/h7-8,10H,3-6H2,1-2H3",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -3232,13 +3228,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Instrument: &massbank.AcInstrument{
 				StringProperty: massbank.StringProperty{
-					String:          "\"X500R QTOF (AB Sciex LLC, USA)\"",
+					String:          "X500R QTOF (AB Sciex LLC, USA)",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			InstrumentType: &massbank.AcInstrumentType{
 				StringProperty: massbank.StringProperty{
-					String:          "\"ESI-QTOF\"",
+					String:          "ESI-QTOF",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -3326,7 +3322,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Splash: &massbank.PkSplash{
 				StringProperty: massbank.StringProperty{
-					String:          "\"splash10-0006-9400000000-6b99aa683e8584601a75\"",
+					String:          "splash10-0006-9400000000-6b99aa683e8584601a75",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -3392,7 +3388,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		Accession: &massbank.RecordAccession{
 			StringProperty: massbank.StringProperty{
-				String:          "\"MSBNK-RIKEN-PR100978\"",
+				String:          "MSBNK-RIKEN-PR100978",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -3403,7 +3399,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Quercetin-3-Glucuronide; LC-ESI-QTOF; MS2; CE:Ramp 5-60 V; [M-H]-\"",
+				String:          "Quercetin-3-Glucuronide; LC-ESI-QTOF; MS2; CE:Ramp 5-60 V; [M-H]-",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -3440,7 +3436,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		License: &massbank.RecordLicense{
 			StringProperty: massbank.StringProperty{
-				String:          "\"CC BY-SA\"",
+				String:          "CC BY-SA",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -3486,25 +3482,25 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Names: []*massbank.ChName{
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"Quercetin-3-Glucuronide\"",
+						String:          "Quercetin-3-Glucuronide",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"Quer-3-GlcA\"",
+						String:          "Quer-3-GlcA",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"Miquelianin\"",
+						String:          "Miquelianin",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"Querciturone\"",
+						String:          "Querciturone",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
@@ -3517,7 +3513,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Formula: &massbank.ChFormula{
 				StringProperty: massbank.StringProperty{
-					String:          "\"C21H18O13\"",
+					String:          "C21H18O13",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -3528,13 +3524,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
-					String:          "\"OC(=O)C(O1)C(O)C(O)C(O)C1OC(C(=O)3)=C(Oc(c4)c(c(O)cc(O)4)3)c(c2)cc(O)c(O)c2\"",
+					String:          "OC(=O)C(O1)C(O)C(O)C(O)C1OC(C(=O)3)=C(Oc(c4)c(c(O)cc(O)4)3)c(c2)cc(O)c(O)c2",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			Inchi: &massbank.ChInchi{
 				StringProperty: massbank.StringProperty{
-					String:          "\"InChI=1S/C21H18O13/c22-7-4-10(25)12-11(5-7)32-17(6-1-2-8(23)9(24)3-6)18(13(12)26)33-21-16(29)14(27)15(28)19(34-21)20(30)31/h1-5,14-16,19,21-25,27-29H,(H,30,31)/t14-,15-,16+,19-,21+/m0/s1\"",
+					String:          "InChI=1S/C21H18O13/c22-7-4-10(25)12-11(5-7)32-17(6-1-2-8(23)9(24)3-6)18(13(12)26)33-21-16(29)14(27)15(28)19(34-21)20(30)31/h1-5,14-16,19,21-25,27-29H,(H,30,31)/t14-,15-,16+,19-,21+/m0/s1",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -3611,13 +3607,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Instrument: &massbank.AcInstrument{
 				StringProperty: massbank.StringProperty{
-					String:          "\"UPLC Q-Tof Premier, Waters\"",
+					String:          "UPLC Q-Tof Premier, Waters",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			InstrumentType: &massbank.AcInstrumentType{
 				StringProperty: massbank.StringProperty{
-					String:          "\"LC-ESI-QTOF\"",
+					String:          "LC-ESI-QTOF",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -3778,7 +3774,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Splash: &massbank.PkSplash{
 				StringProperty: massbank.StringProperty{
-					String:          "\"splash10-0udi-0609400000-9fd50528da25d66adfc7\"",
+					String:          "splash10-0udi-0609400000-9fd50528da25d66adfc7",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -3850,7 +3846,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		Accession: &massbank.RecordAccession{
 			StringProperty: massbank.StringProperty{
-				String:          "\"MSBNK-RIKEN-PR309089\"",
+				String:          "MSBNK-RIKEN-PR309089",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -3861,7 +3857,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
-				String:          "\"FA 18:2+1O; LC-ESI-QTOF; MS2\"",
+				String:          "FA 18:2+1O; LC-ESI-QTOF; MS2",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -3890,7 +3886,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		License: &massbank.RecordLicense{
 			StringProperty: massbank.StringProperty{
-				String:          "\"CC BY-NC-SA\"",
+				String:          "CC BY-NC-SA",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -3902,7 +3898,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		Publication: &massbank.RecordPublication{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Tsugawa H., Nakabayashi R., Mori T., Yamada Y., Takahashi M., Rai A., Sugiyama R., Yamamoto H., Nakaya T., Yamazaki M., Kooke R., Bac-Molenaar JA., Oztolan-Erol N., Keurentjes JJB., Arita M., Saito K. (2019) \\\"A cheminformatics approach to characterize metabolomes in stable-isotope-labeled organisms\\\" Nature Methods 16(4):295-298. [doi:10.1038/s41592-019-0358-2]\"",
+				String:          "Tsugawa H., Nakabayashi R., Mori T., Yamada Y., Takahashi M., Rai A., Sugiyama R., Yamamoto H., Nakaya T., Yamazaki M., Kooke R., Bac-Molenaar JA., Oztolan-Erol N., Keurentjes JJB., Arita M., Saito K. (2019) \\A cheminformatics approach to characterize metabolomes in stable-isotope-labeled organisms\\ Nature Methods 16(4):295-298. [doi:10.1038/s41592-019-0358-2]",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -3936,7 +3932,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Names: []*massbank.ChName{
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"FA 18:2+1O\"",
+						String:          "FA 18:2+1O",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
@@ -3949,7 +3945,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Formula: &massbank.ChFormula{
 				StringProperty: massbank.StringProperty{
-					String:          "\"C18H32O3\"",
+					String:          "C18H32O3",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -3960,13 +3956,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
-					String:          "\"O=C(O)CCCCCCCC=CC=CC(O)CCCCC\"",
+					String:          "O=C(O)CCCCCCCC=CC=CC(O)CCCCC",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			Inchi: &massbank.ChInchi{
 				StringProperty: massbank.StringProperty{
-					String:          "\"InChI=1S/C18H32O3/c1-2-3-11-14-17(19)15-12-9-7-5-4-6-8-10-13-16-18(20)21/h7,9,12,15,17,19H,2-6,8,10-11,13-14,16H2,1H3,(H,20,21)\"",
+					String:          "InChI=1S/C18H32O3/c1-2-3-11-14-17(19)15-12-9-7-5-4-6-8-10-13-16-18(20)21/h7,9,12,15,17,19H,2-6,8,10-11,13-14,16H2,1H3,(H,20,21)",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -4008,13 +4004,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Instrument: &massbank.AcInstrument{
 				StringProperty: massbank.StringProperty{
-					String:          "\"LC, Waters Acquity UPLC System; MS, Waters Xevo G2 Q-Tof\"",
+					String:          "LC, Waters Acquity UPLC System; MS, Waters Xevo G2 Q-Tof",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			InstrumentType: &massbank.AcInstrumentType{
 				StringProperty: massbank.StringProperty{
-					String:          "\"LC-ESI-QTOF\"",
+					String:          "LC-ESI-QTOF",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -4184,7 +4180,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Splash: &massbank.PkSplash{
 				StringProperty: massbank.StringProperty{
-					String:          "\"splash10-0002-0090000000-3b4035f10b24d4c3f5a0\"",
+					String:          "splash10-0002-0090000000-3b4035f10b24d4c3f5a0",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -4256,7 +4252,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		Accession: &massbank.RecordAccession{
 			StringProperty: massbank.StringProperty{
-				String:          "\"MSBNK-Washington_State_Univ-BML81902\"",
+				String:          "MSBNK-Washington_State_Univ-BML81902",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -4267,7 +4263,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Parthenolide; LC-APCI-QTOF; MS; POSITIVE\"",
+				String:          "Parthenolide; LC-APCI-QTOF; MS; POSITIVE",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -4304,7 +4300,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		License: &massbank.RecordLicense{
 			StringProperty: massbank.StringProperty{
-				String:          "\"CC BY-SA\"",
+				String:          "CC BY-SA",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -4350,7 +4346,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Names: []*massbank.ChName{
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"Parthenolide\"",
+						String:          "Parthenolide",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
@@ -4363,7 +4359,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Formula: &massbank.ChFormula{
 				StringProperty: massbank.StringProperty{
-					String:          "\"C15H20O3\"",
+					String:          "C15H20O3",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -4374,13 +4370,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
-					String:          "\"C/C/1=C\\\\CC[C@@]2([C@@H](O2)[C@@H]3[C@@H](CC1)C(=C)C(=O)O3)C\"",
+					String:          "C/C/1=C\\\\CC[C@@]2([C@@H](O2)[C@@H]3[C@@H](CC1)C(=C)C(=O)O3)C",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			Inchi: &massbank.ChInchi{
 				StringProperty: massbank.StringProperty{
-					String:          "\"InChI=1S/C15H20O3/c1-9-5-4-8-15(3)13(18-15)12-11(7-6-9)10(2)14(16)17-12/h5,11-13H,2,4,6-8H2,1,3H3/b9-5+/t11-,12-,13-,15+/m0/s1\"",
+					String:          "InChI=1S/C15H20O3/c1-9-5-4-8-15(3)13(18-15)12-11(7-6-9)10(2)14(16)17-12/h5,11-13H,2,4,6-8H2,1,3H3/b9-5+/t11-,12-,13-,15+/m0/s1",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -4443,13 +4439,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Instrument: &massbank.AcInstrument{
 				StringProperty: massbank.StringProperty{
-					String:          "\"Agilent 1200 RRLC; Agilent 6520 QTOF\"",
+					String:          "Agilent 1200 RRLC; Agilent 6520 QTOF",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			InstrumentType: &massbank.AcInstrumentType{
 				StringProperty: massbank.StringProperty{
-					String:          "\"LC-APCI-QTOF\"",
+					String:          "LC-APCI-QTOF",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -4564,7 +4560,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Splash: &massbank.PkSplash{
 				StringProperty: massbank.StringProperty{
-					String:          "\"splash10-0002-0090000000-b81b1903703b01f61d7d\"",
+					String:          "splash10-0002-0090000000-b81b1903703b01f61d7d",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -4606,7 +4602,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		Accession: &massbank.RecordAccession{
 			StringProperty: massbank.StringProperty{
-				String:          "\"MSBNK-test-TST00001\"",
+				String:          "MSBNK-test-TST00001",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -4617,7 +4613,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Fiscalin C; LC-ESI-ITFT; MS2; CE: 30; R=17500; [M+H]+\"",
+				String:          "Fiscalin C; LC-ESI-ITFT; MS2; CE: 30; R=17500; [M+H]+",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -4650,7 +4646,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		License: &massbank.RecordLicense{
 			StringProperty: massbank.StringProperty{
-				String:          "\"CC BY-SA\"",
+				String:          "CC BY-SA",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -4686,7 +4682,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Names: []*massbank.ChName{
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"Fiscalin C\"",
+						String:          "Fiscalin C",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
@@ -4699,7 +4695,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Formula: &massbank.ChFormula{
 				StringProperty: massbank.StringProperty{
-					String:          "\"C27H29N5O4\"",
+					String:          "C27H29N5O4",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -4710,13 +4706,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
-					String:          "\"CC(C)[C@H]1C2=NC3=CC=CC=C3C(=O)N2[C@@H](C(=O)N1)C[C@@]4([C@@H]5NC(C(=O)N5C6=CC=CC=C64)(C)C)O\"",
+					String:          "CC(C)[C@H]1C2=NC3=CC=CC=C3C(=O)N2[C@@H](C(=O)N1)C[C@@]4([C@@H]5NC(C(=O)N5C6=CC=CC=C64)(C)C)O",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			Inchi: &massbank.ChInchi{
 				StringProperty: massbank.StringProperty{
-					String:          "\"InChI=1S/C27H29N5O4/c1-14(2)20-21-28-17-11-7-5-9-15(17)23(34)31(21)19(22(33)29-20)13-27(36)16-10-6-8-12-18(16)32-24(27)30-26(3,4)25(32)35/h5-12,14,19-20,24,30,36H,13H2,1-4H3,(H,29,33)/t19-,20+,24-,27-/m1/s1\"",
+					String:          "InChI=1S/C27H29N5O4/c1-14(2)20-21-28-17-11-7-5-9-15(17)23(34)31(21)19(22(33)29-20)13-27(36)16-10-6-8-12-18(16)32-24(27)30-26(3,4)25(32)35/h5-12,14,19-20,24,30,36H,13H2,1-4H3,(H,29,33)/t19-,20+,24-,27-/m1/s1",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -4750,13 +4746,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Instrument: &massbank.AcInstrument{
 				StringProperty: massbank.StringProperty{
-					String:          "\"Q-Exactive Orbitrap Thermo Scientific\"",
+					String:          "Q-Exactive Orbitrap Thermo Scientific",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			InstrumentType: &massbank.AcInstrumentType{
 				StringProperty: massbank.StringProperty{
-					String:          "\"LC-ESI-ITFT\"",
+					String:          "LC-ESI-ITFT",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -4798,7 +4794,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Splash: &massbank.PkSplash{
 				StringProperty: massbank.StringProperty{
-					String:          "\"splash10-03di-0290000000-8035e4fe85235c78b955\"",
+					String:          "splash10-03di-0290000000-8035e4fe85235c78b955",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -4846,7 +4842,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		Accession: &massbank.RecordAccession{
 			StringProperty: massbank.StringProperty{
-				String:          "\"MSBNK-test-TST00002\"",
+				String:          "MSBNK-test-TST00002",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -4857,7 +4853,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Disialoganglioside GD1a; MALDI-TOF; MS; Pos\"",
+				String:          "Disialoganglioside GD1a; MALDI-TOF; MS; Pos",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -4882,25 +4878,25 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		License: &massbank.RecordLicense{
 			StringProperty: massbank.StringProperty{
-				String:          "\"CC BY-SA\"",
+				String:          "CC BY-SA",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
 		Copyright: &massbank.RecordCopyright{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Copyright (C) 2019 just a test\"",
+				String:          "Copyright (C) 2019 just a test",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
 		Publication: &massbank.RecordPublication{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Beisken S et al (2014) Scientific Data, 1:140029, DOI:10.1038/sdata.2014.29. http://www.ebi.ac.uk/metabolights/MTBLS38\"",
+				String:          "Beisken S et al (2014) Scientific Data, 1:140029, DOI:10.1038/sdata.2014.29. http://www.ebi.ac.uk/metabolights/MTBLS38",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
 		Project: &massbank.RecordProject{
 			StringProperty: massbank.StringProperty{
-				String:          "\"my test project\"",
+				String:          "my test project",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -4946,13 +4942,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Names: []*massbank.ChName{
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"Disialoganglioside GD1a\"",
+						String:          "Disialoganglioside GD1a",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"another name\"",
+						String:          "another name",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
@@ -4967,7 +4963,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Formula: &massbank.ChFormula{
 				StringProperty: massbank.StringProperty{
-					String:          "\"C86H152N4O39\"",
+					String:          "C86H152N4O39",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -4978,13 +4974,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
-					String:          "\"CCCCCCCCCCCCCCCCCCCC(=O)N[C@@H](CO[C@H]1[C@@H]([C@H]([C@@H]([C@H](O1)CO)O[C@H]2[C@@H]([C@H]([C@H]([C@H](O2)CO)O[C@H]3[C@@H]([C@H]([C@H]([C@H](O3)CO)O)O[C@H]4[C@@H]([C@H]([C@H]([C@H](O4)CO)O)O[C@@]5(C[C@@H]([C@H]([C@@H](O5)C([C@@H](CO)O)O)NC(=O)C)O)C(=O)O)O)NC(=O)C)O[C@@]6(C[C@@H]([C@H]([C@@H](O6)C([C@@H](CO)O)O)NC(=O)C)O)C(=O)O)O)O)O)[C@@H](/C=C/CCCCCCCCCCCCC)O\"",
+					String:          "CCCCCCCCCCCCCCCCCCCC(=O)N[C@@H](CO[C@H]1[C@@H]([C@H]([C@@H]([C@H](O1)CO)O[C@H]2[C@@H]([C@H]([C@H]([C@H](O2)CO)O[C@H]3[C@@H]([C@H]([C@H]([C@H](O3)CO)O)O[C@H]4[C@@H]([C@H]([C@H]([C@H](O4)CO)O)O[C@@]5(C[C@@H]([C@H]([C@@H](O5)C([C@@H](CO)O)O)NC(=O)C)O)C(=O)O)O)NC(=O)C)O[C@@]6(C[C@@H]([C@H]([C@@H](O6)C([C@@H](CO)O)O)NC(=O)C)O)C(=O)O)O)O)O)[C@@H](/C=C/CCCCCCCCCCCCC)O",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			Inchi: &massbank.ChInchi{
 				StringProperty: massbank.StringProperty{
-					String:          "\"InChI=1S/C86H152N4O39/c1-6-8-10-12-14-16-18-20-21-22-23-25-27-29-31-33-35-37-60(105)90-50(51(100)36-34-32-30-28-26-24-19-17-15-13-11-9-7-2)46-118-80-69(111)68(110)72(58(44-95)121-80)123-82-71(113)78(129-86(84(116)117)39-53(102)62(88-48(4)98)76(127-86)65(107)55(104)41-92)73(59(45-96)122-82)124-79-63(89-49(5)99)74(66(108)56(42-93)119-79)125-81-70(112)77(67(109)57(43-94)120-81)128-85(83(114)115)38-52(101)61(87-47(3)97)75(126-85)64(106)54(103)40-91/h34,36,50-59,61-82,91-96,100-104,106-113H,6-33,35,37-46H2,1-5H3,(H,87,97)(H,88,98)(H,89,99)(H,90,105)(H,114,115)(H,116,117)/b36-34+/t50-,51+,52-,53-,54+,55+,56+,57+,58+,59+,61+,62+,63+,64?,65?,66-,67-,68+,69+,70+,71+,72+,73-,74+,75+,76+,77-,78+,79-,80+,81-,82-,85-,86-/m0/s1\"",
+					String:          "InChI=1S/C86H152N4O39/c1-6-8-10-12-14-16-18-20-21-22-23-25-27-29-31-33-35-37-60(105)90-50(51(100)36-34-32-30-28-26-24-19-17-15-13-11-9-7-2)46-118-80-69(111)68(110)72(58(44-95)121-80)123-82-71(113)78(129-86(84(116)117)39-53(102)62(88-48(4)98)76(127-86)65(107)55(104)41-92)73(59(45-96)122-82)124-79-63(89-49(5)99)74(66(108)56(42-93)119-79)125-81-70(112)77(67(109)57(43-94)120-81)128-85(83(114)115)38-52(101)61(87-47(3)97)75(126-85)64(106)54(103)40-91/h34,36,50-59,61-82,91-96,100-104,106-113H,6-33,35,37-46H2,1-5H3,(H,87,97)(H,88,98)(H,89,99)(H,90,105)(H,114,115)(H,116,117)/b36-34+/t50-,51+,52-,53-,54+,55+,56+,57+,58+,59+,61+,62+,63+,64?,65?,66-,67-,68+,69+,70+,71+,72+,73-,74+,75+,76+,77-,78+,79-,80+,81-,82-,85-,86-/m0/s1",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -5013,7 +5009,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Name: &massbank.SpName{
 				StringProperty: massbank.StringProperty{
-					String:          "\"Bos taurus\"",
+					String:          "Bos taurus",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -5022,163 +5018,163 @@ var mbTestRecords = map[string]massbank.Massbank{
 				Value: []massbank.SpLineageElement{
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"cellular organisms\"",
+							String:          "cellular organisms",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Eukaryota\"",
+							String:          "Eukaryota",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Fungi/Metazoa group\"",
+							String:          "Fungi/Metazoa group",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Metazoa\"",
+							String:          "Metazoa",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Eumetazoa\"",
+							String:          "Eumetazoa",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Bilateria\"",
+							String:          "Bilateria",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Coelomata\"",
+							String:          "Coelomata",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Deuterostomia\"",
+							String:          "Deuterostomia",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Chordata\"",
+							String:          "Chordata",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Craniata\"",
+							String:          "Craniata",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Vertebrata\"",
+							String:          "Vertebrata",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Gnathostomata\"",
+							String:          "Gnathostomata",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Teleostomi\"",
+							String:          "Teleostomi",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Euteleostomi\"",
+							String:          "Euteleostomi",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Sarcopterygii\"",
+							String:          "Sarcopterygii",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Tetrapoda\"",
+							String:          "Tetrapoda",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Amniota\"",
+							String:          "Amniota",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Mammalia\"",
+							String:          "Mammalia",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Theria\"",
+							String:          "Theria",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Eutheria\"",
+							String:          "Eutheria",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Laurasiatheria\"",
+							String:          "Laurasiatheria",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Cetartiodactyla\"",
+							String:          "Cetartiodactyla",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Ruminantia\"",
+							String:          "Ruminantia",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Pecora\"",
+							String:          "Pecora",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Bovidae\"",
+							String:          "Bovidae",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Bovinae\"",
+							String:          "Bovinae",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
 					{
 						StringProperty: massbank.StringProperty{
-							String:          "\"Bos\"",
+							String:          "Bos",
 							DefaultProperty: massbank.DefaultProperty{},
 						},
 					},
@@ -5196,7 +5192,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Sample: []*massbank.SampleInformation{
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"brain\"",
+						String:          "brain",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
@@ -5211,13 +5207,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Instrument: &massbank.AcInstrument{
 				StringProperty: massbank.StringProperty{
-					String:          "\"Voyager DE-PRO, Applied Biosystems\"",
+					String:          "Voyager DE-PRO, Applied Biosystems",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			InstrumentType: &massbank.AcInstrumentType{
 				StringProperty: massbank.StringProperty{
-					String:          "\"MALDI-TOF\"",
+					String:          "MALDI-TOF",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -5424,7 +5420,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Splash: &massbank.PkSplash{
 				StringProperty: massbank.StringProperty{
-					String:          "\"splash10-03dr-0000010098-a1f70871442a6d6662d3\"",
+					String:          "splash10-03dr-0000010098-a1f70871442a6d6662d3",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -5751,7 +5747,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		Accession: &massbank.RecordAccession{
 			StringProperty: massbank.StringProperty{
-				String:          "\"MSBNK-test-TST00003\"",
+				String:          "MSBNK-test-TST00003",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -5762,7 +5758,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
-				String:          "\"11-HDoHE; LC-ESI-QTOF; MS2; CE: 20.0; R=N/A; [M-H]-\"",
+				String:          "11-HDoHE; LC-ESI-QTOF; MS2; CE: 20.0; R=N/A; [M-H]-",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -5791,13 +5787,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		License: &massbank.RecordLicense{
 			StringProperty: massbank.StringProperty{
-				String:          "\"CC BY-SA\"",
+				String:          "CC BY-SA",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
 		Copyright: &massbank.RecordCopyright{
 			StringProperty: massbank.StringProperty{
-				String:          "\"Copyright (C) 2019, Leibniz Institut fuer Analytische Wissenschaften - ISAS - e.V., Dortmund, Germany\"",
+				String:          "Copyright (C) 2019, Leibniz Institut fuer Analytische Wissenschaften - ISAS - e.V., Dortmund, Germany",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
@@ -5855,7 +5851,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Names: []*massbank.ChName{
 				{
 					StringProperty: massbank.StringProperty{
-						String:          "\"11-HDoHE\"",
+						String:          "11-HDoHE",
 						DefaultProperty: massbank.DefaultProperty{},
 					},
 				},
@@ -5869,7 +5865,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Formula: &massbank.ChFormula{
 				StringProperty: massbank.StringProperty{
-					String:          "\"C22H32O3\"",
+					String:          "C22H32O3",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -5880,13 +5876,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
-					String:          "\"CC\\\\C=C/C\\\\C=C/C\\\\C=C/CC(O)\\\\C=C\\\\C=C/C\\\\C=C/CCC(O)=O\"",
+					String:          "CC\\\\C=C/C\\\\C=C/C\\\\C=C/CC(O)\\\\C=C\\\\C=C/C\\\\C=C/CCC(O)=O",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			Inchi: &massbank.ChInchi{
 				StringProperty: massbank.StringProperty{
-					String:          "\"InChI=1S/C22H32O3/c1-2-3-4-5-6-7-9-12-15-18-21(23)19-16-13-10-8-11-14-17-20-22(24)25/h3-4,6-7,10-16,19,21,23H,2,5,8-9,17-18,20H2,1H3,(H,24,25)/b4-3-,7-6-,13-10-,14-11-,15-12-,19-16+\"",
+					String:          "InChI=1S/C22H32O3/c1-2-3-4-5-6-7-9-12-15-18-21(23)19-16-13-10-8-11-14-17-20-22(24)25/h3-4,6-7,10-16,19,21,23H,2,5,8-9,17-18,20H2,1H3,(H,24,25)/b4-3-,7-6-,13-10-,14-11-,15-12-,19-16+",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -5949,13 +5945,13 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Instrument: &massbank.AcInstrument{
 				StringProperty: massbank.StringProperty{
-					String:          "\"Q-Exactive HF, Thermo Scientific [MS:1002523]\"",
+					String:          "Q-Exactive HF, Thermo Scientific [MS:1002523]",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
 			InstrumentType: &massbank.AcInstrumentType{
 				StringProperty: massbank.StringProperty{
-					String:          "\"LC-ESI-QTOF\"",
+					String:          "LC-ESI-QTOF",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -6061,7 +6057,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 		}{
 			Splash: &massbank.PkSplash{
 				StringProperty: massbank.StringProperty{
-					String:          "\"splash10-00dl-0914000000-bad728fe323f6890656d\"",
+					String:          "splash10-00dl-0914000000-bad728fe323f6890656d",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
