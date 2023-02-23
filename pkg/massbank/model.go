@@ -55,14 +55,14 @@ type Massbank struct {
 		VersionRef MbReference
 	}
 	Accession   *RecordAccession   `mb2:"ACCESSION"`
-	Deprecated  *RecordDeprecated  `mb2:"DEPRECATED" optional:"true"`
+	Deprecated  *RecordDeprecated  `mb2:"DEPRECATED" optional:"true" bson:"deprecated,omitempty"`
 	RecordTitle *RecordTitle       `mb2:"RECORD_TITLE"`
 	Date        *RecordDate        `mb2:"DATE"`
 	Authors     *RecordAuthorNames `mb2:"AUTHORS"`
 	License     *RecordLicense     `mb2:"LICENSE"`
 	Copyright   *RecordCopyright   `mb2:"COPYRIGHT" optional:"true"`
 	Publication *RecordPublication `mb2:"PUBLICATION" optional:"true"`
-	Project     *RecordProject     `mb2:"PROJECT" optional:"true"`
+	Project     *RecordProject     `mb2:"PROJECT" optional:"true" bson:"project,omitempty"`
 	Comments    []*RecordComment   `mb2:"COMMENT" optional:"true"`
 	Compound    struct {
 		Names     []*ChName          `mb2:"CH$NAME" json:"name"`

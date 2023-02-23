@@ -192,12 +192,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Project: &massbank.RecordProject{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
+		Project: nil,
 		Comments: []*massbank.RecordComment{
 			{
 				SubtagProperty: massbank.SubtagProperty{
@@ -320,18 +315,10 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Link    []*massbank.SpLink            "mb2:\"SP$LINK\" optional:\"true\""
 			Sample  []*massbank.SampleInformation "mb2:\"SP$SAMPLE\" optional:\"true\""
 		}{
-			Name: &massbank.SpName{
-				StringProperty: massbank.StringProperty{
-					String:          "null",
-					DefaultProperty: massbank.DefaultProperty{},
-				},
-			},
-			Lineage: &massbank.SpLineage{
-				DefaultProperty: massbank.DefaultProperty{},
-				Value:           ([]massbank.SpLineageElement)(nil),
-			},
-			Link:   ([]*massbank.SpLink)(nil),
-			Sample: ([]*massbank.SampleInformation)(nil),
+			Name:    nil,
+			Lineage: nil,
+			Link:    ([]*massbank.SpLink)(nil),
+			Sample:  ([]*massbank.SampleInformation)(nil),
 		},
 		Acquisition: struct {
 			Instrument       *massbank.AcInstrument         "mb2:\"AC$INSTRUMENT\""

@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/net/context"
 	"log"
+	"reflect"
 	"strconv"
 	"time"
 )
@@ -90,6 +91,18 @@ func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.Massbank, error) {
 		return nil, err
 	}
 
+	if reflect.DeepEqual(*mb.Deprecated, massbank.RecordDeprecated{}) {
+		mb.Deprecated = nil
+	}
+	if reflect.DeepEqual(*mb.Project, massbank.RecordProject{}) {
+		mb.Project = nil
+	}
+	if mb.Species.Name.String == "" {
+		mb.Species.Name = nil
+	}
+	if mb.Species.Lineage.Value == nil {
+		mb.Species.Lineage = nil
+	}
 	return &mb, err
 }
 

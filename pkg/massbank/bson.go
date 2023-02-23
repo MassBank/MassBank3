@@ -87,7 +87,7 @@ func (p MbReference) MarshalBSONValue() (bsontype.Type, []byte, error) {
 
 func (p *StringProperty) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
 	var raw = bson.RawValue{Type: t, Value: b}
-	p.String = strings.Trim(raw.String(), "\"")
+	raw.Unmarshal(&p.String)
 	return nil
 }
 
@@ -147,11 +147,6 @@ func (p *RecordDeprecated) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
 		if err := raw.Unmarshal(&v); err != nil {
 			return err
 		}
-	}
-	*p = RecordDeprecated{
-		Date:            v.Date,
-		Reason:          v.Reason,
-		DefaultProperty: DefaultProperty{},
 	}
 	return nil
 }
