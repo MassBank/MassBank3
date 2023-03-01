@@ -72,6 +72,13 @@ var TestDbConfigs = map[string]DBConfig{
 	},
 }
 
+type DbInitSet int
+
+const (
+	All DbInitSet = iota
+	Main
+)
+
 var TestDatabases = map[string]MB3Database{
 	"pg valid": &PostgresSQLDB{
 		user:       "mbtestuser",
@@ -135,7 +142,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			FileName   string
 			VersionRef massbank.MbReference
 		}{
-			FileName:   "/home/david/Projekte/MassBank/MassBank-data/AAFC/MSBNK-AAFC-AC000005.txt",
+			FileName:   "/MassBank-data/AAFC/MSBNK-AAFC-AC000005.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession: &massbank.RecordAccession{
@@ -623,7 +630,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			FileName   string
 			VersionRef massbank.MbReference
 		}{
-			FileName:   "/home/david/Projekte/MassBank/MassBank-data/Athens_Univ/MSBNK-Athens_Univ-AU229201.txt",
+			FileName:   "/MassBank-data/Athens_Univ/MSBNK-Athens_Univ-AU229201.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession: &massbank.RecordAccession{
@@ -632,11 +639,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Deprecated: &massbank.RecordDeprecated{
-			Date:            time.Time{},
-			Reason:          "",
-			DefaultProperty: massbank.DefaultProperty{},
-		},
+		Deprecated: nil,
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
 				String:          "2-Amino-3,8-dimethylimidazo-[4,5-f]quinoxaline (MeIQx); LC-ESI-QTOF; MS2; CE: 10 eV; R=35000; [M+H]+",
@@ -682,18 +685,8 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Publication: &massbank.RecordPublication{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
-		Project: &massbank.RecordProject{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
+		Publication: nil,
+		Project:     nil,
 		Comments: []*massbank.RecordComment{
 			{
 				SubtagProperty: massbank.SubtagProperty{
@@ -760,7 +753,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			CdkDepict: ([]*massbank.CdkDepict)(nil),
 			Mass: &massbank.ChMass{
 				DefaultProperty: massbank.DefaultProperty{},
-				Value:           213.101445,
+				Value:           213.1014454,
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
@@ -832,18 +825,10 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Link    []*massbank.SpLink            "mb2:\"SP$LINK\" optional:\"true\""
 			Sample  []*massbank.SampleInformation "mb2:\"SP$SAMPLE\" optional:\"true\""
 		}{
-			Name: &massbank.SpName{
-				StringProperty: massbank.StringProperty{
-					String:          "null",
-					DefaultProperty: massbank.DefaultProperty{},
-				},
-			},
-			Lineage: &massbank.SpLineage{
-				DefaultProperty: massbank.DefaultProperty{},
-				Value:           ([]massbank.SpLineageElement)(nil),
-			},
-			Link:   ([]*massbank.SpLink)(nil),
-			Sample: ([]*massbank.SampleInformation)(nil),
+			Name:    nil,
+			Lineage: nil,
+			Link:    nil,
+			Sample:  nil,
 		},
 		Acquisition: struct {
 			Instrument       *massbank.AcInstrument         "mb2:\"AC$INSTRUMENT\""
@@ -1055,9 +1040,9 @@ var mbTestRecords = map[string]massbank.Massbank{
 				},
 				Values: map[string][]interface{}{
 					"error(ppm)": {
-						-1.220000,
-						-7.780000,
-						-13.600000,
+						-1.22,
+						-7.78,
+						-13.6,
 					},
 					"formula_count": {
 						1,
@@ -1065,14 +1050,14 @@ var mbTestRecords = map[string]massbank.Massbank{
 						1,
 					},
 					"m/z": {
-						214.108500,
-						215.111000,
-						216.113000,
+						214.1085,
+						215.111,
+						216.113,
 					},
 					"mass": {
-						214.108700,
-						215.112600,
-						216.116000,
+						214.1087,
+						215.1126,
+						216.116,
 					},
 					"tentative_formula": {
 						"C11H12N5+",
@@ -1093,14 +1078,14 @@ var mbTestRecords = map[string]massbank.Massbank{
 					"rel.int.",
 				},
 				Mz: []float64{
-					214.108505,
-					215.110992,
-					216.113007,
+					214.1085,
+					215.111,
+					216.113,
 				},
 				Intensity: []float64{
-					2303864.000000,
-					289484.000000,
-					16528.000000,
+					2303864,
+					289484,
+					16528,
 				},
 				Rel: []uint{
 					999,
@@ -1115,7 +1100,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			FileName   string
 			VersionRef massbank.MbReference
 		}{
-			FileName:   "/home/david/Projekte/MassBank/MassBank-data/Eawag/MSBNK-Eawag-EA018353.txt",
+			FileName:   "/MassBank-data/Eawag/MSBNK-Eawag-EA018353.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession: &massbank.RecordAccession{
@@ -1124,11 +1109,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Deprecated: &massbank.RecordDeprecated{
-			Date:            time.Time{},
-			Reason:          "",
-			DefaultProperty: massbank.DefaultProperty{},
-		},
+		Deprecated: nil,
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
 				String:          "Sulfadimethoxine; LC-ESI-ITFT; MS2; CE: 30%; R=7500; [M-H]-",
@@ -1178,18 +1159,8 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Publication: &massbank.RecordPublication{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
-		Project: &massbank.RecordProject{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
+		Publication: nil,
+		Project:     nil,
 		Comments: []*massbank.RecordComment{
 			{
 				SubtagProperty: massbank.SubtagProperty{
@@ -1250,7 +1221,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			CdkDepict: ([]*massbank.CdkDepict)(nil),
 			Mass: &massbank.ChMass{
 				DefaultProperty: massbank.DefaultProperty{},
-				Value:           310.073600,
+				Value:           310.0736,
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
@@ -1322,18 +1293,10 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Link    []*massbank.SpLink            "mb2:\"SP$LINK\" optional:\"true\""
 			Sample  []*massbank.SampleInformation "mb2:\"SP$SAMPLE\" optional:\"true\""
 		}{
-			Name: &massbank.SpName{
-				StringProperty: massbank.StringProperty{
-					String:          "null",
-					DefaultProperty: massbank.DefaultProperty{},
-				},
-			},
-			Lineage: &massbank.SpLineage{
-				DefaultProperty: massbank.DefaultProperty{},
-				Value:           ([]massbank.SpLineageElement)(nil),
-			},
-			Link:   ([]*massbank.SpLink)(nil),
-			Sample: ([]*massbank.SampleInformation)(nil),
+			Name:    nil,
+			Lineage: nil,
+			Link:    nil,
+			Sample:  nil,
 		},
 		Acquisition: struct {
 			Instrument       *massbank.AcInstrument         "mb2:\"AC$INSTRUMENT\""
@@ -1563,10 +1526,10 @@ var mbTestRecords = map[string]massbank.Massbank{
 				},
 				Values: map[string][]interface{}{
 					"error(ppm)": {
-						3.300000,
-						0.090000,
-						-2.230000,
-						-0.940000,
+						3.3,
+						0.09,
+						-2.23,
+						-0.94,
 					},
 					"formula_count": {
 						2,
@@ -1575,16 +1538,16 @@ var mbTestRecords = map[string]massbank.Massbank{
 						1,
 					},
 					"m/z": {
-						174.067900,
-						195.023400,
-						230.080400,
-						309.066000,
+						174.0679,
+						195.0234,
+						230.0804,
+						309.066,
 					},
 					"mass": {
-						174.067300,
-						195.023400,
-						230.080900,
-						309.066300,
+						174.0673,
+						195.0234,
+						230.0809,
+						309.0663,
 					},
 					"tentative_formula": {
 						"C9H8N3O-",
@@ -1606,16 +1569,16 @@ var mbTestRecords = map[string]massbank.Massbank{
 					"rel.int.",
 				},
 				Mz: []float64{
-					174.067902,
-					195.023407,
-					230.080399,
-					309.066010,
+					174.0679,
+					195.0234,
+					230.0804,
+					309.0660,
 				},
 				Intensity: []float64{
-					3134.199951,
-					4236.299805,
-					10982.000000,
-					805229.125000,
+					3134.2,
+					4236.3,
+					10982,
+					805229.1,
 				},
 				Rel: []uint{
 					3,
@@ -1631,7 +1594,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			FileName   string
 			VersionRef massbank.MbReference
 		}{
-			FileName:   "/home/david/Projekte/MassBank/MassBank-data/Eawag_Additional_Specs/MSBNK-Eawag_Additional_Specs-ET060401.txt",
+			FileName:   "/MassBank-data/Eawag_Additional_Specs/MSBNK-Eawag_Additional_Specs-ET060401.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession: &massbank.RecordAccession{
@@ -1640,11 +1603,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Deprecated: &massbank.RecordDeprecated{
-			Date:            time.Time{},
-			Reason:          "",
-			DefaultProperty: massbank.DefaultProperty{},
-		},
+		Deprecated: nil,
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
 				String:          "FEN_246.1101_16.1; LC-ESI-QFT; MS2; CE: 15; R=17500; [M+H]+",
@@ -1696,16 +1655,11 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 		Publication: &massbank.RecordPublication{
 			StringProperty: massbank.StringProperty{
-				String:          "Gulde, R.; Meier, U.; Schymanski, E. L.; Kohler, H.-P. E.; Helbling, D. E.; Derrer, S.; Rentsch, D.; Fenner, K. Systematic Exploration of Biotransformation Reactions of Amine-Containing Micropollutants in Activated Sludge. Environmental Science \\u0026 Technology 2016, 50 (6), 2908–20. DOI:10.1021/acs.est.5b05186",
+				String:          "Gulde, R.; Meier, U.; Schymanski, E. L.; Kohler, H.-P. E.; Helbling, D. E.; Derrer, S.; Rentsch, D.; Fenner, K. Systematic Exploration of Biotransformation Reactions of Amine-Containing Micropollutants in Activated Sludge. Environmental Science \u0026 Technology 2016, 50 (6), 2908–20. DOI:10.1021/acs.est.5b05186",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Project: &massbank.RecordProject{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
+		Project: nil,
 		Comments: []*massbank.RecordComment{
 			{
 				SubtagProperty: massbank.SubtagProperty{
@@ -1830,18 +1784,10 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Link    []*massbank.SpLink            "mb2:\"SP$LINK\" optional:\"true\""
 			Sample  []*massbank.SampleInformation "mb2:\"SP$SAMPLE\" optional:\"true\""
 		}{
-			Name: &massbank.SpName{
-				StringProperty: massbank.StringProperty{
-					String:          "null",
-					DefaultProperty: massbank.DefaultProperty{},
-				},
-			},
-			Lineage: &massbank.SpLineage{
-				DefaultProperty: massbank.DefaultProperty{},
-				Value:           ([]massbank.SpLineageElement)(nil),
-			},
-			Link:   ([]*massbank.SpLink)(nil),
-			Sample: ([]*massbank.SampleInformation)(nil),
+			Name:    nil,
+			Lineage: nil,
+			Link:    nil,
+			Sample:  nil,
 		},
 		Acquisition: struct {
 			Instrument       *massbank.AcInstrument         "mb2:\"AC$INSTRUMENT\""
@@ -2082,24 +2028,24 @@ var mbTestRecords = map[string]massbank.Massbank{
 						1,
 					},
 					"m/z": {
-						60.044400,
-						60.080800,
-						123.116200,
-						141.000600,
-						158.027200,
-						159.041600,
-						187.073000,
-						246.110200,
+						60.0444,
+						60.0808,
+						123.1162,
+						141.0006,
+						158.0272,
+						159.0416,
+						187.073,
+						246.1102,
 					},
 					"mass": {
-						60.044400,
-						60.080800,
-						123.116800,
-						141.000900,
-						158.027500,
-						159.041600,
-						187.072900,
-						246.110000,
+						60.0444,
+						60.0808,
+						123.1168,
+						141.0009,
+						158.0275,
+						159.0416,
+						187.0729,
+						246.11,
 					},
 					"tentative_formula": {
 						"C2H6NO+",
@@ -2125,26 +2071,26 @@ var mbTestRecords = map[string]massbank.Massbank{
 					"rel.int.",
 				},
 				Mz: []float64{
-					60.044399,
-					60.080799,
-					123.116203,
-					141.000595,
-					158.027206,
-					159.041595,
-					187.072998,
-					214.089706,
-					246.110199,
+					60.0444,
+					60.0808,
+					123.1162,
+					141.0006,
+					158.0272,
+					159.0416,
+					187.073,
+					214.0897,
+					246.1102,
 				},
 				Intensity: []float64{
-					17595.500000,
-					1571.699951,
-					990.299988,
-					4683.899902,
-					14370.000000,
-					43520.398438,
-					97124.796875,
-					13043.944336,
-					75456.703125,
+					17595.5,
+					1571.7,
+					990.3,
+					4683.9,
+					14370,
+					43520.4,
+					97124.8,
+					13043.94434,
+					75456.7,
 				},
 				Rel: []uint{
 					180,
@@ -2165,7 +2111,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			FileName   string
 			VersionRef massbank.MbReference
 		}{
-			FileName:   "/home/david/Projekte/MassBank/MassBank-data/Fac_Eng_Univ_Tokyo/MSBNK-Fac_Eng_Univ_Tokyo-JP009132.txt",
+			FileName:   "/MassBank-data/Fac_Eng_Univ_Tokyo/MSBNK-Fac_Eng_Univ_Tokyo-JP009132.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession: &massbank.RecordAccession{
@@ -2174,11 +2120,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Deprecated: &massbank.RecordDeprecated{
-			Date:            time.Time{},
-			Reason:          "",
-			DefaultProperty: massbank.DefaultProperty{},
-		},
+		Deprecated: nil,
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
 				String:          "METHYL PHENYL SULFIDE; EI-B; MS",
@@ -2210,25 +2152,10 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Copyright: &massbank.RecordCopyright{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
-		Publication: &massbank.RecordPublication{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
-		Project: &massbank.RecordProject{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
-		Comments: ([]*massbank.RecordComment)(nil),
+		Copyright:   nil,
+		Publication: nil,
+		Project:     nil,
+		Comments:    ([]*massbank.RecordComment)(nil),
 		Compound: struct {
 			Names     []*massbank.ChName          "mb2:\"CH$NAME\" json:\"name\""
 			Classes   *massbank.ChCompoundClasses "mb2:\"CH$COMPOUND_CLASS\" json:\"classes\""
@@ -2299,18 +2226,10 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Link    []*massbank.SpLink            "mb2:\"SP$LINK\" optional:\"true\""
 			Sample  []*massbank.SampleInformation "mb2:\"SP$SAMPLE\" optional:\"true\""
 		}{
-			Name: &massbank.SpName{
-				StringProperty: massbank.StringProperty{
-					String:          "null",
-					DefaultProperty: massbank.DefaultProperty{},
-				},
-			},
-			Lineage: &massbank.SpLineage{
-				DefaultProperty: massbank.DefaultProperty{},
-				Value:           ([]massbank.SpLineageElement)(nil),
-			},
-			Link:   ([]*massbank.SpLink)(nil),
-			Sample: ([]*massbank.SampleInformation)(nil),
+			Name:    nil,
+			Lineage: nil,
+			Link:    nil,
+			Sample:  nil,
 		},
 		Acquisition: struct {
 			Instrument       *massbank.AcInstrument         "mb2:\"AC$INSTRUMENT\""
@@ -2392,11 +2311,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
-			Annotation: &massbank.PkAnnotation{
-				DefaultProperty: massbank.DefaultProperty{},
-				Header:          ([]string)(nil),
-				Values:          (map[string][]interface{})(nil),
-			},
+			Annotation: nil,
 			NumPeak: &massbank.PkNumPeak{
 				DefaultProperty: massbank.DefaultProperty{},
 				Value:           43,
@@ -2454,49 +2369,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 					126.000000,
 				},
 				Intensity: []float64{
-					5.680000,
-					1.260000,
-					3.110000,
-					1.850000,
-					4.410000,
-					19.290001,
-					28.639999,
-					7.900000,
-					5.090000,
-					1.390000,
-					18.139999,
-					34.820000,
-					3.180000,
-					2.300000,
-					2.040000,
-					1.250000,
-					6.110000,
-					6.120000,
-					22.520000,
-					1.380000,
-					14.670000,
-					1.150000,
-					1.480000,
-					1.160000,
-					6.230000,
-					2.840000,
-					1.810000,
-					12.700000,
-					42.959999,
-					6.050000,
-					2.100000,
-					5.120000,
-					1.610000,
-					31.680000,
-					2.020000,
-					5.640000,
-					46.380001,
-					3.120000,
-					1.970000,
-					8.220000,
-					99.989998,
-					8.310000,
-					4.820000,
+					5.68, 1.26, 3.11, 1.85, 4.41, 19.29, 28.64, 7.9, 5.09, 1.39, 18.14, 34.82, 3.18, 2.3, 2.04, 1.25, 6.11, 6.12, 22.52, 1.38, 14.67, 1.15, 1.48, 1.16, 6.23, 2.84, 1.81, 12.7, 42.96, 6.05, 2.1, 5.12, 1.61, 31.68, 2.02, 5.64, 46.38, 3.12, 1.97, 8.22, 99.99, 8.31, 4.82,
 				},
 				Rel: []uint{
 					57,
@@ -2551,7 +2424,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			FileName   string
 			VersionRef massbank.MbReference
 		}{
-			FileName:   "/home/david/Projekte/MassBank/MassBank-data/Keio_Univ/MSBNK-Keio_Univ-KO009105.txt",
+			FileName:   "/MassBank-data/Keio_Univ/MSBNK-Keio_Univ-KO009105.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession: &massbank.RecordAccession{
@@ -2560,11 +2433,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Deprecated: &massbank.RecordDeprecated{
-			Date:            time.Time{},
-			Reason:          "",
-			DefaultProperty: massbank.DefaultProperty{},
-		},
+		Deprecated: nil,
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
 				String:          "Desthiobiotin; LC-ESI-IT; MS4; m/z: 215/197/179; [M+H]+",
@@ -2612,24 +2481,9 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Copyright: &massbank.RecordCopyright{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
-		Publication: &massbank.RecordPublication{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
-		Project: &massbank.RecordProject{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
+		Copyright:   nil,
+		Publication: nil,
+		Project:     nil,
 		Comments: []*massbank.RecordComment{
 			{
 				SubtagProperty: massbank.SubtagProperty{
@@ -2761,18 +2615,10 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Link    []*massbank.SpLink            "mb2:\"SP$LINK\" optional:\"true\""
 			Sample  []*massbank.SampleInformation "mb2:\"SP$SAMPLE\" optional:\"true\""
 		}{
-			Name: &massbank.SpName{
-				StringProperty: massbank.StringProperty{
-					String:          "null",
-					DefaultProperty: massbank.DefaultProperty{},
-				},
-			},
-			Lineage: &massbank.SpLineage{
-				DefaultProperty: massbank.DefaultProperty{},
-				Value:           ([]massbank.SpLineageElement)(nil),
-			},
-			Link:   ([]*massbank.SpLink)(nil),
-			Sample: ([]*massbank.SampleInformation)(nil),
+			Name:    nil,
+			Lineage: nil,
+			Link:    ([]*massbank.SpLink)(nil),
+			Sample:  ([]*massbank.SampleInformation)(nil),
 		},
 		Acquisition: struct {
 			Instrument       *massbank.AcInstrument         "mb2:\"AC$INSTRUMENT\""
@@ -2873,11 +2719,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
-			Annotation: &massbank.PkAnnotation{
-				DefaultProperty: massbank.DefaultProperty{},
-				Header:          ([]string)(nil),
-				Values:          (map[string][]interface{})(nil),
-			},
+			Annotation: nil,
 			NumPeak: &massbank.PkNumPeak{
 				DefaultProperty: massbank.DefaultProperty{},
 				Value:           33,
@@ -2890,74 +2732,74 @@ var mbTestRecords = map[string]massbank.Massbank{
 					"rel.int.",
 				},
 				Mz: []float64{
-					56.200001,
-					58.200001,
-					67.199997,
-					68.199997,
-					70.199997,
-					76.699997,
-					79.199997,
-					80.000000,
-					81.099998,
-					82.000000,
-					85.000000,
-					91.099998,
-					93.099998,
-					94.000000,
-					95.099998,
-					96.099998,
-					99.099998,
-					108.099998,
-					109.099998,
-					110.099998,
-					111.000000,
-					113.099998,
-					119.099998,
-					123.099998,
-					125.099998,
-					134.100006,
-					136.100006,
-					137.100006,
-					151.100006,
-					162.000000,
-					179.100006,
-					180.100006,
-					197.199997,
+					56.2,
+					58.2,
+					67.2,
+					68.2,
+					70.2,
+					76.7,
+					79.2,
+					80.0,
+					81.1,
+					82.0,
+					85.0,
+					91.1,
+					93.1,
+					94.0,
+					95.1,
+					96.1,
+					99.1,
+					108.1,
+					109.1,
+					110.1,
+					111.0,
+					113.1,
+					119.1,
+					123.1,
+					125.1,
+					134.1,
+					136.1,
+					137.1,
+					151.1,
+					162.0,
+					179.1,
+					180.1,
+					197.2,
 				},
 				Intensity: []float64{
-					7.300000,
-					8.100000,
-					66.360001,
-					1.800000,
-					6.700000,
-					4.900000,
-					14.000000,
-					2.600000,
-					64.279999,
-					18.490000,
-					3.000000,
-					10.000000,
-					49.500000,
-					6.690000,
-					28.990000,
-					10.200000,
-					342.459991,
-					6.600000,
-					33.389999,
-					12.190000,
-					41.200001,
-					17.900000,
-					180.850006,
-					11.400000,
-					12.890000,
-					52.209999,
-					498.250000,
-					13.290000,
-					142.240005,
-					3.900000,
-					39.869999,
-					54.970001,
-					2.200000,
+					7.30,
+					8.10,
+					66.36,
+					1.80,
+					6.70,
+					4.90,
+					14.00,
+					2.60,
+					64.28,
+					18.49,
+					3.00,
+					10.00,
+					49.50,
+					6.69,
+					28.99,
+					10.20,
+					342.46,
+					6.60,
+					33.39,
+					12.19,
+					41.20,
+					17.90,
+					180.85,
+					11.40,
+					12.89,
+					52.21,
+					498.25,
+					13.29,
+					142.24,
+					3.90,
+					39.87,
+					54.97,
+					2.20,
 				},
 				Rel: []uint{
 					15,
@@ -3002,7 +2844,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			FileName   string
 			VersionRef massbank.MbReference
 		}{
-			FileName:   "/home/david/Projekte/MassBank/MassBank-data/MSSJ/MSBNK-MSSJ-MSJ00284.txt",
+			FileName:   "/MassBank-data/MSSJ/MSBNK-MSSJ-MSJ00284.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession: &massbank.RecordAccession{
@@ -3011,11 +2853,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Deprecated: &massbank.RecordDeprecated{
-			Date:            time.Time{},
-			Reason:          "",
-			DefaultProperty: massbank.DefaultProperty{},
-		},
+		Deprecated: nil,
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
 				String:          "Pentoxazone; ESI-QTOF; MS2; NEGATIVE; [M-H]-; CID; 60 V",
@@ -3077,18 +2915,8 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Publication: &massbank.RecordPublication{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
-		Project: &massbank.RecordProject{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
+		Publication: nil,
+		Project:     nil,
 		Comments: []*massbank.RecordComment{
 			{
 				SubtagProperty: massbank.SubtagProperty{
@@ -3193,18 +3021,10 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Link    []*massbank.SpLink            "mb2:\"SP$LINK\" optional:\"true\""
 			Sample  []*massbank.SampleInformation "mb2:\"SP$SAMPLE\" optional:\"true\""
 		}{
-			Name: &massbank.SpName{
-				StringProperty: massbank.StringProperty{
-					String:          "null",
-					DefaultProperty: massbank.DefaultProperty{},
-				},
-			},
-			Lineage: &massbank.SpLineage{
-				DefaultProperty: massbank.DefaultProperty{},
-				Value:           ([]massbank.SpLineageElement)(nil),
-			},
-			Link:   ([]*massbank.SpLink)(nil),
-			Sample: ([]*massbank.SampleInformation)(nil),
+			Name:    nil,
+			Lineage: nil,
+			Link:    ([]*massbank.SpLink)(nil),
+			Sample:  ([]*massbank.SampleInformation)(nil),
 		},
 		Acquisition: struct {
 			Instrument       *massbank.AcInstrument         "mb2:\"AC$INSTRUMENT\""
@@ -3313,11 +3133,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
-			Annotation: &massbank.PkAnnotation{
-				DefaultProperty: massbank.DefaultProperty{},
-				Header:          ([]string)(nil),
-				Values:          (map[string][]interface{})(nil),
-			},
+			Annotation: nil,
 			NumPeak: &massbank.PkNumPeak{
 				DefaultProperty: massbank.DefaultProperty{},
 				Value:           9,
@@ -3330,26 +3146,26 @@ var mbTestRecords = map[string]massbank.Massbank{
 					"rel.int.",
 				},
 				Mz: []float64{
-					31.990101,
-					34.969101,
-					41.039200,
-					69.034203,
-					97.028900,
-					131.001007,
-					149.999207,
-					166.977402,
-					185.976105,
+					31.9901,
+					34.9691,
+					41.0392,
+					69.0342,
+					97.0289,
+					131.001,
+					149.9992,
+					166.9774,
+					185.9761,
 				},
 				Intensity: []float64{
-					0.025420,
-					0.020940,
-					0.260610,
-					0.016450,
-					0.025310,
-					0.037660,
-					0.042760,
-					0.043920,
-					0.039620,
+					0.02542,
+					0.02094,
+					0.26061,
+					0.01645,
+					0.02531,
+					0.03766,
+					0.04276,
+					0.04392,
+					0.03962,
 				},
 				Rel: []uint{
 					97,
@@ -3370,7 +3186,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			FileName   string
 			VersionRef massbank.MbReference
 		}{
-			FileName:   "/home/david/Projekte/MassBank/MassBank-data/RIKEN/MSBNK-RIKEN-PR100978.txt",
+			FileName:   "/MassBank-data/RIKEN/MSBNK-RIKEN-PR100978.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession: &massbank.RecordAccession{
@@ -3379,11 +3195,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Deprecated: &massbank.RecordDeprecated{
-			Date:            time.Time{},
-			Reason:          "",
-			DefaultProperty: massbank.DefaultProperty{},
-		},
+		Deprecated: nil,
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
 				String:          "Quercetin-3-Glucuronide; LC-ESI-QTOF; MS2; CE:Ramp 5-60 V; [M-H]-",
@@ -3427,24 +3239,9 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Copyright: &massbank.RecordCopyright{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
-		Publication: &massbank.RecordPublication{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
-		Project: &massbank.RecordProject{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
+		Copyright:   nil,
+		Publication: nil,
+		Project:     nil,
 		Comments: []*massbank.RecordComment{
 			{
 				SubtagProperty: massbank.SubtagProperty{
@@ -3572,18 +3369,10 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Link    []*massbank.SpLink            "mb2:\"SP$LINK\" optional:\"true\""
 			Sample  []*massbank.SampleInformation "mb2:\"SP$SAMPLE\" optional:\"true\""
 		}{
-			Name: &massbank.SpName{
-				StringProperty: massbank.StringProperty{
-					String:          "null",
-					DefaultProperty: massbank.DefaultProperty{},
-				},
-			},
-			Lineage: &massbank.SpLineage{
-				DefaultProperty: massbank.DefaultProperty{},
-				Value:           ([]massbank.SpLineageElement)(nil),
-			},
-			Link:   ([]*massbank.SpLink)(nil),
-			Sample: ([]*massbank.SampleInformation)(nil),
+			Name:    nil,
+			Lineage: nil,
+			Link:    ([]*massbank.SpLink)(nil),
+			Sample:  ([]*massbank.SampleInformation)(nil),
 		},
 		Acquisition: struct {
 			Instrument       *massbank.AcInstrument         "mb2:\"AC$INSTRUMENT\""
@@ -3765,11 +3554,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
-			Annotation: &massbank.PkAnnotation{
-				DefaultProperty: massbank.DefaultProperty{},
-				Header:          ([]string)(nil),
-				Values:          (map[string][]interface{})(nil),
-			},
+			Annotation: nil,
 			NumPeak: &massbank.PkNumPeak{
 				DefaultProperty: massbank.DefaultProperty{},
 				Value:           11,
@@ -3782,30 +3567,30 @@ var mbTestRecords = map[string]massbank.Massbank{
 					"rel.int.",
 				},
 				Mz: []float64{
-					107.014297,
-					109.029900,
-					121.029800,
-					151.003494,
-					163.003601,
-					178.998901,
-					255.031097,
-					301.035309,
-					302.043213,
-					477.066895,
-					478.075897,
+					107.0143,
+					109.0299,
+					121.0298,
+					151.0035,
+					163.0036,
+					178.9989,
+					255.0311,
+					301.0353,
+					302.0432,
+					477.0669,
+					478.0759,
 				},
 				Intensity: []float64{
-					370.799988,
-					267.700012,
-					395.399994,
-					1650.000000,
-					295.200012,
-					793.799988,
-					333.299988,
-					4687.000000,
-					386.000000,
-					2215.000000,
-					237.500000,
+					370.8,
+					267.7,
+					395.4,
+					1650,
+					295.2,
+					793.8,
+					333.3,
+					4687,
+					386,
+					2215,
+					237.5,
 				},
 				Rel: []uint{
 					79,
@@ -3828,7 +3613,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			FileName   string
 			VersionRef massbank.MbReference
 		}{
-			FileName:   "/home/david/Projekte/MassBank/MassBank-data/RIKEN/MSBNK-RIKEN-PR309089.txt",
+			FileName:   "/MassBank-data/RIKEN/MSBNK-RIKEN-PR309089.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession: &massbank.RecordAccession{
@@ -3837,11 +3622,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Deprecated: &massbank.RecordDeprecated{
-			Date:            time.Time{},
-			Reason:          "",
-			DefaultProperty: massbank.DefaultProperty{},
-		},
+		Deprecated: nil,
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
 				String:          "FA 18:2+1O; LC-ESI-QTOF; MS2",
@@ -3877,24 +3658,14 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Copyright: &massbank.RecordCopyright{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
+		Copyright: nil,
 		Publication: &massbank.RecordPublication{
 			StringProperty: massbank.StringProperty{
-				String:          "Tsugawa H., Nakabayashi R., Mori T., Yamada Y., Takahashi M., Rai A., Sugiyama R., Yamamoto H., Nakaya T., Yamazaki M., Kooke R., Bac-Molenaar JA., Oztolan-Erol N., Keurentjes JJB., Arita M., Saito K. (2019) \\A cheminformatics approach to characterize metabolomes in stable-isotope-labeled organisms\\ Nature Methods 16(4):295-298. [doi:10.1038/s41592-019-0358-2]",
+				String:          "Tsugawa H., Nakabayashi R., Mori T., Yamada Y., Takahashi M., Rai A., Sugiyama R., Yamamoto H., Nakaya T., Yamazaki M., Kooke R., Bac-Molenaar JA., Oztolan-Erol N., Keurentjes JJB., Arita M., Saito K. (2019) \"A cheminformatics approach to characterize metabolomes in stable-isotope-labeled organisms\" Nature Methods 16(4):295-298. [doi:10.1038/s41592-019-0358-2]",
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Project: &massbank.RecordProject{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
+		Project: nil,
 		Comments: []*massbank.RecordComment{
 			{
 				SubtagProperty: massbank.SubtagProperty{
@@ -3969,18 +3740,10 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Link    []*massbank.SpLink            "mb2:\"SP$LINK\" optional:\"true\""
 			Sample  []*massbank.SampleInformation "mb2:\"SP$SAMPLE\" optional:\"true\""
 		}{
-			Name: &massbank.SpName{
-				StringProperty: massbank.StringProperty{
-					String:          "null",
-					DefaultProperty: massbank.DefaultProperty{},
-				},
-			},
-			Lineage: &massbank.SpLineage{
-				DefaultProperty: massbank.DefaultProperty{},
-				Value:           ([]massbank.SpLineageElement)(nil),
-			},
-			Link:   ([]*massbank.SpLink)(nil),
-			Sample: ([]*massbank.SampleInformation)(nil),
+			Name:    nil,
+			Lineage: nil,
+			Link:    ([]*massbank.SpLink)(nil),
+			Sample:  ([]*massbank.SampleInformation)(nil),
 		},
 		Acquisition: struct {
 			Instrument       *massbank.AcInstrument         "mb2:\"AC$INSTRUMENT\""
@@ -4171,11 +3934,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
-			Annotation: &massbank.PkAnnotation{
-				DefaultProperty: massbank.DefaultProperty{},
-				Header:          ([]string)(nil),
-				Values:          (map[string][]interface{})(nil),
-			},
+			Annotation: nil,
 			NumPeak: &massbank.PkNumPeak{
 				DefaultProperty: massbank.DefaultProperty{},
 				Value:           11,
@@ -4188,30 +3947,30 @@ var mbTestRecords = map[string]massbank.Massbank{
 					"rel.int.",
 				},
 				Mz: []float64{
-					57.084129,
-					113.098259,
-					172.092789,
-					177.122955,
-					195.136719,
-					196.146408,
-					197.186310,
-					223.434525,
-					233.159775,
-					277.216187,
-					295.227722,
+					57.08413,
+					113.09826,
+					172.09279,
+					177.12296,
+					195.13672,
+					196.14641,
+					197.18631,
+					223.43452,
+					233.15977,
+					277.21619,
+					295.22772,
 				},
 				Intensity: []float64{
-					18.000000,
-					20.000000,
-					24.000000,
-					20.000000,
-					59.000000,
-					20.000000,
-					20.000000,
-					29.000000,
-					19.000000,
-					272.000000,
-					1553.000000,
+					18.0,
+					20.0,
+					24.0,
+					20.0,
+					59.0,
+					20.0,
+					20.0,
+					29.0,
+					19.0,
+					272.0,
+					1553.0,
 				},
 				Rel: []uint{
 					12,
@@ -4234,7 +3993,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			FileName   string
 			VersionRef massbank.MbReference
 		}{
-			FileName:   "/home/david/Projekte/MassBank/MassBank-data/Washington_State_Univ/MSBNK-Washington_State_Univ-BML81902.txt",
+			FileName:   "/MassBank-data/Washington_State_Univ/MSBNK-Washington_State_Univ-BML81902.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession: &massbank.RecordAccession{
@@ -4243,11 +4002,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Deprecated: &massbank.RecordDeprecated{
-			Date:            time.Time{},
-			Reason:          "",
-			DefaultProperty: massbank.DefaultProperty{},
-		},
+		Deprecated: nil,
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
 				String:          "Parthenolide; LC-APCI-QTOF; MS; POSITIVE",
@@ -4291,24 +4046,9 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Copyright: &massbank.RecordCopyright{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
-		Publication: &massbank.RecordPublication{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
-		Project: &massbank.RecordProject{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
+		Copyright:   nil,
+		Publication: nil,
+		Project:     nil,
 		Comments: []*massbank.RecordComment{
 			{
 				SubtagProperty: massbank.SubtagProperty{
@@ -4357,7 +4097,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
-					String:          "C/C/1=C\\\\CC[C@@]2([C@@H](O2)[C@@H]3[C@@H](CC1)C(=C)C(=O)O3)C",
+					String:          "C/C/1=C\\CC[C@@]2([C@@H](O2)[C@@H]3[C@@H](CC1)C(=C)C(=O)O3)C",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -4404,18 +4144,10 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Link    []*massbank.SpLink            "mb2:\"SP$LINK\" optional:\"true\""
 			Sample  []*massbank.SampleInformation "mb2:\"SP$SAMPLE\" optional:\"true\""
 		}{
-			Name: &massbank.SpName{
-				StringProperty: massbank.StringProperty{
-					String:          "null",
-					DefaultProperty: massbank.DefaultProperty{},
-				},
-			},
-			Lineage: &massbank.SpLineage{
-				DefaultProperty: massbank.DefaultProperty{},
-				Value:           ([]massbank.SpLineageElement)(nil),
-			},
-			Link:   ([]*massbank.SpLink)(nil),
-			Sample: ([]*massbank.SampleInformation)(nil),
+			Name:    nil,
+			Lineage: nil,
+			Link:    ([]*massbank.SpLink)(nil),
+			Sample:  ([]*massbank.SampleInformation)(nil),
 		},
 		Acquisition: struct {
 			Instrument       *massbank.AcInstrument         "mb2:\"AC$INSTRUMENT\""
@@ -4551,11 +4283,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
-			Annotation: &massbank.PkAnnotation{
-				DefaultProperty: massbank.DefaultProperty{},
-				Header:          ([]string)(nil),
-				Values:          (map[string][]interface{})(nil),
-			},
+			Annotation: nil,
 			NumPeak: &massbank.PkNumPeak{
 				DefaultProperty: massbank.DefaultProperty{},
 				Value:           1,
@@ -4568,7 +4296,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 					"rel.int.",
 				},
 				Mz: []float64{
-					249.148483,
+					249.1484765,
 				},
 				Intensity: []float64{
 					310073.000000,
@@ -4579,12 +4307,12 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 		},
 	},
-	"minimal": {
+	"MSBNK-test-TST00001": {
 		Metadata: struct {
 			FileName   string
 			VersionRef massbank.MbReference
 		}{
-			FileName:   "/home/uly55e5/Projekte/ipb/MassBank3/test-data/MSBNK-test-TST00001.txt",
+			FileName:   "/MassBank3/test-data/MSBNK-test-TST00001.txt",
 			VersionRef: "63f50065841fc1dec65402fe",
 		},
 		Accession: &massbank.RecordAccession{
@@ -4593,11 +4321,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Deprecated: &massbank.RecordDeprecated{
-			Date:            time.Time{},
-			Reason:          "",
-			DefaultProperty: massbank.DefaultProperty{},
-		},
+		Deprecated: nil,
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
 				String:          "Fiscalin C; LC-ESI-ITFT; MS2; CE: 30; R=17500; [M+H]+",
@@ -4637,25 +4361,10 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Copyright: &massbank.RecordCopyright{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
-		Publication: &massbank.RecordPublication{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
-		Project: &massbank.RecordProject{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
-		Comments: ([]*massbank.RecordComment)(nil),
+		Copyright:   nil,
+		Publication: nil,
+		Project:     nil,
+		Comments:    ([]*massbank.RecordComment)(nil),
 		Compound: struct {
 			Names     []*massbank.ChName          "mb2:\"CH$NAME\" json:\"name\""
 			Classes   *massbank.ChCompoundClasses "mb2:\"CH$COMPOUND_CLASS\" json:\"classes\""
@@ -4711,18 +4420,10 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Link    []*massbank.SpLink            "mb2:\"SP$LINK\" optional:\"true\""
 			Sample  []*massbank.SampleInformation "mb2:\"SP$SAMPLE\" optional:\"true\""
 		}{
-			Name: &massbank.SpName{
-				StringProperty: massbank.StringProperty{
-					String:          "null",
-					DefaultProperty: massbank.DefaultProperty{},
-				},
-			},
-			Lineage: &massbank.SpLineage{
-				DefaultProperty: massbank.DefaultProperty{},
-				Value:           ([]massbank.SpLineageElement)(nil),
-			},
-			Link:   ([]*massbank.SpLink)(nil),
-			Sample: ([]*massbank.SampleInformation)(nil),
+			Name:    nil,
+			Lineage: nil,
+			Link:    ([]*massbank.SpLink)(nil),
+			Sample:  ([]*massbank.SampleInformation)(nil),
 		},
 		Acquisition: struct {
 			Instrument       *massbank.AcInstrument         "mb2:\"AC$INSTRUMENT\""
@@ -4785,11 +4486,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
-			Annotation: &massbank.PkAnnotation{
-				DefaultProperty: massbank.DefaultProperty{},
-				Header:          ([]string)(nil),
-				Values:          (map[string][]interface{})(nil),
-			},
+			Annotation: nil,
 			NumPeak: &massbank.PkNumPeak{
 				DefaultProperty: massbank.DefaultProperty{},
 				Value:           3,
@@ -4802,14 +4499,14 @@ var mbTestRecords = map[string]massbank.Massbank{
 					"rel.int.",
 				},
 				Mz: []float64{
-					185.107300,
-					213.102203,
-					258.123688,
+					185.1073,
+					213.1022,
+					258.1237,
 				},
 				Intensity: []float64{
-					73653728.000000,
-					235010720.000000,
-					52446636.000000,
+					73653728.0,
+					235010720.0,
+					52446636.0,
 				},
 				Rel: []uint{
 					312,
@@ -4819,12 +4516,12 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 		},
 	},
-	"maximal": {
+	"MSBNK-test-TST00002": {
 		Metadata: struct {
 			FileName   string
 			VersionRef massbank.MbReference
 		}{
-			FileName:   "/home/uly55e5/Projekte/ipb/MassBank3/test-data/MSBNK-test-TST00002.txt",
+			FileName:   "/MassBank3/test-data/MSBNK-test-TST00002.txt",
 			VersionRef: "63f50065841fc1dec65402fe",
 		},
 		Accession: &massbank.RecordAccession{
@@ -4833,11 +4530,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Deprecated: &massbank.RecordDeprecated{
-			Date:            time.Time{},
-			Reason:          "",
-			DefaultProperty: massbank.DefaultProperty{},
-		},
+		Deprecated: nil,
 		RecordTitle: &massbank.RecordTitle{
 			StringProperty: massbank.StringProperty{
 				String:          "Disialoganglioside GD1a; MALDI-TOF; MS; Pos",
@@ -5464,90 +5157,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 					"rel.int.",
 				},
 				Mz: []float64{
-					1278.119995,
-					1279.109985,
-					1279.180054,
-					1306.209961,
-					1309.130005,
-					1366.030029,
-					1375.229980,
-					1527.599976,
-					1569.079956,
-					1591.140015,
-					1595.209961,
-					1597.119995,
-					1598.109985,
-					1599.069946,
-					1620.300049,
-					1620.800049,
-					1621.180054,
-					1843.209961,
-					1860.160034,
-					1861.170044,
-					1862.180054,
-					1863.189941,
-					1864.219971,
-					1866.260010,
-					1867.229980,
-					1871.180054,
-					1876.140015,
-					1877.140015,
-					1878.130005,
-					1879.189941,
-					1882.180054,
-					1883.180054,
-					1884.180054,
-					1885.199951,
-					1886.189941,
-					1888.199951,
-					1889.209961,
-					1890.209961,
-					1891.219971,
-					1892.239990,
-					1893.229980,
-					1894.239990,
-					1895.209961,
-					1897.140015,
-					1898.150024,
-					1899.160034,
-					1900.170044,
-					1902.160034,
-					1903.199951,
-					1904.189941,
-					1905.199951,
-					1906.199951,
-					1907.229980,
-					1908.189941,
-					1910.209961,
-					1911.209961,
-					1912.209961,
-					1913.219971,
-					1914.209961,
-					1915.199951,
-					1920.180054,
-					1921.209961,
-					1922.189941,
-					1926.199951,
-					1927.189941,
-					1928.199951,
-					1929.209961,
-					1930.199951,
-					1931.319946,
-					1932.219971,
-					1933.229980,
-					1934.229980,
-					1935.219971,
-					1943.199951,
-					1948.239990,
-					1949.219971,
-					1950.219971,
-					1960.260010,
-					1965.229980,
-					1971.319946,
-					2064.290039,
-					2091.320068,
-					2092.300049,
-					2136.330078,
+					1278.12, 1279.11, 1279.18, 1306.21, 1309.13, 1366.03, 1375.23, 1527.60, 1569.08, 1591.14, 1595.21, 1597.12, 1598.11, 1599.07, 1620.30, 1620.80, 1621.18, 1843.21, 1860.16, 1861.17, 1862.18, 1863.19, 1864.22, 1866.26, 1867.23, 1871.18, 1876.14, 1877.14, 1878.13, 1879.19, 1882.18, 1883.18, 1884.18, 1885.20, 1886.19, 1888.20, 1889.21, 1890.21, 1891.22, 1892.24, 1893.23, 1894.24, 1895.21, 1897.14, 1898.15, 1899.16, 1900.17, 1902.16, 1903.20, 1904.19, 1905.20, 1906.20, 1907.23, 1908.19, 1910.21, 1911.21, 1912.21, 1913.22, 1914.21, 1915.20, 1920.18, 1921.21, 1922.19, 1926.20, 1927.19, 1928.20, 1929.21, 1930.20, 1931.32, 1932.22, 1933.23, 1934.23, 1935.22, 1943.20, 1948.24, 1949.22, 1950.22, 1960.26, 1965.23, 1971.32, 2064.29, 2091.32, 2092.30, 2136.33,
 				},
 				Intensity: []float64{
 					205.000000,
@@ -5724,12 +5334,12 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 		},
 	},
-	"deprecated": {
+	"MSBNK-test-TST00003": {
 		Metadata: struct {
 			FileName   string
 			VersionRef massbank.MbReference
 		}{
-			FileName:   "/home/uly55e5/Projekte/ipb/MassBank3/test-data/MSBNK-test-TST00003.txt",
+			FileName:   "/MassBank3/test-data/MSBNK-test-TST00003.txt",
 			VersionRef: "63f50065841fc1dec65402fe",
 		},
 		Accession: &massbank.RecordAccession{
@@ -5784,18 +5394,8 @@ var mbTestRecords = map[string]massbank.Massbank{
 				DefaultProperty: massbank.DefaultProperty{},
 			},
 		},
-		Publication: &massbank.RecordPublication{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
-		Project: &massbank.RecordProject{
-			StringProperty: massbank.StringProperty{
-				String:          "null",
-				DefaultProperty: massbank.DefaultProperty{},
-			},
-		},
+		Publication: nil,
+		Project:     nil,
 		Comments: []*massbank.RecordComment{
 			{
 				SubtagProperty: massbank.SubtagProperty{
@@ -5863,7 +5463,7 @@ var mbTestRecords = map[string]massbank.Massbank{
 			},
 			Smiles: &massbank.ChSmiles{
 				StringProperty: massbank.StringProperty{
-					String:          "CC\\\\C=C/C\\\\C=C/C\\\\C=C/CC(O)\\\\C=C\\\\C=C/C\\\\C=C/CCC(O)=O",
+					String:          "CC\\C=C/C\\C=C/C\\C=C/CC(O)\\C=C\\C=C/C\\C=C/CCC(O)=O",
 					DefaultProperty: massbank.DefaultProperty{},
 				},
 			},
@@ -5910,18 +5510,10 @@ var mbTestRecords = map[string]massbank.Massbank{
 			Link    []*massbank.SpLink            "mb2:\"SP$LINK\" optional:\"true\""
 			Sample  []*massbank.SampleInformation "mb2:\"SP$SAMPLE\" optional:\"true\""
 		}{
-			Name: &massbank.SpName{
-				StringProperty: massbank.StringProperty{
-					String:          "null",
-					DefaultProperty: massbank.DefaultProperty{},
-				},
-			},
-			Lineage: &massbank.SpLineage{
-				DefaultProperty: massbank.DefaultProperty{},
-				Value:           ([]massbank.SpLineageElement)(nil),
-			},
-			Link:   ([]*massbank.SpLink)(nil),
-			Sample: ([]*massbank.SampleInformation)(nil),
+			Name:    nil,
+			Lineage: nil,
+			Link:    ([]*massbank.SpLink)(nil),
+			Sample:  ([]*massbank.SampleInformation)(nil),
 		},
 		Acquisition: struct {
 			Instrument       *massbank.AcInstrument         "mb2:\"AC$INSTRUMENT\""
@@ -6058,52 +5650,16 @@ var mbTestRecords = map[string]massbank.Massbank{
 				},
 				Values: map[string][]interface{}{
 					"annotation": {
-						59.013000,
-						95.050000,
-						121.102000,
-						149.133000,
-						165.092000,
-						194.095000,
-						281.227000,
-						299.238000,
-						325.217000,
-						"precursor",
+						59.013, 95.050, 121.102, 149.133, 165.092, 194.095, 281.227, 299.238, 325.217, "precursor",
 					},
 					"error(ppm)": {
-						2.913263,
-						0.409544,
-						0.290319,
-						1.122193,
-						0.707823,
-						0.743784,
-						-0.135616,
-						0.112482,
-						-0.267387,
-						-1.189675,
+						2.913263365927882, 0.40954364535633475, 0.29031912309532387, 1.1221931248150303, 0.7078231920609128, 0.7437838072718687, -0.1356156911126373, 0.1124819597449277, -0.2673869905083813, -1.1896746249719279,
 					},
 					"exact_mass": {
-						59.013300,
-						95.050200,
-						121.102200,
-						149.133300,
-						165.091900,
-						194.094600,
-						281.227300,
-						299.237800,
-						325.217100,
-						343.227869,
+						59.0133, 95.0502, 121.1022, 149.1333, 165.0919, 194.0946, 281.2273, 299.2378, 325.2171, 343.227868554909,
 					},
 					"m/z": {
-						59.013472,
-						95.050239,
-						121.102235,
-						149.133467,
-						165.092017,
-						194.094744,
-						281.227262,
-						299.237834,
-						325.217013,
-						343.227460,
+						59.013471921284996, 95.0502389272054, 121.1022351582845, 149.13346735636392, 165.09201685587564, 194.09474436442056, 281.22726186116535, 299.2378336588542, 325.2170130411784, 343.22746022542316,
 					},
 				},
 			},
@@ -6119,28 +5675,10 @@ var mbTestRecords = map[string]massbank.Massbank{
 					"rel.int.",
 				},
 				Mz: []float64{
-					59.013474,
-					95.050240,
-					121.102234,
-					149.133469,
-					165.092010,
-					194.094742,
-					281.227264,
-					299.237823,
-					325.217010,
-					343.227448,
+					59.013471921284996, 95.0502389272054, 121.1022351582845, 149.13346735636392, 165.09201685587564, 194.09474436442056, 281.22726186116535, 299.2378336588542, 325.2170130411784, 343.22746022542316,
 				},
 				Intensity: []float64{
-					47825.664062,
-					123675.156250,
-					2119825.250000,
-					538442.937500,
-					717616.000000,
-					348560.281250,
-					577177.750000,
-					162688.843750,
-					246360.687500,
-					1749842.500000,
+					47825.663583333335, 123675.15916666668, 2119825.3000000003, 538442.9091666666, 717615.9775, 348560.26666666666, 577177.7541666667, 162688.84041666667, 246360.69083333333, 1749842.5083333335,
 				},
 				Rel: []uint{
 					22,

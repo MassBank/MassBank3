@@ -2,7 +2,7 @@ package database
 
 import (
 	"context"
-	"encoding/json"
+	"go.mongodb.org/mongo-driver/bson"
 	"os"
 	"reflect"
 	"testing"
@@ -66,11 +66,15 @@ func TestNewMongoDB(t *testing.T) {
 	}
 }
 
-func initMongoTestDB() (MB3Database, error) {
-	files := map[string]string{
-		"mb_metadata": "/go/src/test-data/mb_metadata.json",
-		"massbank":    "/go/src/test-data/massbank.json",
+func initMongoTestDB(set DbInitSet) (MB3Database, error) {
+	var files = map[string]string{"mb_metadata": "/go/src/test-data/mb_metadata.json"}
+	switch set {
+	case All:
+		files["massbank"] = "/go/src/test-data/massbank-all.json"
+	case Main:
+		files["massbank"] = "/go/src/test-data/massbank.json"
 	}
+
 	db, err := NewMongoDB(TestDbConfigs["mg valid"])
 	if err != nil {
 		return nil, err
@@ -89,7 +93,7 @@ func initMongoTestDB() (MB3Database, error) {
 		}
 		jsonStr := string(buf)
 		var m []interface{}
-		if err := json.Unmarshal([]byte(jsonStr), &m); err != nil {
+		if err := bson.UnmarshalExtJSON([]byte(jsonStr), false, &m); err != nil {
 			return nil, err
 		}
 		if _, err = db.database.Collection(col).InsertMany(context.Background(), m); err != nil {

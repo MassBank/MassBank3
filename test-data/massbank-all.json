@@ -1336,6 +1336,1081 @@
   },
   {
     "_id": {
+      "$oid": "63f746d41247aa3616748c04"
+    },
+    "metadata": {
+      "filename": "/MassBank-data/Keio_Univ/MSBNK-Keio_Univ-KO009105.txt",
+      "versionref": {
+        "$oid": "63f746d01247aa361673cb67"
+      }
+    },
+    "accession": "MSBNK-Keio_Univ-KO009105",
+    "deprecated": null,
+    "recordtitle": "Desthiobiotin; LC-ESI-IT; MS4; m/z: 215/197/179; [M+H]+",
+    "date": {
+      "updated": {
+        "$date": "2012-10-22T00:00:00Z"
+      },
+      "created": {
+        "$date": "2008-05-12T00:00:00Z"
+      },
+      "modified": {
+        "$date": {
+          "$numberLong": "-62135596800000"
+        }
+      }
+    },
+    "authors": [
+      {
+        "name": "Ojima Y",
+        "marcrelator": ""
+      },
+      {
+        "name": " Kakazu Y",
+        "marcrelator": ""
+      },
+      {
+        "name": " Horai H",
+        "marcrelator": ""
+      },
+      {
+        "name": " Soga T",
+        "marcrelator": ""
+      },
+      {
+        "name": " Institute for Advanced Biosciences",
+        "marcrelator": ""
+      },
+      {
+        "name": " Keio Univ.",
+        "marcrelator": ""
+      }
+    ],
+    "license": "CC BY-NC-SA",
+    "copyright": null,
+    "publication": null,
+    "project": null,
+    "comments": [
+      {
+        "key": "",
+        "value": "KEIO_ID D075"
+      },
+      {
+        "key": "",
+        "value": "[MS3] KO009104"
+      }
+    ],
+    "compound": {
+      "names": [
+        "Desthiobiotin",
+        "Dethiobiotin"
+      ],
+      "classes": [
+        "N/A"
+      ],
+      "formula": "C10H18N2O3",
+      "cdkdepict": null,
+      "mass": 214.13174,
+      "smiles": "OC(=O)CCCCCC(N1)C(C)NC(=O)1",
+      "inchi": "InChI=1S/C10H18N2O3/c1-7-8(12-10(15)11-7)5-3-2-4-6-9(13)14/h7-8H,2-6H2,1H3,(H,13,14)(H2,11,12,15)/t7-,8+/m0/s1",
+      "link": [
+        {
+          "key": "CAS",
+          "value": "533-48-2"
+        },
+        {
+          "key": "CHEBI",
+          "value": "16691"
+        },
+        {
+          "key": "KEGG",
+          "value": "C01909"
+        },
+        {
+          "key": "NIKKAJI",
+          "value": "J9.406D"
+        },
+        {
+          "key": "PUBCHEM",
+          "value": "SID:5017"
+        },
+        {
+          "key": "INCHIKEY",
+          "value": "AUTOLBMXDDTRRT-JGVFFNPUSA-N"
+        },
+        {
+          "key": "COMPTOX",
+          "value": "DTXSID50876136"
+        }
+      ]
+    },
+    "species": {
+      "name": null,
+      "lineage": null,
+      "link": null,
+      "sample": null
+    },
+    "acquisition": {
+      "instrument": "LC/MSD Trap XCT, Agilent Technologies",
+      "instrumenttype": "LC-ESI-IT",
+      "massspectrometry": [
+        {
+          "key": "MS_TYPE",
+          "value": "MS4"
+        },
+        {
+          "key": "ION_MODE",
+          "value": "POSITIVE"
+        },
+        {
+          "key": "COLLISION_ENERGY",
+          "value": "0.70/0.70/0.60"
+        }
+      ],
+      "chromatography": null,
+      "general": null
+    },
+    "massspectrometry": {
+      "focusedion": [
+        {
+          "key": "PRECURSOR_M/Z",
+          "value": "215/197/179"
+        },
+        {
+          "key": "PRECURSOR_TYPE",
+          "value": "[M+H]+"
+        }
+      ],
+      "dataprocessing": [
+        {
+          "key": "WHOLE",
+          "value": "LC/MSD Trap Control and Data Analysis"
+        }
+      ]
+    },
+    "peak": {
+      "splash": "splash10-000j-5900000000-8ad8423e2b359b500863",
+      "annotation": null,
+      "numpeak": 33,
+      "peak": {
+        "header": [
+          "m/z",
+          "int.",
+          "rel.int."
+        ],
+        "mz": [
+          56.2,
+          58.2,
+          67.2,
+          68.2,
+          70.2,
+          76.7,
+          79.2,
+          80.0,
+          81.1,
+          82.0,
+          85.0,
+          91.1,
+          93.1,
+          94.0,
+          95.1,
+          96.1,
+          99.1,
+          108.1,
+          109.1,
+          110.1,
+          111.0,
+          113.1,
+          119.1,
+          123.1,
+          125.1,
+          134.1,
+          136.1,
+          137.1,
+          151.1,
+          162.0,
+          179.1,
+          180.1,
+          197.2
+        ],
+        "intensity": [
+          7.30,
+          8.10,
+          66.36,
+          1.80,
+          6.70,
+          4.90,
+          14.00,
+          2.60,
+          64.28,
+          18.49,
+          3.00,
+          10.00,
+          49.50,
+          6.69,
+          28.99,
+          10.20,
+          342.46,
+          6.60,
+          33.39,
+          12.19,
+          41.20,
+          17.90,
+          180.85,
+          11.40,
+          12.89,
+          52.21,
+          498.25,
+          13.29,
+          142.24,
+          3.90,
+          39.87,
+          54.97,
+          2.20
+        ],
+        "rel": [
+          15,
+          16,
+          133,
+          4,
+          13,
+          10,
+          28,
+          5,
+          129,
+          37,
+          6,
+          20,
+          99,
+          13,
+          58,
+          20,
+          687,
+          13,
+          67,
+          24,
+          83,
+          36,
+          363,
+          23,
+          26,
+          105,
+          999,
+          27,
+          285,
+          8,
+          80,
+          110,
+          4
+        ]
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "63f746d51247aa361674a754"
+    },
+    "metadata": {
+      "filename": "/MassBank-data/MSSJ/MSBNK-MSSJ-MSJ00284.txt",
+      "versionref": {
+        "$oid": "63f746d01247aa361673cb67"
+      }
+    },
+    "accession": "MSBNK-MSSJ-MSJ00284",
+    "deprecated": null,
+    "recordtitle": "Pentoxazone; ESI-QTOF; MS2; NEGATIVE; [M-H]-; CID; 60 V",
+    "date": {
+      "updated": {
+        "$date": "2020-03-18T00:00:00Z"
+      },
+      "created": {
+        "$date": "2020-03-18T00:00:00Z"
+      },
+      "modified": {
+        "$date": {
+          "$numberLong": "-62135596800000"
+        }
+      }
+    },
+    "authors": [
+      {
+        "name": "Atsushi Yamamoto",
+        "marcrelator": ""
+      },
+      {
+        "name": " Faculty of Environmental Studies",
+        "marcrelator": ""
+      },
+      {
+        "name": " Tottori University of Environmental Studies",
+        "marcrelator": ""
+      },
+      {
+        "name": " 1-1",
+        "marcrelator": ""
+      },
+      {
+        "name": " Wakabadai-kita",
+        "marcrelator": ""
+      },
+      {
+        "name": " Tottori City",
+        "marcrelator": ""
+      },
+      {
+        "name": " Tottori 689-1111",
+        "marcrelator": ""
+      },
+      {
+        "name": " Japan.",
+        "marcrelator": ""
+      }
+    ],
+    "license": "CC BY",
+    "copyright": "Atsushi Yamamoto, Faculty of Environmental Studies, Tottori University of Environmental Studies, 1-1, Wakabadai-kita, Tottori City, Tottori 689-1111, Japan.",
+    "publication": null,
+    "project": null,
+    "comments": [
+      {
+        "key": "",
+        "value": "The sample was injected by direct infusion."
+      },
+      {
+        "key": "",
+        "value": "This record was created by the financial support of MEXT/JSPS KAKENHI Grant Number 19HP8024 to the Mass Spectrometry Society of Japan."
+      }
+    ],
+    "compound": {
+      "names": [
+        "Pentoxazone"
+      ],
+      "classes": [
+        "Non-natural product"
+      ],
+      "formula": "C17H17ClFNO4",
+      "cdkdepict": null,
+      "mass": 353.083,
+      "smiles": "CC(=C1C(=O)N(C(=O)O1)c2cc(c(cc2F)Cl)OC3CCCC3)C",
+      "inchi": "InChI=1S/C17H17ClFNO4/c1-9(2)15-16(21)20(17(22)24-15)13-8-14(11(18)7-12(13)19)23-10-5-3-4-6-10/h7-8,10H,3-6H2,1-2H3",
+      "link": [
+        {
+          "key": "CAS",
+          "value": "110956-75-7"
+        },
+        {
+          "key": "CHEMSPIDER",
+          "value": "9888955"
+        },
+        {
+          "key": "INCHIKEY",
+          "value": "JZPKLLLUDLHCEL-UHFFFAOYSA-N"
+        },
+        {
+          "key": "PUBCHEM",
+          "value": "CID:11714234"
+        }
+      ]
+    },
+    "species": {
+      "name": null,
+      "lineage": null,
+      "link": null,
+      "sample": null
+    },
+    "acquisition": {
+      "instrument": "X500R QTOF (AB Sciex LLC, USA)",
+      "instrumenttype": "ESI-QTOF",
+      "massspectrometry": [
+        {
+          "key": "MS_TYPE",
+          "value": "MS2"
+        },
+        {
+          "key": "ION_MODE",
+          "value": "NEGATIVE"
+        },
+        {
+          "key": "COLLISION_ENERGY",
+          "value": "60 V"
+        },
+        {
+          "key": "FRAGMENTATION_MODE",
+          "value": "CID"
+        },
+        {
+          "key": "IONIZATION",
+          "value": "ESI"
+        }
+      ],
+      "chromatography": null,
+      "general": null
+    },
+    "massspectrometry": {
+      "focusedion": [
+        {
+          "key": "PRECURSOR_M/Z",
+          "value": "352.0757"
+        },
+        {
+          "key": "PRECURSOR_TYPE",
+          "value": "[M-H]-"
+        }
+      ],
+      "dataprocessing": null
+    },
+    "peak": {
+      "splash": "splash10-0006-9400000000-6b99aa683e8584601a75",
+      "annotation": null,
+      "numpeak": 9,
+      "peak": {
+        "header": [
+          "m/z",
+          "int.",
+          "rel.int."
+        ],
+        "mz": [
+          31.9901,
+          34.9691,
+          41.0392,
+          69.0342,
+          97.0289,
+          131.001,
+          149.9992,
+          166.9774,
+          185.9761
+        ],
+        "intensity": [
+          0.02542,
+          0.02094,
+          0.26061,
+          0.01645,
+          0.02531,
+          0.03766,
+          0.04276,
+          0.04392,
+          0.03962
+        ],
+        "rel": [
+          97,
+          80,
+          999,
+          63,
+          97,
+          144,
+          164,
+          168,
+          152
+        ]
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "63f746d61247aa361674c916"
+    },
+    "metadata": {
+      "filename": "/MassBank-data/RIKEN/MSBNK-RIKEN-PR100978.txt",
+      "versionref": {
+        "$oid": "63f746d01247aa361673cb67"
+      }
+    },
+    "accession": "MSBNK-RIKEN-PR100978",
+    "deprecated": null,
+    "recordtitle": "Quercetin-3-Glucuronide; LC-ESI-QTOF; MS2; CE:Ramp 5-60 V; [M-H]-",
+    "date": {
+      "updated": {
+        "$date": "2016-01-19T00:00:00Z"
+      },
+      "created": {
+        "$date": "2010-06-21T00:00:00Z"
+      },
+      "modified": {
+        "$date": "2011-05-06T00:00:00Z"
+      }
+    },
+    "authors": [
+      {
+        "name": "Matsuda F",
+        "marcrelator": ""
+      },
+      {
+        "name": " Suzuki M",
+        "marcrelator": ""
+      },
+      {
+        "name": " Sawada Y",
+        "marcrelator": ""
+      },
+      {
+        "name": " Plant Science Center",
+        "marcrelator": ""
+      },
+      {
+        "name": " RIKEN.",
+        "marcrelator": ""
+      }
+    ],
+    "license": "CC BY-SA",
+    "copyright": null,
+    "publication": null,
+    "project": null,
+    "comments": [
+      {
+        "key": "",
+        "value": "Acquisition and generation of the data is financially supported in part by CREST/JST."
+      }
+    ],
+    "compound": {
+      "names": [
+        "Quercetin-3-Glucuronide",
+        "Quer-3-GlcA",
+        "Miquelianin",
+        "Querciturone"
+      ],
+      "classes": [
+        "Flavonoid"
+      ],
+      "formula": "C21H18O13",
+      "cdkdepict": null,
+      "mass": 478.07474,
+      "smiles": "OC(=O)C(O1)C(O)C(O)C(O)C1OC(C(=O)3)=C(Oc(c4)c(c(O)cc(O)4)3)c(c2)cc(O)c(O)c2",
+      "inchi": "InChI=1S/C21H18O13/c22-7-4-10(25)12-11(5-7)32-17(6-1-2-8(23)9(24)3-6)18(13(12)26)33-21-16(29)14(27)15(28)19(34-21)20(30)31/h1-5,14-16,19,21-25,27-29H,(H,30,31)/t14-,15-,16+,19-,21+/m0/s1",
+      "link": [
+        {
+          "key": "CAS",
+          "value": "22688-79-5"
+        },
+        {
+          "key": "CHEMSPIDER",
+          "value": "4438874"
+        },
+        {
+          "key": "KNAPSACK",
+          "value": "C00005376"
+        },
+        {
+          "key": "PUBCHEM",
+          "value": "CID:5274585"
+        },
+        {
+          "key": "INCHIKEY",
+          "value": "DUBCCGAQYVUYEU-ZUGPOPFOSA-N"
+        },
+        {
+          "key": "COMPTOX",
+          "value": "DTXSID70945358"
+        }
+      ]
+    },
+    "species": {
+      "name": null,
+      "lineage": null,
+      "link": null,
+      "sample": null
+    },
+    "acquisition": {
+      "instrument": "UPLC Q-Tof Premier, Waters",
+      "instrumenttype": "LC-ESI-QTOF",
+      "massspectrometry": [
+        {
+          "key": "MS_TYPE",
+          "value": "MS2"
+        },
+        {
+          "key": "ION_MODE",
+          "value": "NEGATIVE"
+        },
+        {
+          "key": "COLLISION_ENERGY",
+          "value": "Ramp 5-60 V"
+        },
+        {
+          "key": "DATAFORMAT",
+          "value": "Continuum"
+        },
+        {
+          "key": "DESOLVATION_GAS_FLOW",
+          "value": "600.0 L/Hr"
+        },
+        {
+          "key": "DESOLVATION_TEMPERATURE",
+          "value": "400 C"
+        },
+        {
+          "key": "FRAGMENTATION_MODE",
+          "value": "LOW-ENERGY CID"
+        },
+        {
+          "key": "IONIZATION",
+          "value": "ESI"
+        },
+        {
+          "key": "SOURCE_TEMPERATURE",
+          "value": "120 C"
+        }
+      ],
+      "chromatography": [
+        {
+          "key": "CAPILLARY_VOLTAGE",
+          "value": "3.0 kV"
+        },
+        {
+          "key": "SAMPLING_CONE",
+          "value": "23.0 V"
+        },
+        {
+          "key": "SOLVENT",
+          "value": "A CH3CN(0.1%HCOOH)"
+        },
+        {
+          "key": "SOLVENT",
+          "value": "B H2O(0.1%HCOOH)"
+        }
+      ],
+      "general": null
+    },
+    "massspectrometry": {
+      "focusedion": [
+        {
+          "key": "PRECURSOR_M/Z",
+          "value": "477.06692"
+        },
+        {
+          "key": "PRECURSOR_TYPE",
+          "value": "[M-H]-"
+        }
+      ],
+      "dataprocessing": null
+    },
+    "peak": {
+      "splash": "splash10-0udi-0609400000-9fd50528da25d66adfc7",
+      "annotation": null,
+      "numpeak": 11,
+      "peak": {
+        "header": [
+          "m/z",
+          "int.",
+          "rel.int."
+        ],
+        "mz": [
+          107.0143,
+          109.0299,
+          121.0298,
+          151.0035,
+          163.0036,
+          178.9989,
+          255.0311,
+          301.0353,
+          302.0432,
+          477.0669,
+          478.0759
+        ],
+        "intensity": [
+          370.8,
+          267.7,
+          395.4,
+          1650,
+          295.2,
+          793.8,
+          333.3,
+          4687,
+          386,
+          2215,
+          237.5
+        ],
+        "rel": [
+          79,
+          57,
+          84,
+          352,
+          63,
+          169,
+          71,
+          999,
+          82,
+          472,
+          51
+        ]
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "63f746d71247aa361674ecd5"
+    },
+    "metadata": {
+      "filename": "/MassBank-data/RIKEN/MSBNK-RIKEN-PR309089.txt",
+      "versionref": {
+        "$oid": "63f746d01247aa361673cb67"
+      }
+    },
+    "accession": "MSBNK-RIKEN-PR309089",
+    "deprecated": null,
+    "recordtitle": "FA 18:2+1O; LC-ESI-QTOF; MS2",
+    "date": {
+      "updated": {
+        "$date": "2019-03-28T00:00:00Z"
+      },
+      "created": {
+        "$date": "2019-03-28T00:00:00Z"
+      },
+      "modified": {
+        "$date": {
+          "$numberLong": "-62135596800000"
+        }
+      }
+    },
+    "authors": [
+      {
+        "name": "Tetsuya Mori",
+        "marcrelator": ""
+      },
+      {
+        "name": " Center for Sustainable Resource Science",
+        "marcrelator": ""
+      },
+      {
+        "name": " RIKEN",
+        "marcrelator": ""
+      }
+    ],
+    "license": "CC BY-NC-SA",
+    "copyright": null,
+    "publication": "Tsugawa H., Nakabayashi R., Mori T., Yamada Y., Takahashi M., Rai A., Sugiyama R., Yamamoto H., Nakaya T., Yamazaki M., Kooke R., Bac-Molenaar JA., Oztolan-Erol N., Keurentjes JJB., Arita M., Saito K. (2019) \"A cheminformatics approach to characterize metabolomes in stable-isotope-labeled organisms\" Nature Methods 16(4):295-298. [doi:10.1038/s41592-019-0358-2]",
+    "project": null,
+    "comments": [
+      {
+        "key": "",
+        "value": "Annotation level-3"
+      }
+    ],
+    "compound": {
+      "names": [
+        "FA 18:2+1O"
+      ],
+      "classes": [
+        "Oxidized fatty acids"
+      ],
+      "formula": "C18H32O3",
+      "cdkdepict": null,
+      "mass": 296.451,
+      "smiles": "O=C(O)CCCCCCCC=CC=CC(O)CCCCC",
+      "inchi": "InChI=1S/C18H32O3/c1-2-3-11-14-17(19)15-12-9-7-5-4-6-8-10-13-16-18(20)21/h7,9,12,15,17,19H,2-6,8,10-11,13-14,16H2,1H3,(H,20,21)",
+      "link": [
+        {
+          "key": "INCHIKEY",
+          "value": "HNICUWMFWZBIFP-UHFFFAOYSA-N"
+        }
+      ]
+    },
+    "species": {
+      "name": null,
+      "lineage": null,
+      "link": null,
+      "sample": null
+    },
+    "acquisition": {
+      "instrument": "LC, Waters Acquity UPLC System; MS, Waters Xevo G2 Q-Tof",
+      "instrumenttype": "LC-ESI-QTOF",
+      "massspectrometry": [
+        {
+          "key": "MS_TYPE",
+          "value": "MS2"
+        },
+        {
+          "key": "ION_MODE",
+          "value": "NEGATIVE"
+        },
+        {
+          "key": "COLLISION_ENERGY",
+          "value": "6V"
+        },
+        {
+          "key": "DESOLVATION_GAS_FLOW",
+          "value": "800/h"
+        },
+        {
+          "key": "DESOLVATION_TEMPERATURE",
+          "value": "450 C"
+        },
+        {
+          "key": "IONIZATION",
+          "value": "ESI"
+        }
+      ],
+      "chromatography": [
+        {
+          "key": "CAPILLARY_VOLTAGE",
+          "value": "+3.00 kV"
+        },
+        {
+          "key": "COLUMN_NAME",
+          "value": "Acquity bridged ethyl hybrid C18 (1.7 um, 2.1 mm * 100 mm, Waters)"
+        },
+        {
+          "key": "COLUMN_TEMPERATURE",
+          "value": "40 C"
+        },
+        {
+          "key": "FLOW_GRADIENT",
+          "value": "A/B = (99.5%/0.5% at 0 min, 99.5%/0.5% at 0.1 min, 20%/80% at 10 min, 0.5%/99.5% at 10.1 min, 0.5%/99.5% at 12.0 min, 99.5%/0.5% at 12.1 min, 99.5%/0.5% at 15.0 min)"
+        },
+        {
+          "key": "FLOW_RATE",
+          "value": "0.3 ml/min at 0 min, 0.3 ml/min at 10 min, 0.4 ml/min at 10.1 min, 0.4 ml/min at 14.4 min, 0.3 ml/min at 14.5 min"
+        },
+        {
+          "key": "RETENTION_TIME",
+          "value": "9.57"
+        },
+        {
+          "key": "SOLVENT",
+          "value": "A water including 0.1% formic acid"
+        },
+        {
+          "key": "SOLVENT",
+          "value": "B acetonitrile including 0.1% formic acid"
+        }
+      ],
+      "general": null
+    },
+    "massspectrometry": {
+      "focusedion": [
+        {
+          "key": "PRECURSOR_TYPE",
+          "value": "[M-H]-"
+        },
+        {
+          "key": "PRECURSOR_M/Z",
+          "value": "295.2272"
+        }
+      ],
+      "dataprocessing": null
+    },
+    "peak": {
+      "splash": "splash10-0002-0090000000-3b4035f10b24d4c3f5a0",
+      "annotation": null,
+      "numpeak": 11,
+      "peak": {
+        "header": [
+          "m/z",
+          "int.",
+          "rel.int."
+        ],
+        "mz": [
+          57.08413,
+          113.09826,
+          172.09279,
+          177.12296,
+          195.13672,
+          196.14641,
+          197.18631,
+          223.43452,
+          233.15977,
+          277.21619,
+          295.22772
+        ],
+        "intensity": [
+          18.0,
+          20.0,
+          24.0,
+          20.0,
+          59.0,
+          20.0,
+          20.0,
+          29.0,
+          19.0,
+          272.0,
+          1553.0
+        ],
+        "rel": [
+          12,
+          13,
+          15,
+          13,
+          38,
+          13,
+          13,
+          19,
+          12,
+          175,
+          999
+        ]
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "63f746d71247aa3616752096"
+    },
+    "metadata": {
+      "filename": "/MassBank-data/Washington_State_Univ/MSBNK-Washington_State_Univ-BML81902.txt",
+      "versionref": {
+        "$oid": "63f746d01247aa361673cb67"
+      }
+    },
+    "accession": "MSBNK-Washington_State_Univ-BML81902",
+    "deprecated": null,
+    "recordtitle": "Parthenolide; LC-APCI-QTOF; MS; POSITIVE",
+    "date": {
+      "updated": {
+        "$date": "2016-01-19T00:00:00Z"
+      },
+      "created": {
+        "$date": "2012-10-26T00:00:00Z"
+      },
+      "modified": {
+        "$date": {
+          "$numberLong": "-62135596800000"
+        }
+      }
+    },
+    "authors": [
+      {
+        "name": "Cuthbertson DJ",
+        "marcrelator": ""
+      },
+      {
+        "name": " Johnson SR",
+        "marcrelator": ""
+      },
+      {
+        "name": " Lange BM",
+        "marcrelator": ""
+      },
+      {
+        "name": " Institute of Biological Chemistry",
+        "marcrelator": ""
+      },
+      {
+        "name": " Washington State University",
+        "marcrelator": ""
+      }
+    ],
+    "license": "CC BY-SA",
+    "copyright": null,
+    "publication": null,
+    "project": null,
+    "comments": [
+      {
+        "key": "",
+        "value": "relative retention time with respect to 9-anthracene Carboxylic Acid is 1.002"
+      }
+    ],
+    "compound": {
+      "names": [
+        "Parthenolide"
+      ],
+      "classes": [
+        "N/A"
+      ],
+      "formula": "C15H20O3",
+      "cdkdepict": null,
+      "mass": 248.141245,
+      "smiles": "C/C/1=C\\CC[C@@]2([C@@H](O2)[C@@H]3[C@@H](CC1)C(=C)C(=O)O3)C",
+      "inchi": "InChI=1S/C15H20O3/c1-9-5-4-8-15(3)13(18-15)12-11(7-6-9)10(2)14(16)17-12/h5,11-13H,2,4,6-8H2,1,3H3/b9-5+/t11-,12-,13-,15+/m0/s1",
+      "link": [
+        {
+          "key": "CAS",
+          "value": "20554-84-1"
+        },
+        {
+          "key": "CHEMSPIDER",
+          "value": "4554343"
+        },
+        {
+          "key": "PUBCHEM",
+          "value": "CID:6473881"
+        },
+        {
+          "key": "INCHIKEY",
+          "value": "KTEXNACQROZXEV-SLXBATTESA-N"
+        }
+      ]
+    },
+    "species": {
+      "name": null,
+      "lineage": null,
+      "link": null,
+      "sample": null
+    },
+    "acquisition": {
+      "instrument": "Agilent 1200 RRLC; Agilent 6520 QTOF",
+      "instrumenttype": "LC-APCI-QTOF",
+      "massspectrometry": [
+        {
+          "key": "MS_TYPE",
+          "value": "MS"
+        },
+        {
+          "key": "ION_MODE",
+          "value": "POSITIVE"
+        },
+        {
+          "key": "SCANNING",
+          "value": "m/z 100-1000"
+        }
+      ],
+      "chromatography": [
+        {
+          "key": "COLUMN_NAME",
+          "value": "Agilent C8 Cartridge Column 2.1X30mm 3.5 micron (guard); Agilent SB-Aq 2.1x50mm 1.8 micron (analytical)"
+        },
+        {
+          "key": "COLUMN_TEMPERATURE",
+          "value": "60 C"
+        },
+        {
+          "key": "FLOW_GRADIENT",
+          "value": "linear from 98A/2B at 0 min to 2A/98B at 13 min, hold 6 min at 2A/98B, reequilibration 98A/2B (5 min)"
+        },
+        {
+          "key": "FLOW_RATE",
+          "value": "0.6 ml/min"
+        },
+        {
+          "key": "RETENTION_TIME",
+          "value": "7.394"
+        },
+        {
+          "key": "SOLVENT",
+          "value": "A water with 0.2% acetic acid"
+        },
+        {
+          "key": "SOLVENT",
+          "value": "B methanol with 0.2% acetic acid"
+        }
+      ],
+      "general": null
+    },
+    "massspectrometry": {
+      "focusedion": null,
+      "dataprocessing": null
+    },
+    "peak": {
+      "splash": "splash10-0002-0090000000-b81b1903703b01f61d7d",
+      "annotation": null,
+      "numpeak": 1,
+      "peak": {
+        "header": [
+          "m/z",
+          "int.",
+          "rel.int."
+        ],
+        "mz": [
+          249.1484765
+        ],
+        "intensity": [
+          310073.0
+        ],
+        "rel": [
+          999
+        ]
+      }
+    }
+  },
+  {
+    "_id": {
       "$oid": "63fcbaf4b9e0e5714f9d623c"
     },
     "metadata": {

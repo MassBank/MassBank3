@@ -23,7 +23,7 @@ func run(m *testing.M) (code int, err error) {
 
 type testDBinit struct {
 	name   string
-	initFn func() (MB3Database, error)
+	initFn func(set DbInitSet) (MB3Database, error)
 }
 
 type testDB struct {
@@ -31,14 +31,14 @@ type testDB struct {
 	db   MB3Database
 }
 
-func initDBs() ([]testDB, error) {
+func initDBs(set DbInitSet) ([]testDB, error) {
 	var testDBs = []testDBinit{
 		{"mongodb", initMongoTestDB},
 		{"postgres", initPostgresTestDB},
 	}
 	var result = []testDB{}
 	for _, d := range testDBs {
-		db, err := d.initFn()
+		db, err := d.initFn(set)
 		if err != nil {
 			return nil, err
 		}
@@ -151,28 +151,28 @@ func TestMB3Database_Disconnect(t *testing.T) {
 	}
 }
 
-func TestMb3MongoDB_Count(t *testing.T) {
-	DBs, err := initDBs()
+func TestMb3Database_Count(t *testing.T) {
+	DBs, err := initDBs(Main)
 	if err != nil {
 		t.Fatal("Could not init Databases: ", err.Error())
 	}
 	for _, db := range DBs {
-		if c, err := db.db.Count(); c != 5 || err != nil {
-			t.Errorf("%s: Could not count: %v", db.name, err)
+		if c, err := db.db.Count(); c != 8 || err != nil {
+			t.Errorf("%s: Could not count expected 8 got %c: %v", db.name, c, err)
 		}
-		if c, err := db.db.Count(); c != 5 || err != nil {
-			t.Errorf("%s: Could not count second time: %v", db.name, err)
+		if c, err := db.db.Count(); c != 8 || err != nil {
+			t.Errorf("%s: Could not count second time exptected 8 got %v: %v", db.name, c, err)
 		}
 	}
 }
 
 func TestMB3Database_DropAllRecords(t *testing.T) {
-	DBs, err := initDBs()
+	DBs, err := initDBs(Main)
 	if err != nil {
 		t.Fatal("Could not init Databases: ", err.Error())
 	}
 	for _, db := range DBs {
-		db.checkCount(t, 5)
+		db.checkCount(t, 8)
 		if err := db.db.DropAllRecords(); err != nil {
 			t.Errorf("%s: Could not drop: %v", db.name, err)
 		}
@@ -185,7 +185,7 @@ func TestMB3Database_DropAllRecords(t *testing.T) {
 }
 
 func TestMb3MongoDB_IsEmpty(t *testing.T) {
-	DBs, err := initDBs()
+	DBs, err := initDBs(Main)
 	if err != nil {
 		t.Fatal("Could not init Databases: ", err.Error())
 	}
@@ -206,25 +206,44 @@ func TestMB3Database_GetRecord(t *testing.T) {
 	type args struct {
 		s string
 	}
-	DBs, err := initDBs()
+	var records = []string{
+		"MSBNK-AAFC-AC000005",
+		"MSBNK-Athens_Univ-AU229201",
+		"MSBNK-Eawag-EA018353",
+		"MSBNK-Eawag_Additional_Specs-ET060401",
+		"MSBNK-Fac_Eng_Univ_Tokyo-JP009132",
+		"MSBNK-Keio_Univ-KO009105",
+		"MSBNK-MSSJ-MSJ00284",
+		"MSBNK-RIKEN-PR100978",
+		"MSBNK-RIKEN-PR309089",
+		"MSBNK-Washington_State_Univ-BML81902",
+		"MSBNK-test-TST00001",
+		"MSBNK-test-TST00002",
+		"MSBNK-test-TST00003",
+	}
+	DBs, err := initDBs(All)
 	if err != nil {
 		t.Fatal("Could not init Databases: ", err.Error())
 	}
 	for _, db := range DBs {
 
-		tests := []struct {
+		type testData struct {
 			db      testDB
 			name    string
 			args    args
 			want    massbank.Massbank
 			wantErr bool
-		}{
-			{db,
-				db.name + " MSBNK-AAFC-AC000005",
-				args{"MSBNK-AAFC-AC000005"},
-				mbTestRecords["MSBNK-AAFC-AC000005"],
+		}
+		var tests = []testData{}
+		for _, record := range records {
+			var test = testData{
+				db,
+				db.name + " " + record,
+				args{record},
+				mbTestRecords[record],
 				false,
-			},
+			}
+			tests = append(tests, test)
 		}
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {

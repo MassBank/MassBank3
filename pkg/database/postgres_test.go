@@ -62,10 +62,15 @@ func TestNewPostgresSQLDb(t *testing.T) {
 	}
 }
 
-func initPostgresTestDB() (MB3Database, error) {
-	files := []string{
-		"/go/src/test-data/metadata.sql",
-		"/go/src/test-data/massbank.sql",
+func initPostgresTestDB(set DbInitSet) (MB3Database, error) {
+	var filenames = []string{"mb_metadata", "massbank"}
+	var files = map[string]string{}
+	files["mb_metadata"] = "/go/src/test-data/metadata.sql"
+	switch set {
+	case All:
+		files["massbank"] = "/go/src/test-data/massbank-all.sql"
+	case Main:
+		files["massbank"] = "/go/src/test-data/massbank.sql"
 	}
 	db, err := NewPostgresSQLDb(TestDbConfigs["pg valid"])
 	if err != nil {
@@ -87,7 +92,8 @@ func initPostgresTestDB() (MB3Database, error) {
 	if _, err = db.database.Exec("ALTER SEQUENCE metadata_id_seq RESTART WITH 1"); err != nil {
 		return nil, err
 	}
-	for _, f := range files {
+	for _, fn := range filenames {
+		f := files[fn]
 		buf, err := os.ReadFile(f)
 		if err != nil {
 			return nil, err

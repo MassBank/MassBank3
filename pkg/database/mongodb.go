@@ -91,11 +91,14 @@ func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.Massbank, error) {
 		return nil, err
 	}
 
-	if reflect.DeepEqual(*mb.Deprecated, massbank.RecordDeprecated{}) {
+	if mb.Deprecated != nil && reflect.DeepEqual(*mb.Deprecated, massbank.RecordDeprecated{}) {
 		mb.Deprecated = nil
 	}
-	if reflect.DeepEqual(*mb.Project, massbank.RecordProject{}) {
+	if mb.Project != nil && reflect.DeepEqual(*mb.Project, massbank.RecordProject{}) {
 		mb.Project = nil
+	}
+	if mb.Peak.Annotation != nil && reflect.DeepEqual(*mb.Peak.Annotation, massbank.PkAnnotation{}) {
+		mb.Peak.Annotation = nil
 	}
 	if mb.Species.Name.String == "" {
 		mb.Species.Name = nil
@@ -103,6 +106,13 @@ func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.Massbank, error) {
 	if mb.Species.Lineage.Value == nil {
 		mb.Species.Lineage = nil
 	}
+	if mb.Publication.String == "" {
+		mb.Publication = nil
+	}
+	if mb.Copyright.String == "" {
+		mb.Copyright = nil
+	}
+
 	return &mb, err
 }
 

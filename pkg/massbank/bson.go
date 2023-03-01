@@ -147,6 +147,8 @@ func (p *RecordDeprecated) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
 		if err := raw.Unmarshal(&v); err != nil {
 			return err
 		}
+		p.Reason = v.Reason
+		p.Date = v.Date
 	}
 	return nil
 }
