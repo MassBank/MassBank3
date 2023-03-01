@@ -71,6 +71,7 @@ func initPostgresTestDB(set DbInitSet) (MB3Database, error) {
 		files["massbank"] = "/go/src/test-data/massbank-all.sql"
 	case Main:
 		files["massbank"] = "/go/src/test-data/massbank.sql"
+	case Empty:
 	}
 	db, err := NewPostgresSQLDb(TestDbConfigs["pg valid"])
 	if err != nil {
@@ -93,14 +94,16 @@ func initPostgresTestDB(set DbInitSet) (MB3Database, error) {
 		return nil, err
 	}
 	for _, fn := range filenames {
-		f := files[fn]
-		buf, err := os.ReadFile(f)
-		if err != nil {
-			return nil, err
-		}
-		sqlStr := string(buf)
-		if _, err = db.database.Exec(sqlStr); err != nil {
-			return nil, err
+		if f, ok := files[fn]; ok {
+
+			buf, err := os.ReadFile(f)
+			if err != nil {
+				return nil, err
+			}
+			sqlStr := string(buf)
+			if _, err = db.database.Exec(sqlStr); err != nil {
+				return nil, err
+			}
 		}
 	}
 	return db, nil

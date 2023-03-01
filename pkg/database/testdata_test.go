@@ -77,6 +77,7 @@ type DbInitSet int
 const (
 	All DbInitSet = iota
 	Main
+	Empty
 )
 
 var TestDatabases = map[string]MB3Database{

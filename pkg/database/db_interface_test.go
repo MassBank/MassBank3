@@ -264,86 +264,228 @@ func TestMB3Database_GetRecord(t *testing.T) {
 }
 
 func TestMB3Database_GetRecords(t *testing.T) {
+	DBs, err := initDBs(Main)
+	if err != nil {
+		t.Fatal("Could not init Databases: ", err.Error())
+	}
+	type args struct {
+		f      Filters
+		lim    uint64
+		offset uint64
+	}
+	for _, db := range DBs {
 
+		type testData struct {
+			db      testDB
+			name    string
+			args    args
+			want    []massbank.Massbank
+			wantErr bool
+		}
+		var tests = []testData{
+			{
+				db,
+				db.name + " " + "Get all records",
+				args{Filters{}, 0, 0},
+				[]massbank.Massbank{
+					mbTestRecords["MSBNK-AAFC-AC000005"],
+					mbTestRecords["MSBNK-Athens_Univ-AU229201"],
+					mbTestRecords["MSBNK-Eawag-EA018353"],
+					mbTestRecords["MSBNK-Eawag_Additional_Specs-ET060401"],
+					mbTestRecords["MSBNK-Fac_Eng_Univ_Tokyo-JP009132"],
+					mbTestRecords["MSBNK-test-TST00001"],
+					mbTestRecords["MSBNK-test-TST00002"],
+					mbTestRecords["MSBNK-test-TST00003"],
+				},
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get first 3 records",
+				args{Filters{}, 3, 0},
+				[]massbank.Massbank{
+					mbTestRecords["MSBNK-AAFC-AC000005"],
+					mbTestRecords["MSBNK-Athens_Univ-AU229201"],
+					mbTestRecords["MSBNK-Eawag-EA018353"],
+				},
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get second page with 3 records",
+				args{Filters{}, 3, 3},
+				[]massbank.Massbank{
+					mbTestRecords["MSBNK-Eawag_Additional_Specs-ET060401"],
+					mbTestRecords["MSBNK-Fac_Eng_Univ_Tokyo-JP009132"],
+					mbTestRecords["MSBNK-test-TST00001"],
+				},
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all but first  3 records",
+				args{Filters{}, 0, 3},
+				[]massbank.Massbank{
+					mbTestRecords["MSBNK-Eawag_Additional_Specs-ET060401"],
+					mbTestRecords["MSBNK-Fac_Eng_Univ_Tokyo-JP009132"],
+					mbTestRecords["MSBNK-test-TST00001"],
+					mbTestRecords["MSBNK-test-TST00002"],
+					mbTestRecords["MSBNK-test-TST00003"],
+				},
+				false,
+			},
+		}
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				got, err := tt.db.db.GetRecords(tt.args.f, tt.args.lim, tt.args.offset)
+				if (err != nil) != tt.wantErr {
+					t.Errorf("%s: GetRecords() error = %v, wantErr %v", tt.db.name, err, tt.wantErr)
+					return
+				}
+				if (tt.args.lim != 0 && len(got) > int(tt.args.lim)) ||
+					len(got) != len(tt.want) {
+					t.Errorf("Limit was %d, expected %d records, but got %d records", tt.args.lim, len(tt.want), len(got))
+				}
+
+				for i := range tt.want {
+					got[i].Metadata.VersionRef = tt.want[i].Metadata.VersionRef
+					bg, errg := json.Marshal(got[i])
+					bw, errw := json.Marshal(tt.want[i])
+					if string(bg) != string(bw) || errg != nil || errw != nil {
+						t.Errorf("\nwant: %v \ngot : %v\n", string(bw), string(bg))
+					}
+				}
+
+			})
+		}
+
+	}
 }
 
 func TestMB3Database_AddRecord(t *testing.T) {
-	type fields struct {
-		user       string
-		dbname     string
-		password   string
-		host       string
-		port       uint
-		connString string
-		database   *sql.DB
+	DBs, err := initDBs(Empty)
+	if err != nil {
+		t.Fatal("Could not init Databases: ", err.Error())
+	}
+	var records = []string{
+		"MSBNK-AAFC-AC000005",
+		"MSBNK-Athens_Univ-AU229201",
+		"MSBNK-Eawag-EA018353",
+		"MSBNK-Eawag_Additional_Specs-ET060401",
+		"MSBNK-Fac_Eng_Univ_Tokyo-JP009132",
+		"MSBNK-Keio_Univ-KO009105",
+		"MSBNK-MSSJ-MSJ00284",
+		"MSBNK-RIKEN-PR100978",
+		"MSBNK-RIKEN-PR309089",
+		"MSBNK-Washington_State_Univ-BML81902",
+		"MSBNK-test-TST00001",
+		"MSBNK-test-TST00002",
+		"MSBNK-test-TST00003",
 	}
 	type args struct {
 		record     *massbank.Massbank
 		metaDataId string
 	}
-	tests := []struct {
+	type testData struct {
 		name    string
-		fields  fields
 		args    args
 		wantErr bool
-	}{
-		// TODO: Add test cases.
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &PostgresSQLDB{
-				user:       tt.fields.user,
-				dbname:     tt.fields.dbname,
-				password:   tt.fields.password,
-				host:       tt.fields.host,
-				port:       tt.fields.port,
-				connString: tt.fields.connString,
-				database:   tt.fields.database,
+	for _, db := range DBs {
+		db.checkCount(t, 0)
+		var tests = []testData{}
+		for _, r := range records {
+			var record = mbTestRecords[r]
+			var versionId string
+			if db.name == "mongodb" {
+				versionId = "63fcbaf4b9e0e5714f9d623b"
+			} else {
+				versionId = "1"
 			}
-			if err := p.AddRecord(tt.args.record, tt.args.metaDataId); (err != nil) != tt.wantErr {
-				t.Errorf("AddRecord() error = %v, wantErr %v", err, tt.wantErr)
+			data := testData{
+				name:    db.name + "-" + r,
+				args:    args{&record, versionId},
+				wantErr: false,
 			}
-		})
+			tests = append(tests, data)
+		}
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				if err := db.db.AddRecord(tt.args.record, tt.args.metaDataId); (err != nil) != tt.wantErr {
+					t.Errorf("AddRecord() error = %v, wantErr %v", err, tt.wantErr)
+				}
+			})
+		}
+		db.checkCount(t, int64(len(records)))
 	}
 }
 
 func TestMB3Database_AddRecords(t *testing.T) {
-	type fields struct {
-		user       string
-		dbname     string
-		password   string
-		host       string
-		port       uint
-		connString string
-		database   *sql.DB
+	DBs, err := initDBs(Empty)
+	if err != nil {
+		t.Fatal("Could not init Databases: ", err.Error())
 	}
 	type args struct {
-		records    []*massbank.Massbank
+		records    []uint64
 		metaDataId string
 	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
+	type testData struct {
+		name      string
+		args      args
+		wantErr   bool
+		wantCount uint64
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &PostgresSQLDB{
-				user:       tt.fields.user,
-				dbname:     tt.fields.dbname,
-				password:   tt.fields.password,
-				host:       tt.fields.host,
-				port:       tt.fields.port,
-				connString: tt.fields.connString,
-				database:   tt.fields.database,
-			}
-			if err := p.AddRecords(tt.args.records, tt.args.metaDataId); (err != nil) != tt.wantErr {
-				t.Errorf("AddRecords() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
+	var recordnames = []string{
+		"MSBNK-AAFC-AC000005",
+		"MSBNK-Athens_Univ-AU229201",
+		"MSBNK-Eawag-EA018353",
+		"MSBNK-Eawag_Additional_Specs-ET060401",
+		"MSBNK-Fac_Eng_Univ_Tokyo-JP009132",
+		"MSBNK-Keio_Univ-KO009105",
+		"MSBNK-MSSJ-MSJ00284",
+		"MSBNK-RIKEN-PR100978",
+		"MSBNK-RIKEN-PR309089",
+		"MSBNK-Washington_State_Univ-BML81902",
+		"MSBNK-test-TST00001",
+		"MSBNK-test-TST00002",
+		"MSBNK-test-TST00003",
+	}
+	for _, db := range DBs {
+		var versionId string
+		if db.name == "mongodb" {
+			versionId = "63fcbaf4b9e0e5714f9d623b"
+		} else {
+			versionId = "1"
+		}
+		var tests = []testData{
+			{
+				db.name + "-" + "Insert first 5",
+				args{[]uint64{0, 1, 2, 3, 4}, versionId},
+				false,
+				5,
+			},
+			{
+				db.name + "-" + "Insert second 5",
+				args{[]uint64{5, 6, 7, 8, 9}, versionId},
+				false,
+				10,
+			},
+		}
+
+		db.checkCount(t, 0)
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				var records []*massbank.Massbank
+				for _, i := range tt.args.records {
+					var mb = mbTestRecords[recordnames[i]]
+					records = append(records, &mb)
+				}
+				if err := db.db.AddRecords(records, tt.args.metaDataId); (err != nil) != tt.wantErr {
+					t.Errorf("AddRecords() error = %v, wantErr %v", err, tt.wantErr)
+				}
+				db.checkCount(t, int64(tt.wantCount))
+			})
+		}
 	}
 }
 

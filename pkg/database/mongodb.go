@@ -2,8 +2,6 @@ package database
 
 import (
 	"errors"
-	"fmt"
-	"github.com/Code-Hex/dd"
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -78,12 +76,21 @@ func (db *Mb3MongoDB) IsEmpty() (bool, error) {
 
 func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.Massbank, error) {
 	var bsonResult bson.M
-	var mb massbank.Massbank
 	err := db.database.Collection(MB_COLLECTION).FindOne(context.Background(), bson.D{{"accession", s}}).Decode(&bsonResult)
 	if err != nil {
 		return nil, err
 	}
-	b, err := bson.Marshal(bsonResult)
+	mb, err := ummarshal2Massbank(err, &bsonResult)
+	if err != nil {
+		return nil, err
+	}
+
+	return mb, err
+}
+
+func ummarshal2Massbank(err error, value *bson.M) (*massbank.Massbank, error) {
+	var mb massbank.Massbank
+	b, err := bson.Marshal(value)
 	if err != nil {
 		return nil, err
 	}
@@ -112,35 +119,29 @@ func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.Massbank, error) {
 	if mb.Copyright.String == "" {
 		mb.Copyright = nil
 	}
-
 	return &mb, err
 }
 
-func (db *Mb3MongoDB) GetRecords(filters Filters, limit uint64) ([]*massbank.Massbank, error) {
+func (db *Mb3MongoDB) GetRecords(filters Filters, limit uint64, offset uint64) ([]*massbank.Massbank, error) {
 	if db.database == nil {
 		return nil, errors.New("database not ready")
 	}
-	cur, err := db.database.Collection("massbank").Find(context.Background(), bson.D{})
+	cur, err := db.database.Collection("massbank").Find(context.Background(), bson.D{}, options.Find().SetLimit(int64(limit)).SetSkip(int64(offset)))
 	if err != nil {
 		return nil, err
 	}
-	var bsonResult []bson.D
+	var bsonResult []bson.M
 	if err := cur.All(context.Background(), &bsonResult); err != nil {
 		return nil, err
 	}
 	var mbResult = []*massbank.Massbank{}
 	for _, val := range bsonResult {
-		b, err := bson.Marshal(val)
+		mb, err := ummarshal2Massbank(err, &val)
 		if err != nil {
 			return nil, err
 		}
-		var mb massbank.Massbank
-		if err = bson.Unmarshal(b, &mb); err != nil {
-			return nil, err
-		}
-		mbResult = append(mbResult, &mb)
+		mbResult = append(mbResult, mb)
 	}
-	fmt.Println(dd.Dump(mbResult))
 	return mbResult, nil
 }
 
@@ -237,7 +238,7 @@ func (db *Mb3MongoDB) Connect() error {
 	if db.dirty && db.database != nil {
 		err := db.database.Client().Disconnect(ctx)
 		if err != nil {
-			println("Database connection probably not closed: " + err.Error())
+			log.Println("Database connection probably not closed: " + err.Error())
 		}
 		db.database = nil
 	}

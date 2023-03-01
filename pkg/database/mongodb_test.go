@@ -73,6 +73,7 @@ func initMongoTestDB(set DbInitSet) (MB3Database, error) {
 		files["massbank"] = "/go/src/test-data/massbank-all.json"
 	case Main:
 		files["massbank"] = "/go/src/test-data/massbank.json"
+	case Empty:
 	}
 
 	db, err := NewMongoDB(TestDbConfigs["mg valid"])

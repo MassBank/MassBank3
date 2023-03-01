@@ -29,7 +29,7 @@ type MB3Database interface {
 	IsEmpty() (bool, error)
 	DropAllRecords() error
 	GetRecord(*string) (*massbank.Massbank, error)
-	GetRecords(filters Filters, limit uint64) ([]*massbank.Massbank, error)
+	GetRecords(filters Filters, limit uint64, offset uint64) ([]*massbank.Massbank, error)
 	UpdateMetadata(meta *massbank.MbMetaData) (string, error)
 	AddRecord(record *massbank.Massbank, metaDataId string) error
 	AddRecords(records []*massbank.Massbank, metaDataId string) error

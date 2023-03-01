@@ -9,6 +9,7 @@ import (
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"log"
+	"math"
 	"strconv"
 )
 
@@ -149,9 +150,25 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.Massbank, error) {
 	return &result, err
 }
 
-func (p *PostgresSQLDB) GetRecords(filters Filters, limit uint64) ([]*massbank.Massbank, error) {
-	//TODO implement me
-	panic("implement me")
+func (p *PostgresSQLDB) GetRecords(filters Filters, limit uint64, offset uint64) ([]*massbank.Massbank, error) {
+	if limit == 0 {
+		limit = math.MaxInt64
+	}
+	rows, err := p.database.Query("SELECT document FROM massbank LIMIT $1 OFFSET $2", limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	var result = []*massbank.Massbank{}
+	for rows.Next() {
+		var mb massbank.Massbank
+		var b []byte
+		if err = rows.Scan(&b); err != nil {
+			return nil, err
+		}
+		json.Unmarshal(b, &mb)
+		result = append(result, &mb)
+	}
+	return result, nil
 }
 
 func (p *PostgresSQLDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error) {
@@ -275,7 +292,7 @@ func (p *PostgresSQLDB) UpdateRecords(records []*massbank.Massbank, metaDataId s
 			res, err = stmt.Exec(r.Metadata.FileName, js, mid, r.Accession.String)
 		}
 		if err != nil {
-			println(err.Error())
+			return 0, 0, err
 		}
 		if res != nil {
 			mod, _ := res.RowsAffected()
