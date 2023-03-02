@@ -190,6 +190,7 @@ func (p *PostgresSQLDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error
 }
 
 func (p *PostgresSQLDB) AddRecord(record *massbank.Massbank, metaDataId string) error {
+	println(record.Accession)
 	records := []*massbank.Massbank{record}
 	return p.AddRecords(records, metaDataId)
 }
@@ -272,9 +273,10 @@ func (p *PostgresSQLDB) UpdateRecords(records []*massbank.Massbank, metaDataId s
 		UPDATE massbank 
 			SET filename = $1,
 			    document = $2
-			WHERE (document->'Accession') == $3 
+			WHERE (document->'Accession') = $4 
 			  AND  metadataid= $3 `
 	}
+
 	stmt, err := tx.Prepare(q)
 	if err != nil {
 		return 0, 0, err
@@ -289,7 +291,8 @@ func (p *PostgresSQLDB) UpdateRecords(records []*massbank.Massbank, metaDataId s
 		if upsert {
 			res, err = stmt.Exec(r.Metadata.FileName, js, mid)
 		} else {
-			res, err = stmt.Exec(r.Metadata.FileName, js, mid, r.Accession.String)
+			acc, _ := json.Marshal(r.Accession.String)
+			res, err = stmt.Exec(r.Metadata.FileName, js, mid, acc)
 		}
 		if err != nil {
 			return 0, 0, err
