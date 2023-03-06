@@ -54,6 +54,10 @@ func (p *PostgresSQLDB) CheckDatabase() error {
 	return p.database.Ping()
 }
 
+// NewPostgresSQLDb creates a postgres database handle implementing [MB3Database] from the configuration.
+// It does test the connection or connect to the database. This should be done by [Connect()].
+//
+// Returns an error if the connection data is not syntactically valid.
 func NewPostgresSQLDb(config DBConfig) (*PostgresSQLDB, error) {
 	if config.Database != Postgres {
 		return nil, errors.New("database type must be Postgres")

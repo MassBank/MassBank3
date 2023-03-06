@@ -34,7 +34,7 @@ func (db *Mb3MongoDB) Count() (int64, error) {
 	return db.database.Collection(MB_COLLECTION).EstimatedDocumentCount(context.Background())
 }
 
-func (db *Mb3MongoDB) Reset() {
+func (db *Mb3MongoDB) reset() {
 	db.database = nil
 	db.dirty = true
 }
@@ -206,6 +206,10 @@ func (db *Mb3MongoDB) UpdateRecord(record *massbank.Massbank, metadataId string,
 	return uint64(res.ModifiedCount), uint64(res.UpsertedCount), nil
 }
 
+// NewMongoDB creates a mongodb database handle implementing [MB3Database] from the configuration.
+// It does test the connection or connect to the database. This should be done by [Connect()].
+//
+// Returns an error if the connection data is not valid.
 func NewMongoDB(config DBConfig) (*Mb3MongoDB, error) {
 	if config.Database != MongoDB {
 		return nil, errors.New("database type must be Postgres")
