@@ -51,8 +51,10 @@ jobs:
         go-version: '1.20'
 
     - name: Run all go tests
-      run: go test ./... -v -covermode=count -coverprofile=coverage.out
+      run: go test ./... -v -race -coverprofile=coverage.txt -covermode=atomic
       env:
         MONGODB_HOST: localhost
         POSTGRES_HOST: localhost
         TEST_DATA_DIR: /home/runner/work/MassBank3/MassBank3/
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
