@@ -14,6 +14,7 @@ func getEnv(name string, fallback string) string {
 }
 
 var mongo_host = getEnv("MONGODB_HOST", "testmongo")
+var test_data_dir = getEnv("TEST_DATA_DIR", "/go/src/")
 
 var TestDbConfigs = map[string]DBConfig{
 	"pg valid": {

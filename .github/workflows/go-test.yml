@@ -54,3 +54,4 @@ jobs:
       run: go test ./... -v -covermode=count -coverprofile=coverage.out
       env:
         MONGODB_HOST: localhost
+        TEST_DATA_DIR: ./
