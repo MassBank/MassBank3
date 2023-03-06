@@ -67,12 +67,12 @@ func TestNewMongoDB(t *testing.T) {
 }
 
 func initMongoTestDB(set DbInitSet) (MB3Database, error) {
-	var files = map[string]string{"mb_metadata": test_data_dir + "test-data/mb_metadata.json"}
+	var files = map[string]string{"mb_metadata": testDataDir + "test-data/mb_metadata.json"}
 	switch set {
 	case All:
-		files["massbank"] = test_data_dir + "test-data/massbank-all.json"
+		files["massbank"] = testDataDir + "test-data/massbank-all.json"
 	case Main:
-		files["massbank"] = test_data_dir + "test-data/massbank.json"
+		files["massbank"] = testDataDir + "test-data/massbank.json"
 	case Empty:
 	}
 

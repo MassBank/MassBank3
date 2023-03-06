@@ -65,12 +65,12 @@ func TestNewPostgresSQLDb(t *testing.T) {
 func initPostgresTestDB(set DbInitSet) (MB3Database, error) {
 	var filenames = []string{"mb_metadata", "massbank"}
 	var files = map[string]string{}
-	files["mb_metadata"] = test_data_dir + "test-data/metadata.sql"
+	files["mb_metadata"] = testDataDir + "test-data/metadata.sql"
 	switch set {
 	case All:
-		files["massbank"] = test_data_dir + "test-data/massbank-all.sql"
+		files["massbank"] = testDataDir + "test-data/massbank-all.sql"
 	case Main:
-		files["massbank"] = test_data_dir + "test-data/massbank.sql"
+		files["massbank"] = testDataDir + "test-data/massbank.sql"
 	case Empty:
 	}
 	db, err := NewPostgresSQLDb(TestDbConfigs["pg valid"])

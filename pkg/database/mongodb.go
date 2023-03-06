@@ -14,31 +14,131 @@ import (
 	"time"
 )
 
+// Mb3MongoDB represents a mongodb connection and should implement [MB3Database]
+type Mb3MongoDB struct {
+	user     string          // user name for database
+	pwd      string          // password for database
+	host     string          // host name of database connection
+	dbname   string          // database name
+	port     uint16          // port number
+	connStr  string          // connection string for a mongodb database
+	database *mongo.Database // handle to the database
+	dirty    bool            // if true, the database connection was changed and the database will reconnect.
+}
+
+// collection names
 const (
-	MB_COLLECTION      = "massbank"
-	MB_META_COLLECTION = "mb_metadata"
+	mbCollection        = "massbank"
+	mbMetaCollection    = "mb_metadata"
+	MongoConnectTimeout = "200ms"
 )
 
-type Mb3MongoDB struct {
-	user     string
-	pwd      string
-	host     string
-	dbname   string
-	port     uint16
-	connStr  string
-	database *mongo.Database
-	dirty    bool
+// NewMongoDB creates a mongodb database handle implementing [MB3Database] from the configuration.
+// It does test the connection or connect to the database. This should be done by [Connect()].
+//
+// Returns an error if the connection data is not valid.
+func NewMongoDB(config DBConfig) (*Mb3MongoDB, error) {
+	if config.Database != MongoDB {
+		return nil, errors.New("database type must be Postgres")
+	}
+	if len(config.DbName) < 1 ||
+		len(config.DbConnStr) < 1 &&
+			(len(config.DbHost) < 1 ||
+				config.DbPort == 0 ||
+				config.DbPort > uint(^uint16(0))) {
+		return nil, errors.New("database name, host and port not in config, but DbConnStr is also empty")
+	}
+	if len(config.DbConnStr) > 0 {
+		log.Println("Using connection string for database connection, ignoring other values")
+	}
+	return &Mb3MongoDB{
+		user:     config.DbUser,
+		pwd:      config.DbPwd,
+		host:     config.DbHost,
+		dbname:   config.DbName,
+		port:     uint16(config.DbPort),
+		connStr:  config.DbConnStr,
+		database: nil,
+		dirty:    true,
+	}, nil
 }
 
-func (db *Mb3MongoDB) Count() (int64, error) {
-	return db.database.Collection(MB_COLLECTION).EstimatedDocumentCount(context.Background())
+// Connect see [MB3Database.Connect]
+func (db *Mb3MongoDB) Connect() error {
+	timeout, _ := time.ParseDuration(MongoConnectTimeout)
+	ctx := context.Background()
+	if db.dirty && db.database != nil {
+		err := db.database.Client().Disconnect(ctx)
+		if err != nil {
+			return err
+		}
+		db.database = nil
+	}
+	if db.database == nil {
+		var err error
+		var dbClient *mongo.Client
+		if len(db.connStr) > 0 {
+			if dbClient, err = mongo.Connect(ctx, options.Client().ApplyURI(db.connStr).SetConnectTimeout(timeout)); err != nil {
+				return err
+			}
+		} else {
+
+			clOptions := options.Client().SetAuth(options.Credential{
+				AuthMechanism:           "SCRAM-SHA-256",
+				AuthMechanismProperties: nil,
+				AuthSource:              "admin",
+				Username:                db.user,
+				Password:                db.pwd,
+				PasswordSet:             true,
+			}).SetAppName("MassBank3API").SetHosts([]string{db.host + ":" + strconv.FormatInt(int64(db.port), 10)}).SetConnectTimeout(timeout).SetTLSConfig(nil)
+			if dbClient, err = mongo.Connect(ctx, clOptions); err != nil {
+				return err
+			}
+		}
+		mongoDb := dbClient.Database(db.dbname)
+		if err != nil {
+			return err
+		}
+		db.database = mongoDb
+		db.dirty = false
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	if err := db.database.Client().Ping(ctx, nil); err != nil {
+		db.database = nil
+		return err
+	}
+	return db.init()
 }
 
-func (db *Mb3MongoDB) reset() {
+// Disconnect see [MB3Database.Disconnect]
+func (db *Mb3MongoDB) Disconnect() error {
+	if db.database == nil {
+		return errors.New("database not connected")
+	}
+	err := db.database.Client().Disconnect(context.Background())
 	db.database = nil
-	db.dirty = true
+	return err
 }
 
+// Count see [MB3Database.Count]
+func (db *Mb3MongoDB) Count() (int64, error) {
+	return db.database.Collection(mbCollection).EstimatedDocumentCount(context.Background())
+}
+
+// IsEmpty see [MB3Database.IsEmpty]
+func (db *Mb3MongoDB) IsEmpty() (bool, error) {
+	if db.database == nil {
+		return true, errors.New("database not ready")
+	}
+	count, err := db.database.Collection(mbCollection).CountDocuments(context.Background(), bson.D{})
+	if count < 1 || err != nil {
+		return true, err
+	}
+	return false, nil
+}
+
+// DropAllRecords see [MB3Database.DropAllRecords]
 func (db *Mb3MongoDB) DropAllRecords() error {
 	if err := db.database.Drop(context.Background()); err != nil {
 		return err
@@ -46,14 +146,57 @@ func (db *Mb3MongoDB) DropAllRecords() error {
 	return db.init()
 }
 
+// GetRecord see [MB3Database.GetRecord]
+func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.Massbank, error) {
+	var bsonResult bson.M
+	err := db.database.Collection(mbCollection).FindOne(context.Background(), bson.D{{"accession", s}}).Decode(&bsonResult)
+	if err != nil {
+		return nil, err
+	}
+	mb, err := unmarshal2Massbank(err, &bsonResult)
+	if err != nil {
+		return nil, err
+	}
+	return mb, err
+}
+
+// GetRecords see [MB3Database.GetRecords]
+func (db *Mb3MongoDB) GetRecords(
+	filters Filters,
+	limit uint64,
+	offset uint64,
+) ([]*massbank.Massbank, error) {
+	if db.database == nil {
+		return nil, errors.New("database not ready")
+	}
+	cur, err := db.database.Collection(mbCollection).Find(context.Background(), bson.D{}, options.Find().SetLimit(int64(limit)).SetSkip(int64(offset)))
+	if err != nil {
+		return nil, err
+	}
+	var bsonResult []bson.M
+	if err := cur.All(context.Background(), &bsonResult); err != nil {
+		return nil, err
+	}
+	var mbResult = []*massbank.Massbank{}
+	for _, val := range bsonResult {
+		mb, err := unmarshal2Massbank(err, &val)
+		if err != nil {
+			return nil, err
+		}
+		mbResult = append(mbResult, mb)
+	}
+	return mbResult, nil
+}
+
+// UpdateMetadata see [MB3Database.UpdateMetadata]
 func (db *Mb3MongoDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error) {
 	if db.database == nil {
 		return "", errors.New("database not ready")
 	}
 	var res bson.M
-	err := db.database.Collection(MB_META_COLLECTION).FindOne(context.Background(), bson.D{{"commit", meta.Commit}, {"timestamp", meta.Timestamp}}, options.FindOne().SetProjection(bson.D{{"_id", 1}})).Decode(&res)
+	err := db.database.Collection(mbMetaCollection).FindOne(context.Background(), bson.D{{"commit", meta.Commit}, {"timestamp", meta.Timestamp}}, options.FindOne().SetProjection(bson.D{{"_id", 1}})).Decode(&res)
 	if err != nil {
-		iRes, err := db.database.Collection(MB_META_COLLECTION).InsertOne(context.Background(), meta)
+		iRes, err := db.database.Collection(mbMetaCollection).InsertOne(context.Background(), meta)
 		if err != nil {
 			return "", err
 		}
@@ -63,32 +206,129 @@ func (db *Mb3MongoDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error) 
 	return res["_id"].(primitive.ObjectID).Hex(), nil
 }
 
-func (db *Mb3MongoDB) IsEmpty() (bool, error) {
+// AddRecord see [MB3Database.AddRecord]
+func (db *Mb3MongoDB) AddRecord(record *massbank.Massbank, metadataId string) error {
 	if db.database == nil {
-		return true, errors.New("database not ready")
+		return errors.New("database not ready")
 	}
-	count, err := db.database.Collection(MB_COLLECTION).CountDocuments(context.Background(), bson.D{})
-	if count < 1 || err != nil {
-		return true, err
+	record.Metadata.VersionRef = massbank.MbReference(metadataId)
+	_, err := db.database.Collection(mbCollection).InsertOne(context.Background(), *record)
+	if err != nil {
+		return err
 	}
-	return false, nil
+	return nil
 }
 
-func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.Massbank, error) {
-	var bsonResult bson.M
-	err := db.database.Collection(MB_COLLECTION).FindOne(context.Background(), bson.D{{"accession", s}}).Decode(&bsonResult)
-	if err != nil {
-		return nil, err
+// AddRecords see [MB3Database.AddRecords]
+func (db *Mb3MongoDB) AddRecords(records []*massbank.Massbank, metadataId string) error {
+	if db.database == nil {
+		return errors.New("database not ready")
 	}
-	mb, err := ummarshal2Massbank(err, &bsonResult)
-	if err != nil {
-		return nil, err
+	var recordsI = make([]interface{}, len(records))
+	for i, record := range records {
+		record.Metadata.VersionRef = massbank.MbReference(metadataId)
+		recordsI[i] = record
 	}
-
-	return mb, err
+	_, err := db.database.Collection(mbCollection).InsertMany(context.Background(), recordsI)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func ummarshal2Massbank(err error, value *bson.M) (*massbank.Massbank, error) {
+// UpdateRecord see [MB3Database.UpdateRecord]
+func (db *Mb3MongoDB) UpdateRecord(
+	record *massbank.Massbank,
+	metadataId string,
+	upsert bool,
+) (uint64, uint64, error) {
+	if db.database == nil {
+		return 0, 0, errors.New("database not ready")
+	}
+	record.Metadata.VersionRef = massbank.MbReference(metadataId)
+	opt := options.ReplaceOptions{}
+	res, err := db.database.Collection(mbCollection).ReplaceOne(context.Background(), bson.D{{"accession", record.Accession.String}}, record, opt.SetUpsert(upsert))
+	if err != nil {
+		return 0, 0, err
+	}
+	return uint64(res.ModifiedCount), uint64(res.UpsertedCount), nil
+}
+
+// UpdateRecords see [MB3Database.UpdateRecords]
+func (db *Mb3MongoDB) UpdateRecords(
+	records []*massbank.Massbank,
+	metadataId string,
+	upsert bool,
+) (uint64, uint64, error) {
+	if db.database == nil {
+		return 0, 0, errors.New("database not ready")
+	}
+	var upserted uint64 = 0
+	var modified uint64 = 0
+	for _, record := range records {
+		u, m, err := db.UpdateRecord(record, metadataId, upsert)
+		if err != nil {
+			return 0, 0, err
+		}
+		upserted += u
+		modified += m
+	}
+	return upserted, modified, nil
+}
+
+func (db *Mb3MongoDB) reset() {
+	db.database = nil
+	db.dirty = true
+}
+
+func (db *Mb3MongoDB) init() error {
+	opt := options.IndexOptions{}
+	_, err := db.database.Collection(mbCollection).Indexes().CreateOne(context.Background(),
+		mongo.IndexModel{Keys: bson.D{{"accession", 1}},
+			Options: opt.SetName("accession_1").SetUnique(true)})
+	indices := []string{
+		"compound.names",
+		"compound.mass",
+		"compound.formula",
+		"acquisition.instrumenttype",
+		"acquisition.massspectrometry.ION_MODE",
+		"acquisition.massspectrometry.MS_TYPE",
+	}
+	for _, index := range indices {
+		if _, err := db.database.Collection(mbCollection).Indexes().CreateOne(
+			context.Background(),
+			mongo.IndexModel{Keys: bson.D{{
+				index,
+				1,
+			}},
+				Options: &options.IndexOptions{}},
+		); err != nil {
+			return err
+		}
+	}
+	opt = options.IndexOptions{}
+	if _, err := db.database.Collection(mbMetaCollection).Indexes().CreateOne(
+		context.Background(),
+		mongo.IndexModel{
+			Keys: bson.D{{
+				"version",
+				1,
+			}, {
+				"commit",
+				1,
+			}, {
+				"timestamp",
+				1,
+			}},
+			Options: opt.SetUnique(true),
+		},
+	); err != nil {
+		return err
+	}
+	return err
+}
+
+func unmarshal2Massbank(err error, value *bson.M) (*massbank.Massbank, error) {
 	var mb massbank.Massbank
 	b, err := bson.Marshal(value)
 	if err != nil {
@@ -120,189 +360,4 @@ func ummarshal2Massbank(err error, value *bson.M) (*massbank.Massbank, error) {
 		mb.Copyright = nil
 	}
 	return &mb, err
-}
-
-func (db *Mb3MongoDB) GetRecords(filters Filters, limit uint64, offset uint64) ([]*massbank.Massbank, error) {
-	if db.database == nil {
-		return nil, errors.New("database not ready")
-	}
-	cur, err := db.database.Collection("massbank").Find(context.Background(), bson.D{}, options.Find().SetLimit(int64(limit)).SetSkip(int64(offset)))
-	if err != nil {
-		return nil, err
-	}
-	var bsonResult []bson.M
-	if err := cur.All(context.Background(), &bsonResult); err != nil {
-		return nil, err
-	}
-	var mbResult = []*massbank.Massbank{}
-	for _, val := range bsonResult {
-		mb, err := ummarshal2Massbank(err, &val)
-		if err != nil {
-			return nil, err
-		}
-		mbResult = append(mbResult, mb)
-	}
-	return mbResult, nil
-}
-
-func (db *Mb3MongoDB) AddRecords(records []*massbank.Massbank, metadataId string) error {
-	if db.database == nil {
-		return errors.New("database not ready")
-	}
-	var recordsI = make([]interface{}, len(records))
-	for i, record := range records {
-		record.Metadata.VersionRef = massbank.MbReference(metadataId)
-		recordsI[i] = record
-	}
-	_, err := db.database.Collection(MB_COLLECTION).InsertMany(context.Background(), recordsI)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	return nil
-}
-
-func (db *Mb3MongoDB) UpdateRecords(records []*massbank.Massbank, metadataId string, upsert bool) (uint64, uint64, error) {
-	if db.database == nil {
-		return 0, 0, errors.New("database not ready")
-	}
-	var upserted uint64 = 0
-	var modified uint64 = 0
-	for _, record := range records {
-		u, m, err := db.UpdateRecord(record, metadataId, upsert)
-		if err != nil {
-			log.Println(err)
-		}
-		upserted += u
-		modified += m
-	}
-	return upserted, modified, nil
-}
-
-func (db *Mb3MongoDB) AddRecord(record *massbank.Massbank, metadataId string) error {
-	if db.database == nil {
-		return errors.New("database not ready")
-	}
-	record.Metadata.VersionRef = massbank.MbReference(metadataId)
-	_, err := db.database.Collection(MB_COLLECTION).InsertOne(context.Background(), *record)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	return nil
-}
-
-func (db *Mb3MongoDB) UpdateRecord(record *massbank.Massbank, metadataId string, upsert bool) (uint64, uint64, error) {
-	if db.database == nil {
-		return 0, 0, errors.New("database not ready")
-	}
-	record.Metadata.VersionRef = massbank.MbReference(metadataId)
-	opt := options.ReplaceOptions{}
-	res, err := db.database.Collection(MB_COLLECTION).ReplaceOne(context.Background(), bson.D{{"accession", record.Accession.String}}, record, opt.SetUpsert(upsert))
-	if err != nil {
-		log.Println(err)
-		return 0, 0, err
-	}
-	return uint64(res.ModifiedCount), uint64(res.UpsertedCount), nil
-}
-
-// NewMongoDB creates a mongodb database handle implementing [MB3Database] from the configuration.
-// It does test the connection or connect to the database. This should be done by [Connect()].
-//
-// Returns an error if the connection data is not valid.
-func NewMongoDB(config DBConfig) (*Mb3MongoDB, error) {
-	if config.Database != MongoDB {
-		return nil, errors.New("database type must be Postgres")
-	}
-	if len(config.DbName) < 1 ||
-		len(config.DbConnStr) < 1 &&
-			(len(config.DbHost) < 1 ||
-				config.DbPort == 0 ||
-				config.DbPort > uint(^uint16(0))) {
-		return nil, errors.New("database name, host and port not in config, but DbConnStr is also empty")
-	}
-	if len(config.DbConnStr) > 0 {
-		log.Print("Using connection string for database connection, ignoring other values")
-	}
-	return &Mb3MongoDB{
-		user:     config.DbUser,
-		pwd:      config.DbPwd,
-		host:     config.DbHost,
-		dbname:   config.DbName,
-		port:     uint16(config.DbPort),
-		connStr:  config.DbConnStr,
-		database: nil,
-		dirty:    true,
-	}, nil
-}
-
-func (db *Mb3MongoDB) Connect() error {
-	timeout, _ := time.ParseDuration("200ms")
-	ctx := context.Background()
-	if db.dirty && db.database != nil {
-		err := db.database.Client().Disconnect(ctx)
-		if err != nil {
-			log.Println("Database connection probably not closed: " + err.Error())
-		}
-		db.database = nil
-	}
-	if db.database == nil {
-		var err error
-		var dbclient *mongo.Client
-		if len(db.connStr) > 0 {
-			if dbclient, err = mongo.Connect(ctx, options.Client().ApplyURI(db.connStr).SetConnectTimeout(timeout)); err != nil {
-				return err
-			}
-		} else {
-
-			clOptions := options.Client().SetAuth(options.Credential{
-				AuthMechanism:           "SCRAM-SHA-256",
-				AuthMechanismProperties: nil,
-				AuthSource:              "admin",
-				Username:                db.user,
-				Password:                db.pwd,
-				PasswordSet:             true,
-			}).SetAppName("Massbank3API").SetHosts([]string{db.host + ":" + strconv.FormatInt(int64(db.port), 10)}).SetConnectTimeout(timeout).SetTLSConfig(nil)
-			if dbclient, err = mongo.Connect(ctx, clOptions); err != nil {
-				return err
-			}
-		}
-		mongoDb := dbclient.Database(db.dbname)
-		if err != nil {
-			return err
-		}
-		db.database = mongoDb
-		db.dirty = false
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	if err := db.database.Client().Ping(ctx, nil); err != nil {
-		db.database = nil
-		return err
-	}
-	return db.init()
-}
-
-func (db *Mb3MongoDB) init() error {
-	opt := options.IndexOptions{}
-	_, err := db.database.Collection(MB_COLLECTION).Indexes().CreateOne(context.Background(),
-		mongo.IndexModel{bson.D{{"accession", 1}},
-			opt.SetName("accession_1").SetUnique(true)})
-	indeces := []string{"compound.names", "compound.mass", "compound.formula", "acquisition.instrumenttype", "acquisition.massspectrometry.ION_MODE", "acquisition.massspectrometry.MS_TYPE"}
-	for _, index := range indeces {
-		db.database.Collection(MB_COLLECTION).Indexes().CreateOne(context.Background(), mongo.IndexModel{bson.D{{index, 1}}, &options.IndexOptions{}})
-
-	}
-	opt = options.IndexOptions{}
-	db.database.Collection(MB_META_COLLECTION).Indexes().CreateOne(context.Background(), mongo.IndexModel{bson.D{{"version", 1}, {"commit", 1}, {"timestamp", 1}}, opt.SetUnique(true)})
-	return err
-}
-
-func (db *Mb3MongoDB) Disconnect() error {
-	if db.database == nil {
-		return errors.New("Database not connected")
-	}
-	err := db.database.Client().Disconnect(context.TODO())
-	db.database = nil
-	return err
 }

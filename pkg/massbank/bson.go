@@ -87,8 +87,7 @@ func (p MbReference) MarshalBSONValue() (bsontype.Type, []byte, error) {
 
 func (p *StringProperty) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
 	var raw = bson.RawValue{Type: t, Value: b}
-	raw.Unmarshal(&p.String)
-	return nil
+	return raw.Unmarshal(&p.String)
 }
 
 func (p *RecordAuthorNames) UnmarshalBSONValue(t bsontype.Type, b []byte) error {

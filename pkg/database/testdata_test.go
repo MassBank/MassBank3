@@ -13,16 +13,16 @@ func getEnv(name string, fallback string) string {
 	return fallback
 }
 
-var mongo_host = getEnv("MONGODB_HOST", "testmongo")
-var test_data_dir = getEnv("TEST_DATA_DIR", "/go/src/")
-var postgres_host = getEnv("POSTGRES_HOST", "testpostgres")
+var mongoHost = getEnv("MONGODB_HOST", "testmongo")
+var testDataDir = getEnv("TEST_DATA_DIR", "/go/src/")
+var postgresHost = getEnv("POSTGRES_HOST", "testpostgres")
 
 var TestDbConfigs = map[string]DBConfig{
 	"pg valid": {
 		Database:  Postgres,
 		DbUser:    "mbtestuser",
 		DbPwd:     "mbtestpwd",
-		DbHost:    postgres_host,
+		DbHost:    postgresHost,
 		DbName:    "mbtestdb",
 		DbPort:    5432,
 		DbConnStr: "",
@@ -43,7 +43,7 @@ var TestDbConfigs = map[string]DBConfig{
 		DbHost:    "",
 		DbName:    "",
 		DbPort:    0,
-		DbConnStr: "host=" + postgres_host + " port=5432 user=mbtestuser password=mbtestpwd dbname=mbtestdb sslmode=disable",
+		DbConnStr: "host=" + postgresHost + " port=5432 user=mbtestuser password=mbtestpwd dbname=mbtestdb sslmode=disable",
 	},
 	"pg empty": {
 		Database: Postgres,
@@ -56,7 +56,7 @@ var TestDbConfigs = map[string]DBConfig{
 		Database:  MongoDB,
 		DbUser:    "mbtestuser",
 		DbPwd:     "mbtestpwd",
-		DbHost:    mongo_host,
+		DbHost:    mongoHost,
 		DbName:    "mbtestdb",
 		DbPort:    27017,
 		DbConnStr: "",
@@ -75,12 +75,12 @@ var TestDbConfigs = map[string]DBConfig{
 	},
 	"mg valid conn string": {
 		Database:  MongoDB,
-		DbConnStr: "mongodb://mbtestuser:mbtestpwd@" + mongo_host + ":27017",
+		DbConnStr: "mongodb://mbtestuser:mbtestpwd@" + mongoHost + ":27017",
 		DbName:    "mbtestdb",
 	},
 	"mg conn string ": {
 		Database:  MongoDB,
-		DbConnStr: "mongodb://mbtestuser:mbtestpwd@" + mongo_host + ":27017",
+		DbConnStr: "mongodb://mbtestuser:mbtestpwd@" + mongoHost + ":27017",
 	},
 }
 
@@ -97,9 +97,9 @@ var TestDatabases = map[string]MB3Database{
 		user:       "mbtestuser",
 		dbname:     "mbtestdb",
 		password:   "mbtestpwd",
-		host:       postgres_host,
+		host:       postgresHost,
 		port:       5432,
-		connString: "host=" + postgres_host + " port=5432 user=mbtestuser password=mbtestpwd dbname=mbtestdb sslmode=disable",
+		connString: "host=" + postgresHost + " port=5432 user=mbtestuser password=mbtestpwd dbname=mbtestdb sslmode=disable",
 		database:   nil,
 	},
 	"pg wrong host": &PostgresSQLDB{
@@ -117,13 +117,13 @@ var TestDatabases = map[string]MB3Database{
 		password:   "",
 		host:       "",
 		port:       0,
-		connString: "host=" + postgres_host + " port=5432 user=mbtestuser password=mbtestpwd dbname=mbtestdb sslmode=disable",
+		connString: "host=" + postgresHost + " port=5432 user=mbtestuser password=mbtestpwd dbname=mbtestdb sslmode=disable",
 		database:   nil,
 	},
 	"mg valid": &Mb3MongoDB{
 		user:     "mbtestuser",
 		pwd:      "mbtestpwd",
-		host:     mongo_host,
+		host:     mongoHost,
 		dbname:   "mbtestdb",
 		port:     27017,
 		database: nil,
@@ -139,7 +139,7 @@ var TestDatabases = map[string]MB3Database{
 		dirty:    true,
 	},
 	"mg valid conn string": &Mb3MongoDB{
-		connStr: "mongodb://mbtestuser:mbtestpwd@" + mongo_host + ":27017",
+		connStr: "mongodb://mbtestuser:mbtestpwd@" + mongoHost + ":27017",
 		dbname:  "mbtestdb",
 	},
 }

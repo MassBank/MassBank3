@@ -2,12 +2,12 @@ package database
 
 import "github.com/MassBank/MassBank3/pkg/massbank"
 
-// Filters is the abstract description of filters used to find MassBank reacords
+// Filters is the abstract description of filters used to find MassBank records
 // in the database
 type Filters struct {
 }
 
-// DatabaseType is an enum containig the database type
+// DatabaseType is an enum containing the database type
 type DatabaseType int
 
 // The list of supported databases
@@ -33,7 +33,7 @@ type MBErrorType int
 
 // The list of error types
 const (
-	DatabbaseNotReady MBErrorType = iota
+	DatabaseNotReady MBErrorType = iota
 	CouldNotReachHost
 	InternalError
 	NotFoundError
@@ -48,7 +48,7 @@ type MBDatabaseError struct {
 
 // Implements the error interface for [MBDatabaseError]
 func (err *MBDatabaseError) Error() string {
-	var msg string = err.Message
+	var msg = err.Message
 	if err != nil && len(err.Message) > 0 && err.InnerError != nil {
 		msg += ": "
 	}
@@ -58,7 +58,7 @@ func (err *MBDatabaseError) Error() string {
 	return msg
 }
 
-// This is the Interface which has to be implemented for databases using MassBank3
+// MB3Database This is the Interface which has to be implemented for databases using MassBank3
 //
 // Any database can be used as in the backend as long as it defines the interface.
 type MB3Database interface {
@@ -84,7 +84,7 @@ type MB3Database interface {
 	// database.
 	GetRecord(*string) (*massbank.Massbank, error)
 
-	// GetRecords Get an array of massbank records by filtering
+	// GetRecords Get an array of MassBank records by filtering
 	//   - limit: maximum records to show
 	// 	 - offset: first record
 	//
