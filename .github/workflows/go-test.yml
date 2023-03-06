@@ -12,10 +12,11 @@ env:
 
 jobs:
   build:
-    matrix:
-      mongodb-version: ['5.0', '6.0']
-      os: [ubuntu-22.04, ubuntu-20.04]
-      runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        mongodb-version: ['5.0', '6.0']
+        os: [ubuntu-22.04, ubuntu-20.04]
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v3
