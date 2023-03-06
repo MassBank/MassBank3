@@ -15,13 +15,14 @@ func getEnv(name string, fallback string) string {
 
 var mongo_host = getEnv("MONGODB_HOST", "testmongo")
 var test_data_dir = getEnv("TEST_DATA_DIR", "/go/src/")
+var postgres_host = getEnv("POSTGRES_HOST", "testpostgres")
 
 var TestDbConfigs = map[string]DBConfig{
 	"pg valid": {
 		Database:  Postgres,
 		DbUser:    "mbtestuser",
 		DbPwd:     "mbtestpwd",
-		DbHost:    "testpostgres",
+		DbHost:    postgres_host,
 		DbName:    "mbtestdb",
 		DbPort:    5432,
 		DbConnStr: "",
@@ -42,7 +43,7 @@ var TestDbConfigs = map[string]DBConfig{
 		DbHost:    "",
 		DbName:    "",
 		DbPort:    0,
-		DbConnStr: "host=testpostgres port=5432 user=mbtestuser password=mbtestpwd dbname=mbtestdb sslmode=disable",
+		DbConnStr: "host=" + postgres_host + " port=5432 user=mbtestuser password=mbtestpwd dbname=mbtestdb sslmode=disable",
 	},
 	"pg empty": {
 		Database: Postgres,
@@ -96,9 +97,9 @@ var TestDatabases = map[string]MB3Database{
 		user:       "mbtestuser",
 		dbname:     "mbtestdb",
 		password:   "mbtestpwd",
-		host:       "testpostgres",
+		host:       postgres_host,
 		port:       5432,
-		connString: "host=testpostgres port=5432 user=mbtestuser password=mbtestpwd dbname=mbtestdb sslmode=disable",
+		connString: "host=" + postgres_host + " port=5432 user=mbtestuser password=mbtestpwd dbname=mbtestdb sslmode=disable",
 		database:   nil,
 	},
 	"pg wrong host": &PostgresSQLDB{
@@ -116,7 +117,7 @@ var TestDatabases = map[string]MB3Database{
 		password:   "",
 		host:       "",
 		port:       0,
-		connString: "host=testpostgres port=5432 user=mbtestuser password=mbtestpwd dbname=mbtestdb sslmode=disable",
+		connString: "host=" + postgres_host + " port=5432 user=mbtestuser password=mbtestpwd dbname=mbtestdb sslmode=disable",
 		database:   nil,
 	},
 	"mg valid": &Mb3MongoDB{
