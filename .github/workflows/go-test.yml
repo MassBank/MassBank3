@@ -14,9 +14,26 @@ jobs:
   build:
     strategy:
       matrix:
-        mongodb-version: ['5.0', '6.0']
-        os: [ubuntu-22.04, ubuntu-20.04]
+        mongodb-version: ['6.0']
+        os: [ 'ubuntu-22.04' ]
+        postgres-images: [ 'postgres:latest']
     runs-on: ${{ matrix.os }}
+
+    services:
+      testpostgres:
+        image: ${{matrix.postgres-images}}
+        env:
+          POSTGRES_DB: mbtestdb
+          POSTGRES_PASSWORD: mbtestpwd
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: mbtestuser
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
     - uses: actions/checkout@v3
