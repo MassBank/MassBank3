@@ -54,4 +54,4 @@ jobs:
       run: go test ./... -v -covermode=count -coverprofile=coverage.out
       env:
         MONGODB_HOST: localhost
-        TEST_DATA_DIR: ./
+        TEST_DATA_DIR: /home/runner/work/MassBank3/MassBank3/
