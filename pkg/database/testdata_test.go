@@ -2,8 +2,18 @@ package database
 
 import (
 	"github.com/MassBank/MassBank3/pkg/massbank"
+	"os"
 	"time"
 )
+
+func getEnv(name string, fallback string) string {
+	if value, ok := os.LookupEnv(name); ok {
+		return value
+	}
+	return fallback
+}
+
+var mongo_host = getEnv("MONGODB_HOST", "testmongo")
 
 var TestDbConfigs = map[string]DBConfig{
 	"pg valid": {
@@ -44,7 +54,7 @@ var TestDbConfigs = map[string]DBConfig{
 		Database:  MongoDB,
 		DbUser:    "mbtestuser",
 		DbPwd:     "mbtestpwd",
-		DbHost:    "testmongo",
+		DbHost:    mongo_host,
 		DbName:    "mbtestdb",
 		DbPort:    27017,
 		DbConnStr: "",
@@ -63,12 +73,12 @@ var TestDbConfigs = map[string]DBConfig{
 	},
 	"mg valid conn string": {
 		Database:  MongoDB,
-		DbConnStr: "mongodb://mbtestuser:mbtestpwd@testmongo:27017",
+		DbConnStr: "mongodb://mbtestuser:mbtestpwd@" + mongo_host + ":27017",
 		DbName:    "mbtestdb",
 	},
 	"mg conn string ": {
 		Database:  MongoDB,
-		DbConnStr: "mongodb://mbtestuser:mbtestpwd@testmongo:27017",
+		DbConnStr: "mongodb://mbtestuser:mbtestpwd@" + mongo_host + ":27017",
 	},
 }
 
@@ -111,7 +121,7 @@ var TestDatabases = map[string]MB3Database{
 	"mg valid": &Mb3MongoDB{
 		user:     "mbtestuser",
 		pwd:      "mbtestpwd",
-		host:     "testmongo",
+		host:     mongo_host,
 		dbname:   "mbtestdb",
 		port:     27017,
 		database: nil,
@@ -127,7 +137,7 @@ var TestDatabases = map[string]MB3Database{
 		dirty:    true,
 	},
 	"mg valid conn string": &Mb3MongoDB{
-		connStr: "mongodb://mbtestuser:mbtestpwd@testmongo:27017",
+		connStr: "mongodb://mbtestuser:mbtestpwd@" + mongo_host + ":27017",
 		dbname:  "mbtestdb",
 	},
 }
