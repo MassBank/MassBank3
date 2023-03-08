@@ -212,24 +212,6 @@ func TestMB3Database_DropAllRecords(t *testing.T) {
 	}
 }
 
-func TestMb3MongoDB_IsEmpty(t *testing.T) {
-	DBs, err := initDBs(Main)
-	if err != nil {
-		t.Fatal("Could not init Databases: ", err.Error())
-	}
-	for _, db := range DBs {
-		if ok, err := db.db.IsEmpty(); ok || err != nil {
-			t.Errorf("%s: error on no-nempty database: %v", db.name, err)
-		}
-		if err := db.db.DropAllRecords(); err != nil {
-			t.Errorf("%s: Could not drop on empty db: %v", db.name, err)
-		}
-		if ok, err := db.db.IsEmpty(); !ok || err != nil {
-			t.Errorf("%s: error on nempty database: %v", db.name, err)
-		}
-	}
-}
-
 func TestMB3Database_GetRecord(t *testing.T) {
 	type args struct {
 		s string

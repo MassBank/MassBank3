@@ -78,7 +78,7 @@ func main() {
 			panic(err)
 		}
 	}
-	empty, err := db.IsEmpty()
+	count, err := db.Count()
 	if err != nil {
 		println(err.Error())
 	}
@@ -86,7 +86,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	if empty {
+	if count < 1 {
 		err = db.AddRecords(mbfiles, metaId)
 		if err != nil {
 			panic(err)

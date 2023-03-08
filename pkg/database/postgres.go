@@ -92,6 +92,12 @@ func (p *PostgresSQLDB) Disconnect() error {
 func (p *PostgresSQLDB) Count() (int64, error) {
 	var count int64
 	err := p.database.QueryRow("SELECT COUNT(*) FROM  massbank").Scan(&count)
+	if err != nil && err.(*pq.Error).Code == "42P01" {
+		return 0, nil
+	}
+	if err != nil {
+		return 0, err
+	}
 	return count, err
 }
 

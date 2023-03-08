@@ -126,18 +126,6 @@ func (db *Mb3MongoDB) Count() (int64, error) {
 	return db.database.Collection(mbCollection).EstimatedDocumentCount(context.Background())
 }
 
-// IsEmpty see [MB3Database.IsEmpty]
-func (db *Mb3MongoDB) IsEmpty() (bool, error) {
-	if db.database == nil {
-		return true, errors.New("database not ready")
-	}
-	count, err := db.database.Collection(mbCollection).CountDocuments(context.Background(), bson.D{})
-	if count < 1 || err != nil {
-		return true, err
-	}
-	return false, nil
-}
-
 // DropAllRecords see [MB3Database.DropAllRecords]
 func (db *Mb3MongoDB) DropAllRecords() error {
 	if err := db.database.Drop(context.Background()); err != nil {

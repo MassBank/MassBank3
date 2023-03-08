@@ -72,10 +72,6 @@ type MB3Database interface {
 	// Count MassBank records in the database.
 	Count() (int64, error)
 
-	// IsEmpty checks if the database is empty and returns true if the database
-	// is empty.
-	IsEmpty() (bool, error)
-
 	// DropAllRecords drops all MassBank records in the Database.
 	DropAllRecords() error
 
