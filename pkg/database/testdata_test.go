@@ -5709,3 +5709,11 @@ var mbTestRecords = map[string]massbank.Massbank{
 		},
 	},
 }
+
+var UniqueValueTestData = map[string]MB3Values{
+	"all": MB3Values{[]MBCountValues{{"LC-ESI-ITFT", 3}, {"EI-B", 1}, {"LC-ESI-IT", 1}, {"ESI-QTOF", 1}, {"LC-APCI-QTOF", 1}, {"LC-ESI-QFT", 1}, {"LC-ESI-QTOF", 4}, {"MALDI-TOF", 1}},
+		[]MBCountValues{{"MS", 3}, {"MS2", 9}, {"MS4", 1}},
+		[]MBCountValues{{"NEGATIVE", 5}, {"POSITIVE", 8}},
+		MBMinMaxValues{0.01645, 235010720},
+		MBMinMaxValues{1865.00337, 124.03467},
+		MBMinMaxValues{15, 2136.33}}}

@@ -58,6 +58,24 @@ func (err *MBDatabaseError) Error() string {
 	return msg
 }
 
+type MBCountValues struct {
+	Val   string
+	Count int
+}
+type MBMinMaxValues struct {
+	Min float64
+	Max float64
+}
+
+type MB3Values struct {
+	InstrumentType []MBCountValues
+	MSType         []MBCountValues
+	IonMode        []MBCountValues
+	Intensity      MBMinMaxValues
+	Mass           MBMinMaxValues
+	Peak           MBMinMaxValues
+}
+
 // MB3Database This is the Interface which has to be implemented for databases using MassBank3
 //
 // Any database can be used as in the backend as long as it defines the interface.
@@ -86,6 +104,9 @@ type MB3Database interface {
 	//
 	// Will return an empty list if the filter does not match any records.
 	GetRecords(filters Filters, limit uint64, offset uint64) ([]*massbank.Massbank, error)
+
+	// GetUniqueValues is used to get the values for filter frontend
+	GetUniqueValues(filters Filters) (MB3Values, error)
 
 	// UpdateMetadata updates the metadata describing the MassBank version.
 	// Provides the database id of an existing entry if it is already in the

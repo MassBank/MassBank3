@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"os"
+	"reflect"
 	"testing"
 )
 
@@ -332,6 +333,44 @@ func TestMB3Database_GetRecords(t *testing.T) {
 		}
 
 	}
+}
+
+func TestMB3Database_GetUniqueValues(t *testing.T) {
+	DBs, err := initDBs(All)
+	if err != nil {
+		t.Fatal("Could not init Databases: ", err.Error())
+	}
+	for _, db := range DBs {
+		type testData struct {
+			db      testDB
+			name    string
+			want    MB3Values
+			wantErr bool
+		}
+
+		var tests = []testData{
+			{
+				db:      db,
+				name:    db.name + " Test valid data",
+				want:    UniqueValueTestData["all"],
+				wantErr: false,
+			},
+		}
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				got, err := tt.db.db.GetUniqueValues(Filters{})
+				if (err != nil) != tt.wantErr {
+					t.Errorf("%s: GetUniqueValues() error = %v, wantErr %v", tt.db.name, err, tt.wantErr)
+					return
+				}
+
+				if !reflect.DeepEqual(got, tt.want) {
+					t.Errorf("GetUniqueValues(): got %v, want %v", got, tt.want)
+				}
+			})
+		}
+	}
+
 }
 
 func TestMB3Database_AddRecord(t *testing.T) {

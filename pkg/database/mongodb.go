@@ -8,6 +8,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	bson2 "gopkg.in/mgo.v2/bson"
+
 	"log"
 	"reflect"
 	"strconv"
@@ -24,6 +26,177 @@ type Mb3MongoDB struct {
 	connStr  string          // connection string for a mongodb database
 	database *mongo.Database // handle to the database
 	dirty    bool            // if true, the database connection was changed and the database will reconnect.
+}
+
+func (db *Mb3MongoDB) GetUniqueValues(filters Filters) (MB3Values, error) {
+	var query = `
+[
+    { "$facet": {
+        "InstrumentType": [
+            {
+                "$group": {
+                    "_id": "$acquisition.instrumenttype",
+                    "Count": {"$sum": 1}
+                },
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "Val": "$_id",
+                    "Count": 1
+                }
+            },
+			{
+				"$sort": {
+					"Val": 1
+				}
+            }
+        ],
+        "IonMode": [
+            {
+                "$unwind": "$acquisition.massspectrometry"
+            },
+            {
+                "$redact": {
+                    "$cond": {
+                        "if": {"$eq": ["$acquisition.massspectrometry.key", "ION_MODE"]},
+                        "then": "$$KEEP",
+                        "else": "$$PRUNE"
+                    }
+                }
+            },
+            {
+                "$group": {
+                    "_id": "$acquisition.massspectrometry.value",
+                    "Count": {"$sum": 1}
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "Val": "$_id",
+                    "Count": 1
+                }
+            },
+			{
+				"$sort": {
+					"Val": 1
+				}
+            }
+        ],
+        "MSType": [
+            {
+                "$unwind": "$acquisition.massspectrometry"
+            },
+            {
+                "$redact": {
+                    "$cond": {
+                        "if": {"$eq": ["$acquisition.massspectrometry.key", "MS_TYPE"]},
+                        "then": "$$KEEP",
+                        "else": "$$PRUNE"
+                    }
+                }
+            },
+            {
+                "$group": {
+                    "_id": "$acquisition.massspectrometry.value",
+                    "Count": {"$sum": 1}
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "Val": "$_id",
+                    "Count": 1
+                }
+            },
+			{
+				"$sort": {
+					"Val": 1
+				}
+            }
+        ]    ,
+
+        "Intensity": [
+            { "$unwind": "$peak.peak.intensity"},
+    {
+        "$group": {
+            "_id": null,
+            "Max": {"$max": "$peak.peak.intensity"},
+            "Min": {"$min": "$peak.peak.intensity"}
+
+        }
+    },
+            {
+                "$project": {"_id":0}
+            }
+        ],
+            "Peak": [
+                { "$unwind": "$peak.peak.mz"},
+                {
+                    "$group": {
+                        "_id": null,
+                        "Max": {"$max": "$peak.peak.mz"},
+                        "Min": {"$min": "$peak.peak.mz"}
+
+                    }
+                },
+                            {
+                "$project": {"_id":0}
+            }
+            ],
+            "Mass": [
+                {
+                    "$group": {
+                        "_id": null,
+                        "Min": {"$max": "$compound.mass"},
+                        "Max": {"$min": "$compound.mass"}
+
+                    }
+                },
+                {
+                    "$project": {"_id":0}
+                }
+            ]
+        }
+    }
+    ]`
+	var result MB3Values
+	var bdoc interface{}
+	if err := bson2.UnmarshalJSON([]byte(query), &bdoc); err != nil {
+		return result, err
+	}
+	cur, err := db.database.Collection(mbCollection).Aggregate(context.Background(), bdoc)
+	if err != nil {
+		return result, err
+	}
+	var temp = make([]bson.D, 0)
+	if err = cur.All(context.Background(), &temp); err != nil {
+		return result, err
+	}
+	doc, err := bson.Marshal(temp[0])
+	if err != nil {
+		return result, err
+	}
+	type MB3ValuesTemp struct {
+		InstrumentType []MBCountValues
+		MSType         []MBCountValues
+		IonMode        []MBCountValues
+		Intensity      []MBMinMaxValues
+		Mass           []MBMinMaxValues
+		Peak           []MBMinMaxValues
+	}
+	var tempV MB3ValuesTemp
+	err = bson.Unmarshal(doc, &tempV)
+	result = MB3Values{
+		InstrumentType: tempV.InstrumentType,
+		MSType:         tempV.MSType,
+		IonMode:        tempV.IonMode,
+		Intensity:      tempV.Intensity[0],
+		Mass:           tempV.Mass[0],
+		Peak:           tempV.Peak[0],
+	}
+	return result, err
 }
 
 // collection names

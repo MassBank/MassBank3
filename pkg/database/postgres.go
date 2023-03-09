@@ -173,6 +173,68 @@ func (p *PostgresSQLDB) GetRecords(filters Filters, limit uint64, offset uint64)
 	return result, nil
 }
 
+// GetUniqueValues see [MB3Database.GetUniqueValues]
+func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
+	var query = `
+SELECT to_json(it) as instrument_type,
+       to_json(mt) as ms_type,
+       to_json(im) as ion_mode,
+       mass.maxm   as max_mass,
+       mass.minm   as min_mass,
+       mz.maxmz    as max_mz,
+       mz.minmz    as min_mz,
+       i.maxi      as max_intensity,
+       i.mini      as min_intensity
+FROM (SELECT ARRAY(SELECT t
+                   FROM (SELECT document -> 'Acquisition' -> 'InstrumentType' ->> 'String' as val,
+                                count(id)
+                         from massbank
+                         GROUP BY document -> 'Acquisition' -> 'InstrumentType' ->> 'String' ORDER BY document -> 'Acquisition' -> 'InstrumentType' ->> 'String') t)) as it,
+     (SELECT ARRAY(SELECT t
+                   FROM (select t.ms ->> 'String' as val, count(t.ms)
+                         FROM (Select jsonb_array_elements(document -> 'Acquisition' -> 'MassSpectrometry') as ms
+                               from massbank) t
+                         where ms ->> 'Subtag' = 'MS_TYPE'
+                         GROUP BY t.ms ORDER BY t.ms) t)) as mt,
+     (SELECT ARRAY(SELECT t
+                   FROM (select t.ms ->> 'String' as val, count(t.ms)
+                         FROM (Select jsonb_array_elements(document -> 'Acquisition' -> 'MassSpectrometry') as ms
+                               from massbank) t
+                         where ms ->> 'Subtag' = 'ION_MODE'
+                         GROUP BY t.ms ORDER BY t.ms) t)) as im,
+     (SELECT MIN(document -> 'Compound' -> 'mass' ->> 'Value') as minm,
+             MAX(document -> 'Compound' -> 'mass' ->> 'Value') as maxm
+      from massbank) as mass,
+     (SELECT MIN(t.mz) as minmz, MAX(t.mz) as maxmz
+      from (SELECT jsonb_array_elements(document -> 'Peak' -> 'Peak' -> 'Mz')::float8 as mz FROM massbank) t) as mz,
+     (SELECT MIN(t.i) as mini, MAX(t.i) as maxi
+      FROM (SELECT jsonb_array_elements(document -> 'Peak' -> 'Peak' -> 'Intensity')::float8 as i
+            FROM massbank) t) as i`
+	var val MB3Values
+	row := p.database.QueryRow(query)
+	itjs := make([]uint8, 0)
+	mtjs := make([]uint8, 0)
+	imjs := make([]uint8, 0)
+	err := row.Scan(
+		&itjs,
+		&mtjs,
+		&imjs,
+		&val.Mass.Max,
+		&val.Mass.Min,
+		&val.Peak.Max,
+		&val.Peak.Min,
+		&val.Intensity.Max,
+		&val.Intensity.Min)
+	var rit = struct{ Array []MBCountValues }{}
+	json.Unmarshal(itjs, &rit)
+	val.InstrumentType = append(val.InstrumentType, rit.Array...)
+	json.Unmarshal(mtjs, &rit)
+	val.MSType = append(val.MSType, rit.Array...)
+	json.Unmarshal(imjs, &rit)
+	val.IonMode = append(val.IonMode, rit.Array...)
+	return val, err
+}
+
 // UpdateMetadata see [MB3Database.UpdateMetadata]
 func (p *PostgresSQLDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error) {
 	if err := p.checkDatabase(); err != nil {
