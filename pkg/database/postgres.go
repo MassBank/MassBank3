@@ -202,8 +202,8 @@ FROM (SELECT ARRAY(SELECT t
                                from massbank) t
                          where ms ->> 'Subtag' = 'ION_MODE'
                          GROUP BY t.ms ORDER BY t.ms) t)) as im,
-     (SELECT MIN(document -> 'Compound' -> 'mass' ->> 'Value') as minm,
-             MAX(document -> 'Compound' -> 'mass' ->> 'Value') as maxm
+     (SELECT MIN((document -> 'Compound' -> 'mass' ->> 'Value')::float8) as minm,
+             MAX((document -> 'Compound' -> 'mass' ->> 'Value')::float8) as maxm
       from massbank) as mass,
      (SELECT MIN(t.mz) as minmz, MAX(t.mz) as maxmz
       from (SELECT jsonb_array_elements(document -> 'Peak' -> 'Peak' -> 'Mz')::float8 as mz FROM massbank) t) as mz,

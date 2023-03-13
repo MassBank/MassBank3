@@ -3,6 +3,7 @@ WORKDIR /go/src
 COPY cmd/mb3dbtool/main.go ./cmd/mb3dbtool/
 COPY pkg/ ./pkg
 COPY go.mod .
+COPY go.sum .
 COPY test-data/ ./test-data
 
 RUN go get -d -v ./...

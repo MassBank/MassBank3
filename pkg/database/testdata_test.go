@@ -5711,9 +5711,76 @@ var mbTestRecords = map[string]massbank.Massbank{
 }
 
 var UniqueValueTestData = map[string]MB3Values{
-	"all": MB3Values{[]MBCountValues{{"LC-ESI-ITFT", 3}, {"EI-B", 1}, {"LC-ESI-IT", 1}, {"ESI-QTOF", 1}, {"LC-APCI-QTOF", 1}, {"LC-ESI-QFT", 1}, {"LC-ESI-QTOF", 4}, {"MALDI-TOF", 1}},
-		[]MBCountValues{{"MS", 3}, {"MS2", 9}, {"MS4", 1}},
-		[]MBCountValues{{"NEGATIVE", 5}, {"POSITIVE", 8}},
-		MBMinMaxValues{0.01645, 235010720},
-		MBMinMaxValues{1865.00337, 124.03467},
-		MBMinMaxValues{15, 2136.33}}}
+	"all": {
+		[]MBCountValues{
+			MBCountValues{
+				Val:   "EI-B",
+				Count: 1,
+			},
+			MBCountValues{
+				Val:   "ESI-QTOF",
+				Count: 1,
+			},
+			MBCountValues{
+				Val:   "LC-APCI-QTOF",
+				Count: 1,
+			},
+			MBCountValues{
+				Val:   "LC-ESI-IT",
+				Count: 1,
+			},
+			MBCountValues{
+				Val:   "LC-ESI-ITFT",
+				Count: 3,
+			},
+			MBCountValues{
+				Val:   "LC-ESI-QFT",
+				Count: 1,
+			},
+			MBCountValues{
+				Val:   "LC-ESI-QTOF",
+				Count: 4,
+			},
+			MBCountValues{
+				Val:   "MALDI-TOF",
+				Count: 1,
+			},
+		},
+		[]MBCountValues{
+			MBCountValues{
+				Val:   "MS",
+				Count: 3,
+			},
+			MBCountValues{
+				Val:   "MS2",
+				Count: 9,
+			},
+			MBCountValues{
+				Val:   "MS4",
+				Count: 1,
+			},
+		},
+		[]MBCountValues{
+			MBCountValues{
+				Val:   "NEGATIVE",
+				Count: 5,
+			},
+			MBCountValues{
+				Val:   "POSITIVE",
+				Count: 8,
+			},
+		},
+		MBMinMaxValues{
+			Min: 0.016450,
+			Max: 235010720.000000,
+		},
+		MBMinMaxValues{
+			Min: 124.034670,
+			Max: 1865.00337,
+		},
+		MBMinMaxValues{
+			Min: 15.000000,
+			Max: 2136.330000,
+		},
+	},
+}

@@ -149,8 +149,8 @@ func (db *Mb3MongoDB) GetUniqueValues(filters Filters) (MB3Values, error) {
                 {
                     "$group": {
                         "_id": null,
-                        "Min": {"$max": "$compound.mass"},
-                        "Max": {"$min": "$compound.mass"}
+                        "Min": {"$min": "$compound.mass"},
+                        "Max": {"$max": "$compound.mass"}
 
                     }
                 },
