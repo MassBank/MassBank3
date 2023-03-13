@@ -3,7 +3,6 @@ package database
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Code-Hex/dd"
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"os"
 	"reflect"
@@ -364,7 +363,6 @@ func TestMB3Database_GetUniqueValues(t *testing.T) {
 					t.Errorf("%s: GetUniqueValues() error = %v, wantErr %v", tt.db.name, err, tt.wantErr)
 					return
 				}
-				println(dd.Dump(got))
 				if !reflect.DeepEqual(got, tt.want) {
 					t.Errorf("GetUniqueValues(): \ngot  %v, \nwant %v", got, tt.want)
 				}
