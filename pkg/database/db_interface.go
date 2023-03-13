@@ -5,6 +5,21 @@ import "github.com/MassBank/MassBank3/pkg/massbank"
 // Filters is the abstract description of filters used to find MassBank records
 // in the database
 type Filters struct {
+	InstrumentType  *[]string
+	Splash          *string
+	MsType          *string
+	IonMode         *string
+	CompoundName    *string
+	Mass            *float64
+	MassEpsilon     *float64
+	Formula         *string
+	Peaks           *[]float64
+	Intensity       *[]uint
+	PeakDifferences *[]float64
+	PeakList        *[]float64
+	IntensityCutOff *[]uint
+	InchiKey        *string
+	Contributor     *string
 }
 
 // DatabaseType is an enum containing the database type

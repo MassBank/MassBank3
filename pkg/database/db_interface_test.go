@@ -307,6 +307,13 @@ func TestMB3Database_GetRecords(t *testing.T) {
 				testRecords([]uint64{3, 4, 10, 11, 12}),
 				false,
 			},
+			{
+				db,
+				db.name + " " + "Get all records with InstrumentType LC-ESI-ITFT",
+				args{Filters{InstrumentType: &[]string{"LC-ESI-ITFT"}}, 0, 0},
+				testRecords([]uint64{1, 2, 4}),
+				false,
+			},
 		}
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
@@ -321,9 +328,13 @@ func TestMB3Database_GetRecords(t *testing.T) {
 				}
 
 				for i := range tt.want {
-					got[i].Metadata.VersionRef = tt.want[i].Metadata.VersionRef
-					bg, errg := json.Marshal(got[i])
 					bw, errw := json.Marshal(tt.want[i])
+					var bg []byte = nil
+					var errg error = nil
+					if len(got) > i {
+						got[i].Metadata.VersionRef = tt.want[i].Metadata.VersionRef
+						bg, errg = json.Marshal(got[i])
+					}
 					if string(bg) != string(bw) || errg != nil || errw != nil {
 						t.Errorf("\nwant: %v \ngot : %v\n", string(bw), string(bg))
 					}

@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"errors"
+	"github.com/Code-Hex/dd"
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -330,7 +331,9 @@ func (db *Mb3MongoDB) GetRecords(
 	if db.database == nil {
 		return nil, errors.New("database not ready")
 	}
-	cur, err := db.database.Collection(mbCollection).Find(context.Background(), bson.D{}, options.Find().SetLimit(int64(limit)).SetSkip(int64(offset)))
+	query := getQuery(filters)
+	println(dd.Dump(query))
+	cur, err := db.database.Collection(mbCollection).Find(context.Background(), query, options.Find().SetLimit(int64(limit)).SetSkip(int64(offset)))
 	if err != nil {
 		return nil, err
 	}
@@ -347,6 +350,23 @@ func (db *Mb3MongoDB) GetRecords(
 		mbResult = append(mbResult, mb)
 	}
 	return mbResult, nil
+}
+
+func getQuery(filters Filters) bson.D {
+	result := bson.D{}
+	if filters.InstrumentType != nil {
+		return bson.D{{"acquisition.instrumenttype", "LC-ESI-ITFT"}}
+
+		arr := bson.A{}
+		for _, it := range *filters.InstrumentType {
+			arr = append(arr, it)
+		}
+		result = append(result,
+			bson.E{"acquisition.instrumenttype",
+				bson.E{"$in", arr}})
+
+	}
+	return result
 }
 
 // UpdateMetadata see [MB3Database.UpdateMetadata]
