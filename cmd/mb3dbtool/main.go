@@ -7,6 +7,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/Code-Hex/dd"
 	"github.com/MassBank/MassBank3/pkg/database"
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"github.com/go-git/go-git/v5"
@@ -31,7 +32,7 @@ const (
 	DB_DEFAULT                = "postgres"
 	DB_USER_DEFAULT           = "massbank3"
 	DB_PASSWORD_DEFAULT       = "massbank3password"
-	DB_HOST_DEFAULT           = "localhost"
+	DB_HOST_DEFAULT           = "localhst"
 	DB_PORT_DEFAULT           = "0"
 	DB_NAME_DEFAULT           = "massbank3"
 	DB_CONN_STRING_DEFAULT    = ""
@@ -52,6 +53,7 @@ func main() {
 		}
 	} else if userConfig.Database == database.Postgres {
 		db, err = database.NewPostgresSQLDb(userConfig.DBConfig)
+		log.Println(dd.Dump(db))
 		if err != nil {
 			panic(err)
 		}

@@ -8,7 +8,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: "mbtestuser"
       MONGO_INITDB_ROOT_PASSWORD: "mbtestpwd"
-
   testpostgres:
     image: postgres:latest
     restart: always
@@ -16,7 +15,6 @@ services:
       POSTGRES_PASSWORD: "mbtestpwd"
       POSTGRES_USER:     "mbtestuser"
       POSTGRES_DB:       "mbtestdb"
-
   mb3test:
     build:
       context: ..

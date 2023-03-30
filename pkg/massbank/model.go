@@ -226,6 +226,22 @@ type AcInstrumentType struct {
 	StringProperty
 }
 type MsType string
+
+const (
+	MS  MsType = "MS"
+	MS2 MsType = "MS2"
+	MS3 MsType = "MS3"
+	MS4 MsType = "MS4"
+)
+
+type IonMode string
+
+const (
+	ANY      IonMode = ""
+	POSITIVE IonMode = "POSITIVE"
+	NEGATIVE IonMode = "NEGATIVE"
+)
+
 type AcMassSpectrometry struct {
 	SubtagProperty
 }

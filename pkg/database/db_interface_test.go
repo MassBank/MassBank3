@@ -259,8 +259,12 @@ func TestMB3Database_GetRecord(t *testing.T) {
 	}
 }
 
+func ptr[T any](v T) *T {
+	return &v
+}
+
 func TestMB3Database_GetRecords(t *testing.T) {
-	DBs, err := initDBs(Main)
+	DBs, err := initDBs(All)
 	if err != nil {
 		t.Fatal("Could not init Databases: ", err.Error())
 	}
@@ -283,7 +287,7 @@ func TestMB3Database_GetRecords(t *testing.T) {
 				db,
 				db.name + " " + "Get all records",
 				args{Filters{}, 0, 0},
-				testRecords([]uint64{0, 1, 2, 3, 4, 10, 11, 12}),
+				testRecords([]uint64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}),
 				false,
 			},
 			{
@@ -297,21 +301,140 @@ func TestMB3Database_GetRecords(t *testing.T) {
 				db,
 				db.name + " " + "Get second page with 3 records",
 				args{Filters{}, 3, 3},
-				testRecords([]uint64{3, 4, 10}),
+				testRecords([]uint64{3, 4, 5}),
 				false,
 			},
 			{
 				db,
 				db.name + " " + "Get all but first  3 records",
 				args{Filters{}, 0, 3},
-				testRecords([]uint64{3, 4, 10, 11, 12}),
+				testRecords([]uint64{3, 4, 5, 6, 7, 8, 9, 10, 11, 12}),
 				false,
 			},
 			{
 				db,
 				db.name + " " + "Get all records with InstrumentType LC-ESI-ITFT",
 				args{Filters{InstrumentType: &[]string{"LC-ESI-ITFT"}}, 0, 0},
-				testRecords([]uint64{1, 2, 4}),
+				testRecords([]uint64{0, 2, 10}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with InstrumentType LC-ESI-ITFT OR LC-ESI-QFT",
+				args{Filters{InstrumentType: &[]string{"LC-ESI-ITFT", "LC-ESI-QFT"}}, 0, 0},
+				testRecords([]uint64{0, 2, 3, 10}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with MS type MS",
+				args{Filters{MsType: &[]massbank.MsType{massbank.MS}}, 0, 0},
+				testRecords([]uint64{4, 9, 11}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with MS type MS2",
+				args{Filters{MsType: &[]massbank.MsType{massbank.MS2}}, 0, 0},
+				testRecords([]uint64{0, 1, 2, 3, 6, 7, 8, 10, 12}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with MS type MS2",
+				args{Filters{MsType: &[]massbank.MsType{massbank.MS, massbank.MS2}}, 0, 0},
+				testRecords([]uint64{0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with ion mode POSITIVE",
+				args{Filters{IonMode: massbank.POSITIVE}, 0, 0},
+				testRecords([]uint64{0, 1, 3, 4, 5, 9, 10, 11}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with ion mode ANY",
+				args{Filters{IonMode: massbank.ANY}, 0, 0},
+				testRecords([]uint64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with SPLASH ",
+				args{Filters{Splash: "splash10-0udi-0609400000-9fd50528da25d66adfc7"}, 0, 0},
+				testRecords([]uint64{7}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with SPLASH ",
+				args{Filters{Splash: "splash10-0udi-0609400000-9fd50528da25d66adfc7"}, 0, 0},
+				testRecords([]uint64{7}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Mass and default epsilon",
+				args{Filters{Mass: ptr(float64(296.251000))}, 0, 0},
+				testRecords([]uint64{8}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Mass and default epsilon, no match",
+				args{Filters{Mass: ptr(float64(296.141000))}, 0, 0},
+				testRecords([]uint64{}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Mass and custom epsilon",
+				args{Filters{Mass: ptr(float64(296.141000)), MassEpsilon: ptr(float64(0.5))}, 0, 0},
+				testRecords([]uint64{8}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with methyl in name",
+				args{Filters{CompoundName: "methyl"}, 0, 0},
+				testRecords([]uint64{0, 1, 3, 4}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Methyl in name",
+				args{Filters{CompoundName: "Methyl"}, 0, 0},
+				testRecords([]uint64{0, 1, 3, 4}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with name 11-HDoHE",
+				args{Filters{CompoundName: "11-HDoHE"}, 0, 0},
+				testRecords([]uint64{12}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with contributor RIKEN",
+				args{Filters{Contributor: "RIKEN"}, 0, 0},
+				testRecords([]uint64{7, 8}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with formula C11H11",
+				args{Filters{Formula: "C11H11"}, 0, 0},
+				testRecords([]uint64{1}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with InchiKey ZVKARXLKNIBGIR-UHFFFAOYSA-N",
+				args{Filters{InchiKey: "ZVKARXLKNIBGIR-UHFFFAOYSA-N"}, 0, 0},
+				testRecords([]uint64{3}),
 				false,
 			},
 		}
@@ -324,23 +447,40 @@ func TestMB3Database_GetRecords(t *testing.T) {
 				}
 				if (tt.args.lim != 0 && len(got) > int(tt.args.lim)) ||
 					len(got) != len(tt.want) {
-					t.Errorf("Limit was %d, expected %d records, but got %d records", tt.args.lim, len(tt.want), len(got))
-				}
-
-				for i := range tt.want {
-					bw, errw := json.Marshal(tt.want[i])
-					var bg []byte = nil
-					var errg error = nil
-					if len(got) > i {
-						got[i].Metadata.VersionRef = tt.want[i].Metadata.VersionRef
-						bg, errg = json.Marshal(got[i])
+					gotNames := []string{}
+					for _, g := range got {
+						gotNames = append(gotNames, g.Accession.String)
 					}
-					if string(bg) != string(bw) || errg != nil || errw != nil {
-						t.Errorf("\nwant: %v \ngot : %v\n", string(bw), string(bg))
-					}
+					t.Errorf("Limit was %d, expected %d records, but got %d records: %v", tt.args.lim, len(tt.want), len(got), gotNames)
 				}
-
+				compareDbResults(t, tt.want, got)
 			})
+		}
+
+	}
+}
+
+func compareDbResults(t *testing.T, want []*massbank.Massbank, got []*massbank.Massbank) {
+
+	for _, w := range want {
+		bw, errw := json.Marshal(w)
+		found := false
+		for _, g := range got {
+			g.Metadata.VersionRef = w.Metadata.VersionRef
+			bg, errg := json.Marshal(w)
+			if g.Accession.String == w.Accession.String {
+				found = true
+				if string(bg) != string(bw) || errg != nil || errw != nil {
+					t.Errorf("\nwant: %v \ngot : %v\n", string(bw), string(bg))
+				}
+			}
+		}
+		if found == false {
+			gotNames := []string{}
+			for _, g := range got {
+				gotNames = append(gotNames, g.Accession.String)
+			}
+			t.Errorf("Expected Accession %v to be in result but it was not found. Result was %v", w.Accession.String, gotNames)
 		}
 
 	}
