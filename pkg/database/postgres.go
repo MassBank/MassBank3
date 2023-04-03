@@ -150,11 +150,11 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.Massbank, error) {
 }
 
 // GetRecords see [MB3Database.GetRecords]
-func (p *PostgresSQLDB) GetRecords(filters Filters, limit uint64, offset uint64) ([]*massbank.Massbank, error) {
-	if limit == 0 {
-		limit = math.MaxInt64
+func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.Massbank, error) {
+	if filters.Limit <= 0 {
+		filters.Limit = math.MaxInt64
 	}
-	rows, err := p.database.Query("SELECT document FROM massbank LIMIT $1 OFFSET $2", limit, offset)
+	rows, err := p.database.Query("SELECT document FROM massbank LIMIT $1 OFFSET $2", filters.Limit, filters.Offset)
 	if err != nil {
 		return nil, err
 	}

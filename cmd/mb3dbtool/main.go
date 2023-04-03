@@ -32,7 +32,7 @@ const (
 	DB_DEFAULT                = "postgres"
 	DB_USER_DEFAULT           = "massbank3"
 	DB_PASSWORD_DEFAULT       = "massbank3password"
-	DB_HOST_DEFAULT           = "localhst"
+	DB_HOST_DEFAULT           = "localhost"
 	DB_PORT_DEFAULT           = "0"
 	DB_NAME_DEFAULT           = "massbank3"
 	DB_CONN_STRING_DEFAULT    = ""

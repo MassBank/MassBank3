@@ -1,6 +1,9 @@
 package database
 
-import "github.com/MassBank/MassBank3/pkg/massbank"
+import (
+	"github.com/MassBank/MassBank3/pkg/massbank"
+	"math"
+)
 
 // Filters is the abstract description of filters used to find MassBank records
 // in the database
@@ -17,6 +20,9 @@ type Filters struct {
 	PeakDifferences *[]float64
 	InchiKey        string
 	Contributor     string
+	IntensityCutoff *int64
+	Limit           int64
+	Offset          int64
 }
 
 // DatabaseType is an enum containing the database type
@@ -39,6 +45,13 @@ type DBConfig struct {
 	DbPort    uint
 	DbConnStr string
 }
+
+var DefaultValues = struct {
+	MassEpsilon     float64
+	IntensityCutoff int64
+	Limit           int64
+	Offset          int64
+}{0.3, 100, math.MaxInt64, 0}
 
 // MBErrorType is an enum for the error types during database operations
 type MBErrorType int
@@ -111,11 +124,9 @@ type MB3Database interface {
 	GetRecord(*string) (*massbank.Massbank, error)
 
 	// GetRecords Get an array of MassBank records by filtering
-	//   - limit: maximum records to show
-	// 	 - offset: first record
 	//
 	// Will return an empty list if the filter does not match any records.
-	GetRecords(filters Filters, limit uint64, offset uint64) ([]*massbank.Massbank, error)
+	GetRecords(filters Filters) ([]*massbank.Massbank, error)
 
 	// GetUniqueValues is used to get the values for filter frontend
 	GetUniqueValues(filters Filters) (MB3Values, error)
