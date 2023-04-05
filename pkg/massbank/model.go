@@ -234,6 +234,10 @@ const (
 	MS4 MsType = "MS4"
 )
 
+func (ms MsType) String() string {
+	return string(ms)
+}
+
 type IonMode string
 
 const (

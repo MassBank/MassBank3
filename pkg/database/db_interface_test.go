@@ -339,7 +339,7 @@ func TestMB3Database_GetRecords(t *testing.T) {
 			},
 			{
 				db,
-				db.name + " " + "Get all records with MS type MS2",
+				db.name + " " + "Get all records with MS type MS and MS2",
 				Filters{MsType: &[]massbank.MsType{massbank.MS, massbank.MS2}},
 				testRecords([]uint64{0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12}),
 				false,
@@ -367,9 +367,9 @@ func TestMB3Database_GetRecords(t *testing.T) {
 			},
 			{
 				db,
-				db.name + " " + "Get all records with SPLASH ",
-				Filters{Splash: "splash10-0udi-0609400000-9fd50528da25d66adfc7"},
-				testRecords([]uint64{7}),
+				db.name + " " + "Get all records with non existing SPLASH ",
+				Filters{Splash: "splash10-0udi-0609400000-9fd50528a725d66adfc7"},
+				testRecords([]uint64{}),
 				false,
 			},
 			{
@@ -454,6 +454,34 @@ func TestMB3Database_GetRecords(t *testing.T) {
 				db.name + " " + "Get all records with Peak difference 18.01056 and 27.9857",
 				Filters{PeakDifferences: &[]float64{18.01056, 27.9857}},
 				testRecords([]uint64{4, 11, 12}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Peak 123.0",
+				Filters{Peaks: &[]float64{123.0}},
+				testRecords([]uint64{3, 4, 5}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Peak 123.0 with custom epsilon",
+				Filters{Peaks: &[]float64{123.0}, MassEpsilon: ptr(0.1)},
+				testRecords([]uint64{4}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Peak 123.0 and 125.0",
+				Filters{Peaks: &[]float64{123.0, 125.0}},
+				testRecords([]uint64{4, 5}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with non existing Peak",
+				Filters{Peaks: &[]float64{222.0}},
+				testRecords([]uint64{}),
 				false,
 			},
 		}
