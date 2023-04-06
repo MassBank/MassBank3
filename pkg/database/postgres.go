@@ -158,6 +158,9 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.Massbank, error
 	if filters.MassEpsilon == nil {
 		filters.MassEpsilon = &DefaultValues.MassEpsilon
 	}
+	if filters.IntensityCutoff == nil {
+		filters.IntensityCutoff = &DefaultValues.IntensityCutoff
+	}
 
 	where := bqb.Optional("WHERE")
 	if filters.InstrumentType != nil {
@@ -196,8 +199,18 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.Massbank, error
 			where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Peak'->'Peak'->'Mz') mz WHERE mz BETWEEN ? AND ?)", p-*filters.MassEpsilon, p+*filters.MassEpsilon)
 		}
 	}
+
 	query := bqb.New("SELECT document FROM massbank ?", where)
-	query.Space("ORDER BY id LIMIT ? OFFSET ?", filters.Limit, filters.Offset)
+	if filters.PeakDifferences != nil {
+		innerwhere := bqb.Optional("WHERE")
+		innerwhere.And("t1.mz > t2.mz")
+		for _, pd := range *filters.PeakDifferences {
+			innerwhere.Or("(t1.mz-t2.mz BETWEEN ? AND ?)", pd-*filters.MassEpsilon, pd+*filters.MassEpsilon)
+		}
+		query = bqb.New("SELECT massbank.document FROM massbank JOIN (WITH t AS (SELECT mz,id FROM (SELECT jsonb_array_elements(document->'Peak'->'Peak'->'Mz')::float AS mz,jsonb_array_elements(document->'Peak'->'Peak'->'Rel')::int AS rel,id FROM massbank) as relmz WHERE relmz.rel>=?) SELECT DISTINCT t1.id FROM t as t1 LEFT JOIN t as t2 ON t1.id=t2.id ?) AS diff ON massbank.id = diff.id", *filters.IntensityCutoff, innerwhere)
+
+	}
+	query.Space("ORDER BY massbank.id LIMIT ? OFFSET ?", filters.Limit, filters.Offset)
 	sql, params, err := query.ToPgsql()
 	println(sql, dd.Dump(params))
 	rows, err := p.database.Query(sql, params...)

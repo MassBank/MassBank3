@@ -467,7 +467,7 @@ func TestMB3Database_GetRecords(t *testing.T) {
 				db,
 				db.name + " " + "Get all records with Peak 123.0 with custom epsilon",
 				Filters{Peaks: &[]float64{123.0}, MassEpsilon: ptr(0.1)},
-				testRecords([]uint64{4}),
+				testRecords([]uint64{4, 5}),
 				false,
 			},
 			{

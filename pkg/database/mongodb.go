@@ -413,7 +413,7 @@ func getQuery(filters Filters) bson.D {
 	}
 	if filters.Peaks != nil {
 		for _, p := range *filters.Peaks {
-			pval := bson.M{"$elemMatch": bson.M{"$gt": p - eps, "$lt": p + eps}}
+			pval := bson.M{"$elemMatch": bson.M{"$gte": p - eps, "$lte": p + eps}}
 			result = append(result, bson.E{"peak.peak.mz", pval})
 		}
 	}
