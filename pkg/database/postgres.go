@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/Code-Hex/dd"
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
@@ -213,7 +212,6 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.Massbank, error
 	}
 	query.Space("ORDER BY massbank.id LIMIT ? OFFSET ?", filters.Limit, filters.Offset)
 	sql, params, err := query.ToPgsql()
-	println(sql, dd.Dump(params))
 	rows, err := p.database.Query(sql, params...)
 	if err != nil {
 		return nil, err
