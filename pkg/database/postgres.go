@@ -202,11 +202,12 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.Massbank, error
 
 	query := bqb.New("SELECT document FROM massbank ?", where)
 	if filters.PeakDifferences != nil {
-		innerwhere := bqb.Optional("WHERE")
-		innerwhere.And("t1.mz > t2.mz")
+		innerwhere := bqb.New("WHERE t1.mz > t2.mz")
+		diff := bqb.Optional("")
 		for _, pd := range *filters.PeakDifferences {
-			innerwhere.Or("(t1.mz-t2.mz BETWEEN ? AND ?)", pd-*filters.MassEpsilon, pd+*filters.MassEpsilon)
+			diff.Or("(t1.mz-t2.mz BETWEEN ? AND ?)", pd-*filters.MassEpsilon, pd+*filters.MassEpsilon)
 		}
+		innerwhere.And("?", diff)
 		query = bqb.New("SELECT massbank.document FROM massbank JOIN (WITH t AS (SELECT mz,id FROM (SELECT jsonb_array_elements(document->'Peak'->'Peak'->'Mz')::float AS mz,jsonb_array_elements(document->'Peak'->'Peak'->'Rel')::int AS rel,id FROM massbank) as relmz WHERE relmz.rel>=?) SELECT DISTINCT t1.id FROM t as t1 LEFT JOIN t as t2 ON t1.id=t2.id ?) AS diff ON massbank.id = diff.id", *filters.IntensityCutoff, innerwhere)
 
 	}

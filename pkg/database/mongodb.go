@@ -432,7 +432,7 @@ func (db *Mb3MongoDB) GetPeakDifferenceResult(search *[]float64, tolerance float
 							"for (let i=0; i < mz.length; i++) { for (let j=i+1; j < mz.length; j++) {" +
 							"for (let p=0; p < search.length; p++) {" +
 							"if (Math.abs(Math.abs(mz[i].mz - mz[j].mz)-search[p]) <= tol) {" +
-							"result[search[p]]=true; if (Object.keys(result).length==search.length) {return true;}; continue;}}}}" +
+							"return true;}}}}" +
 							"return false;}"},
 						{"args", bson.A{
 							bson.D{{"$filter", bson.D{

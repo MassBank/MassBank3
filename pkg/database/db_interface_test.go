@@ -451,9 +451,9 @@ func TestMB3Database_GetRecords(t *testing.T) {
 			},
 			{
 				db,
-				db.name + " " + "Get all records with Peak difference 18.01056 and 27.9857",
+				db.name + " " + "Get all records with Peak difference 18.01056 or 27.9857",
 				Filters{PeakDifferences: &[]float64{18.01056, 27.9857}},
-				testRecords([]uint64{4, 11, 12}),
+				testRecords([]uint64{0, 3, 4, 5, 7, 8, 10, 11, 12}),
 				false,
 			},
 			{
