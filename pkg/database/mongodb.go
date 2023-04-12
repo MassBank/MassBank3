@@ -9,7 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	bson2 "gopkg.in/mgo.v2/bson"
-
 	"log"
 	"reflect"
 	"strconv"
@@ -324,13 +323,30 @@ func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.Massbank, error) {
 // GetRecords see [MB3Database.GetRecords]
 func (db *Mb3MongoDB) GetRecords(
 	filters Filters,
-	limit uint64,
-	offset uint64,
 ) ([]*massbank.Massbank, error) {
 	if db.database == nil {
 		return nil, errors.New("database not ready")
 	}
-	cur, err := db.database.Collection(mbCollection).Find(context.Background(), bson.D{}, options.Find().SetLimit(int64(limit)).SetSkip(int64(offset)))
+	var err error
+	var cur *mongo.Cursor
+	if filters.Limit <= 0 {
+		filters.Limit = DefaultValues.Limit
+	}
+	if filters.MassEpsilon == nil {
+		filters.MassEpsilon = &DefaultValues.MassEpsilon
+	}
+	if filters.IntensityCutoff == nil {
+		filters.IntensityCutoff = &DefaultValues.IntensityCutoff
+	}
+	if filters.Offset < 0 {
+		filters.Offset = DefaultValues.Offset
+	}
+	if filters.PeakDifferences != nil && len(*filters.PeakDifferences) > 0 {
+		cur, err = db.GetPeakDifferenceResult(filters.PeakDifferences, *filters.MassEpsilon, *filters.IntensityCutoff, filters.Limit, filters.Offset)
+	} else {
+		query := getQuery(filters)
+		cur, err = db.database.Collection(mbCollection).Find(context.Background(), query, options.Find().SetLimit(filters.Limit).SetSkip(filters.Offset))
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -347,6 +363,98 @@ func (db *Mb3MongoDB) GetRecords(
 		mbResult = append(mbResult, mb)
 	}
 	return mbResult, nil
+}
+
+func getQuery(filters Filters) bson.D {
+	result := bson.D{}
+	eps := 0.3
+	if filters.MassEpsilon != nil {
+		eps = *filters.MassEpsilon
+	}
+	if filters.InstrumentType != nil {
+		arr := bson.A{}
+		for _, it := range *filters.InstrumentType {
+			arr = append(arr, it)
+		}
+		result = append(result,
+			bson.E{"acquisition.instrumenttype", bson.M{"$in": arr}})
+
+	}
+	if filters.MsType != nil {
+		arr := bson.A{}
+		for _, it := range *filters.MsType {
+			arr = append(arr, bson.D{bson.E{"key", "MS_TYPE"}, bson.E{"value", it}})
+		}
+		result = append(result,
+			bson.E{"acquisition.massspectrometry", bson.M{"$in": arr}})
+	}
+	if filters.IonMode != massbank.ANY {
+		im := bson.E{"acquisition.massspectrometry", bson.D{bson.E{"key", "ION_MODE"}, bson.E{"value", filters.IonMode}}}
+		result = append(result, im)
+	}
+	if filters.Splash != "" {
+		result = append(result, bson.E{"peak.splash", filters.Splash})
+	}
+	if filters.Mass != nil {
+		result = append(result, bson.E{"compound.mass", bson.M{"$gt": *filters.Mass - eps, "$lt": *filters.Mass + eps}})
+	}
+	if filters.CompoundName != "" {
+		result = append(result, bson.E{"compound.names", bson.M{"$regex": filters.CompoundName, "$options": "is"}})
+	}
+	if filters.Formula != "" {
+		result = append(result, bson.E{"compound.formula", bson.M{"$regex": filters.Formula, "$options": "is"}})
+	}
+	if filters.InchiKey != "" {
+		im := bson.E{"compound.link", bson.D{bson.E{"key", "INCHIKEY"}, bson.E{"value", filters.InchiKey}}}
+		result = append(result, im)
+	}
+	if filters.Contributor != "" {
+		result = append(result, bson.E{"accession", bson.M{"$regex": "-" + filters.Contributor + "-", "$options": "is"}})
+	}
+	if filters.Peaks != nil {
+		for _, p := range *filters.Peaks {
+			pval := bson.M{"$elemMatch": bson.M{"$gte": p - eps, "$lte": p + eps}}
+			result = append(result, bson.E{"peak.peak.mz", pval})
+		}
+	}
+	return result
+}
+
+func (db *Mb3MongoDB) GetPeakDifferenceResult(search *[]float64, tolerance float64, intensityOffset int64, limit int64, skip int64) (*mongo.Cursor, error) {
+	query :=
+		bson.A{
+			bson.D{{"$match", bson.D{{"peak.peak.mz.1", bson.D{{"$exists", 1}}}}}},
+			bson.D{{"$addFields", bson.D{{
+				"peak.peak.diff", bson.D{{
+					"$function", bson.D{{
+						"body", "function(mz,search,tol) {" +
+							"let result = {};" +
+							"for (let i=0; i < mz.length; i++) { for (let j=i+1; j < mz.length; j++) {" +
+							"for (let p=0; p < search.length; p++) {" +
+							"if (Math.abs(Math.abs(mz[i].mz - mz[j].mz)-search[p]) <= tol) {" +
+							"return true;}}}}" +
+							"return false;}"},
+						{"args", bson.A{
+							bson.D{{"$filter", bson.D{
+								{"input", bson.D{
+									{"$map", bson.D{
+										{"input", "$peak.peak.rel"},
+										{"as", "rel"},
+										{"in", bson.D{
+											{"rel", "$$rel"},
+											{"mz",
+												bson.D{{"$arrayElemAt",
+													bson.A{"$peak.peak.mz", bson.D{{"$indexOfArray", bson.A{"$peak.peak.rel", "$$rel"}}}}}}}}}}}}},
+								{"as", "relmz"},
+								{"cond", bson.D{{"$gte", bson.A{"$$relmz.rel", intensityOffset}}}}}}},
+							search,
+							tolerance}},
+						{"lang", "js"}}}}}}}},
+			bson.D{{"$match", bson.D{{"peak.peak.diff", true}}}},
+			bson.D{{"$skip", skip}},
+			bson.D{{"$limit", limit}},
+		}
+	return db.database.Collection(mbCollection).Aggregate(context.TODO(), query)
 }
 
 // UpdateMetadata see [MB3Database.UpdateMetadata]
@@ -489,6 +597,14 @@ func (db *Mb3MongoDB) init() error {
 	return err
 }
 
+func (db *Mb3MongoDB) addPeakDiffs() {
+	matchStage := bson.D{{"$match", bson.M{
+		"$and": bson.A{bson.M{"peak.peak.diff": bson.M{"$exists": false}}, bson.M{"peak.peak.mz.1": bson.M{"$exists": true}}}}}}
+
+	db.database.Collection(mbCollection).Aggregate(
+		context.Background(),
+		mongo.Pipeline{matchStage})
+}
 func unmarshal2Massbank(err error, value *bson.M) (*massbank.Massbank, error) {
 	var mb massbank.Massbank
 	b, err := bson.Marshal(value)

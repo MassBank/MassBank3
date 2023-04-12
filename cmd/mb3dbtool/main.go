@@ -7,6 +7,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/Code-Hex/dd"
 	"github.com/MassBank/MassBank3/pkg/database"
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"github.com/go-git/go-git/v5"
@@ -52,6 +53,7 @@ func main() {
 		}
 	} else if userConfig.Database == database.Postgres {
 		db, err = database.NewPostgresSQLDb(userConfig.DBConfig)
+		log.Println(dd.Dump(db))
 		if err != nil {
 			panic(err)
 		}

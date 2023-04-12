@@ -259,22 +259,24 @@ func TestMB3Database_GetRecord(t *testing.T) {
 	}
 }
 
+func ptr[T any](v T) *T {
+	return &v
+}
+
 func TestMB3Database_GetRecords(t *testing.T) {
-	DBs, err := initDBs(Main)
+	DBs, err := initDBs(All)
 	if err != nil {
 		t.Fatal("Could not init Databases: ", err.Error())
 	}
 	type args struct {
-		f      Filters
-		lim    uint64
-		offset uint64
+		f Filters
 	}
 	for _, db := range DBs {
 
 		type testData struct {
 			db      testDB
 			name    string
-			args    args
+			args    Filters
 			want    []*massbank.Massbank
 			wantErr bool
 		}
@@ -282,54 +284,250 @@ func TestMB3Database_GetRecords(t *testing.T) {
 			{
 				db,
 				db.name + " " + "Get all records",
-				args{Filters{}, 0, 0},
-				testRecords([]uint64{0, 1, 2, 3, 4, 10, 11, 12}),
+				Filters{},
+				testRecords([]uint64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}),
 				false,
 			},
 			{
 				db,
 				db.name + " " + "Get first 3 records",
-				args{Filters{}, 3, 0},
+				Filters{Limit: 3, Offset: 0},
 				testRecords([]uint64{0, 1, 2}),
 				false,
 			},
 			{
 				db,
 				db.name + " " + "Get second page with 3 records",
-				args{Filters{}, 3, 3},
-				testRecords([]uint64{3, 4, 10}),
+				Filters{Limit: 3, Offset: 3},
+				testRecords([]uint64{3, 4, 5}),
 				false,
 			},
 			{
 				db,
 				db.name + " " + "Get all but first  3 records",
-				args{Filters{}, 0, 3},
-				testRecords([]uint64{3, 4, 10, 11, 12}),
+				Filters{Limit: 0, Offset: 3},
+				testRecords([]uint64{3, 4, 5, 6, 7, 8, 9, 10, 11, 12}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with InstrumentType LC-ESI-ITFT",
+				Filters{InstrumentType: &[]string{"LC-ESI-ITFT"}},
+				testRecords([]uint64{0, 2, 10}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with InstrumentType LC-ESI-ITFT OR LC-ESI-QFT",
+				Filters{InstrumentType: &[]string{"LC-ESI-ITFT", "LC-ESI-QFT"}},
+				testRecords([]uint64{0, 2, 3, 10}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with MS type MS",
+				Filters{MsType: &[]massbank.MsType{massbank.MS}},
+				testRecords([]uint64{4, 9, 11}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with MS type MS2",
+				Filters{MsType: &[]massbank.MsType{massbank.MS2}},
+				testRecords([]uint64{0, 1, 2, 3, 6, 7, 8, 10, 12}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with MS type MS and MS2",
+				Filters{MsType: &[]massbank.MsType{massbank.MS, massbank.MS2}},
+				testRecords([]uint64{0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with ion mode POSITIVE",
+				Filters{IonMode: massbank.POSITIVE},
+				testRecords([]uint64{0, 1, 3, 4, 5, 9, 10, 11}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with ion mode ANY",
+				Filters{IonMode: massbank.ANY},
+				testRecords([]uint64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with SPLASH ",
+				Filters{Splash: "splash10-0udi-0609400000-9fd50528da25d66adfc7"},
+				testRecords([]uint64{7}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with non existing SPLASH ",
+				Filters{Splash: "splash10-0udi-0609400000-9fd50528a725d66adfc7"},
+				testRecords([]uint64{}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Mass and default epsilon",
+				Filters{Mass: ptr(float64(296.251000))},
+				testRecords([]uint64{8}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Mass and default epsilon, no match",
+				Filters{Mass: ptr(float64(296.141000))},
+				testRecords([]uint64{}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Mass and custom epsilon",
+				Filters{Mass: ptr(float64(296.141000)), MassEpsilon: ptr(float64(0.5))},
+				testRecords([]uint64{8}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with methyl in name",
+				Filters{CompoundName: "methyl"},
+				testRecords([]uint64{0, 1, 3, 4}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Methyl in name",
+				Filters{CompoundName: "Methyl"},
+				testRecords([]uint64{0, 1, 3, 4}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with name 11-HDoHE",
+				Filters{CompoundName: "11-HDoHE"},
+				testRecords([]uint64{12}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with contributor RIKEN",
+				Filters{Contributor: "RIKEN"},
+				testRecords([]uint64{7, 8}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with formula C11H11",
+				Filters{Formula: "C11H11"},
+				testRecords([]uint64{1}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with InchiKey ZVKARXLKNIBGIR-UHFFFAOYSA-N",
+				Filters{InchiKey: "ZVKARXLKNIBGIR-UHFFFAOYSA-N"},
+				testRecords([]uint64{3}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Peak difference 18.01056 ",
+				Filters{PeakDifferences: &[]float64{18.01056}},
+				testRecords([]uint64{4, 5, 8, 11, 12}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Peak difference 27.9857 ",
+				Filters{PeakDifferences: &[]float64{27.9857}},
+				testRecords([]uint64{0, 3, 4, 7, 10, 11, 12}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Peak difference 18.01056 or 27.9857",
+				Filters{PeakDifferences: &[]float64{18.01056, 27.9857}},
+				testRecords([]uint64{0, 3, 4, 5, 7, 8, 10, 11, 12}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Peak 123.0",
+				Filters{Peaks: &[]float64{123.0}},
+				testRecords([]uint64{3, 4, 5}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Peak 123.0 with custom epsilon",
+				Filters{Peaks: &[]float64{123.0}, MassEpsilon: ptr(0.1)},
+				testRecords([]uint64{4, 5}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with Peak 123.0 and 125.0",
+				Filters{Peaks: &[]float64{123.0, 125.0}},
+				testRecords([]uint64{4, 5}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with non existing Peak",
+				Filters{Peaks: &[]float64{222.0}},
+				testRecords([]uint64{}),
 				false,
 			},
 		}
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				got, err := tt.db.db.GetRecords(tt.args.f, tt.args.lim, tt.args.offset)
+				got, err := tt.db.db.GetRecords(tt.args)
 				if (err != nil) != tt.wantErr {
 					t.Errorf("%s: GetRecords() error = %v, wantErr %v", tt.db.name, err, tt.wantErr)
 					return
 				}
-				if (tt.args.lim != 0 && len(got) > int(tt.args.lim)) ||
+				if (tt.args.Limit != 0 && len(got) > int(tt.args.Limit)) ||
 					len(got) != len(tt.want) {
-					t.Errorf("Limit was %d, expected %d records, but got %d records", tt.args.lim, len(tt.want), len(got))
-				}
-
-				for i := range tt.want {
-					got[i].Metadata.VersionRef = tt.want[i].Metadata.VersionRef
-					bg, errg := json.Marshal(got[i])
-					bw, errw := json.Marshal(tt.want[i])
-					if string(bg) != string(bw) || errg != nil || errw != nil {
-						t.Errorf("\nwant: %v \ngot : %v\n", string(bw), string(bg))
+					gotNames := []string{}
+					for _, g := range got {
+						gotNames = append(gotNames, g.Accession.String)
 					}
+					t.Errorf("Limit was %d, expected %d records, but got %d records: %v", tt.args.Limit, len(tt.want), len(got), gotNames)
 				}
-
+				compareDbResults(t, tt.want, got)
 			})
+		}
+
+	}
+}
+
+func compareDbResults(t *testing.T, want []*massbank.Massbank, got []*massbank.Massbank) {
+
+	for _, w := range want {
+		bw, errw := json.Marshal(w)
+		found := false
+		for _, g := range got {
+			g.Metadata.VersionRef = w.Metadata.VersionRef
+			bg, errg := json.Marshal(w)
+			if g.Accession.String == w.Accession.String {
+				found = true
+				if string(bg) != string(bw) || errg != nil || errw != nil {
+					t.Errorf("\nwant: %v \ngot : %v\n", string(bw), string(bg))
+				}
+			}
+		}
+		if found == false {
+			gotNames := []string{}
+			for _, g := range got {
+				gotNames = append(gotNames, g.Accession.String)
+			}
+			t.Errorf("Expected Accession %v to be in result but it was not found. Result was %v", w.Accession.String, gotNames)
 		}
 
 	}

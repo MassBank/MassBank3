@@ -8,8 +8,8 @@ import (
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
+	"github.com/nullism/bqb"
 	"log"
-	"math"
 	"strconv"
 )
 
@@ -150,11 +150,69 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.Massbank, error) {
 }
 
 // GetRecords see [MB3Database.GetRecords]
-func (p *PostgresSQLDB) GetRecords(filters Filters, limit uint64, offset uint64) ([]*massbank.Massbank, error) {
-	if limit == 0 {
-		limit = math.MaxInt64
+func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.Massbank, error) {
+	if filters.Limit <= 0 {
+		filters.Limit = DefaultValues.Limit
 	}
-	rows, err := p.database.Query("SELECT document FROM massbank LIMIT $1 OFFSET $2", limit, offset)
+	if filters.MassEpsilon == nil {
+		filters.MassEpsilon = &DefaultValues.MassEpsilon
+	}
+	if filters.IntensityCutoff == nil {
+		filters.IntensityCutoff = &DefaultValues.IntensityCutoff
+	}
+
+	where := bqb.Optional("WHERE")
+	if filters.InstrumentType != nil {
+		where.And("document->'Acquisition'->'InstrumentType'->>'String' IN (?)", *filters.InstrumentType)
+	}
+	if filters.MsType != nil {
+		var msTypes []string
+		for _, ms := range *filters.MsType {
+			msTypes = append(msTypes, ms.String())
+		}
+		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Acquisition'->'MassSpectrometry') ms WHERE ms->>'Subtag' = 'MS_TYPE' AND ms->>'String' IN (?))", msTypes)
+	}
+	if filters.IonMode != massbank.ANY {
+		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Acquisition'->'MassSpectrometry') ms WHERE ms->>'Subtag' = 'ION_MODE' AND ms->>'String' = ?)", string(filters.IonMode))
+	}
+	if filters.Mass != nil {
+		where.And("(document->'Compound'->'mass'->>'Value')::float BETWEEN ? AND ?", *filters.Mass-*filters.MassEpsilon, *filters.Mass+*filters.MassEpsilon)
+	}
+	if filters.Splash != "" {
+		where.And("document->'Peak'->'Splash'->>'String' = ?", filters.Splash)
+	}
+	if filters.CompoundName != "" {
+		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Compound'->'name') name WHERE name->>'String' ILIKE ?)", "%"+filters.CompoundName+"%")
+	}
+	if filters.Formula != "" {
+		where.And("document->'Compound'->'formula'->>'String' ILIKE ?", "%"+filters.Formula+"%")
+	}
+	if filters.Contributor != "" {
+		where.And("document->'Accession'->>'String' ILIKE ?", "%"+filters.Contributor+"%")
+	}
+	if filters.InchiKey != "" {
+		where.And("jsonb_typeof(document->'Compound'->'link') = 'array' AND EXISTS (SELECT * FROM jsonb_array_elements(document->'Compound'->'link') link WHERE link->>'Database' = 'INCHIKEY' AND link->>'Identifier' = ?)", filters.InchiKey)
+	}
+	if filters.Peaks != nil {
+		for _, p := range *filters.Peaks {
+			where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Peak'->'Peak'->'Mz') mz WHERE mz BETWEEN ? AND ?)", p-*filters.MassEpsilon, p+*filters.MassEpsilon)
+		}
+	}
+
+	query := bqb.New("SELECT document FROM massbank ?", where)
+	if filters.PeakDifferences != nil {
+		innerwhere := bqb.New("WHERE t1.mz > t2.mz")
+		diff := bqb.Optional("")
+		for _, pd := range *filters.PeakDifferences {
+			diff.Or("(t1.mz-t2.mz BETWEEN ? AND ?)", pd-*filters.MassEpsilon, pd+*filters.MassEpsilon)
+		}
+		innerwhere.And("?", diff)
+		query = bqb.New("SELECT massbank.document FROM massbank JOIN (WITH t AS (SELECT mz,id FROM (SELECT jsonb_array_elements(document->'Peak'->'Peak'->'Mz')::float AS mz,jsonb_array_elements(document->'Peak'->'Peak'->'Rel')::int AS rel,id FROM massbank) as relmz WHERE relmz.rel>=?) SELECT DISTINCT t1.id FROM t as t1 LEFT JOIN t as t2 ON t1.id=t2.id ?) AS diff ON massbank.id = diff.id", *filters.IntensityCutoff, innerwhere)
+
+	}
+	query.Space("ORDER BY massbank.id LIMIT ? OFFSET ?", filters.Limit, filters.Offset)
+	sql, params, err := query.ToPgsql()
+	rows, err := p.database.Query(sql, params...)
 	if err != nil {
 		return nil, err
 	}
