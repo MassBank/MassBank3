@@ -1,0 +1,16 @@
+FROM node:19-alpine AS build
+
+WORKDIR /app
+
+COPY web-frontend/package.json ./
+RUN npm install
+COPY web-frontend/static ./static
+COPY web-frontend/src ./src
+COPY web-frontend/svelte.config.js  web-frontend/tsconfig.json  web-frontend/vite.config.ts ./
+RUN npm run build
+
+FROM node:19-alpine
+COPY --from=build /app/package.json /app/package-lock.json ./
+RUN npm ci --omit dev
+COPY --from=build /app/build ./build
+ENTRYPOINT ["node", "build"]
