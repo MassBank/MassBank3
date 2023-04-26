@@ -8,10 +8,6 @@ COPY web-frontend/static ./static
 COPY web-frontend/src ./src
 COPY web-frontend/svelte.config.js  web-frontend/tsconfig.json  web-frontend/vite.config.ts ./
 COPY web-frontend/.svelte-kit/tsconfig.json ./.svelte-kit/
-RUN npm run build
+EXPOSE 5173
+ENTRYPOINT ["npm", "run", "dev","--host"]
 
-FROM node:19-alpine
-COPY --from=build /app/package.json /app/package-lock.json ./
-RUN npm ci --omit dev
-COPY --from=build /app/build ./build
-ENTRYPOINT ["node", "build"]

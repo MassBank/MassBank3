@@ -35,5 +35,13 @@ services:
       - MB_DATA_DIRECTORY
       - MB_DROP_ALL
     depends_on:
-      - postgres
-      - mongodb
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+  mb3frontend:
+    build:
+      context: ..
+      dockerfile: Dockerfile-svelte-debug
+    ports:
+      - "${MB3_FRONTEND_PORT}:5173"
