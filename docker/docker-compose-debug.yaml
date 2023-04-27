@@ -45,3 +45,5 @@ services:
       dockerfile: Dockerfile-svelte-debug
     ports:
       - "${MB3_FRONTEND_PORT}:5173"
+    volumes:
+      - ../web-frontend:/app
