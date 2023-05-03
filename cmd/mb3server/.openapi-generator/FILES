@@ -3,7 +3,6 @@ api/openapi.yaml
 main.go
 src/api.go
 src/api_default.go
-src/api_default_service.go
 src/error.go
 src/helpers.go
 src/impl.go
@@ -38,5 +37,5 @@ src/model_ms_focused_ion_inner.go
 src/model_search_result.go
 src/model_search_result_data_inner.go
 src/model_search_result_data_inner_spectra_inner.go
-src/model_string_count.go
+src/model_string_count_inner.go
 src/routers.go

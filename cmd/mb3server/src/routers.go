@@ -192,7 +192,7 @@ func parseBoolParameter(param string, required bool) (bool, error) {
 		return false, err
 	}
 
-	return val, nil
+	return bool(val), nil
 }
 
 // parseInt64ArrayParameter parses a string parameter containing array of values to []int64.

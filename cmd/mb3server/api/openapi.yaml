@@ -594,59 +594,58 @@ components:
           result_count: 0
           timestamp: timestamp
         compound_start:
-          values:
-          - values
-          - values
-          count: 0
+        - count: 0
+          value: value
+        - count: 0
+          value: value
         contributor:
-          values:
-          - values
-          - values
-          count: 0
+        - count: 0
+          value: value
+        - count: 0
+          value: value
         ms_type:
-          values:
-          - values
-          - values
-          count: 0
+        - count: 0
+          value: value
+        - count: 0
+          value: value
         ion_mode:
-          values:
-          - values
-          - values
-          count: 0
+        - count: 0
+          value: value
+        - count: 0
+          value: value
         instrument_type:
-          values:
-          - values
-          - values
-          count: 0
+        - count: 0
+          value: value
+        - count: 0
+          value: value
       properties:
         metadata:
           $ref: '#/components/schemas/Metadata'
         contributor:
-          $ref: '#/components/schemas/StringCount'
+          items:
+            $ref: '#/components/schemas/StringCount_inner'
+          type: array
         instrument_type:
-          $ref: '#/components/schemas/StringCount'
+          items:
+            $ref: '#/components/schemas/StringCount_inner'
+          type: array
         ms_type:
-          $ref: '#/components/schemas/StringCount'
+          items:
+            $ref: '#/components/schemas/StringCount_inner'
+          type: array
         ion_mode:
-          $ref: '#/components/schemas/StringCount'
+          items:
+            $ref: '#/components/schemas/StringCount_inner'
+          type: array
         compound_start:
-          $ref: '#/components/schemas/StringCount'
+          items:
+            $ref: '#/components/schemas/StringCount_inner'
+          type: array
       type: object
     StringCount:
-      example:
-        values:
-        - values
-        - values
-        count: 0
-      properties:
-        values:
-          items:
-            type: string
-          type: array
-        count:
-          minimum: 0
-          type: integer
-      type: object
+      items:
+        $ref: '#/components/schemas/StringCount_inner'
+      type: array
     Authors:
       items:
         $ref: '#/components/schemas/Authors_inner'
@@ -1152,6 +1151,17 @@ components:
           type: integer
         maximum:
           default: 100
+          type: integer
+      type: object
+    StringCount_inner:
+      example:
+        count: 0
+        value: value
+      properties:
+        value:
+          type: string
+        count:
+          minimum: 0
           type: integer
       type: object
     Authors_inner:

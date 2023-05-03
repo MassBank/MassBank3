@@ -12,13 +12,15 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	mb3server "github.com/MassBank/MassBank3/cmd/mb3server/src"
 )
 
 func main() {
 	log.Printf("Server started")
-
+	time.Sleep(5 * time.Second)
+	log.Printf("Server started 5")
 	DefaultApiService := mb3server.NewDefaultApiService()
 	DefaultApiController := mb3server.NewDefaultApiController(DefaultApiService)
 

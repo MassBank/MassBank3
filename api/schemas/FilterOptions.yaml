@@ -1,15 +1,15 @@
 components:
   schemas:
     StringCount:
-      type: object
-      properties:
-        values:
-          type: array
-          items:
+      type: array
+      items:
+        type: object
+        properties:
+          value:
             type: string
-        count:
-          type: integer
-          minimum: 0
+          count:
+            type: integer
+            minimum: 0
     FilterOptions:
       type: object
       properties:

@@ -12,15 +12,15 @@ package mb3server
 type BrowseOptions struct {
 	Metadata Metadata `json:"metadata,omitempty"`
 
-	Contributor StringCount `json:"contributor,omitempty"`
+	Contributor []StringCountInner `json:"contributor,omitempty"`
 
-	InstrumentType StringCount `json:"instrument_type,omitempty"`
+	InstrumentType []StringCountInner `json:"instrument_type,omitempty"`
 
-	MsType StringCount `json:"ms_type,omitempty"`
+	MsType []StringCountInner `json:"ms_type,omitempty"`
 
-	IonMode StringCount `json:"ion_mode,omitempty"`
+	IonMode []StringCountInner `json:"ion_mode,omitempty"`
 
-	CompoundStart StringCount `json:"compound_start,omitempty"`
+	CompoundStart []StringCountInner `json:"compound_start,omitempty"`
 }
 
 // AssertBrowseOptionsRequired checks if the required fields are not zero-ed
@@ -28,20 +28,30 @@ func AssertBrowseOptionsRequired(obj BrowseOptions) error {
 	if err := AssertMetadataRequired(obj.Metadata); err != nil {
 		return err
 	}
-	if err := AssertStringCountRequired(obj.Contributor); err != nil {
-		return err
+	for _, el := range obj.Contributor {
+		if err := AssertStringCountInnerRequired(el); err != nil {
+			return err
+		}
 	}
-	if err := AssertStringCountRequired(obj.InstrumentType); err != nil {
-		return err
+	for _, el := range obj.InstrumentType {
+		if err := AssertStringCountInnerRequired(el); err != nil {
+			return err
+		}
 	}
-	if err := AssertStringCountRequired(obj.MsType); err != nil {
-		return err
+	for _, el := range obj.MsType {
+		if err := AssertStringCountInnerRequired(el); err != nil {
+			return err
+		}
 	}
-	if err := AssertStringCountRequired(obj.IonMode); err != nil {
-		return err
+	for _, el := range obj.IonMode {
+		if err := AssertStringCountInnerRequired(el); err != nil {
+			return err
+		}
 	}
-	if err := AssertStringCountRequired(obj.CompoundStart); err != nil {
-		return err
+	for _, el := range obj.CompoundStart {
+		if err := AssertStringCountInnerRequired(el); err != nil {
+			return err
+		}
 	}
 	return nil
 }

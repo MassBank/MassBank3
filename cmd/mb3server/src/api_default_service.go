@@ -28,24 +28,22 @@ func NewDefaultApiService() DefaultApiServicer {
 
 // GetBrowseOptions - get browse options
 func (s *DefaultApiService) GetBrowseOptions(ctx context.Context) (ImplResponse, error) {
-	// TODO - update GetBrowseOptions with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, BrowseOptions{}) or use other options such as http.Ok ...
-	//return Response(200, BrowseOptions{}), nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("GetBrowseOptions method not implemented")
+	opt, err := GetBrowseOptions()
+	if err != nil {
+		return Response(http.StatusInternalServerError, nil), errors.New("Could not get results")
+	}
+	return Response(http.StatusOK, opt), nil
 }
 
 // GetFilterOptions - get filter options
 func (s *DefaultApiService) GetFilterOptions(ctx context.Context) (ImplResponse, error) {
-	// TODO - update GetFilterOptions with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	//TODO: Uncomment the next line to return response Response(200, FilterOptions{}) or use other options such as http.Ok ...
-	//return Response(200, FilterOptions{}), nil
+	opt, err := GetBrowseOptions()
+	if err != nil {
+		return Response(http.StatusInternalServerError, nil), errors.New("Could not get results")
+	}
+	return Response(http.StatusOK, opt), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GetFilterOptions method not implemented")
 }
 
 // GetMetadata - get massbank metadata

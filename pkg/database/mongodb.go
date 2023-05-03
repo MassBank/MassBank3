@@ -283,6 +283,13 @@ func (db *Mb3MongoDB) Connect() error {
 	return db.init()
 }
 
+func (db *Mb3MongoDB) Ping() error {
+	timeout, _ := time.ParseDuration(MongoConnectTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	return db.database.Client().Ping(ctx, nil)
+}
+
 // Disconnect see [MB3Database.Disconnect]
 func (db *Mb3MongoDB) Disconnect() error {
 	if db.database == nil {

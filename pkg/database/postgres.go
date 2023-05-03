@@ -76,6 +76,10 @@ func (p *PostgresSQLDB) Connect() error {
 	return p.init()
 }
 
+func (p *PostgresSQLDB) Ping() error {
+	return p.database.Ping()
+}
+
 // Disconnect see [MB3Database.Disconnect]
 func (p *PostgresSQLDB) Disconnect() error {
 	if p.database == nil {

@@ -112,6 +112,8 @@ type MB3Database interface {
 	// Disconnect from the database.
 	Disconnect() error
 
+	Ping() error
+
 	// Count MassBank records in the database.
 	Count() (int64, error)
 

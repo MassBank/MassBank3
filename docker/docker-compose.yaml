@@ -34,7 +34,7 @@ services:
     ports:
       - "${MB3_API_PORT}:8080"
     environment:
-      MONGO_URI: "mongodb://${MONGODB_USER}:${MONGODB_PWD}@mongo:27017"
+      MONGO_URI: "mongodb://${MONGODB_USER}:${MONGODB_PWD}@mongodb:27017"
       MONGO_DB_NAME: "massbank3"
     depends_on:
       - mongodb
@@ -42,3 +42,5 @@ services:
 
   mb3frontend:
     restart: always
+    environment:
+      VITE_SERVER_API_URL: "http://localhost:8081"
