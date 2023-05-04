@@ -93,12 +93,23 @@ type MBMinMaxValues struct {
 }
 
 type MB3Values struct {
+	CompoundStart  []MBCountValues
+	Contributor    []MBCountValues
 	InstrumentType []MBCountValues
 	MSType         []MBCountValues
 	IonMode        []MBCountValues
 	Intensity      MBMinMaxValues
 	Mass           MBMinMaxValues
 	Peak           MBMinMaxValues
+}
+
+type MB3MetaData struct {
+	Version       string
+	TimeStamp     string
+	GitCommit     string
+	SpectraCount  int
+	CompoundCount int
+	IsomerCount   int
 }
 
 // MB3Database This is the Interface which has to be implemented for databases using MassBank3
@@ -132,6 +143,8 @@ type MB3Database interface {
 
 	// GetUniqueValues is used to get the values for filter frontend
 	GetUniqueValues(filters Filters) (MB3Values, error)
+
+	GetMetaData() (*MB3MetaData, error)
 
 	// UpdateMetadata updates the metadata describing the MassBank version.
 	// Provides the database id of an existing entry if it is already in the

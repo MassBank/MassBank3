@@ -27,10 +27,78 @@ type Mb3MongoDB struct {
 	dirty    bool            // if true, the database connection was changed and the database will reconnect.
 }
 
+func (db *Mb3MongoDB) GetMetaData() (*MB3MetaData, error) {
+	var query = ``
+	var bdoc interface{}
+	if err := bson2.UnmarshalJSON([]byte(query), &bdoc); err != nil {
+		return nil, err
+	}
+	cur, err := db.database.Collection(mbCollection).Aggregate(context.Background(), bdoc)
+	if err != nil {
+		return nil, err
+	}
+	var temp = make([]bson.D, 0)
+	if err = cur.All(context.Background(), &temp); err != nil {
+		return nil, err
+	}
+	result := MB3MetaData{
+		Version:       "",
+		TimeStamp:     "",
+		GitCommit:     "",
+		SpectraCount:  0,
+		CompoundCount: 0,
+		IsomerCount:   0,
+	}
+	return &result, nil
+}
+
 func (db *Mb3MongoDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	var query = `
 [
     { "$facet": {
+		"CompoundStart": [
+    { "$project": { "compound.names": 1}},
+        { "$unwind": "$compound.names" },
+    {"$group": {
+        "_id": {"$substr": [ {"$trim": { "input": {"$toUpper":"$compound.names"}, "chars": "()+-[]{}/? ,"}},0,1]},
+        "Count": {"$sum": 1}
+        }},
+    {
+        "$project": {
+            "_id": 0,
+            "Val": "$_id",
+            "Count": 1
+        }
+    },
+    {
+        "$sort": {
+            "Val": 1
+        }
+    }
+    ],
+		"Contributor": [
+    {
+        "$project": { "_id": 0, "cont": {"$arrayElemAt":[ {"$split": [ "$accession","-"]}, 1]} }
+    },
+    {
+        "$group": {
+            "_id": "$cont",
+            "Count": {"$sum": 1}
+        },
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "Val": "$_id",
+            "Count": 1
+        }
+    },
+    {
+        "$sort": {
+            "Val": 1
+        }
+    }
+],
         "InstrumentType": [
             {
                 "$group": {
@@ -178,9 +246,11 @@ func (db *Mb3MongoDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 		return result, err
 	}
 	type MB3ValuesTemp struct {
+		CompoundStart  []MBCountValues
 		InstrumentType []MBCountValues
 		MSType         []MBCountValues
 		IonMode        []MBCountValues
+		Contributor    []MBCountValues
 		Intensity      []MBMinMaxValues
 		Mass           []MBMinMaxValues
 		Peak           []MBMinMaxValues
@@ -188,6 +258,8 @@ func (db *Mb3MongoDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	var tempV MB3ValuesTemp
 	err = bson.Unmarshal(doc, &tempV)
 	result = MB3Values{
+		CompoundStart:  tempV.CompoundStart,
+		Contributor:    tempV.Contributor,
 		InstrumentType: tempV.InstrumentType,
 		MSType:         tempV.MSType,
 		IonMode:        tempV.IonMode,

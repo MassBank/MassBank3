@@ -76,6 +76,64 @@ func GetBrowseOptions() (*BrowseOptions, error) {
 			Count: int32(val.Count),
 		})
 	}
+	for _, val := range vals.Contributor {
+		result.Contributor = append(result.Contributor, StringCountInner{
+			Value: val.Val,
+			Count: int32(val.Count),
+		})
+	}
+	for _, val := range vals.CompoundStart {
+		result.CompoundStart = append(result.CompoundStart, StringCountInner{
+			Value: val.Val,
+			Count: int32(val.Count),
+		})
+	}
 
+	return &result, nil
+}
+
+func GetRecords(limit int32, offset int32) (*SearchResult, error) {
+	if limit <= 0 {
+		limit = 20
+	}
+	if offset <= 0 {
+		offset = 0
+	}
+	if err := initDB(); err != nil {
+		return nil, err
+	}
+	var filters = database.Filters{
+		InstrumentType:  nil,
+		Splash:          "",
+		MsType:          nil,
+		IonMode:         "",
+		CompoundName:    "",
+		Mass:            nil,
+		MassEpsilon:     nil,
+		Formula:         "",
+		Peaks:           nil,
+		PeakDifferences: nil,
+		InchiKey:        "",
+		Contributor:     "",
+		IntensityCutoff: nil,
+		Limit:           int64(limit),
+		Offset:          int64(offset),
+	}
+	records, err := db.GetRecords(filters)
+	if err != nil {
+		return nil, err
+	}
+	var result = SearchResult{}
+	for _, record := range records {
+		var val = SearchResultDataInner{
+			Data:    map[string]interface{}{},
+			Name:    record.Compound.Names[1].String,
+			Formula: record.Compound.Formula.String,
+			Mass:    record.Compound.Mass.Value,
+			Smiles:  record.Compound.Smiles.String,
+			Spectra: []SearchResultDataInnerSpectraInner{{record.RecordTitle.String, record.Accession.String}},
+		}
+		result.Data = append(result.Data, val)
+	}
 	return &result, nil
 }

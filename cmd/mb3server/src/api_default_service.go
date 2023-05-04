@@ -70,11 +70,10 @@ func (s *DefaultApiService) GetRecord(ctx context.Context, accession string) (Im
 
 // GetRecords - Get a list of records
 func (s *DefaultApiService) GetRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, limit int32, page int32, intensityCutoff int32, inchiKey string, contributor string) (ImplResponse, error) {
-	// TODO - update GetRecords with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	result, err := GetRecords(limit, (page-1)*limit)
+	if err != nil {
+		return Response(http.StatusInternalServerError, nil), errors.New("Could not get results")
+	}
+	return Response(200, result), nil
 
-	//TODO: Uncomment the next line to return response Response(200, SearchResult{}) or use other options such as http.Ok ...
-	//return Response(200, SearchResult{}), nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("GetRecords method not implemented")
 }

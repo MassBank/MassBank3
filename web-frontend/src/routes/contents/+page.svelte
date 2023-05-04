@@ -22,8 +22,10 @@
     {:then filters}
         <div class="card">
         <h2>Filters</h2>
-
         <h3>Contributor</h3>
+            {#each filters.contributor as t}
+                <FilterButton group="cont" val={t.value}>{t.value} ({t.count})</FilterButton>
+            {/each}
         <h3>Instrument Type</h3>
             {#each filters.instrument_type as t}
                 <FilterButton group="insttype" val={t.value}>{t.value} ({t.count})</FilterButton>
@@ -35,6 +37,10 @@
         <h3>Ion Mode</h3>
             {#each filters.ion_mode as t}
                 <FilterButton group="ionmode" val={t.value}>{t.value} ({t.count})</FilterButton>
+            {/each}
+        <h3>Compound Start</h3>
+            {#each filters.compound_start as t}
+                <FilterButton group="compoundstart" val={t.value}>{t.value} ({t.count})</FilterButton>
             {/each}
         </div>
 
