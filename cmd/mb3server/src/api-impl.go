@@ -137,3 +137,81 @@ func GetRecords(limit int32, offset int32) (*SearchResult, error) {
 	}
 	return &result, nil
 }
+
+func GetRecord(accession string) (*MbRecord, error) {
+	if err := initDB(); err != nil {
+		return nil, err
+	}
+	record, err := db.GetRecord(&accession)
+	if err != nil {
+		return nil, err
+	}
+	result := MbRecord{
+		Accession:  record.Accession.String,
+		Deprecated: MbRecordDeprecated{},
+		Title:      record.RecordTitle.String,
+		Date: MbRecordDate{
+			Updated:  record.Date.Updated.String(),
+			Created:  record.Date.Created.String(),
+			Modified: record.Date.Modified.String(),
+		},
+		Authors:     nil,
+		License:     record.License.String,
+		Copyright:   "",
+		Publication: "",
+		Project:     "",
+		Comments:    nil,
+		Compound: MbRecordCompound{
+			Names:     nil,
+			Classes:   nil,
+			Formula:   record.Compound.Formula.String,
+			CdkDepict: nil,
+			Mass:      record.Compound.Mass.Value,
+			Smiles:    record.Compound.Smiles.String,
+			Inchi:     record.Compound.Inchi.String,
+			Link:      nil,
+		},
+		Species: MbRecordSpecies{
+			Name:    "",
+			Lineage: nil,
+			Link:    nil,
+			Sample:  nil,
+		},
+		Acquisition: MbRecordAcquisition{
+			Instrument:     record.Acquisition.Instrument.String,
+			InstrumentType: record.Acquisition.InstrumentType.String,
+			MassSpectrometry: AcMassSpec{
+				MsType:  "",
+				IonMode: "",
+				Subtags: nil,
+			},
+			Chromatography: nil,
+			General:        nil,
+			IonMobility:    nil,
+		},
+		MassSpectrometry: MbRecordMassSpectrometry{
+			FocusedIon:     nil,
+			DataProcessing: nil,
+		},
+		Peak: MbRecordPeak{
+			Splash: record.Peak.Splash.String,
+			Annotation: MbRecordPeakAnnotation{
+				Header: nil,
+				Values: nil,
+			},
+			NumPeak: int32(record.Peak.NumPeak.Value),
+			Peak: MbRecordPeakPeak{
+				Header: nil,
+				Values: nil,
+			},
+		},
+	}
+	for _, author := range record.Authors.Value {
+		result.Authors = append(result.Authors, AuthorsInner{
+			Name:        author.Name,
+			MarcRelator: author.MarcRelator,
+		})
+	}
+	return &result, nil
+
+}
