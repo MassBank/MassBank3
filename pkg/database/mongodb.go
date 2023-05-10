@@ -56,26 +56,6 @@ func (db *Mb3MongoDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	var query = `
 [
     { "$facet": {
-		"CompoundStart": [
-    { "$project": { "compound.names": 1}},
-        { "$unwind": "$compound.names" },
-    {"$group": {
-        "_id": {"$substr": [ {"$trim": { "input": {"$toUpper":"$compound.names"}, "chars": "()+-[]{}/? ,"}},0,1]},
-        "Count": {"$sum": 1}
-        }},
-    {
-        "$project": {
-            "_id": 0,
-            "Val": "$_id",
-            "Count": 1
-        }
-    },
-    {
-        "$sort": {
-            "Val": 1
-        }
-    }
-    ],
 		"Contributor": [
     {
         "$project": { "_id": 0, "cont": {"$arrayElemAt":[ {"$split": [ "$accession","-"]}, 1]} }
@@ -359,6 +339,13 @@ func (db *Mb3MongoDB) Ping() error {
 	timeout, _ := time.ParseDuration(MongoConnectTimeout)
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
+	if db.database == nil {
+		return errors.New("Database not connected")
+	}
+	client := db.database.Client()
+	if client == nil {
+		return errors.New("Database not connected")
+	}
 	return db.database.Client().Ping(ctx, nil)
 }
 

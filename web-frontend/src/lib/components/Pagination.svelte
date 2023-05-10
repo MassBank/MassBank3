@@ -25,6 +25,9 @@
 <slot></slot>
 
 <style>
+    .pagination {
+        padding: 1em;
+    }
     .current-page {
         font-size: 1.2em;
         font-weight: bold;

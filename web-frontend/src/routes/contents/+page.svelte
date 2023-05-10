@@ -24,6 +24,11 @@
     async function getResults(page) {
         let url = new URL("/v1/records",base)
         url.searchParams.append('page',page.toString())
+        contribuors.forEach(element => url.searchParams.append('contributor',element))
+        msType.forEach(element => url.searchParams.append('ms_type',element))
+        instrumentType.forEach(element => url.searchParams.append('instrument_type',element))
+        ionMode.forEach(element => url.searchParams.append('ion-mode',element))
+
         console.log(url)
         let resp = await fetch(url)
         let jsonData = await  resp.json();
@@ -37,10 +42,14 @@
         }
     }
 
-    $: base = data.baseurl;
+    let contribuors = [];
+    let msType = [];
+    let instrumentType = [];
+    let ionMode = [];
+    $: base = data.baseurl
 </script>
-
-{page}
+{base}
+{contribuors}
 <div class="pure-g">
     <div class="pure-u-1-5">
         {#await getFilters(base)}
@@ -49,25 +58,13 @@
             <div class="card">
                 <h2>Filters</h2>
                 <h3>Contributor</h3>
-                {#each filters.contributor as t}
-                    <FilterButton group="cont" val={t.value}>{t.value} ({t.count})</FilterButton>
-                {/each}
+                <FilterButton bind:result={contribuors} group="cont" values={filters.contributor}></FilterButton>
                 <h3>Instrument Type</h3>
-                {#each filters.instrument_type as t}
-                    <FilterButton group="insttype" val={t.value}>{t.value} ({t.count})</FilterButton>
-                {/each}
+                <FilterButton bind:result={instrumentType} group="itype" values={filters.instrument_type}></FilterButton>
                 <h3>MS Type</h3>
-                {#each filters.ms_type as t}
-                    <FilterButton group="mstype" val={t.value}>{t.value} ({t.count})</FilterButton>
-                {/each}
+                <FilterButton bind:result={msType} group="mstype" values={filters.ms_type}></FilterButton>
                 <h3>Ion Mode</h3>
-                {#each filters.ion_mode as t}
-                    <FilterButton group="ionmode" val={t.value}>{t.value} ({t.count})</FilterButton>
-                {/each}
-                <h3>Compound Start</h3>
-                {#each filters.compound_start as t}
-                    <FilterButton group="compoundstart" val={t.value}>{t.value} ({t.count})</FilterButton>
-                {/each}
+                <FilterButton bind:result={ionMode} group="imode" values={filters.ion_mode}></FilterButton>
             </div>
         {:catch error}
             <div class="error">Error during Filter loading</div>

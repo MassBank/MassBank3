@@ -2,6 +2,7 @@ package mb3server
 
 import (
 	"github.com/MassBank/MassBank3/pkg/database"
+	"github.com/MassBank/MassBank3/pkg/massbank"
 	"log"
 	"os"
 )
@@ -34,7 +35,11 @@ func initDB() error {
 			return err
 		}
 	}
-	return db.Ping()
+	err := db.Ping()
+	if err != nil {
+		db = nil
+	}
+	return err
 
 }
 
@@ -82,32 +87,59 @@ func GetBrowseOptions() (*BrowseOptions, error) {
 			Count: int32(val.Count),
 		})
 	}
-	for _, val := range vals.CompoundStart {
-		result.CompoundStart = append(result.CompoundStart, StringCountInner{
-			Value: val.Val,
-			Count: int32(val.Count),
-		})
-	}
 
 	return &result, nil
 }
 
-func GetRecords(limit int32, page int32) (*SearchResult, error) {
+func GetRecords(limit int32, page int32, contributor string, instrumentType []string, msType []string, ionMode string) (*SearchResult, error) {
 	if limit <= 0 {
 		limit = 20
 	}
 	if page <= 0 {
 		page = 1
 	}
+
+	msTypeLokal := &[]massbank.MsType{}
+	for _, t := range msType {
+		switch t {
+		case "MS":
+			*msTypeLokal = append(*msTypeLokal, massbank.MS)
+		case "MS2":
+			*msTypeLokal = append(*msTypeLokal, massbank.MS2)
+		case "MS3":
+			*msTypeLokal = append(*msTypeLokal, massbank.MS3)
+		case "MS4":
+			*msTypeLokal = append(*msTypeLokal, massbank.MS4)
+		}
+	}
+
+	if len(*msTypeLokal) == 0 {
+		msTypeLokal = nil
+	}
+
+	var ionModeLokal massbank.IonMode = massbank.ANY
+	switch ionMode {
+	case "POSITIVE":
+		ionModeLokal = massbank.POSITIVE
+	case "NEGATIVE":
+		ionModeLokal = massbank.NEGATIVE
+	}
+	log.Println(ionModeLokal)
+	it := &instrumentType
+	if len(*it) == 0 {
+		it = nil
+	}
+
 	var offset = (page - 1) * limit
 	if err := initDB(); err != nil {
 		return nil, err
 	}
+
 	var filters = database.Filters{
 		InstrumentType:  nil,
 		Splash:          "",
-		MsType:          nil,
-		IonMode:         "",
+		MsType:          msTypeLokal,
+		IonMode:         ionModeLokal,
 		CompoundName:    "",
 		Mass:            nil,
 		MassEpsilon:     nil,
@@ -115,7 +147,7 @@ func GetRecords(limit int32, page int32) (*SearchResult, error) {
 		Peaks:           nil,
 		PeakDifferences: nil,
 		InchiKey:        "",
-		Contributor:     "",
+		Contributor:     contributor,
 		IntensityCutoff: nil,
 		Limit:           int64(limit),
 		Offset:          int64(offset),
