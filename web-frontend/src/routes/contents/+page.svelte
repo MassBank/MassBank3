@@ -72,6 +72,7 @@
     </div>
     <div class="pure-u-4-5">
         <h2>Results</h2>
+        {#key ionMode,msType,contribuors,instrumentType}
         {#await getResults(page)}
             <div class="info">Loading results...</div>
             {:then records}
@@ -83,6 +84,7 @@
         {:catch error}
             <div class="error">Error while loading results</div>
         {/await}
+        {/key}
     </div>
 </div>
 

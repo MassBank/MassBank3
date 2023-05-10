@@ -25,6 +25,11 @@ type PostgresSQLDB struct {
 	database   *sql.DB
 }
 
+func (p *PostgresSQLDB) GetMetaData() (*MB3MetaData, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 // NewPostgresSQLDb creates a postgres database handle implementing [MB3Database] from the configuration.
 // It does test the connection or connect to the database. This should be done by [Connect()].
 //

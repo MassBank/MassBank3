@@ -9,7 +9,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PWD}
     healthcheck:
-      test:  ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
+      test:  ["CMD","mongosh", "--eval", "\"db.adminCommand('ping')\""]
       interval: 30s
       timeout: 60s
       retries: 5
