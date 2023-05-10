@@ -2,11 +2,13 @@
     import Header from "$lib/components/Header.svelte";
     import FilterButton from "$component/FilterBox.svelte";
     import ShortRecordSummary from "$component/ShortRecordSummary.svelte";
+    import Pagination from "$component/Pagination.svelte";
 
     /** @type {import('./$types').PageData} */
     export let data: any;
     let base: string;
-
+    let page: bigint = 1;
+    let pages: bigint = 10;
     async function getFilters(base) {
         let resp = await fetch(base + "/v1/filter/browse");
         let jsonData = await resp.json();
@@ -19,8 +21,11 @@
 
     }
 
-    async function getResults(filters) {
-        let resp = await fetch(base+"/v1/records")
+    async function getResults(page) {
+        let url = new URL("/v1/records",base)
+        url.searchParams.append('page',page.toString())
+        console.log(url)
+        let resp = await fetch(url)
         let jsonData = await  resp.json();
         if(resp.ok) {
             console.log(JSON.stringify(jsonData))
@@ -35,7 +40,7 @@
     $: base = data.baseurl;
 </script>
 
-
+{page}
 <div class="pure-g">
     <div class="pure-u-1-5">
         {#await getFilters(base)}
@@ -70,13 +75,15 @@
     </div>
     <div class="pure-u-4-5">
         <h2>Results</h2>
-        {#await getResults(base)}
+        {#await getResults(page)}
             <div class="info">Loading results...</div>
             {:then records}
+            <Pagination bind:currentPage={page} pages={pages}>
             {#each records.data as record}
                 <ShortRecordSummary record="{record}"></ShortRecordSummary>
             {/each}
-            {:catch error}
+            </Pagination>
+        {:catch error}
             <div class="error">Error while loading results</div>
         {/await}
     </div>

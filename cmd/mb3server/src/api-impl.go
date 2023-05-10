@@ -92,13 +92,14 @@ func GetBrowseOptions() (*BrowseOptions, error) {
 	return &result, nil
 }
 
-func GetRecords(limit int32, offset int32) (*SearchResult, error) {
+func GetRecords(limit int32, page int32) (*SearchResult, error) {
 	if limit <= 0 {
 		limit = 20
 	}
-	if offset <= 0 {
-		offset = 0
+	if page <= 0 {
+		page = 1
 	}
+	var offset = (page - 1) * limit
 	if err := initDB(); err != nil {
 		return nil, err
 	}
@@ -127,7 +128,7 @@ func GetRecords(limit int32, offset int32) (*SearchResult, error) {
 	for _, record := range records {
 		var val = SearchResultDataInner{
 			Data:    map[string]interface{}{},
-			Name:    record.Compound.Names[1].String,
+			Name:    record.Compound.Names[0].String,
 			Formula: record.Compound.Formula.String,
 			Mass:    record.Compound.Mass.Value,
 			Smiles:  record.Compound.Smiles.String,

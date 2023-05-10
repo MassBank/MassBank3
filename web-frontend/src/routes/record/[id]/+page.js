@@ -1,6 +1,10 @@
 /** @type {import('./$types').PageLoad} */
-export function load({ params }) {
+import { error } from '@sveltejs/kit';
+
+/** @type {import('./$types').PageLoad} */
+export function load({params: {id}}) {
     return {
-        accession: params.id
+        title: "Massbank Europe",
+        accession: id
     };
 }
