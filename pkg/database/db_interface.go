@@ -139,7 +139,7 @@ type MB3Database interface {
 	// GetRecords Get an array of MassBank records by filtering
 	//
 	// Will return an empty list if the filter does not match any records.
-	GetRecords(filters Filters) ([]*massbank.Massbank, error)
+	GetRecords(filters Filters) ([]*massbank.Massbank, int64, error)
 
 	// GetUniqueValues is used to get the values for filter frontend
 	GetUniqueValues(filters Filters) (MB3Values, error)

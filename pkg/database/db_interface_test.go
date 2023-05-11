@@ -487,7 +487,7 @@ func TestMB3Database_GetRecords(t *testing.T) {
 		}
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				got, err := tt.db.db.GetRecords(tt.args)
+				got, _, err := tt.db.db.GetRecords(tt.args)
 				if (err != nil) != tt.wantErr {
 					t.Errorf("%s: GetRecords() error = %v, wantErr %v", tt.db.name, err, tt.wantErr)
 					return

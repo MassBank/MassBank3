@@ -7,8 +7,8 @@
     /** @type {import('./$types').PageData} */
     export let data: any;
     let base: string;
-    let page: bigint = 1;
-    let pages: bigint = 10;
+    let cur_page: number = 1;
+    let pages: number = 10;
     async function getFilters(base) {
         let resp = await fetch(base + "/v1/filter/browse");
         let jsonData = await resp.json();
@@ -24,16 +24,20 @@
     async function getResults(page) {
         let url = new URL("/v1/records",base)
         url.searchParams.append('page',page.toString())
-        contribuors.forEach(element => url.searchParams.append('contributor',element))
-        msType.forEach(element => url.searchParams.append('ms_type',element))
-        instrumentType.forEach(element => url.searchParams.append('instrument_type',element))
-        ionMode.forEach(element => url.searchParams.append('ion-mode',element))
+        url.searchParams.append('instrument_type',instrumentType.join())
+        url.searchParams.append('ms_type',msType.join())
+        url.searchParams.append('ion-mode',ionMode.join())
+        url.searchParams.append('contributor',contributors.join())
 
         console.log(url)
         let resp = await fetch(url)
         let jsonData = await  resp.json();
         if(resp.ok) {
             console.log(JSON.stringify(jsonData))
+            pages = Math.floor(Number(jsonData.metadata.result_count)/20+1)
+            if (cur_page>pages) {
+                cur_page=1
+            }
             return jsonData
 
         } else {
@@ -42,14 +46,12 @@
         }
     }
 
-    let contribuors = [];
+    let contributors = [];
     let msType = [];
     let instrumentType = [];
     let ionMode = [];
     $: base = data.baseurl
 </script>
-{base}
-{contribuors}
 <div class="pure-g">
     <div class="pure-u-1-5">
         {#await getFilters(base)}
@@ -58,7 +60,7 @@
             <div class="card">
                 <h2>Filters</h2>
                 <h3>Contributor</h3>
-                <FilterButton bind:result={contribuors} group="cont" values={filters.contributor}></FilterButton>
+                <FilterButton bind:result={contributors} group="cont" values={filters.contributor}></FilterButton>
                 <h3>Instrument Type</h3>
                 <FilterButton bind:result={instrumentType} group="itype" values={filters.instrument_type}></FilterButton>
                 <h3>MS Type</h3>
@@ -72,11 +74,11 @@
     </div>
     <div class="pure-u-4-5">
         <h2>Results</h2>
-        {#key ionMode,msType,contribuors,instrumentType}
-        {#await getResults(page)}
+        {#key ionMode,msType,contributors,instrumentType}
+        {#await getResults(cur_page)}
             <div class="info">Loading results...</div>
             {:then records}
-            <Pagination bind:currentPage={page} pages={pages}>
+            <Pagination bind:currentPage={cur_page} pages={pages}>
             {#each records.data as record}
                 <ShortRecordSummary record="{record}"></ShortRecordSummary>
             {/each}

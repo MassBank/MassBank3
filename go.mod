@@ -10,7 +10,7 @@ require (
 	github.com/go-git/go-git/v5 v5.5.2
 	github.com/lib/pq v1.10.7
 	github.com/nullism/bqb v1.3.1
-	go.mongodb.org/mongo-driver v1.11.1
+	go.mongodb.org/mongo-driver v1.11.6
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 )
 

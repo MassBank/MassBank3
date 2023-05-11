@@ -126,7 +126,7 @@ func GetRecords(limit int32, page int32, contributor string, instrumentType []st
 	}
 	log.Println(ionModeLokal)
 	it := &instrumentType
-	if len(*it) == 0 {
+	if len(*it) == 0 || (len(*it) == 1 && (*it)[0] == "") {
 		it = nil
 	}
 
@@ -136,7 +136,7 @@ func GetRecords(limit int32, page int32, contributor string, instrumentType []st
 	}
 
 	var filters = database.Filters{
-		InstrumentType:  nil,
+		InstrumentType:  it,
 		Splash:          "",
 		MsType:          msTypeLokal,
 		IonMode:         ionModeLokal,
@@ -152,7 +152,7 @@ func GetRecords(limit int32, page int32, contributor string, instrumentType []st
 		Limit:           int64(limit),
 		Offset:          int64(offset),
 	}
-	records, err := db.GetRecords(filters)
+	records, count, err := db.GetRecords(filters)
 	if err != nil {
 		return nil, err
 	}
@@ -168,6 +168,7 @@ func GetRecords(limit int32, page int32, contributor string, instrumentType []st
 		}
 		result.Data = append(result.Data, val)
 	}
+	result.Metadata.ResultCount = int32(count)
 	return &result, nil
 }
 

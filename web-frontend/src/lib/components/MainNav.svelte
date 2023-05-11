@@ -18,7 +18,7 @@
             <a href="https://github.com/MassBank/MassBank-data/releases/latest" target="_blank" class="pure-menu-link">Download</a>
         </li>
          <li class="pure-menu-item">
-        <input type="search" placeholder="Accession" bind:value="{acc}"><button on:click={() => goto('/record/'+acc)}>Go</button>{acc}
+        <input type="search" placeholder="Accession" bind:value="{acc}"><button on:click={() => goto('/record/'+acc)}>Go</button>
          </li>
          <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
              <a href="#" id="moreLink" class="pure-menu-link">More</a>

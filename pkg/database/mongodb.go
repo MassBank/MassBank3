@@ -389,12 +389,13 @@ func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.Massbank, error) {
 // GetRecords see [MB3Database.GetRecords]
 func (db *Mb3MongoDB) GetRecords(
 	filters Filters,
-) ([]*massbank.Massbank, error) {
+) ([]*massbank.Massbank, int64, error) {
 	if db.database == nil {
-		return nil, errors.New("database not ready")
+		return nil, 0, errors.New("database not ready")
 	}
 	var err error
 	var cur *mongo.Cursor
+	var count int64
 	if filters.Limit <= 0 {
 		filters.Limit = DefaultValues.Limit
 	}
@@ -412,23 +413,24 @@ func (db *Mb3MongoDB) GetRecords(
 	} else {
 		query := getQuery(filters)
 		cur, err = db.database.Collection(mbCollection).Find(context.Background(), query, options.Find().SetLimit(filters.Limit).SetSkip(filters.Offset))
+		count, err = db.database.Collection(mbCollection).CountDocuments(context.Background(), query)
 	}
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	var bsonResult []bson.M
 	if err := cur.All(context.Background(), &bsonResult); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	var mbResult = []*massbank.Massbank{}
 	for _, val := range bsonResult {
 		mb, err := unmarshal2Massbank(err, &val)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		mbResult = append(mbResult, mb)
 	}
-	return mbResult, nil
+	return mbResult, count, nil
 }
 
 func getQuery(filters Filters) bson.D {
