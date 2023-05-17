@@ -548,7 +548,7 @@ func (db *Mb3MongoDB) AddRecord(record *massbank.MassBank2, metadataId string) e
 	if db.database == nil {
 		return errors.New("database not ready")
 	}
-	record.Metadata.VersionRef = massbank.MbReference(metadataId)
+	record.Metadata.VersionRef = metadataId
 	_, err := db.database.Collection(mbCollection).InsertOne(context.Background(), *record)
 	if err != nil {
 		return err
@@ -563,7 +563,7 @@ func (db *Mb3MongoDB) AddRecords(records []*massbank.MassBank2, metadataId strin
 	}
 	var recordsI = make([]interface{}, len(records))
 	for i, record := range records {
-		record.Metadata.VersionRef = massbank.MbReference(metadataId)
+		record.Metadata.VersionRef = metadataId
 		recordsI[i] = record
 	}
 	_, err := db.database.Collection(mbCollection).InsertMany(context.Background(), recordsI)
@@ -582,7 +582,7 @@ func (db *Mb3MongoDB) UpdateRecord(
 	if db.database == nil {
 		return 0, 0, errors.New("database not ready")
 	}
-	record.Metadata.VersionRef = massbank.MbReference(metadataId)
+	record.Metadata.VersionRef = metadataId
 	opt := options.ReplaceOptions{}
 	res, err := db.database.Collection(mbCollection).ReplaceOne(context.Background(), bson.D{{"accession", *record.Accession}}, record, opt.SetUpsert(upsert))
 	if err != nil {
@@ -692,16 +692,13 @@ func unmarshal2Massbank(err error, value *bson.M) (*massbank.MassBank2, error) {
 	if mb.Peak.Annotation != nil && reflect.DeepEqual(*mb.Peak.Annotation, massbank.PkAnnotation{}) {
 		mb.Peak.Annotation = nil
 	}
-	if *mb.Species.Name == "" {
+	if mb.Species.Name != nil && *mb.Species.Name == "" {
 		mb.Species.Name = nil
 	}
-	if mb.Species.Lineage == nil {
-		mb.Species.Lineage = nil
-	}
-	if *mb.Publication == "" {
+	if mb.Publication != nil && *mb.Publication == "" {
 		mb.Publication = nil
 	}
-	if *mb.Copyright == "" {
+	if mb.Copyright != nil && *mb.Copyright == "" {
 		mb.Copyright = nil
 	}
 	return &mb, err

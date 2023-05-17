@@ -11,10 +11,10 @@ var db database.MB3Database = nil
 
 func initDB() error {
 	if db == nil {
-		var mongo_uri = os.Getenv("MONGO_URI")
-		var mongo_name = os.Getenv("MONGO_DB_NAME")
-		log.Println("MongoDB URI: ", mongo_uri)
-		log.Println("Database_Name", mongo_name)
+		var mongoUri = os.Getenv("MONGO_URI")
+		var mongoName = os.Getenv("MONGO_DB_NAME")
+		log.Println("MongoDB URI: ", mongoUri)
+		log.Println("Database_Name", mongoName)
 		var err error = nil
 		var config = database.DBConfig{
 			Database:  database.MongoDB,
@@ -117,7 +117,7 @@ func GetRecords(limit int32, page int32, contributor string, instrumentType []st
 		msTypeLokal = nil
 	}
 
-	var ionModeLokal massbank.IonMode = massbank.ANY
+	var ionModeLokal = massbank.ANY
 	switch ionMode {
 	case "POSITIVE":
 		ionModeLokal = massbank.POSITIVE
@@ -160,11 +160,11 @@ func GetRecords(limit int32, page int32, contributor string, instrumentType []st
 	for _, record := range records {
 		var val = SearchResultDataInner{
 			Data:    map[string]interface{}{},
-			Name:    record.Compound.Names[0].String,
-			Formula: record.Compound.Formula.String,
-			Mass:    record.Compound.Mass.Value,
-			Smiles:  record.Compound.Smiles.String,
-			Spectra: []SearchResultDataInnerSpectraInner{{record.RecordTitle.String, record.Accession.String}},
+			Name:    (*record.Compound.Names)[0],
+			Formula: *record.Compound.Formula,
+			Mass:    *record.Compound.Mass,
+			Smiles:  *record.Compound.Smiles,
+			Spectra: []SearchResultDataInnerSpectraInner{{*record.RecordTitle, *record.Accession}},
 		}
 		result.Data = append(result.Data, val)
 	}
@@ -181,16 +181,16 @@ func GetRecord(accession string) (*MbRecord, error) {
 		return nil, err
 	}
 	result := MbRecord{
-		Accession:  record.Accession.String,
+		Accession:  *record.Accession,
 		Deprecated: MbRecordDeprecated{},
-		Title:      record.RecordTitle.String,
+		Title:      *record.RecordTitle,
 		Date: MbRecordDate{
 			Updated:  record.Date.Updated.String(),
 			Created:  record.Date.Created.String(),
 			Modified: record.Date.Modified.String(),
 		},
 		Authors:     nil,
-		License:     record.License.String,
+		License:     *record.License,
 		Copyright:   "",
 		Publication: "",
 		Project:     "",
@@ -198,11 +198,11 @@ func GetRecord(accession string) (*MbRecord, error) {
 		Compound: MbRecordCompound{
 			Names:     nil,
 			Classes:   nil,
-			Formula:   record.Compound.Formula.String,
+			Formula:   *record.Compound.Formula,
 			CdkDepict: nil,
-			Mass:      record.Compound.Mass.Value,
-			Smiles:    record.Compound.Smiles.String,
-			Inchi:     record.Compound.InChI.String,
+			Mass:      *record.Compound.Mass,
+			Smiles:    *record.Compound.Smiles,
+			Inchi:     *record.Compound.InChI,
 			Link:      nil,
 		},
 		Species: MbRecordSpecies{
@@ -212,8 +212,8 @@ func GetRecord(accession string) (*MbRecord, error) {
 			Sample:  nil,
 		},
 		Acquisition: MbRecordAcquisition{
-			Instrument:     record.Acquisition.Instrument.String,
-			InstrumentType: record.Acquisition.InstrumentType.String,
+			Instrument:     *record.Acquisition.Instrument,
+			InstrumentType: *record.Acquisition.InstrumentType,
 			MassSpectrometry: AcMassSpec{
 				MsType:  "",
 				IonMode: "",
@@ -228,19 +228,19 @@ func GetRecord(accession string) (*MbRecord, error) {
 			DataProcessing: nil,
 		},
 		Peak: MbRecordPeak{
-			Splash: record.Peak.Splash.String,
+			Splash: *record.Peak.Splash,
 			Annotation: MbRecordPeakAnnotation{
 				Header: nil,
 				Values: nil,
 			},
-			NumPeak: int32(record.Peak.NumPeak.Value),
+			NumPeak: int32(*record.Peak.NumPeak),
 			Peak: MbRecordPeakPeak{
 				Header: nil,
 				Values: nil,
 			},
 		},
 	}
-	for _, author := range record.Authors.Value {
+	for _, author := range *record.Authors {
 		result.Authors = append(result.Authors, AuthorsInner{
 			Name:        author.Name,
 			MarcRelator: author.MarcRelator,

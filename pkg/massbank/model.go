@@ -1,12 +1,8 @@
 package massbank
 
 import (
-	"reflect"
 	"time"
 )
-
-const dateFormat = "2006.01.02"
-const deprecatedDateFormat = "2006-01-02"
 
 type MbMetaData struct {
 	Commit    string
@@ -15,8 +11,8 @@ type MbMetaData struct {
 }
 
 type SubtagProperty struct {
-	Subtag string
-	Value  string
+	Key   string
+	Value string
 }
 
 type DatabaseProperty struct {
@@ -24,12 +20,10 @@ type DatabaseProperty struct {
 	Identifier string
 }
 
-type MbReference string
-
 type MassBank2 struct {
 	Metadata struct {
 		FileName   string
-		VersionRef MbReference
+		VersionRef string
 	}
 	Accession   *string             `mb2:"ACCESSION"`
 	Deprecated  *RecordDeprecated   `mb2:"DEPRECATED" optional:"true" bson:"deprecated,omitempty"`
@@ -102,44 +96,4 @@ type PkPeak struct {
 type PkAnnotation struct {
 	Header []string
 	Values map[string][]interface{}
-}
-
-var lastTag string
-
-type tagProperties struct {
-	Type  reflect.Type
-	Name  string
-	Index []int
-}
-
-var tagMap = map[string]tagProperties{}
-
-// Build an array with type information and tag strings for parsing
-func buildTags() {
-	var mb = MassBank2{}
-	mb.addTagField(mb, []int{})
-}
-
-func (mb *MassBank2) addTagField(i interface{}, index []int) {
-	valType := reflect.TypeOf(i)
-	for _, field := range reflect.VisibleFields(valType) {
-		if field.Type.Kind() != reflect.Struct {
-			mb.addFieldToMap(field, index)
-		} else {
-			mb.addTagField(reflect.ValueOf(i).FieldByIndex(field.Index).Interface(), append(index, field.Index...))
-		}
-	}
-}
-
-func (mb *MassBank2) addFieldToMap(field reflect.StructField, index []int) {
-	var props = tagProperties{}
-	props.Name = field.Name
-	props.Type = field.Type
-	props.Index = append(index, field.Index...)
-	tag := field.Tag.Get("mb2")
-	subtag := field.Tag.Get("mb2st")
-	if subtag != "" {
-		subtag = ":" + subtag
-	}
-	tagMap[tag] = props
 }

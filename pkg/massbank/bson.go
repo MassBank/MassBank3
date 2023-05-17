@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/bsontype"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"strings"
 	"time"
 )
@@ -44,14 +43,6 @@ func (p PkAnnotation) MarshalBSONValue() (bsontype.Type, []byte, error) {
 		Header []string
 		Values map[string][]interface{}
 	}{p.Header, p.Values})
-}
-
-func (p MbReference) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	id, err := primitive.ObjectIDFromHex(string(p))
-	if err != nil {
-		return bsontype.Null, nil, err
-	}
-	return bson.MarshalValue(id)
 }
 
 func (p *DatabaseProperty) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
@@ -120,15 +111,5 @@ func (p *PkAnnotation) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
 	}
 	p.Header = v.Header
 	p.Values = v.Values
-	return nil
-}
-
-func (p *MbReference) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
-	var raw = bson.RawValue{Type: t, Value: b}
-	var id primitive.ObjectID
-	if err := raw.Unmarshal(&id); err != nil {
-		return err
-	}
-	*p = MbReference(id.Hex())
 	return nil
 }

@@ -179,10 +179,10 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.MassBank2, int6
 		for _, ms := range *filters.MsType {
 			msTypes = append(msTypes, ms.String())
 		}
-		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Acquisition'->'MassSpectrometry') ms WHERE ms->>'Subtag' = 'MS_TYPE' AND ms->>'String' IN (?))", msTypes)
+		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Acquisition'->'MassSpectrometry') ms WHERE ms->>'Key' = 'MS_TYPE' AND ms->>'String' IN (?))", msTypes)
 	}
 	if filters.IonMode != massbank.ANY {
-		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Acquisition'->'MassSpectrometry') ms WHERE ms->>'Subtag' = 'ION_MODE' AND ms->>'String' = ?)", string(filters.IonMode))
+		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Acquisition'->'MassSpectrometry') ms WHERE ms->>'Key' = 'ION_MODE' AND ms->>'String' = ?)", string(filters.IonMode))
 	}
 	if filters.Mass != nil {
 		where.And("(document->'Compound'->'mass'->>'Value')::float BETWEEN ? AND ?", *filters.Mass-*filters.MassEpsilon, *filters.Mass+*filters.MassEpsilon)
@@ -261,13 +261,13 @@ FROM (SELECT ARRAY(SELECT t
                    FROM (select t.ms ->> 'String' as val, count(t.ms)
                          FROM (Select jsonb_array_elements(document -> 'Acquisition' -> 'MassSpectrometry') as ms
                                from massbank) t
-                         where ms ->> 'Subtag' = 'MS_TYPE'
+                         where ms ->> 'Key' = 'MS_TYPE'
                          GROUP BY t.ms ORDER BY t.ms) t)) as mt,
      (SELECT ARRAY(SELECT t
                    FROM (select t.ms ->> 'String' as val, count(t.ms)
                          FROM (Select jsonb_array_elements(document -> 'Acquisition' -> 'MassSpectrometry') as ms
                                from massbank) t
-                         where ms ->> 'Subtag' = 'ION_MODE'
+                         where ms ->> 'Key' = 'ION_MODE'
                          GROUP BY t.ms ORDER BY t.ms) t)) as im,
      (SELECT MIN((document -> 'Compound' -> 'mass' ->> 'Value')::float8) as minm,
              MAX((document -> 'Compound' -> 'mass' ->> 'Value')::float8) as maxm
