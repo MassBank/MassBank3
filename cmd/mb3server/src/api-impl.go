@@ -202,7 +202,7 @@ func GetRecord(accession string) (*MbRecord, error) {
 			CdkDepict: nil,
 			Mass:      record.Compound.Mass.Value,
 			Smiles:    record.Compound.Smiles.String,
-			Inchi:     record.Compound.Inchi.String,
+			Inchi:     record.Compound.InChI.String,
 			Link:      nil,
 		},
 		Species: MbRecordSpecies{

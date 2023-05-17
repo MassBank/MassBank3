@@ -3,6 +3,7 @@ package massbank
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -13,39 +14,33 @@ import (
 	"time"
 )
 
-func (p *DefaultProperty) Parse(string) error {
-	return errors.New("not implemented")
+func getDatabaseProperty(s string) (*DatabaseProperty, error) {
+	db := DatabaseProperty{}
+	ss := strings.SplitN(s, " ", 2)
+	if len(ss) > 1 {
+		db.Database = ss[0]
+		db.Identifier = ss[1]
+	} else {
+		return nil, errors.New("Subtag error: " + s)
+	}
+	return &db, nil
 }
 
-func (p *StringProperty) Parse(s string) error {
-	p.String = s
-	return nil
-}
-
-func (p *SubtagProperty) Parse(s string) error {
+func getSubtagProperty(s string) (*SubtagProperty, error) {
+	p := SubtagProperty{}
 	ss := strings.SplitN(s, " ", 2)
 	if len(ss) > 1 {
 		p.Subtag = ss[0]
-		p.String = ss[1]
+		p.Value = ss[1]
 	} else {
-		return errors.New("Subtag error: " + s)
+		return nil, errors.New("Subtag error: " + s)
 	}
-	return nil
+	return &p, nil
 }
 
-func (p *DatabaseProperty) Parse(s string) error {
-	ss := strings.SplitN(s, " ", 2)
-	if len(ss) > 1 {
-		p.Database = ss[0]
-		p.Identifier = ss[1]
-	} else {
-		return errors.New("Subtag error: " + s)
-	}
-	return nil
-}
-
-func (p *RecordDate) Parse(s string) error {
+func getRecordDate(s string) (*RecordDate, error) {
 	var err error
+	var p = &RecordDate{}
 	ss := strings.SplitN(s, " ", 2)
 	if len(ss) > 1 {
 		re := regexp.MustCompile("\\(Created (.*)\\)")
@@ -54,32 +49,32 @@ func (p *RecordDate) Parse(s string) error {
 			ss3 := strings.SplitN(ss2[1], ",", 2)
 			if len(ss3) > 1 {
 				if p.Created, err = time.Parse(dateFormat, ss3[0]); err != nil {
-					return err
+					return nil, err
 				}
 				ss4 := strings.SplitN(strings.TrimSpace(ss3[1]), " ", 2)
 				if len(ss4) > 1 {
 					if p.Modified, err = time.Parse(dateFormat, ss4[1]); strings.TrimSpace(ss4[0]) != "modified" || err != nil {
-						return err
+						return nil, err
 					}
 				} else {
-					return err
+					return nil, err
 				}
 			} else {
 				if p.Created, err = time.Parse(dateFormat, ss2[1]); err != nil {
-					return err
+					return nil, err
 				}
 			}
 		}
 	} else {
 		if p.Created, err = time.Parse(dateFormat, ss[0]); err != nil {
-			return err
+			return nil, err
 		}
 	}
 	p.Updated, err = time.Parse(dateFormat, ss[0])
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return p, nil
 
 }
 
@@ -98,7 +93,8 @@ func (p *RecordDeprecated) Parse(s string) error {
 	return errors.New("could not parse DEPRECATED tag")
 }
 
-func (names *RecordAuthorNames) Parse(s string) error {
+func getRecordAuthornames(s string) (*[]RecordAuthorName, error) {
+	rn := []RecordAuthorName{}
 	ss := strings.Split(s, ",")
 	for _, s1 := range ss {
 		re := regexp.MustCompile("(.*)([(.*)])?")
@@ -108,37 +104,10 @@ func (names *RecordAuthorNames) Parse(s string) error {
 			marc = ss1[2]
 		}
 		if len(ss1) > 1 {
-			names.Value = append(names.Value, RecordAuthorName{ss1[1], marc})
+			rn = append(rn, RecordAuthorName{ss1[1], marc})
 		}
 	}
-	return nil
-}
-
-func (cc *ChCompoundClasses) Parse(s string) error {
-	ss := strings.Split(s, ";")
-	for _, s1 := range ss {
-		var c = ChCompoundClass(strings.TrimSpace(s1))
-		cc.Value = append(cc.Value, c)
-	}
-	return nil
-}
-
-func (mass *ChMass) Parse(s string) error {
-	var err error
-	mass.Value, err = strconv.ParseFloat(s, 64)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (n *PkNumPeak) Parse(s string) error {
-	val, err := strconv.ParseUint(s, 10, 32)
-	if err != nil {
-		return err
-	}
-	n.Value = uint(val)
-	return nil
+	return &rn, nil
 }
 
 func (p *PkPeak) Parse(s string) error {
@@ -152,36 +121,14 @@ func (p *PkPeak) Parse(s string) error {
 	return nil
 }
 
-func (p *PkAnnotation) Parse(s string) error {
-	p.Header = strings.Split(s, " ")
-	p.Values = map[string][]interface{}{}
-	return nil
+func getAnnotions(s string) (*PkAnnotation, error) {
+	pa := PkAnnotation{}
+	pa.Header = strings.Split(s, " ")
+	pa.Values = map[string][]interface{}{}
+	return &pa, nil
 }
 
-func (p *SpLineage) Parse(s string) error {
-	ss := strings.Split(s, ";")
-	for _, es := range ss {
-		element := SpLineageElement{}
-		element.String = strings.TrimSpace(es)
-		p.Value = append(p.Value, element)
-	}
-	return nil
-}
-
-func (p *RecordComment) Parse(s string) error {
-	ss := strings.SplitN(s, " ", 2)
-	if len(ss) > 1 && contains(commentSubtagList, strings.TrimSpace(ss[0])) {
-		p.Subtag = ss[0]
-		p.String = ss[1]
-	} else if len(s) > 0 {
-		p.String = s
-	} else {
-		return errors.New("Subtag error: " + s)
-	}
-	return nil
-}
-
-func ParseFile(fileName string) (mb *Massbank, err error) {
+func ParseFile(fileName string) (mb *MassBank2, err error) {
 	file, err := os.Open(fileName)
 	defer file.Close()
 	if err != nil {
@@ -194,11 +141,11 @@ func ParseFile(fileName string) (mb *Massbank, err error) {
 	return mb, nil
 }
 
-func ScanMbFile(mb2Reader io.Reader, fileName string) (*Massbank, error) {
-	if len(TagMap) == 0 {
+func ScanMbFile(mb2Reader io.Reader, fileName string) (*MassBank2, error) {
+	if len(tagMap) == 0 {
 		buildTags()
 	}
-	var mb = Massbank{}
+	var mb = MassBank2{}
 	mb.Metadata.FileName = fileName
 	scanner := bufio.NewScanner(mb2Reader)
 	lineNum := 0
@@ -210,7 +157,7 @@ func ScanMbFile(mb2Reader io.Reader, fileName string) (*Massbank, error) {
 	return &mb, nil
 }
 
-func (mb *Massbank) ReadLine(line string, lineNum int) {
+func (mb *MassBank2) ReadLine(line string, lineNum int) {
 	if strings.HasPrefix(line, "//") {
 		// ignore comment
 	} else if strings.HasPrefix(line, "  ") {
@@ -240,7 +187,7 @@ func (mb *Massbank) ReadLine(line string, lineNum int) {
 	}
 }
 
-func (mb *Massbank) parsePeakValue(line string, lineNum int) error {
+func (mb *MassBank2) parsePeakValue(line string, lineNum int) error {
 	svals := strings.Split(strings.TrimSpace(line), " ")
 	if len(svals) != 3 {
 		return errors.New("Could not read Peakvalue: line " + strconv.Itoa(lineNum))
@@ -263,7 +210,7 @@ func (mb *Massbank) parsePeakValue(line string, lineNum int) error {
 	return nil
 }
 
-func (mb *Massbank) parseAnnotationValue(line string, lineNum int) {
+func (mb *MassBank2) parseAnnotationValue(line string, lineNum int) {
 	var values = &(mb.Peak.Annotation.Values)
 	var header = mb.Peak.Annotation.Header
 	if strings.HasPrefix(line, "    ") && len(*values) > 0 {
@@ -286,28 +233,63 @@ func (mb *Massbank) parseAnnotationValue(line string, lineNum int) {
 		(*values)[h] = append((*values)[h], ss)
 	}
 }
-
-func (mb *Massbank) addValue(tagname string, value string, lineNum int) error {
-	tagInfo := TagMap[tagname]
+func (mb *MassBank2) addValue(tagname string, value string, lineNum int) error {
+	tagInfo := tagMap[tagname]
 	index := tagInfo.Index
 	mb2 := reflect.ValueOf(mb)
 	mb3 := reflect.Indirect(mb2)
-	prop := mb3.FieldByIndex(index)
-	prop2 := prop.Type().Elem()
-	if prop.Kind() == reflect.Slice {
-		prop2 = prop2.Elem()
-	}
-	newPro := reflect.New(prop2)
-	newInterf := newPro.Interface()
-	propInt := newInterf.(Property)
-	err := propInt.Parse(value)
-	if err != nil {
-		log.Println(err.Error(), "Tag: ", tagname, "File: ", mb.Metadata.FileName, "Line: ", lineNum)
-	}
-	if prop.Kind() == reflect.Slice {
-		prop.Set(reflect.Append(prop, newPro))
-	} else {
-		prop.Set(newPro)
+	property := mb3.FieldByIndex(index)
+	propertyElement := property.Type().Elem()
+	newProperty := reflect.New(propertyElement)
+	switch propertyElement.Kind() {
+	case reflect.String:
+		newProperty.Elem().SetString(value)
+		property.Set(newProperty)
+	case reflect.Float64:
+		f, _ := strconv.ParseFloat(value, 64)
+		newProperty.Elem().SetFloat(f)
+	case reflect.Struct:
+		switch propertyElement {
+		case reflect.TypeOf(RecordDate{}):
+			rd, err := getRecordDate(value)
+			if err != nil {
+				println("Could not parse Recorddate: ", value)
+			}
+			property.Set(reflect.ValueOf(rd))
+		case reflect.TypeOf(PkAnnotation{}):
+			pa, _ := getAnnotions(value)
+			property.Set(reflect.ValueOf(pa))
+		default:
+			fmt.Printf("Found unhandled struct: %s\n", propertyElement.Name())
+		}
+	case reflect.Slice:
+		switch propertyElement.Elem() {
+		case reflect.TypeOf(""):
+			if property.Elem().Kind() == reflect.Invalid {
+				property.Set(reflect.New(propertyElement))
+			}
+			property.Elem().Set(reflect.Append(property.Elem(), reflect.ValueOf(value)))
+		case reflect.TypeOf(RecordAuthorName{}):
+			rn, _ := getRecordAuthornames(value)
+			property.Set(reflect.ValueOf(rn))
+		case reflect.TypeOf(SubtagProperty{}):
+			st, _ := getSubtagProperty(value)
+			if property.Elem().Kind() == reflect.Invalid {
+				property.Set(reflect.New(propertyElement))
+			}
+			property.Elem().Set(reflect.Append(property.Elem(), reflect.ValueOf(*st)))
+		case reflect.TypeOf(DatabaseProperty{}):
+			db, _ := getDatabaseProperty(value)
+			if property.Elem().Kind() == reflect.Invalid {
+				property.Set(reflect.New(propertyElement))
+			}
+			property.Elem().Set(reflect.Append(property.Elem(), reflect.ValueOf(*db)))
+		default:
+			fmt.Printf("Found unhandled slice of %s\n", propertyElement.Elem().String())
+		}
+	default:
+		fmt.Printf("Property not set. Type was %v, kind was %v, tag was %v\n", propertyElement.String(), propertyElement.Kind().String(), tagname)
+
 	}
 	return nil
 }

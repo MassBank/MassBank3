@@ -1,5 +1,26 @@
 package massbank
 
+type MsType string
+
+const (
+	MS  MsType = "MS"
+	MS2 MsType = "MS2"
+	MS3 MsType = "MS3"
+	MS4 MsType = "MS4"
+)
+
+func (ms MsType) String() string {
+	return string(ms)
+}
+
+type IonMode string
+
+const (
+	ANY      IonMode = ""
+	POSITIVE IonMode = "POSITIVE"
+	NEGATIVE IonMode = "NEGATIVE"
+)
+
 var licenseList = []string{
 	"CC0",
 	"CC BY",

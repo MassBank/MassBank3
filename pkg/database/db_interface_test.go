@@ -33,12 +33,12 @@ var recordnames = []string{
 	"MSBNK-test-TST00003",
 }
 
-func testRecord(i uint64) *massbank.Massbank {
+func testRecord(i uint64) *massbank.MassBank2 {
 	var mb = mbTestRecords[recordnames[i]]
 	return &mb
 }
-func testRecords(names []uint64) []*massbank.Massbank {
-	var records = []*massbank.Massbank{}
+func testRecords(names []uint64) []*massbank.MassBank2 {
+	var records = []*massbank.MassBank2{}
 	for _, i := range names {
 		var mb = mbTestRecords[recordnames[i]]
 		records = append(records, &mb)
@@ -227,7 +227,7 @@ func TestMB3Database_GetRecord(t *testing.T) {
 			db      testDB
 			name    string
 			args    args
-			want    massbank.Massbank
+			want    massbank.MassBank2
 			wantErr bool
 		}
 		var tests = []testData{}
@@ -277,7 +277,7 @@ func TestMB3Database_GetRecords(t *testing.T) {
 			db      testDB
 			name    string
 			args    Filters
-			want    []*massbank.Massbank
+			want    []*massbank.MassBank2
 			wantErr bool
 		}
 		var tests = []testData{
@@ -507,7 +507,7 @@ func TestMB3Database_GetRecords(t *testing.T) {
 	}
 }
 
-func compareDbResults(t *testing.T, want []*massbank.Massbank, got []*massbank.Massbank) {
+func compareDbResults(t *testing.T, want []*massbank.MassBank2, got []*massbank.MassBank2) {
 
 	for _, w := range want {
 		bw, errw := json.Marshal(w)
@@ -576,7 +576,7 @@ func TestMB3Database_AddRecord(t *testing.T) {
 		t.Fatal("Could not init Databases: ", err.Error())
 	}
 	type args struct {
-		record     massbank.Massbank
+		record     massbank.MassBank2
 		metaDataId string
 	}
 	type testData struct {
@@ -652,7 +652,7 @@ func TestMB3Database_AddRecords(t *testing.T) {
 		db.checkCount(t, 0)
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				var records []*massbank.Massbank
+				var records []*massbank.MassBank2
 				for _, i := range tt.args.records {
 					var mb = mbTestRecords[recordnames[i]]
 					records = append(records, &mb)
@@ -732,7 +732,7 @@ func TestMB3Database_UpdateRecord(t *testing.T) {
 		t.Fatal("Could not init Databases: ", err.Error())
 	}
 	type args struct {
-		record     *massbank.Massbank
+		record     *massbank.MassBank2
 		metaDataId string
 		upsert     bool
 	}
@@ -795,7 +795,7 @@ func TestMB3Database_UpdateRecords(t *testing.T) {
 		t.Fatal("Could not init Databases: ", err.Error())
 	}
 	type args struct {
-		records    []*massbank.Massbank
+		records    []*massbank.MassBank2
 		metaDataId string
 		upsert     bool
 	}
@@ -842,7 +842,7 @@ func TestMB3Database_UpdateRecords(t *testing.T) {
 		db.checkCount(t, 8)
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				var records []*massbank.Massbank
+				var records []*massbank.MassBank2
 				for _, r := range tt.args.records {
 					r.Comments = append(r.Comments, &massbank.RecordComment{SubtagProperty: massbank.SubtagProperty{StringProperty: massbank.StringProperty{String: "new comment"}}})
 					records = append(records, r)

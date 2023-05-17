@@ -9,17 +9,6 @@ import (
 	"time"
 )
 
-func (p StringProperty) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	return bson.MarshalValue(p.String)
-}
-
-func (p SubtagProperty) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	return bson.MarshalValue(bson.E{
-		Key:   p.Subtag,
-		Value: p.String,
-	})
-}
-
 func (p DatabaseProperty) MarshalBSONValue() (bsontype.Type, []byte, error) {
 	return bson.MarshalValue(bson.E{
 		Key:   p.Database,
@@ -41,22 +30,6 @@ func (p RecordDate) MarshalBSONValue() (bsontype.Type, []byte, error) {
 		{"modified", p.Modified}})
 }
 
-func (p RecordAuthorNames) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	return bson.MarshalValue(p.Value)
-}
-
-func (p ChCompoundClasses) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	return bson.MarshalValue(p.Value)
-}
-
-func (p ChMass) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	return bson.MarshalValue(p.Value)
-}
-
-func (p SpLineage) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	return bson.MarshalValue(p.Value)
-}
-
 func (p PkPeak) MarshalBSONValue() (bsontype.Type, []byte, error) {
 	return bson.MarshalValue(struct {
 		Header    []string
@@ -64,10 +37,6 @@ func (p PkPeak) MarshalBSONValue() (bsontype.Type, []byte, error) {
 		Intensity []float64
 		Rel       []uint
 	}{p.Header, p.Mz, p.Intensity, p.Rel})
-}
-
-func (p PkNumPeak) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	return bson.MarshalValue(p.Value)
 }
 
 func (p PkAnnotation) MarshalBSONValue() (bsontype.Type, []byte, error) {
@@ -83,46 +52,6 @@ func (p MbReference) MarshalBSONValue() (bsontype.Type, []byte, error) {
 		return bsontype.Null, nil, err
 	}
 	return bson.MarshalValue(id)
-}
-
-func (p *StringProperty) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
-	var raw = bson.RawValue{Type: t, Value: b}
-	return raw.Unmarshal(&p.String)
-}
-
-func (p *RecordAuthorNames) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
-	var raw = bson.RawValue{Type: t, Value: b}
-	if err := raw.Unmarshal(&p.Value); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (p *ChCompoundClasses) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
-	var raw = bson.RawValue{Type: t, Value: b}
-	if err := raw.Unmarshal(&p.Value); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (p *ChMass) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
-	var raw = bson.RawValue{Type: t, Value: b}
-	if err := raw.Unmarshal(&p.Value); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (p *SubtagProperty) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
-	var raw = bson.RawValue{Type: t, Value: b}
-	var doc bson.E
-	if err := raw.Unmarshal(&doc); err != nil {
-		return err
-	}
-	p.Subtag = doc.Key
-	p.String = fmt.Sprintf("%v", doc.Value)
-	return nil
 }
 
 func (p *DatabaseProperty) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
@@ -178,38 +107,6 @@ func getTime(raw bson.Raw, key string) (time.Time, error) {
 		}
 	}
 	return t, nil
-}
-
-func (p *SpLineage) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
-	var raw = bson.RawValue{Type: t, Value: b}
-	if err := raw.Unmarshal(&p.Value); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (p *PkPeak) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
-	var raw = bson.RawValue{Type: t, Value: b}
-	var v struct {
-		Header    []string
-		Mz        []float64
-		Intensity []float64
-		Rel       []uint
-	}
-
-	if err := raw.Unmarshal(&v); err != nil {
-		return err
-	}
-	*p = PkPeak{DefaultProperty{}, v.Header, v.Mz, v.Intensity, v.Rel}
-	return nil
-}
-
-func (p *PkNumPeak) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
-	var raw = bson.RawValue{Type: t, Value: b}
-	if err := raw.Unmarshal(&p.Value); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (p *PkAnnotation) UnmarshalBSONValue(t bsontype.Type, b []byte) error {

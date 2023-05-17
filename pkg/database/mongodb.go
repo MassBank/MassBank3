@@ -373,7 +373,7 @@ func (db *Mb3MongoDB) DropAllRecords() error {
 }
 
 // GetRecord see [MB3Database.GetRecord]
-func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.Massbank, error) {
+func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	var bsonResult bson.M
 	err := db.database.Collection(mbCollection).FindOne(context.Background(), bson.D{{"accession", s}}).Decode(&bsonResult)
 	if err != nil {
@@ -389,7 +389,7 @@ func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.Massbank, error) {
 // GetRecords see [MB3Database.GetRecords]
 func (db *Mb3MongoDB) GetRecords(
 	filters Filters,
-) ([]*massbank.Massbank, int64, error) {
+) ([]*massbank.MassBank2, int64, error) {
 	if db.database == nil {
 		return nil, 0, errors.New("database not ready")
 	}
@@ -422,7 +422,7 @@ func (db *Mb3MongoDB) GetRecords(
 	if err := cur.All(context.Background(), &bsonResult); err != nil {
 		return nil, 0, err
 	}
-	var mbResult = []*massbank.Massbank{}
+	var mbResult = []*massbank.MassBank2{}
 	for _, val := range bsonResult {
 		mb, err := unmarshal2Massbank(err, &val)
 		if err != nil {
@@ -544,7 +544,7 @@ func (db *Mb3MongoDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error) 
 }
 
 // AddRecord see [MB3Database.AddRecord]
-func (db *Mb3MongoDB) AddRecord(record *massbank.Massbank, metadataId string) error {
+func (db *Mb3MongoDB) AddRecord(record *massbank.MassBank2, metadataId string) error {
 	if db.database == nil {
 		return errors.New("database not ready")
 	}
@@ -557,7 +557,7 @@ func (db *Mb3MongoDB) AddRecord(record *massbank.Massbank, metadataId string) er
 }
 
 // AddRecords see [MB3Database.AddRecords]
-func (db *Mb3MongoDB) AddRecords(records []*massbank.Massbank, metadataId string) error {
+func (db *Mb3MongoDB) AddRecords(records []*massbank.MassBank2, metadataId string) error {
 	if db.database == nil {
 		return errors.New("database not ready")
 	}
@@ -575,7 +575,7 @@ func (db *Mb3MongoDB) AddRecords(records []*massbank.Massbank, metadataId string
 
 // UpdateRecord see [MB3Database.UpdateRecord]
 func (db *Mb3MongoDB) UpdateRecord(
-	record *massbank.Massbank,
+	record *massbank.MassBank2,
 	metadataId string,
 	upsert bool,
 ) (uint64, uint64, error) {
@@ -584,7 +584,7 @@ func (db *Mb3MongoDB) UpdateRecord(
 	}
 	record.Metadata.VersionRef = massbank.MbReference(metadataId)
 	opt := options.ReplaceOptions{}
-	res, err := db.database.Collection(mbCollection).ReplaceOne(context.Background(), bson.D{{"accession", record.Accession.String}}, record, opt.SetUpsert(upsert))
+	res, err := db.database.Collection(mbCollection).ReplaceOne(context.Background(), bson.D{{"accession", *record.Accession}}, record, opt.SetUpsert(upsert))
 	if err != nil {
 		return 0, 0, err
 	}
@@ -593,7 +593,7 @@ func (db *Mb3MongoDB) UpdateRecord(
 
 // UpdateRecords see [MB3Database.UpdateRecords]
 func (db *Mb3MongoDB) UpdateRecords(
-	records []*massbank.Massbank,
+	records []*massbank.MassBank2,
 	metadataId string,
 	upsert bool,
 ) (uint64, uint64, error) {
@@ -673,8 +673,8 @@ func (db *Mb3MongoDB) addPeakDiffs() {
 		context.Background(),
 		mongo.Pipeline{matchStage})
 }
-func unmarshal2Massbank(err error, value *bson.M) (*massbank.Massbank, error) {
-	var mb massbank.Massbank
+func unmarshal2Massbank(err error, value *bson.M) (*massbank.MassBank2, error) {
+	var mb massbank.MassBank2
 	b, err := bson.Marshal(value)
 	if err != nil {
 		return nil, err
@@ -686,22 +686,22 @@ func unmarshal2Massbank(err error, value *bson.M) (*massbank.Massbank, error) {
 	if mb.Deprecated != nil && reflect.DeepEqual(*mb.Deprecated, massbank.RecordDeprecated{}) {
 		mb.Deprecated = nil
 	}
-	if mb.Project != nil && reflect.DeepEqual(*mb.Project, massbank.RecordProject{}) {
+	if mb.Project != nil && *mb.Project == "" {
 		mb.Project = nil
 	}
 	if mb.Peak.Annotation != nil && reflect.DeepEqual(*mb.Peak.Annotation, massbank.PkAnnotation{}) {
 		mb.Peak.Annotation = nil
 	}
-	if mb.Species.Name.String == "" {
+	if *mb.Species.Name == "" {
 		mb.Species.Name = nil
 	}
-	if mb.Species.Lineage.Value == nil {
+	if mb.Species.Lineage == nil {
 		mb.Species.Lineage = nil
 	}
-	if mb.Publication.String == "" {
+	if *mb.Publication == "" {
 		mb.Publication = nil
 	}
-	if mb.Copyright.String == "" {
+	if *mb.Copyright == "" {
 		mb.Copyright = nil
 	}
 	return &mb, err

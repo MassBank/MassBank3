@@ -148,8 +148,8 @@ func (p *PostgresSQLDB) DropAllRecords() error {
 }
 
 // GetRecord see [MB3Database.GetRecord]
-func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.Massbank, error) {
-	var result massbank.Massbank
+func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
+	var result massbank.MassBank2
 	var b []byte
 	if err := p.database.QueryRow("SELECT document FROM massbank WHERE document->'Accession'->>'String' = $1", *s).Scan(&b); err != nil {
 		return nil, err
@@ -159,7 +159,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.Massbank, error) {
 }
 
 // GetRecords see [MB3Database.GetRecords]
-func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.Massbank, error) {
+func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.MassBank2, int64, error) {
 	if filters.Limit <= 0 {
 		filters.Limit = DefaultValues.Limit
 	}
@@ -223,21 +223,21 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.Massbank, error
 	sql, params, err := query.ToPgsql()
 	rows, err := p.database.Query(sql, params...)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	var result = []*massbank.Massbank{}
+	var result = []*massbank.MassBank2{}
 	for rows.Next() {
-		var mb massbank.Massbank
+		var mb massbank.MassBank2
 		var b []byte
 		if err = rows.Scan(&b); err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		if err := json.Unmarshal(b, &mb); err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		result = append(result, &mb)
 	}
-	return result, nil
+	return result, 0, nil
 }
 
 // GetUniqueValues see [MB3Database.GetUniqueValues]
@@ -322,13 +322,13 @@ func (p *PostgresSQLDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error
 }
 
 // AddRecord see [MB3Database.AddRecord]
-func (p *PostgresSQLDB) AddRecord(record *massbank.Massbank, metaDataId string) error {
-	records := []*massbank.Massbank{record}
+func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string) error {
+	records := []*massbank.MassBank2{record}
 	return p.AddRecords(records, metaDataId)
 }
 
 // AddRecords see [MB3Database.AddRecords]
-func (p *PostgresSQLDB) AddRecords(records []*massbank.Massbank, metaDataId string) error {
+func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId string) error {
 	if err := p.checkDatabase(); err != nil {
 		return err
 	}
@@ -377,13 +377,13 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.Massbank, metaDataId stri
 }
 
 // UpdateRecord see [MB3Database.UpdateRecord]
-func (p *PostgresSQLDB) UpdateRecord(record *massbank.Massbank, metaDataId string, upsert bool) (uint64, uint64, error) {
-	records := []*massbank.Massbank{record}
+func (p *PostgresSQLDB) UpdateRecord(record *massbank.MassBank2, metaDataId string, upsert bool) (uint64, uint64, error) {
+	records := []*massbank.MassBank2{record}
 	return p.UpdateRecords(records, metaDataId, upsert)
 }
 
 // UpdateRecords see [MB3Database.UpdateRecords]
-func (p *PostgresSQLDB) UpdateRecords(records []*massbank.Massbank, metaDataId string, upsert bool) (uint64, uint64, error) {
+func (p *PostgresSQLDB) UpdateRecords(records []*massbank.MassBank2, metaDataId string, upsert bool) (uint64, uint64, error) {
 	var err error
 	if err = p.checkDatabase(); err != nil {
 		return 0, 0, err
@@ -436,7 +436,7 @@ func (p *PostgresSQLDB) UpdateRecords(records []*massbank.Massbank, metaDataId s
 		if upsert {
 			res, err = stmt.Exec(r.Metadata.FileName, js, mid)
 		} else {
-			acc, _ := json.Marshal(r.Accession.String)
+			acc, _ := json.Marshal(r.Accession)
 			res, err = stmt.Exec(r.Metadata.FileName, js, mid, acc)
 		}
 		if err != nil {

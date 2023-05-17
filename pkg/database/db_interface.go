@@ -134,12 +134,12 @@ type MB3Database interface {
 	// GetRecord gets a single MassBank record by the Accession string.
 	// It should return nil and a [NotFoundError] if the record is not in the
 	// database.
-	GetRecord(*string) (*massbank.Massbank, error)
+	GetRecord(*string) (*massbank.MassBank2, error)
 
 	// GetRecords Get an array of MassBank records by filtering
 	//
 	// Will return an empty list if the filter does not match any records.
-	GetRecords(filters Filters) ([]*massbank.Massbank, int64, error)
+	GetRecords(filters Filters) ([]*massbank.MassBank2, int64, error)
 
 	// GetUniqueValues is used to get the values for filter frontend
 	GetUniqueValues(filters Filters) (MB3Values, error)
@@ -158,7 +158,7 @@ type MB3Database interface {
 	//
 	// The second parameter is the database id of the version information. You
 	// can get it from [UpdateMetadata].
-	AddRecord(record *massbank.Massbank, metaDataId string) error
+	AddRecord(record *massbank.MassBank2, metaDataId string) error
 
 	// AddRecords adds a list of MassBank records given as an array to the
 	// database. If one of the Accession ids  exists the  function should roll
@@ -166,7 +166,7 @@ type MB3Database interface {
 	//
 	// The second parameter is the database id of the version information. You
 	// can get it from [UpdateMetadata].
-	AddRecords(records []*massbank.Massbank, metaDataId string) error
+	AddRecords(records []*massbank.MassBank2, metaDataId string) error
 
 	// UpdateRecord will replace an existing MassBank record. Depending on the
 	// upsert parameter it also inserts the record if it not exists.
@@ -176,7 +176,7 @@ type MB3Database interface {
 	//
 	// This should return number of  modified and inserted records, but this is
 	// not implemented for all databases.
-	UpdateRecord(record *massbank.Massbank, metaDataId string, upsert bool) (uint64, uint64, error)
+	UpdateRecord(record *massbank.MassBank2, metaDataId string, upsert bool) (uint64, uint64, error)
 
 	// UpdateRecords will replace existing MassBank record. Depending on the
 	// upsert parameter it also inserts the record if it not exists. This should
@@ -187,5 +187,5 @@ type MB3Database interface {
 	//
 	// This should return number of  modified and inserted records, but this is
 	// not implemented for all databases.
-	UpdateRecords(records []*massbank.Massbank, metaDataId string, upsert bool) (uint64, uint64, error)
+	UpdateRecords(records []*massbank.MassBank2, metaDataId string, upsert bool) (uint64, uint64, error)
 }

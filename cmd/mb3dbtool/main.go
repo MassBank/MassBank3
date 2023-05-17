@@ -66,7 +66,7 @@ func main() {
 			println(err.Error())
 		}
 	}
-	var mbfiles []*massbank.Massbank
+	var mbfiles []*massbank.MassBank2
 	var versionData *massbank.MbMetaData
 	if len(userConfig.dataDir) > 0 {
 		mbfiles, versionData, err = readDirectoryData(userConfig.dataDir)
@@ -170,7 +170,7 @@ func getConfig() config {
 	return c
 }
 
-func readDirectoryData(dir string) ([]*massbank.Massbank, *massbank.MbMetaData, error) {
+func readDirectoryData(dir string) ([]*massbank.MassBank2, *massbank.MbMetaData, error) {
 	println("Reading files from directory " + dir + " ...")
 	filesNames, err := filepath.Glob(dir + "/**/*.txt")
 	if err != nil {
@@ -194,7 +194,7 @@ func readDirectoryData(dir string) ([]*massbank.Massbank, *massbank.MbMetaData, 
 			mbmeta.Commit = head.Hash().String()
 		}
 	}
-	var mbfiles = []*massbank.Massbank{}
+	var mbfiles = []*massbank.MassBank2{}
 	for _, name := range filesNames {
 		file, err := os.Open(name)
 		if err != nil {
@@ -206,7 +206,7 @@ func readDirectoryData(dir string) ([]*massbank.Massbank, *massbank.MbMetaData, 
 	return mbfiles, &mbmeta, nil
 }
 
-func readGitData(repo string, branch string) ([]*massbank.Massbank, *massbank.MbMetaData, error) {
+func readGitData(repo string, branch string) ([]*massbank.MassBank2, *massbank.MbMetaData, error) {
 	c := http.Client{}
 	var url = fmt.Sprintf("%v/archive/refs/heads/%v.zip", repo, branch)
 	println("Downloading file " + url)
@@ -223,7 +223,7 @@ func readGitData(repo string, branch string) ([]*massbank.Massbank, *massbank.Mb
 	if err != nil {
 		log.Panicln(err)
 	}
-	var mbfiles = []*massbank.Massbank{}
+	var mbfiles = []*massbank.MassBank2{}
 	var mbmeta = massbank.MbMetaData{Commit: zReader.Comment}
 	for _, zFile := range zReader.File {
 		if strings.HasSuffix(zFile.Name, "VERSION") {

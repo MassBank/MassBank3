@@ -149,7 +149,7 @@ func parseTimeWoErr(timeStr string) time.Time {
 	return t
 }
 
-var mbTestRecords = map[string]massbank.Massbank{
+var mbTestRecords = map[string]massbank.MassBank2{
 	"MSBNK-AAFC-AC000005": {
 		Metadata: struct {
 			FileName   string
