@@ -226,7 +226,6 @@ func (db *Mb3MongoDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 		return result, err
 	}
 	type MB3ValuesTemp struct {
-		CompoundStart  []MBCountValues
 		InstrumentType []MBCountValues
 		MSType         []MBCountValues
 		IonMode        []MBCountValues
@@ -238,7 +237,6 @@ func (db *Mb3MongoDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	var tempV MB3ValuesTemp
 	err = bson.Unmarshal(doc, &tempV)
 	result = MB3Values{
-		CompoundStart:  tempV.CompoundStart,
 		Contributor:    tempV.Contributor,
 		InstrumentType: tempV.InstrumentType,
 		MSType:         tempV.MSType,
@@ -692,16 +690,13 @@ func unmarshal2Massbank(err error, value *bson.M) (*massbank.MassBank2, error) {
 	if mb.Peak.Annotation != nil && reflect.DeepEqual(*mb.Peak.Annotation, massbank.PkAnnotation{}) {
 		mb.Peak.Annotation = nil
 	}
-	if *mb.Species.Name == "" {
+	if mb.Species.Name != nil && *mb.Species.Name == "" {
 		mb.Species.Name = nil
 	}
-	if mb.Species.Lineage == nil {
-		mb.Species.Lineage = nil
-	}
-	if *mb.Publication == "" {
+	if mb.Publication != nil && *mb.Publication == "" {
 		mb.Publication = nil
 	}
-	if *mb.Copyright == "" {
+	if mb.Copyright != nil && *mb.Copyright == "" {
 		mb.Copyright = nil
 	}
 	return &mb, err

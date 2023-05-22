@@ -496,7 +496,7 @@ func TestMB3Database_GetRecords(t *testing.T) {
 					len(got) != len(tt.want) {
 					gotNames := []string{}
 					for _, g := range got {
-						gotNames = append(gotNames, g.Accession.String)
+						gotNames = append(gotNames, *g.Accession)
 					}
 					t.Errorf("Limit was %d, expected %d records, but got %d records: %v", tt.args.Limit, len(tt.want), len(got), gotNames)
 				}
@@ -515,7 +515,7 @@ func compareDbResults(t *testing.T, want []*massbank.MassBank2, got []*massbank.
 		for _, g := range got {
 			g.Metadata.VersionRef = w.Metadata.VersionRef
 			bg, errg := json.Marshal(w)
-			if g.Accession.String == w.Accession.String {
+			if *g.Accession == *w.Accession {
 				found = true
 				if string(bg) != string(bw) || errg != nil || errw != nil {
 					t.Errorf("\nwant: %v \ngot : %v\n", string(bw), string(bg))
@@ -525,9 +525,9 @@ func compareDbResults(t *testing.T, want []*massbank.MassBank2, got []*massbank.
 		if found == false {
 			gotNames := []string{}
 			for _, g := range got {
-				gotNames = append(gotNames, g.Accession.String)
+				gotNames = append(gotNames, *g.Accession)
 			}
-			t.Errorf("Expected Accession %v to be in result but it was not found. Result was %v", w.Accession.String, gotNames)
+			t.Errorf("Expected Accession %v to be in result but it was not found. Result was %v", *w.Accession, gotNames)
 		}
 
 	}
@@ -844,7 +844,10 @@ func TestMB3Database_UpdateRecords(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				var records []*massbank.MassBank2
 				for _, r := range tt.args.records {
-					r.Comments = append(r.Comments, &massbank.RecordComment{SubtagProperty: massbank.SubtagProperty{StringProperty: massbank.StringProperty{String: "new comment"}}})
+					if r.Comments == nil {
+						r.Comments = &[]massbank.SubtagProperty{}
+					}
+					*r.Comments = append(*r.Comments, massbank.SubtagProperty{Value: "new comment"})
 					records = append(records, r)
 				}
 				_, _, err := db.db.UpdateRecords(records, tt.args.metaDataId, tt.args.upsert)

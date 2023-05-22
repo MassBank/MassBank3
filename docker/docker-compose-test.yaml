@@ -8,6 +8,12 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: "mbtestuser"
       MONGO_INITDB_ROOT_PASSWORD: "mbtestpwd"
+    healthcheck:
+      test: [ "CMD","mongosh", "--eval", "\"db.adminCommand('ping')\"" ]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 40s
   testpostgres:
     image: postgres:latest
     restart: always
@@ -15,6 +21,12 @@ services:
       POSTGRES_PASSWORD: "mbtestpwd"
       POSTGRES_USER:     "mbtestuser"
       POSTGRES_DB:       "mbtestdb"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "${POSTGRES_DB_NAME}","-U", "${POSTGRES_USER}" ]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 40s
   mb3server:
     build: ../
   mb3test:
@@ -24,5 +36,7 @@ services:
     volumes:
       - ./testout:/go/src/out
     depends_on:
-      - testmongo
-      - testpostgres
+      testpostgres:
+        condition: service_healthy
+      testmongo:
+        condition: service_healthy

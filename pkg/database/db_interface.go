@@ -93,7 +93,6 @@ type MBMinMaxValues struct {
 }
 
 type MB3Values struct {
-	CompoundStart  []MBCountValues
 	Contributor    []MBCountValues
 	InstrumentType []MBCountValues
 	MSType         []MBCountValues
