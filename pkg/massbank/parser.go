@@ -26,10 +26,18 @@ func getDatabaseProperty(s string) (*DatabaseProperty, error) {
 	return &db, nil
 }
 
-func getSubtagProperty(s string) (*SubtagProperty, error) {
+func getSubtagProperty(s string, tagname string) (*SubtagProperty, error) {
 	p := SubtagProperty{}
 	ss := strings.SplitN(s, " ", 2)
-	if len(ss) > 1 {
+	if tagname == "COMMENT" {
+		if len(ss) > 1 && contains(commentSubtagList, strings.TrimSpace(ss[0])) {
+
+			p.Subtag = ss[0]
+			p.Value = ss[1]
+		} else {
+			p.Value = s
+		}
+	} else if len(ss) > 1 {
 		p.Subtag = ss[0]
 		p.Value = ss[1]
 	} else {
@@ -78,19 +86,20 @@ func getRecordDate(s string) (*RecordDate, error) {
 
 }
 
-func (p *RecordDeprecated) Parse(s string) error {
+func getDeprecated(s string) (*RecordDeprecated, error) {
 	var err error
+	dp := RecordDeprecated{}
 	ss := strings.SplitN(s, " ", 2)
 	if len(ss) > 0 {
-		if p.Date, err = time.Parse(deprecatedDateFormat, ss[0]); err != nil {
-			return errors.New("Format error in Date: " + err.Error())
+		if dp.Date, err = time.Parse(deprecatedDateFormat, ss[0]); err != nil {
+			return nil, errors.New("Format error in Date: " + err.Error())
 		}
 		if len(ss) > 1 {
-			p.Reason = ss[1]
+			dp.Reason = ss[1]
 		}
-		return nil
+		return &dp, nil
 	}
-	return errors.New("could not parse DEPRECATED tag")
+	return nil, errors.New("could not parse DEPRECATED tag")
 }
 
 func getRecordAuthornames(s string) (*[]RecordAuthorName, error) {
@@ -110,15 +119,16 @@ func getRecordAuthornames(s string) (*[]RecordAuthorName, error) {
 	return &rn, nil
 }
 
-func (p *PkPeak) Parse(s string) error {
+func getPeaks(s string) (*PkPeak, error) {
+	p := PkPeak{}
 	if s != "m/z int. rel.int." {
-		return errors.New("PK$ is not valid")
+		return nil, errors.New("PK$ is not valid")
 	}
 	p.Header = strings.Split(s, " ")
 	p.Mz = []float64{}
 	p.Intensity = []float64{}
 	p.Rel = []uint{}
-	return nil
+	return &p, nil
 }
 
 func getAnnotions(s string) (*PkAnnotation, error) {
@@ -248,6 +258,9 @@ func (mb *MassBank2) addValue(tagname string, value string, lineNum int) error {
 	case reflect.Float64:
 		f, _ := strconv.ParseFloat(value, 64)
 		newProperty.Elem().SetFloat(f)
+	case reflect.Uint:
+		i, _ := strconv.ParseUint(value, 10, 32)
+		newProperty.Elem().SetUint(i)
 	case reflect.Struct:
 		switch propertyElement {
 		case reflect.TypeOf(RecordDate{}):
@@ -259,6 +272,12 @@ func (mb *MassBank2) addValue(tagname string, value string, lineNum int) error {
 		case reflect.TypeOf(PkAnnotation{}):
 			pa, _ := getAnnotions(value)
 			property.Set(reflect.ValueOf(pa))
+		case reflect.TypeOf(PkPeak{}):
+			pk, _ := getPeaks(value)
+			property.Set(reflect.ValueOf(pk))
+		case reflect.TypeOf(RecordDeprecated{}):
+			dp, _ := getDeprecated(value)
+			property.Set(reflect.ValueOf(dp))
 		default:
 			fmt.Printf("Found unhandled struct: %s\n", propertyElement.Name())
 		}
@@ -273,7 +292,7 @@ func (mb *MassBank2) addValue(tagname string, value string, lineNum int) error {
 			rn, _ := getRecordAuthornames(value)
 			property.Set(reflect.ValueOf(rn))
 		case reflect.TypeOf(SubtagProperty{}):
-			st, _ := getSubtagProperty(value)
+			st, _ := getSubtagProperty(value, tagname)
 			if property.Elem().Kind() == reflect.Invalid {
 				property.Set(reflect.New(propertyElement))
 			}

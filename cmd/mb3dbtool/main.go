@@ -198,9 +198,11 @@ func readDirectoryData(dir string) ([]*massbank.MassBank2, *massbank.MbMetaData,
 	for _, name := range filesNames {
 		file, err := os.Open(name)
 		if err != nil {
+			println(err.Error())
 			return nil, nil, err
 		}
 		mb, err := massbank.ScanMbFile(file, name)
+		file.Close()
 		mbfiles = append(mbfiles, mb)
 	}
 	return mbfiles, &mbmeta, nil
