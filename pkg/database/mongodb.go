@@ -58,11 +58,8 @@ func (db *Mb3MongoDB) GetUniqueValues(filters Filters) (MB3Values, error) {
     { "$facet": {
 		"Contributor": [
     {
-        "$project": { "_id": 0, "cont": {"$arrayElemAt":[ {"$split": [ "$accession","-"]}, 1]} }
-    },
-    {
         "$group": {
-            "_id": "$cont",
+            "_id": "$contributor",
             "Count": {"$sum": 1}
         },
     },
@@ -213,7 +210,7 @@ func (db *Mb3MongoDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	if err := bson2.UnmarshalJSON([]byte(query), &bdoc); err != nil {
 		return result, err
 	}
-	cur, err := db.database.Collection(mbCollection).Aggregate(context.Background(), bdoc)
+	cur, err := db.database.Collection(mbCollection).Aggregate(context.Background(), bdoc, &options.AggregateOptions{Collation: &options.Collation{Locale: "en"}})
 	if err != nil {
 		return result, err
 	}

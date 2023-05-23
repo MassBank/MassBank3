@@ -1,7 +1,8 @@
-FROM golang:1.19 AS build
+FROM docker.io/golang:1.20 AS build
 WORKDIR /go/src
 COPY cmd/mb3server/src ./cmd/mb3server/src
 COPY cmd/mb3server/main.go ./cmd/mb3server
+COPY pkg ./pkg
 COPY go.mod .
 
 ENV CGO_ENABLED=0

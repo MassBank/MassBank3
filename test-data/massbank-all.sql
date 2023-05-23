@@ -148,6 +148,7 @@ values ('/MassBank-data/AAFC/MSBNK-AAFC-AC000005.txt', '{
     "VersionRef": ""
   },
   "Accession": "MSBNK-AAFC-AC000005",
+  "Contributor": "AAFC",
   "Copyright": "Copyright (C) 2017",
   "Deprecated": null,
   "Acquisition": {
@@ -404,6 +405,7 @@ values ('/MassBank-data/Athens_Univ/MSBNK-Athens_Univ-AU229201.txt', '{
     "VersionRef": ""
   },
   "Accession": "MSBNK-Athens_Univ-AU229201",
+  "Contributor": "Athens_Univ",
   "Copyright": "Copyright (C) 2019 Department of Chemistry, University of Athens",
   "Deprecated": null,
   "Acquisition": {
@@ -660,6 +662,7 @@ values ('/MassBank-data/Eawag/MSBNK-Eawag-EA018353.txt', '{
     "VersionRef": ""
   },
   "Accession": "MSBNK-Eawag-EA018353",
+  "Contributor": "Eawag",
   "Copyright": "Copyright (C) 2012 Eawag, Duebendorf, Switzerland",
   "Deprecated": null,
   "Acquisition": {
@@ -951,6 +954,7 @@ values ('/MassBank-data/Eawag_Additional_Specs/MSBNK-Eawag_Additional_Specs-ET06
     "VersionRef": ""
   },
   "Accession": "MSBNK-Eawag_Additional_Specs-ET060401",
+  "Contributor": "Eawag_Additional_Specs",
   "Copyright": "Copyright (C) 2016 Eawag, Duebendorf, Switzerland",
   "Deprecated": null,
   "Acquisition": {
@@ -1244,6 +1248,7 @@ values ('/MassBank-data/Fac_Eng_Univ_Tokyo/MSBNK-Fac_Eng_Univ_Tokyo-JP009132.txt
     "VersionRef": ""
   },
   "Accession": "MSBNK-Fac_Eng_Univ_Tokyo-JP009132",
+  "Contributor": "Fac_Eng_Univ_Tokyo",
   "Copyright": null,
   "Deprecated": null,
   "Acquisition": {
@@ -1495,6 +1500,7 @@ values ('/MassBank-data/Keio_Univ/MSBNK-Keio_Univ-KO009105.txt', '{
     "VersionRef": ""
   },
   "Accession": "MSBNK-Keio_Univ-KO009105",
+  "Contributor": "Keio_Univ",
   "Copyright": null,
   "Deprecated": null,
   "Acquisition": {
@@ -1678,6 +1684,7 @@ values ('/MassBank-data/MSSJ/MSBNK-MSSJ-MSJ00284.txt', '{
     "VersionRef": ""
   },
   "Accession": "MSBNK-MSSJ-MSJ00284",
+  "Contributor": "MSSJ",
   "Copyright": "Atsushi Yamamoto, Faculty of Environmental Studies, Tottori University of Environmental Studies, 1-1, Wakabadai-kita, Tottori City, Tottori 689-1111, Japan.",
   "Deprecated": null,
   "Acquisition": {
@@ -1865,6 +1872,7 @@ values ('/MassBank-data/RIKEN/MSBNK-RIKEN-PR100978.txt', '{
     "VersionRef": ""
   },
   "Accession": "MSBNK-RIKEN-PR100978",
+  "Contributor": "RIKEN",
   "Copyright": null,
   "Deprecated": null,
   "Acquisition": {
@@ -2054,6 +2062,7 @@ values ('/MassBank-data/RIKEN/MSBNK-RIKEN-PR309089.txt', '{
     "VersionRef": ""
   },
   "Accession": "MSBNK-RIKEN-PR309089",
+  "Contributor": "RIKEN",
   "Copyright": null,
   "Deprecated": null,
   "Acquisition": {
@@ -2238,6 +2247,7 @@ values ('/MassBank-data/Washington_State_Univ/MSBNK-Washington_State_Univ-BML819
     "VersionRef": ""
   },
   "Accession": "MSBNK-Washington_State_Univ-BML81902",
+  "Contributor": "Washington_State_Univ",
   "Copyright": null,
   "Deprecated": null,
   "Acquisition": {
@@ -2376,6 +2386,7 @@ VALUES ('/MassBank3/test-data/MSBNK-test-TST00001.txt', '{
     "VersionRef": ""
   },
   "Accession": "MSBNK-test-TST00001",
+  "Contributor": "test",
   "Copyright": null,
   "Deprecated": null,
   "Acquisition": {
@@ -2816,6 +2827,7 @@ VALUES ('/MassBank3/test-data/MSBNK-test-TST00002.txt', '{
     "VersionRef": ""
   },
   "Accession": "MSBNK-test-TST00002",
+  "Contributor": "test",
   "Copyright": "Copyright (C) 2019 just a test",
   "Deprecated": null,
   "Acquisition": {
@@ -3102,6 +3114,7 @@ VALUES ('/MassBank3/test-data/MSBNK-test-TST00003.txt', '{
     "VersionRef": ""
   },
   "Accession": "MSBNK-test-TST00003",
+  "Contributor": "test",
   "Copyright": "Copyright (C) 2019, Leibniz Institut fuer Analytische Wissenschaften - ISAS - e.V., Dortmund, Germany",
   "Deprecated": {
     "Date": "2019-11-25T00:00:00Z",

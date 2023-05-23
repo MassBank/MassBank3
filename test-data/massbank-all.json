@@ -10,6 +10,7 @@
       }
     },
     "accession": "MSBNK-AAFC-AC000005",
+    "contributor": "AAFC",
     "deprecated": null,
     "recordtitle": "Mellein; LC-ESI-ITFT; MS2; CE: 50; R=17500; [M+H]+",
     "date": {
@@ -272,6 +273,7 @@
       }
     },
     "accession": "MSBNK-Athens_Univ-AU229201",
+    "contributor": "Athens_Univ",
     "deprecated": null,
     "recordtitle": "2-Amino-3,8-dimethylimidazo-[4,5-f]quinoxaline (MeIQx); LC-ESI-QTOF; MS2; CE: 10 eV; R=35000; [M+H]+",
     "date": {
@@ -528,6 +530,7 @@
       }
     },
     "accession": "MSBNK-Eawag-EA018353",
+    "contributor": "Eawag",
     "deprecated": null,
     "recordtitle": "Sulfadimethoxine; LC-ESI-ITFT; MS2; CE: 30%; R=7500; [M-H]-",
     "date": {
@@ -803,6 +806,7 @@
       }
     },
     "accession": "MSBNK-Eawag_Additional_Specs-ET060401",
+    "contributor": "Eawag_Additional_Specs",
     "deprecated": null,
     "recordtitle": "FEN_246.1101_16.1; LC-ESI-QFT; MS2; CE: 15; R=17500; [M+H]+",
     "date": {
@@ -1100,6 +1104,7 @@
       }
     },
     "accession": "MSBNK-Fac_Eng_Univ_Tokyo-JP009132",
+    "contributor": "Fac_Eng_Univ_Tokyo",
     "deprecated": null,
     "recordtitle": "METHYL PHENYL SULFIDE; EI-B; MS",
     "date": {
@@ -1345,6 +1350,7 @@
       }
     },
     "accession": "MSBNK-Keio_Univ-KO009105",
+    "contributor": "Keio_Univ",
     "deprecated": null,
     "recordtitle": "Desthiobiotin; LC-ESI-IT; MS4; m/z: 215/197/179; [M+H]+",
     "date": {
@@ -1617,6 +1623,7 @@
       }
     },
     "accession": "MSBNK-MSSJ-MSJ00284",
+    "contributor": "MSSJ",
     "deprecated": null,
     "recordtitle": "Pentoxazone; ESI-QTOF; MS2; NEGATIVE; [M-H]-; CID; 60 V",
     "date": {
@@ -1815,6 +1822,7 @@
       }
     },
     "accession": "MSBNK-RIKEN-PR100978",
+    "contributor": "RIKEN",
     "deprecated": null,
     "recordtitle": "Quercetin-3-Glucuronide; LC-ESI-QTOF; MS2; CE:Ramp 5-60 V; [M-H]-",
     "date": {
@@ -2045,6 +2053,7 @@
       }
     },
     "accession": "MSBNK-RIKEN-PR309089",
+    "contributor": "RIKEN",
     "deprecated": null,
     "recordtitle": "FA 18:2+1O; LC-ESI-QTOF; MS2",
     "date": {
@@ -2250,6 +2259,7 @@
       }
     },
     "accession": "MSBNK-Washington_State_Univ-BML81902",
+    "contributor": "Washington_State_Univ",
     "deprecated": null,
     "recordtitle": "Parthenolide; LC-APCI-QTOF; MS; POSITIVE",
     "date": {
@@ -2420,6 +2430,7 @@
       }
     },
     "accession": "MSBNK-test-TST00001",
+    "contributor": "test",
     "recordtitle": "Fiscalin C; LC-ESI-ITFT; MS2; CE: 30; R=17500; [M+H]+",
     "date": {
       "updated": {
@@ -2535,6 +2546,7 @@
       }
     },
     "accession": "MSBNK-test-TST00002",
+    "contributor": "test",
     "recordtitle": "Disialoganglioside GD1a; MALDI-TOF; MS; Pos",
     "date": {
       "updated": {
@@ -3058,6 +3070,7 @@
       }
     },
     "accession": "MSBNK-test-TST00003",
+    "contributor": "test",
     "deprecated": {
       "date": {
         "$date": "2019-11-25T00:00:00Z"

@@ -155,14 +155,12 @@ func toPtr[T any](v T) *T {
 
 var mbTestRecords = map[string]massbank.MassBank2{
 	"MSBNK-AAFC-AC000005": {
-		Metadata: struct {
-			FileName   string
-			VersionRef massbank.MbReference
-		}{
+		Metadata: massbank.Metadata{
 			FileName:   "/MassBank-data/AAFC/MSBNK-AAFC-AC000005.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession:   toPtr("MSBNK-AAFC-AC000005"),
+		Contributor: toPtr("AAFC"),
 		Deprecated:  nil,
 		RecordTitle: toPtr("Mellein; LC-ESI-ITFT; MS2; CE: 50; R=17500; [M+H]+"),
 		Date: &massbank.RecordDate{
@@ -432,14 +430,12 @@ var mbTestRecords = map[string]massbank.MassBank2{
 	},
 
 	"MSBNK-Athens_Univ-AU229201": {
-		Metadata: struct {
-			FileName   string
-			VersionRef massbank.MbReference
-		}{
+		Metadata: massbank.Metadata{
 			FileName:   "/MassBank-data/Athens_Univ/MSBNK-Athens_Univ-AU229201.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession:   toPtr("MSBNK-Athens_Univ-AU229201"),
+		Contributor: toPtr("Athens_Univ"),
 		Deprecated:  nil,
 		RecordTitle: toPtr("2-Amino-3,8-dimethylimidazo-[4,5-f]quinoxaline (MeIQx); LC-ESI-QTOF; MS2; CE: 10 eV; R=35000; [M+H]+"),
 		Date: &massbank.RecordDate{
@@ -684,14 +680,12 @@ var mbTestRecords = map[string]massbank.MassBank2{
 		},
 	},
 	"MSBNK-Eawag-EA018353": {
-		Metadata: struct {
-			FileName   string
-			VersionRef massbank.MbReference
-		}{
+		Metadata: massbank.Metadata{
 			FileName:   "/MassBank-data/Eawag/MSBNK-Eawag-EA018353.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession:   toPtr("MSBNK-Eawag-EA018353"),
+		Contributor: toPtr("Eawag"),
 		Deprecated:  nil,
 		RecordTitle: toPtr("Sulfadimethoxine; LC-ESI-ITFT; MS2; CE: 30%; R=7500; [M-H]-"),
 		Date: &massbank.RecordDate{
@@ -955,14 +949,12 @@ var mbTestRecords = map[string]massbank.MassBank2{
 		},
 	},
 	"MSBNK-Eawag_Additional_Specs-ET060401": {
-		Metadata: struct {
-			FileName   string
-			VersionRef massbank.MbReference
-		}{
+		Metadata: massbank.Metadata{
 			FileName:   "/MassBank-data/Eawag_Additional_Specs/MSBNK-Eawag_Additional_Specs-ET060401.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession:   toPtr("MSBNK-Eawag_Additional_Specs-ET060401"),
+		Contributor: toPtr("Eawag_Additional_Specs"),
 		Deprecated:  nil,
 		RecordTitle: toPtr("FEN_246.1101_16.1; LC-ESI-QFT; MS2; CE: 15; R=17500; [M+H]+"),
 		Date: &massbank.RecordDate{
@@ -1250,14 +1242,12 @@ var mbTestRecords = map[string]massbank.MassBank2{
 		},
 	},
 	"MSBNK-Fac_Eng_Univ_Tokyo-JP009132": {
-		Metadata: struct {
-			FileName   string
-			VersionRef massbank.MbReference
-		}{
+		Metadata: massbank.Metadata{
 			FileName:   "/MassBank-data/Fac_Eng_Univ_Tokyo/MSBNK-Fac_Eng_Univ_Tokyo-JP009132.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession:   toPtr("MSBNK-Fac_Eng_Univ_Tokyo-JP009132"),
+		Contributor: toPtr("Fac_Eng_Univ_Tokyo"),
 		Deprecated:  nil,
 		RecordTitle: toPtr("METHYL PHENYL SULFIDE; EI-B; MS"),
 		Date: &massbank.RecordDate{
@@ -1448,14 +1438,12 @@ var mbTestRecords = map[string]massbank.MassBank2{
 		},
 	},
 	"MSBNK-Keio_Univ-KO009105": {
-		Metadata: struct {
-			FileName   string
-			VersionRef massbank.MbReference
-		}{
+		Metadata: massbank.Metadata{
 			FileName:   "/MassBank-data/Keio_Univ/MSBNK-Keio_Univ-KO009105.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession:   toPtr("MSBNK-Keio_Univ-KO009105"),
+		Contributor: toPtr("Keio_Univ"),
 		Deprecated:  nil,
 		RecordTitle: toPtr("Desthiobiotin; LC-ESI-IT; MS4; m/z: 215/197/179; [M+H]+"),
 		Date: &massbank.RecordDate{
@@ -1714,14 +1702,12 @@ var mbTestRecords = map[string]massbank.MassBank2{
 		},
 	},
 	"MSBNK-MSSJ-MSJ00284": {
-		Metadata: struct {
-			FileName   string
-			VersionRef massbank.MbReference
-		}{
+		Metadata: massbank.Metadata{
 			FileName:   "/MassBank-data/MSSJ/MSBNK-MSSJ-MSJ00284.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession:   toPtr("MSBNK-MSSJ-MSJ00284"),
+		Contributor: toPtr("MSSJ"),
 		Deprecated:  nil,
 		RecordTitle: toPtr("Pentoxazone; ESI-QTOF; MS2; NEGATIVE; [M-H]-; CID; 60 V"),
 		Date: &massbank.RecordDate{
@@ -1905,14 +1891,12 @@ var mbTestRecords = map[string]massbank.MassBank2{
 		},
 	},
 	"MSBNK-RIKEN-PR100978": {
-		Metadata: struct {
-			FileName   string
-			VersionRef massbank.MbReference
-		}{
+		Metadata: massbank.Metadata{
 			FileName:   "/MassBank-data/RIKEN/MSBNK-RIKEN-PR100978.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession:   toPtr("MSBNK-RIKEN-PR100978"),
+		Contributor: toPtr("RIKEN"),
 		Deprecated:  nil,
 		RecordTitle: toPtr("Quercetin-3-Glucuronide; LC-ESI-QTOF; MS2; CE:Ramp 5-60 V; [M-H]-"),
 		Date: &massbank.RecordDate{
@@ -2133,14 +2117,12 @@ var mbTestRecords = map[string]massbank.MassBank2{
 		},
 	},
 	"MSBNK-RIKEN-PR309089": {
-		Metadata: struct {
-			FileName   string
-			VersionRef massbank.MbReference
-		}{
+		Metadata: massbank.Metadata{
 			FileName:   "/MassBank-data/RIKEN/MSBNK-RIKEN-PR309089.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession:   toPtr("MSBNK-RIKEN-PR309089"),
+		Contributor: toPtr("RIKEN"),
 		Deprecated:  nil,
 		RecordTitle: toPtr("FA 18:2+1O; LC-ESI-QTOF; MS2"),
 		Date: &massbank.RecordDate{
@@ -2332,14 +2314,13 @@ var mbTestRecords = map[string]massbank.MassBank2{
 		},
 	},
 	"MSBNK-Washington_State_Univ-BML81902": {
-		Metadata: struct {
-			FileName   string
-			VersionRef massbank.MbReference
-		}{
+		Metadata: massbank.Metadata{
+
 			FileName:   "/MassBank-data/Washington_State_Univ/MSBNK-Washington_State_Univ-BML81902.txt",
 			VersionRef: "63f38e47dc8c761f4af1ad51",
 		},
 		Accession:   toPtr("MSBNK-Washington_State_Univ-BML81902"),
+		Contributor: toPtr("Washington_State_Univ"),
 		Deprecated:  nil,
 		RecordTitle: toPtr("Parthenolide; LC-APCI-QTOF; MS; POSITIVE"),
 		Date: &massbank.RecordDate{
@@ -2495,14 +2476,12 @@ var mbTestRecords = map[string]massbank.MassBank2{
 		},
 	},
 	"MSBNK-test-TST00001": {
-		Metadata: struct {
-			FileName   string
-			VersionRef massbank.MbReference
-		}{
+		Metadata: massbank.Metadata{
 			FileName:   "/MassBank3/test-data/MSBNK-test-TST00001.txt",
 			VersionRef: "63f50065841fc1dec65402fe",
 		},
 		Accession:   toPtr("MSBNK-test-TST00001"),
+		Contributor: toPtr("test"),
 		Deprecated:  nil,
 		RecordTitle: toPtr("Fiscalin C; LC-ESI-ITFT; MS2; CE: 30; R=17500; [M+H]+"),
 		Date: &massbank.RecordDate{
@@ -2605,14 +2584,12 @@ var mbTestRecords = map[string]massbank.MassBank2{
 		},
 	},
 	"MSBNK-test-TST00002": {
-		Metadata: struct {
-			FileName   string
-			VersionRef massbank.MbReference
-		}{
+		Metadata: massbank.Metadata{
 			FileName:   "/MassBank3/test-data/MSBNK-test-TST00002.txt",
 			VersionRef: "63f50065841fc1dec65402fe",
 		},
 		Accession:   toPtr("MSBNK-test-TST00002"),
+		Contributor: toPtr("test"),
 		Deprecated:  nil,
 		RecordTitle: toPtr("Disialoganglioside GD1a; MALDI-TOF; MS; Pos"),
 		Date: &massbank.RecordDate{
@@ -3043,14 +3020,12 @@ var mbTestRecords = map[string]massbank.MassBank2{
 		},
 	},
 	"MSBNK-test-TST00003": {
-		Metadata: struct {
-			FileName   string
-			VersionRef massbank.MbReference
-		}{
+		Metadata: massbank.Metadata{
 			FileName:   "/MassBank3/test-data/MSBNK-test-TST00003.txt",
 			VersionRef: "63f50065841fc1dec65402fe",
 		},
-		Accession: toPtr("MSBNK-test-TST00003"),
+		Accession:   toPtr("MSBNK-test-TST00003"),
+		Contributor: toPtr("test"),
 		Deprecated: &massbank.RecordDeprecated{
 			Date:   parseTimeWoErr("2019-11-25T00:00:00Z"),
 			Reason: "Wrong MS measurement assigned",
@@ -3249,8 +3224,8 @@ var UniqueValueTestData = map[string]MB3Values{
 			{"Keio_Univ", 1},
 			{"MSSJ", 1},
 			{"RIKEN", 2},
-			{"Washington_State_Univ", 1},
 			{"test", 3},
+			{"Washington_State_Univ", 1},
 		},
 		[]MBCountValues{
 			{

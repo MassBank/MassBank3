@@ -191,7 +191,7 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.MassBank2, int6
 		where.And("document->'Peak'->>'Splash' = ?", filters.Splash)
 	}
 	if filters.CompoundName != "" {
-		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Compound'->'name') name WHERE name ILIKE ?)", "%"+filters.CompoundName+"%")
+		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Compound'->'name') name WHERE name::text ILIKE ?)", "%"+filters.CompoundName+"%")
 	}
 	if filters.Formula != "" {
 		where.And("document->'Compound'->>'formula' ILIKE ?", "%"+filters.Formula+"%")
@@ -243,7 +243,8 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.MassBank2, int6
 // GetUniqueValues see [MB3Database.GetUniqueValues]
 func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	var query = `
-SELECT to_json(it) as instrument_type,
+SELECT to_json(co) as contributor,
+       to_json(it) as instrument_type,
        to_json(mt) as ms_type,
        to_json(im) as ion_mode,
        mass.maxm   as max_mass,
@@ -253,6 +254,11 @@ SELECT to_json(it) as instrument_type,
        i.maxi      as max_intensity,
        i.mini      as min_intensity
 FROM (SELECT ARRAY(SELECT t
+                   FROM (SELECT document ->> 'Contributor' as val,
+                                count(id)
+                         from massbank
+                         GROUP BY document ->> 'Contributor' ORDER BY document ->> 'Contributor') t)) as co,
+    (SELECT ARRAY(SELECT t
                    FROM (SELECT document -> 'Acquisition' ->> 'InstrumentType' as val,
                                 count(id)
                          from massbank
@@ -261,7 +267,7 @@ FROM (SELECT ARRAY(SELECT t
                    FROM (select t.ms ->> 'Value' as val, count(t.ms)
                          FROM (Select jsonb_array_elements(document -> 'Acquisition' -> 'MassSpectrometry') as ms
                                from massbank) t
-                         where ms ->> 'Value' = 'MS_TYPE'
+                         where ms ->> 'Subtag' = 'MS_TYPE'
                          GROUP BY t.ms ORDER BY t.ms) t)) as mt,
      (SELECT ARRAY(SELECT t
                    FROM (select t.ms ->> 'Value' as val, count(t.ms)
@@ -279,10 +285,12 @@ FROM (SELECT ARRAY(SELECT t
             FROM massbank) t) as i`
 	var val MB3Values
 	row := p.database.QueryRow(query)
+	cojs := make([]uint8, 0)
 	itjs := make([]uint8, 0)
 	mtjs := make([]uint8, 0)
 	imjs := make([]uint8, 0)
 	err := row.Scan(
+		&cojs,
 		&itjs,
 		&mtjs,
 		&imjs,
@@ -293,6 +301,8 @@ FROM (SELECT ARRAY(SELECT t
 		&val.Intensity.Max,
 		&val.Intensity.Min)
 	var rit = struct{ Array []MBCountValues }{}
+	json.Unmarshal(cojs, &rit)
+	val.Contributor = append(val.Contributor, rit.Array...)
 	json.Unmarshal(itjs, &rit)
 	val.InstrumentType = append(val.InstrumentType, rit.Array...)
 	json.Unmarshal(mtjs, &rit)

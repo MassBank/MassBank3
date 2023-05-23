@@ -43,6 +43,10 @@ func ScanMbFile(mb2Reader io.Reader, fileName string) (*MassBank2, error) {
 			log.Printf("Error in file %s, line %v:\n %s", fileName, lineNum, err)
 		}
 	}
+	if mb.Accession != nil {
+		c := strings.Split(*mb.Accession, "-")[1]
+		mb.Contributor = &c
+	}
 	return &mb, nil
 }
 
@@ -66,13 +70,13 @@ func getSubtagProperty(s string, tagname string) (*SubtagProperty, error) {
 	ss := strings.SplitN(s, " ", 2)
 	if tagname == "COMMENT" {
 		if len(ss) > 1 && contains(commentSubtagList, strings.TrimSpace(ss[0])) {
-			p.Key = ss[0]
+			p.Subtag = ss[0]
 			p.Value = ss[1]
 		} else {
 			p.Value = s
 		}
 	} else if len(ss) > 1 {
-		p.Key = ss[0]
+		p.Subtag = ss[0]
 		p.Value = ss[1]
 	} else {
 		return nil, errors.New("Key error: " + s)

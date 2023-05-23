@@ -1,12 +1,8 @@
 package massbank
 
 import (
-	"reflect"
 	"time"
 )
-
-const dateFormat = "2006.01.02"
-const deprecatedDateFormat = "2006-01-02"
 
 type MbMetaData struct {
 	Commit    string
@@ -64,12 +60,15 @@ type PeakProperties struct {
 	Peak       *PkPeak       `mb2:"PK$PEAK"`
 }
 
+type Metadata struct {
+	FileName   string
+	VersionRef string
+}
+
 type MassBank2 struct {
-	Metadata struct {
-		FileName   string
-		VersionRef MbReference
-	}
-	Accession        *string                `mb2:"ACCESSION"`
+	Metadata         Metadata
+	Accession        *string `mb2:"ACCESSION"`
+	Contributor      *string
 	Deprecated       *RecordDeprecated      `mb2:"DEPRECATED" optional:"true" bson:"deprecated,omitempty"`
 	RecordTitle      *string                `mb2:"RECORD_TITLE"`
 	Date             *RecordDate            `mb2:"DATE"`

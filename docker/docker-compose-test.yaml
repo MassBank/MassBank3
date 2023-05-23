@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   testmongo:
-    image: mongo:latest
+    image: docker.io/mongo:latest
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: "mbtestuser"
@@ -15,7 +15,7 @@ services:
       retries: 5
       start_period: 40s
   testpostgres:
-    image: postgres:latest
+    image: docker.io/postgres:latest
     restart: always
     environment:
       POSTGRES_PASSWORD: "mbtestpwd"
