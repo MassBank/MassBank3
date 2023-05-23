@@ -14,10 +14,10 @@ jobs:
   build:
     strategy:
       matrix:
-        mongodb-version: ['6.0','5.0']
+        mongodb-version: ['6.0']
         os: [ 'ubuntu-22.04', 'ubuntu-20.04']
-        postgres-images: [ 'postgres:latest','postgres:14']
-        go-version: ['1.20','1.19']
+        postgres-images: [ 'postgres:latest']
+        go-version: ['1.20']
     runs-on: ${{ matrix.os }}
 
     services:
