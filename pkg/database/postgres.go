@@ -151,7 +151,7 @@ func (p *PostgresSQLDB) DropAllRecords() error {
 func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	var result massbank.MassBank2
 	var b []byte
-	if err := p.database.QueryRow("SELECT document FROM massbank WHERE document->'Accession'->>'String' = $1", *s).Scan(&b); err != nil {
+	if err := p.database.QueryRow("SELECT document FROM massbank WHERE document->>'Accession' = $1", *s).Scan(&b); err != nil {
 		return nil, err
 	}
 	var err = json.Unmarshal(b, &result)
@@ -172,32 +172,32 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.MassBank2, int6
 
 	where := bqb.Optional("WHERE")
 	if filters.InstrumentType != nil {
-		where.And("document->'Acquisition'->'InstrumentType'->>'String' IN (?)", *filters.InstrumentType)
+		where.And("document->'Acquisition'->>'InstrumentType' IN (?)", *filters.InstrumentType)
 	}
 	if filters.MsType != nil {
 		var msTypes []string
 		for _, ms := range *filters.MsType {
 			msTypes = append(msTypes, ms.String())
 		}
-		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Acquisition'->'MassSpectrometry') ms WHERE ms->>'Key' = 'MS_TYPE' AND ms->>'String' IN (?))", msTypes)
+		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Acquisition'->'MassSpectrometry') ms WHERE ms->>'Subtag' = 'MS_TYPE' AND ms->>'Value' IN (?))", msTypes)
 	}
 	if filters.IonMode != massbank.ANY {
-		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Acquisition'->'MassSpectrometry') ms WHERE ms->>'Key' = 'ION_MODE' AND ms->>'String' = ?)", string(filters.IonMode))
+		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Acquisition'->'MassSpectrometry') ms WHERE ms->>'Subtag' = 'ION_MODE' AND ms->>'Value' = ?)", string(filters.IonMode))
 	}
 	if filters.Mass != nil {
-		where.And("(document->'Compound'->'mass'->>'Value')::float BETWEEN ? AND ?", *filters.Mass-*filters.MassEpsilon, *filters.Mass+*filters.MassEpsilon)
+		where.And("(document->'Compound'->>'mass')::float BETWEEN ? AND ?", *filters.Mass-*filters.MassEpsilon, *filters.Mass+*filters.MassEpsilon)
 	}
 	if filters.Splash != "" {
-		where.And("document->'Peak'->'Splash'->>'String' = ?", filters.Splash)
+		where.And("document->'Peak'->>'Splash' = ?", filters.Splash)
 	}
 	if filters.CompoundName != "" {
-		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Compound'->'name') name WHERE name->>'String' ILIKE ?)", "%"+filters.CompoundName+"%")
+		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Compound'->'name') name WHERE name ILIKE ?)", "%"+filters.CompoundName+"%")
 	}
 	if filters.Formula != "" {
-		where.And("document->'Compound'->'formula'->>'String' ILIKE ?", "%"+filters.Formula+"%")
+		where.And("document->'Compound'->>'formula' ILIKE ?", "%"+filters.Formula+"%")
 	}
 	if filters.Contributor != "" {
-		where.And("document->'Accession'->>'String' ILIKE ?", "%"+filters.Contributor+"%")
+		where.And("document->>'Accession' ILIKE ?", "%"+filters.Contributor+"%")
 	}
 	if filters.InchiKey != "" {
 		where.And("jsonb_typeof(document->'Compound'->'link') = 'array' AND EXISTS (SELECT * FROM jsonb_array_elements(document->'Compound'->'link') link WHERE link->>'Database' = 'INCHIKEY' AND link->>'Identifier' = ?)", filters.InchiKey)
@@ -253,24 +253,24 @@ SELECT to_json(it) as instrument_type,
        i.maxi      as max_intensity,
        i.mini      as min_intensity
 FROM (SELECT ARRAY(SELECT t
-                   FROM (SELECT document -> 'Acquisition' -> 'InstrumentType' ->> 'String' as val,
+                   FROM (SELECT document -> 'Acquisition' ->> 'InstrumentType' as val,
                                 count(id)
                          from massbank
-                         GROUP BY document -> 'Acquisition' -> 'InstrumentType' ->> 'String' ORDER BY document -> 'Acquisition' -> 'InstrumentType' ->> 'String') t)) as it,
+                         GROUP BY document -> 'Acquisition' ->> 'InstrumentType' ORDER BY document -> 'Acquisition' ->> 'InstrumentType' ) t)) as it,
      (SELECT ARRAY(SELECT t
-                   FROM (select t.ms ->> 'String' as val, count(t.ms)
+                   FROM (select t.ms ->> 'Value' as val, count(t.ms)
                          FROM (Select jsonb_array_elements(document -> 'Acquisition' -> 'MassSpectrometry') as ms
                                from massbank) t
-                         where ms ->> 'Key' = 'MS_TYPE'
+                         where ms ->> 'Value' = 'MS_TYPE'
                          GROUP BY t.ms ORDER BY t.ms) t)) as mt,
      (SELECT ARRAY(SELECT t
-                   FROM (select t.ms ->> 'String' as val, count(t.ms)
+                   FROM (select t.ms ->> 'Value' as val, count(t.ms)
                          FROM (Select jsonb_array_elements(document -> 'Acquisition' -> 'MassSpectrometry') as ms
                                from massbank) t
-                         where ms ->> 'Key' = 'ION_MODE'
+                         where ms ->> 'Subtag' = 'ION_MODE'
                          GROUP BY t.ms ORDER BY t.ms) t)) as im,
-     (SELECT MIN((document -> 'Compound' -> 'mass' ->> 'Value')::float8) as minm,
-             MAX((document -> 'Compound' -> 'mass' ->> 'Value')::float8) as maxm
+     (SELECT MIN((document -> 'Compound' ->> 'mass' )::float8) as minm,
+             MAX((document -> 'Compound' ->> 'mass' )::float8) as maxm
       from massbank) as mass,
      (SELECT MIN(t.mz) as minmz, MAX(t.mz) as maxmz
       from (SELECT jsonb_array_elements(document -> 'Peak' -> 'Peak' -> 'Mz')::float8 as mz FROM massbank) t) as mz,

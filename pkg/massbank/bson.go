@@ -15,6 +15,13 @@ func (p DatabaseProperty) MarshalBSONValue() (bsontype.Type, []byte, error) {
 	})
 }
 
+func (p SubtagProperty) MarshalBSONValue() (bsontype.Type, []byte, error) {
+	return bson.MarshalValue(bson.E{
+		Key:   p.Subtag,
+		Value: p.Value,
+	})
+}
+
 func (p RecordDeprecated) MarshalBSONValue() (bsontype.Type, []byte, error) {
 	return bson.MarshalValue(struct {
 		Date   time.Time
@@ -53,6 +60,17 @@ func (p *DatabaseProperty) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
 	}
 	p.Database = doc.Key
 	p.Identifier = fmt.Sprintf("%v", doc.Value)
+	return nil
+}
+
+func (p *SubtagProperty) UnmarshalBSONValue(t bsontype.Type, b []byte) error {
+	var raw = bson.RawValue{Type: t, Value: b}
+	var doc bson.E
+	if err := raw.Unmarshal(&doc); err != nil {
+		return err
+	}
+	p.Subtag = doc.Key
+	p.Value = fmt.Sprintf("%v", doc.Value)
 	return nil
 }
 

@@ -226,7 +226,6 @@ func (db *Mb3MongoDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 		return result, err
 	}
 	type MB3ValuesTemp struct {
-		CompoundStart  []MBCountValues
 		InstrumentType []MBCountValues
 		MSType         []MBCountValues
 		IonMode        []MBCountValues
@@ -238,7 +237,6 @@ func (db *Mb3MongoDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	var tempV MB3ValuesTemp
 	err = bson.Unmarshal(doc, &tempV)
 	result = MB3Values{
-		CompoundStart:  tempV.CompoundStart,
 		Contributor:    tempV.Contributor,
 		InstrumentType: tempV.InstrumentType,
 		MSType:         tempV.MSType,
