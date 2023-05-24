@@ -30,7 +30,7 @@ type DefaultApiRouter interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type DefaultApiServicer interface {
-	GetBrowseOptions(context.Context) (ImplResponse, error)
+	GetBrowseOptions(context.Context, []string, []string, string, string) (ImplResponse, error)
 	GetFilterOptions(context.Context) (ImplResponse, error)
 	GetMetadata(context.Context) (ImplResponse, error)
 	GetRecord(context.Context, string) (ImplResponse, error)

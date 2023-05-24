@@ -149,6 +149,31 @@ paths:
     get:
       summary: get browse options
       operationId: getBrowseOptions
+      parameters:
+        - in: query
+          name: instrument_type
+          description: Filter by a list of instrument type, which will be associated by OR.
+          schema:
+            $ref: "./schemas/FilterSchemas.yaml#/components/schemas/InstrumentType"
+          required: false
+        - in: query
+          description: Filter by a List of MS types, which are associated by OR. If none is given, all is assumed.
+          name: ms_type
+          schema:
+            $ref: "./schemas/FilterSchemas.yaml#/components/schemas/MSType"
+          required: false
+        - in: query
+          name: ion-mode
+          description: Filter by ion mode. If none is given, both is assumed.
+          schema:
+            $ref: "./schemas/FilterSchemas.yaml#/components/schemas/IonMode"
+          required: false
+        - in: query
+          name: contributor
+          description: a contributor (institution)
+          schema:
+            $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Contributor"
+          required: false
       responses:
         '200':
           description: "All browse options"
@@ -167,5 +192,3 @@ paths:
             application/json:
               schema:
                 $ref: "./schemas/FilterOptions.yaml#/components/schemas/Metadata"
-
-

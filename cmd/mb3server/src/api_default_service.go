@@ -27,8 +27,8 @@ func NewDefaultApiService() DefaultApiServicer {
 }
 
 // GetBrowseOptions - get browse options
-func (s *DefaultApiService) GetBrowseOptions(ctx context.Context) (ImplResponse, error) {
-	opt, err := GetBrowseOptions()
+func (s *DefaultApiService) GetBrowseOptions(ctx context.Context, instrumentType []string, msType []string, ionMode string, contributor string) (ImplResponse, error) {
+	opt, err := GetBrowseOptions(instrumentType, msType, ionMode, contributor)
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), errors.New("Could not get results")
 	}

@@ -84,7 +84,12 @@ func (c *DefaultApiController) Routes() Routes {
 
 // GetBrowseOptions - get browse options
 func (c *DefaultApiController) GetBrowseOptions(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetBrowseOptions(r.Context())
+	query := r.URL.Query()
+	instrumentTypeParam := strings.Split(query.Get("instrument_type"), ",")
+	msTypeParam := strings.Split(query.Get("ms_type"), ",")
+	ionModeParam := query.Get("ion-mode")
+	contributorParam := query.Get("contributor")
+	result, err := c.service.GetBrowseOptions(r.Context(), instrumentTypeParam, msTypeParam, ionModeParam, contributorParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

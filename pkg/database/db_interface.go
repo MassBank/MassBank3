@@ -19,7 +19,7 @@ type Filters struct {
 	Peaks           *[]float64
 	PeakDifferences *[]float64
 	InchiKey        string
-	Contributor     string
+	Contributor     *[]string
 	IntensityCutoff *int64
 	Limit           int64
 	Offset          int64

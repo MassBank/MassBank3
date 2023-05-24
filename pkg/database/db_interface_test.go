@@ -417,8 +417,15 @@ func TestMB3Database_GetRecords(t *testing.T) {
 			{
 				db,
 				db.name + " " + "Get all records with contributor RIKEN",
-				Filters{Contributor: "RIKEN"},
+				Filters{Contributor: &[]string{"RIKEN"}},
 				testRecords([]uint64{7, 8}),
+				false,
+			},
+			{
+				db,
+				db.name + " " + "Get all records with contributor RIKEN and AAFC",
+				Filters{Contributor: &[]string{"RIKEN", "AAFC"}},
+				testRecords([]uint64{0, 7, 8}),
 				false,
 			},
 			{

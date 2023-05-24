@@ -53,6 +53,7 @@ func (db *Mb3MongoDB) GetMetaData() (*MB3MetaData, error) {
 }
 
 func (db *Mb3MongoDB) GetUniqueValues(filters Filters) (MB3Values, error) {
+	match := getQuery(filters)
 	var query = `
 [
     { "$facet": {
@@ -209,6 +210,9 @@ func (db *Mb3MongoDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	var bdoc interface{}
 	if err := bson2.UnmarshalJSON([]byte(query), &bdoc); err != nil {
 		return result, err
+	}
+	if len(match) > 0 {
+		bdoc = append([]interface{}{bson.D{{"$match", match}}}, bdoc.([]interface{})...)
 	}
 	cur, err := db.database.Collection(mbCollection).Aggregate(context.Background(), bdoc, &options.AggregateOptions{Collation: &options.Collation{Locale: "en"}})
 	if err != nil {
@@ -471,8 +475,13 @@ func getQuery(filters Filters) bson.D {
 		im := bson.E{"compound.link", bson.D{bson.E{"key", "INCHIKEY"}, bson.E{"value", filters.InchiKey}}}
 		result = append(result, im)
 	}
-	if filters.Contributor != "" {
-		result = append(result, bson.E{"accession", bson.M{"$regex": "-" + filters.Contributor + "-", "$options": "is"}})
+	if filters.Contributor != nil {
+		arr := bson.A{}
+		for _, co := range *filters.Contributor {
+			arr = append(arr, co)
+		}
+		result = append(result,
+			bson.E{"contributor", bson.M{"$in": arr}})
 	}
 	if filters.Peaks != nil {
 		for _, p := range *filters.Peaks {
@@ -619,12 +628,15 @@ func (db *Mb3MongoDB) init() error {
 		mongo.IndexModel{Keys: bson.D{{"accession", 1}},
 			Options: opt.SetName("accession_1").SetUnique(true)})
 	indices := []string{
+		"contributor",
 		"compound.names",
 		"compound.mass",
 		"compound.formula",
 		"acquisition.instrumenttype",
-		"acquisition.massspectrometry.ION_MODE",
-		"acquisition.massspectrometry.MS_TYPE",
+		"acquisition.massspectrometry.key",
+		"acquisition.massspectrometry.value",
+		"peak.peak.intensity",
+		"peak.peak.mz",
 	}
 	for _, index := range indices {
 		if _, err := db.database.Collection(mbCollection).Indexes().CreateOne(
@@ -668,6 +680,7 @@ func (db *Mb3MongoDB) addPeakDiffs() {
 		context.Background(),
 		mongo.Pipeline{matchStage})
 }
+
 func unmarshal2Massbank(err error, value *bson.M) (*massbank.MassBank2, error) {
 	var mb massbank.MassBank2
 	b, err := bson.Marshal(value)

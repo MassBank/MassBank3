@@ -43,11 +43,32 @@ func initDB() error {
 
 }
 
-func GetBrowseOptions() (*BrowseOptions, error) {
+func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, contributor string) (*BrowseOptions, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
-	vals, err := db.GetUniqueValues(database.Filters{})
+	it := &instrumentTyoe
+	if len(*it) == 0 || (len(*it) == 1 && (*it)[0] == "") {
+		it = nil
+	}
+	filters := database.Filters{
+		InstrumentType:  it,
+		Splash:          "",
+		MsType:          getMsTypes(msType),
+		IonMode:         getIonMode(ionMode),
+		CompoundName:    "",
+		Mass:            nil,
+		MassEpsilon:     nil,
+		Formula:         "",
+		Peaks:           nil,
+		PeakDifferences: nil,
+		InchiKey:        "",
+		Contributor:     contributor,
+		IntensityCutoff: nil,
+		Limit:           0,
+		Offset:          0,
+	}
+	vals, err := db.GetUniqueValues(filters)
 	if err != nil {
 		return nil, err
 	}
@@ -99,32 +120,6 @@ func GetRecords(limit int32, page int32, contributor string, instrumentType []st
 		page = 1
 	}
 
-	msTypeLokal := &[]massbank.MsType{}
-	for _, t := range msType {
-		switch t {
-		case "MS":
-			*msTypeLokal = append(*msTypeLokal, massbank.MS)
-		case "MS2":
-			*msTypeLokal = append(*msTypeLokal, massbank.MS2)
-		case "MS3":
-			*msTypeLokal = append(*msTypeLokal, massbank.MS3)
-		case "MS4":
-			*msTypeLokal = append(*msTypeLokal, massbank.MS4)
-		}
-	}
-
-	if len(*msTypeLokal) == 0 {
-		msTypeLokal = nil
-	}
-
-	var ionModeLokal = massbank.ANY
-	switch ionMode {
-	case "POSITIVE":
-		ionModeLokal = massbank.POSITIVE
-	case "NEGATIVE":
-		ionModeLokal = massbank.NEGATIVE
-	}
-	log.Println(ionModeLokal)
 	it := &instrumentType
 	if len(*it) == 0 || (len(*it) == 1 && (*it)[0] == "") {
 		it = nil
@@ -138,8 +133,8 @@ func GetRecords(limit int32, page int32, contributor string, instrumentType []st
 	var filters = database.Filters{
 		InstrumentType:  it,
 		Splash:          "",
-		MsType:          msTypeLokal,
-		IonMode:         ionModeLokal,
+		MsType:          getMsTypes(msType),
+		IonMode:         getIonMode(ionMode),
 		CompoundName:    "",
 		Mass:            nil,
 		MassEpsilon:     nil,
@@ -170,6 +165,37 @@ func GetRecords(limit int32, page int32, contributor string, instrumentType []st
 	}
 	result.Metadata.ResultCount = int32(count)
 	return &result, nil
+}
+
+func getIonMode(ionMode string) massbank.IonMode {
+	switch ionMode {
+	case "POSITIVE":
+		return massbank.POSITIVE
+	case "NEGATIVE":
+		return massbank.NEGATIVE
+	}
+	return massbank.ANY
+}
+
+func getMsTypes(msType []string) *[]massbank.MsType {
+	result := &[]massbank.MsType{}
+	for _, t := range msType {
+		switch t {
+		case "MS":
+			*result = append(*result, massbank.MS)
+		case "MS2":
+			*result = append(*result, massbank.MS2)
+		case "MS3":
+			*result = append(*result, massbank.MS3)
+		case "MS4":
+			*result = append(*result, massbank.MS4)
+		}
+	}
+
+	if len(*result) == 0 {
+		result = nil
+	}
+	return result
 }
 
 func GetRecord(accession string) (*MbRecord, error) {

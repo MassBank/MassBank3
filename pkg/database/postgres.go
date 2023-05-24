@@ -196,8 +196,8 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.MassBank2, int6
 	if filters.Formula != "" {
 		where.And("document->'compound'->>'formula' ILIKE ?", "%"+filters.Formula+"%")
 	}
-	if filters.Contributor != "" {
-		where.And("document->>'accession' ILIKE ?", "%"+filters.Contributor+"%")
+	if filters.Contributor != nil {
+		where.And("document->>'contributor' IN (?)", *filters.Contributor)
 	}
 	if filters.InchiKey != "" {
 		where.And("jsonb_typeof(document->'compound'->'link') = 'array' AND EXISTS (SELECT * FROM jsonb_array_elements(document->'compound'->'link') link WHERE link->>'database' = 'INCHIKEY' AND link->>'identifier' = ?)", filters.InchiKey)

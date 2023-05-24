@@ -188,6 +188,41 @@ paths:
   /filter/browse:
     get:
       operationId: getBrowseOptions
+      parameters:
+      - description: "Filter by a list of instrument type, which will be associated\
+          \ by OR."
+        explode: true
+        in: query
+        name: instrument_type
+        required: false
+        schema:
+          $ref: '#/components/schemas/InstrumentType'
+        style: form
+      - description: "Filter by a List of MS types, which are associated by OR. If\
+          \ none is given, all is assumed."
+        explode: true
+        in: query
+        name: ms_type
+        required: false
+        schema:
+          $ref: '#/components/schemas/MSType'
+        style: form
+      - description: "Filter by ion mode. If none is given, both is assumed."
+        explode: true
+        in: query
+        name: ion-mode
+        required: false
+        schema:
+          $ref: '#/components/schemas/IonMode'
+        style: form
+      - description: a contributor (institution)
+        explode: true
+        in: query
+        name: contributor
+        required: false
+        schema:
+          $ref: '#/components/schemas/Contributor'
+        style: form
       responses:
         "200":
           content:
