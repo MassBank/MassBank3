@@ -1,13 +1,13 @@
 insert into public.massbank (filename, document, metadataid)
 values ('/MassBank-data/AAFC/MSBNK-AAFC-AC000005.txt', '{
-  "Date": {
-    "Created": "2017-07-07T00:00:00Z",
-    "Updated": "2017-07-07T00:00:00Z",
-    "Modified": "0001-01-01T00:00:00Z"
+  "date": {
+    "created": "2017-07-07T00:00:00Z",
+    "updated": "2017-07-07T00:00:00Z",
+    "modified": "0001-01-01T00:00:00Z"
   },
-  "Peak": {
-    "Peak": {
-      "Mz": [
+  "peak": {
+    "peak": {
+      "mz": [
         105.0698,
         115.054,
         133.0643,
@@ -15,7 +15,7 @@ values ('/MassBank-data/AAFC/MSBNK-AAFC-AC000005.txt', '{
         161.0589,
         179.0696
       ],
-      "Rel": [
+      "rel": [
         422,
         36,
         999,
@@ -23,12 +23,12 @@ values ('/MassBank-data/AAFC/MSBNK-AAFC-AC000005.txt', '{
         708,
         56
       ],
-      "Header": [
+      "header": [
         "m/z",
         "int.",
         "rel.int."
       ],
-      "Intensity": [
+      "intensity": [
         1513707.125,
         134276.65625,
         3576966.75,
@@ -37,17 +37,15 @@ values ('/MassBank-data/AAFC/MSBNK-AAFC-AC000005.txt', '{
         204606.65625
       ]
     },
-    "Splash": "splash10-01q9-0900000000-f556e9b53553d12b44b5",
-    "NumPeak": {
-      "Value": 6
-    },
-    "Annotation": {
-      "Header": [
+    "splash": "splash10-01q9-0900000000-f556e9b53553d12b44b5",
+    "n_peak": 6,
+    "annotation": {
+      "header": [
         "m/z",
         "tentative_formula",
         "mass_error(ppm)"
       ],
-      "Values": {
+      "values": {
         "m/z": [
           105.0698,
           115.054,
@@ -75,232 +73,223 @@ values ('/MassBank-data/AAFC/MSBNK-AAFC-AC000005.txt', '{
       }
     }
   },
-  "Authors": {
-    "Value": [
-      {
-        "Name": "Justin B. Renaud",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " Mark W. Sumarah",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " Agriculture and Agri-Food Canada",
-        "MarcRelator": ""
-      }
-    ]
-  },
-  "License": "CC BY-SA",
-  "Project": null,
-  "Species": {
-    "Link": null,
-    "Name": null,
-    "Sample": null,
-    "Lineage": null
-  },
-  "Comments": [
+  "authors": [
     {
-      "Value": "isolated standard",
-      "Subtag": "CONFIDENCE"
+      "name": "Justin B. Renaud",
+      "marc_relator": ""
+    },
+    {
+      "name": " Mark W. Sumarah",
+      "marc_relator": ""
+    },
+    {
+      "name": " Agriculture and Agri-Food Canada",
+      "marc_relator": ""
     }
   ],
-  "Compound": {
+  "license": "CC BY-SA",
+  "project": null,
+  "species": {
+    "link": null,
+    "name": null,
+    "Sample": null,
+    "lineage": null
+  },
+  "comments": [
+    {
+      "value": "isolated standard",
+      "subtag": "CONFIDENCE"
+    }
+  ],
+  "compound": {
     "link": [
       {
-        "Database": "INCHIKEY",
-        "Identifier": "KWILGNNWGSNMPA-UHFFFAOYSA-N"
+        "database": "INCHIKEY",
+        "identifier": "KWILGNNWGSNMPA-UHFFFAOYSA-N"
       },
       {
-        "Database": "CAS",
-        "Identifier": "17397-85-2"
+        "database": "CAS",
+        "identifier": "17397-85-2"
       },
       {
-        "Database": "PUBCHEM",
-        "Identifier": "CID:28516"
+        "database": "PUBCHEM",
+        "identifier": "CID:28516"
       },
       {
-        "Database": "CHEMSPIDER",
-        "Identifier": "26529"
+        "database": "CHEMSPIDER",
+        "identifier": "26529"
       },
       {
-        "Database": "KNAPSACK",
-        "Identifier": "C00000550"
+        "database": "KNAPSACK",
+        "identifier": "C00000550"
       },
       {
-        "Database": "COMPTOX",
-        "Identifier": "DTXSID60891794"
+        "database": "COMPTOX",
+        "identifier": "DTXSID60891794"
       }
     ],
-    "mass": {
-      "Value": 178.06299
-    },
+    "mass": 178.06299,
     "name": [
       "Mellein",
       "Ochracin",
-      {
-        "Value": "8-hydroxy-3-methyl-3,4-dihydroisochromen-1-one"
-      }
+      "8-hydroxy-3-methyl-3,4-dihydroisochromen-1-one"
     ],
     "inchi": "InChI=1S/C10H10O3/c1-6-5-7-3-2-4-8(11)9(7)10(12)13-6/h2-4,6,11H,5H2,1H3",
     "smiles": "CC1CC2=C(C(=CC=C2)O)C(=O)O1",
-    "classes": {
-      "Value": [
-        "Natural Product",
-        "Fungal metabolite"
-      ]
-    },
+    "classes": [
+      "Natural Product",
+      "Fungal metabolite"
+    ],
     "formula": "C10H10O3",
-    "cdk-depict": null
+    "cdk_depict": null
   },
-  "Metadata": {
-    "FileName": "/MassBank-data/AAFC/MSBNK-AAFC-AC000005.txt",
-    "VersionRef": ""
+  "metadata": {
+    "file_name": "/MassBank-data/AAFC/MSBNK-AAFC-AC000005.txt",
+    "version_ref": ""
   },
-  "Accession": "MSBNK-AAFC-AC000005",
-  "Copyright": "Copyright (C) 2017",
-  "Deprecated": null,
-  "Acquisition": {
-    "General": null,
-    "Instrument": "Q-Exactive Orbitrap Thermo Scientific",
-    "Chromatography": [
+  "accession": "MSBNK-AAFC-AC000005",
+  "contributor": "AAFC",
+  "copyright": "Copyright (C) 2017",
+  "deprecated": null,
+  "acquisition": {
+    "general": null,
+    "instrument": "Q-Exactive Orbitrap Thermo Scientific",
+    "chromatography": [
       {
-        "Value": "Agilent RRHD Eclipse 50 x 2 mm, 1.8 uM",
-        "Subtag": "COLUMN_NAME"
+        "value": "Agilent RRHD Eclipse 50 x 2 mm, 1.8 uM",
+        "subtag": "COLUMN_NAME"
       },
       {
-        "Value": "100:0 at 0 min, 100:0 at 0.5 min, 0:100 at 3.5 min, 0:100 at 5.5 min, 100:0 at 7 min",
-        "Subtag": "FLOW_GRADIENT"
+        "value": "100:0 at 0 min, 100:0 at 0.5 min, 0:100 at 3.5 min, 0:100 at 5.5 min, 100:0 at 7 min",
+        "subtag": "FLOW_GRADIENT"
       },
       {
-        "Value": "0.3 mL min-1",
-        "Subtag": "FLOW_RATE"
+        "value": "0.3 mL min-1",
+        "subtag": "FLOW_RATE"
       },
       {
-        "Value": "3.44",
-        "Subtag": "RETENTION_TIME"
+        "value": "3.44",
+        "subtag": "RETENTION_TIME"
       },
       {
-        "Value": "1094",
-        "Subtag": "NAPS_RTI"
+        "value": "1094",
+        "subtag": "NAPS_RTI"
       },
       {
-        "Value": "A H2O 0.1% FA",
-        "Subtag": "SOLVENT"
+        "value": "A H2O 0.1% FA",
+        "subtag": "SOLVENT"
       },
       {
-        "Value": "B ACN 0.1% FA",
-        "Subtag": "SOLVENT"
+        "value": "B ACN 0.1% FA",
+        "subtag": "SOLVENT"
       }
     ],
-    "InstrumentType": "LC-ESI-ITFT",
-    "MassSpectrometry": [
+    "instrument_type": "LC-ESI-ITFT",
+    "mass_spectrometry": [
       {
-        "Value": "MS2",
-        "Subtag": "MS_TYPE"
+        "value": "MS2",
+        "subtag": "MS_TYPE"
       },
       {
-        "Value": "POSITIVE",
-        "Subtag": "ION_MODE"
+        "value": "POSITIVE",
+        "subtag": "ION_MODE"
       },
       {
-        "Value": "ESI",
-        "Subtag": "IONIZATION"
+        "value": "ESI",
+        "subtag": "IONIZATION"
       },
       {
-        "Value": "3.9 kV",
-        "Subtag": "IONIZATION_VOLTAGE"
+        "value": "3.9 kV",
+        "subtag": "IONIZATION_VOLTAGE"
       },
       {
-        "Value": "HCD",
-        "Subtag": "FRAGMENTATION_MODE"
+        "value": "HCD",
+        "subtag": "FRAGMENTATION_MODE"
       },
       {
-        "Value": "50(NCE)",
-        "Subtag": "COLLISION_ENERGY"
+        "value": "50(NCE)",
+        "subtag": "COLLISION_ENERGY"
       },
       {
-        "Value": "17500",
-        "Subtag": "RESOLUTION"
+        "value": "17500",
+        "subtag": "RESOLUTION"
       }
     ]
   },
-  "Publication": "Renaud, J. B.; Sumarah, M. W. Data Independent Acquisition-Digital Archiving Mass Spectrometry: Application to Single Kernel Mycotoxin Analysis of Fusarium Graminearum Infected Maize. Analytical and Bioanalytical Chemistry 2016, 408 (12), 3083–91. DOI:10.1007/s00216-016-9391-5",
-  "RecordTitle": "Mellein; LC-ESI-ITFT; MS2; CE: 50; R=17500; [M+H]+",
-  "MassSpectrometry": {
-    "FocusedIon": [
+  "publication": "Renaud, J. B.; Sumarah, M. W. Data Independent Acquisition-Digital Archiving Mass Spectrometry: Application to Single Kernel Mycotoxin Analysis of Fusarium Graminearum Infected Maize. Analytical and Bioanalytical Chemistry 2016, 408 (12), 3083–91. DOI:10.1007/s00216-016-9391-5",
+  "title": "Mellein; LC-ESI-ITFT; MS2; CE: 50; R=17500; [M+H]+",
+  "mass_spectrometry": {
+    "focused_ion": [
       {
-        "Value": "133.0643",
-        "Subtag": "BASE_PEAK"
+        "value": "133.0643",
+        "subtag": "BASE_PEAK"
       },
       {
-        "Value": "179.0697",
-        "Subtag": "PRECURSOR_M/Z"
+        "value": "179.0697",
+        "subtag": "PRECURSOR_M/Z"
       },
       {
-        "Value": "[M+H]+",
-        "Subtag": "PRECURSOR_TYPE"
+        "value": "[M+H]+",
+        "subtag": "PRECURSOR_TYPE"
       }
     ],
-    "DataProcessing": [
+    "data_processing": [
       {
-        "Value": "Proteowizard",
-        "Subtag": "DEPROFILE"
+        "value": "Proteowizard",
+        "subtag": "DEPROFILE"
       },
       {
-        "Value": "based on Fragment ion formula determination",
-        "Subtag": "RECALIBRATE"
+        "value": "based on Fragment ion formula determination",
+        "subtag": "RECALIBRATE"
       },
       {
-        "Value": "CUTOFF 0.05 Base Peak",
-        "Subtag": "INTENSITY"
+        "value": "CUTOFF 0.05 Base Peak",
+        "subtag": "INTENSITY"
       }
     ]
   }
 }', 1);
 insert into public.massbank (filename, document, metadataid)
 values ('/MassBank-data/Athens_Univ/MSBNK-Athens_Univ-AU229201.txt', '{
-  "Date": {
-    "Created": "2019-04-05T00:00:00Z",
-    "Updated": "2019-04-05T00:00:00Z",
-    "Modified": "0001-01-01T00:00:00Z"
+  "date": {
+    "created": "2019-04-05T00:00:00Z",
+    "updated": "2019-04-05T00:00:00Z",
+    "modified": "0001-01-01T00:00:00Z"
   },
-  "Peak": {
-    "Peak": {
-      "Mz": [
+  "peak": {
+    "peak": {
+      "mz": [
         214.1085,
         215.111,
         216.113
       ],
-      "Rel": [
+      "rel": [
         999,
         125,
         7
       ],
-      "Header": [
+      "header": [
         "m/z",
         "int.",
         "rel.int."
       ],
-      "Intensity": [
+      "intensity": [
         2303864,
         289484,
         16528
       ]
     },
-    "Splash": "splash10-03di-0090000000-4ca5f2773c0d659574ef",
-    "NumPeak": {
-      "Value": 3
-    },
-    "Annotation": {
-      "Header": [
+    "splash": "splash10-03di-0090000000-4ca5f2773c0d659574ef",
+    "n_peak":  3,
+    "annotation": {
+      "header": [
         "m/z",
         "tentative_formula",
         "formula_count",
         "mass",
         "error(ppm)"
       ],
-      "Values": {
+      "values": {
         "m/z": [
           214.1085,
           215.111,
@@ -329,235 +318,226 @@ values ('/MassBank-data/Athens_Univ/MSBNK-Athens_Univ-AU229201.txt', '{
       }
     }
   },
-  "Authors": {
-    "Value": [
-      {
-        "Name": "Nikiforos Alygizakis",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " Katerina Galani",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " Nikolaos Thomaidis",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " University of Athens",
-        "MarcRelator": ""
-      }
-    ]
-  },
-  "License": "CC BY",
-  "Project": null,
-  "Species": {
-    "Link": null,
-    "Name": null,
-    "Sample": null,
-    "Lineage": null
-  },
-  "Comments": [
+  "authors":[
     {
-      "Value": "standard compound",
-      "Subtag": "CONFIDENCE"
+      "name": "Nikiforos Alygizakis",
+      "marc_relator": ""
     },
     {
-      "Value": "2292",
-      "Subtag": "INTERNAL_ID"
+      "name": " Katerina Galani",
+      "marc_relator": ""
+    },
+    {
+      "name": " Nikolaos Thomaidis",
+      "marc_relator": ""
+    },
+    {
+      "name": " University of Athens",
+      "marc_relator": ""
     }
   ],
-  "Compound": {
+  "license": "CC BY",
+  "project": null,
+  "species": {
+    "link": null,
+    "name": null,
+    "Sample": null,
+    "lineage": null
+  },
+  "comments": [
+    {
+      "value": "standard compound",
+      "subtag": "CONFIDENCE"
+    },
+    {
+      "value": "2292",
+      "subtag": "INTERNAL_ID"
+    }
+  ],
+  "compound": {
     "link": [
       {
-        "Database": "CAS",
-        "Identifier": "77500-04-0"
+        "database": "CAS",
+        "identifier": "77500-04-0"
       },
       {
-        "Database": "CHEBI",
-        "Identifier": "76604"
+        "database": "CHEBI",
+        "identifier": "76604"
       },
       {
-        "Database": "KEGG",
-        "Identifier": "C19255"
+        "database": "KEGG",
+        "identifier": "C19255"
       },
       {
-        "Database": "PUBCHEM",
-        "Identifier": "CID:62275"
+        "database": "PUBCHEM",
+        "identifier": "CID:62275"
       },
       {
-        "Database": "INCHIKEY",
-        "Identifier": "DVCCCQNKIYNAKB-UHFFFAOYSA-N"
+        "database": "INCHIKEY",
+        "identifier": "DVCCCQNKIYNAKB-UHFFFAOYSA-N"
       },
       {
-        "Database": "CHEMSPIDER",
-        "Identifier": "56076"
+        "database": "CHEMSPIDER",
+        "identifier": "56076"
       },
       {
-        "Database": "COMPTOX",
-        "Identifier": "DTXSID1020801"
+        "database": "COMPTOX",
+        "identifier": "DTXSID1020801"
       }
     ],
-    "mass": {
-      "Value": 213.1014454
-    },
+    "mass":  213.1014454,
     "name": [
       "2-Amino-3,8-dimethylimidazo-[4,5-f]quinoxaline (MeIQx)",
       "MeIQx",
-      {
-        "Value": "3,8-dimethylimidazo[4,5-f]quinoxalin-2-amine"
-      }
+      "3,8-dimethylimidazo[4,5-f]quinoxalin-2-amine"
     ],
     "inchi": "InChI=1S/C11H11N5/c1-6-5-13-7-3-4-8-10(9(7)14-6)15-11(12)16(8)2/h3-5H,1-2H3,(H2,12,15)",
     "smiles": "CN1C(N)=NC2=C1C=CC1=NC=C(C)N=C21",
-    "classes": {
-      "Value": [
-        "N/A",
-        "Environmental Standard"
-      ]
-    },
+    "classes": [
+      "N/A",
+      "Environmental Standard"
+    ],
     "formula": "C11H11N5",
-    "cdk-depict": null
+    "cdk_depict": null
   },
-  "Metadata": {
-    "FileName": "/MassBank-data/Athens_Univ/MSBNK-Athens_Univ-AU229201.txt",
-    "VersionRef": ""
+  "metadata": {
+    "file_name": "/MassBank-data/Athens_Univ/MSBNK-Athens_Univ-AU229201.txt",
+    "version_ref": ""
   },
-  "Accession": "MSBNK-Athens_Univ-AU229201",
-  "Copyright": "Copyright (C) 2019 Department of Chemistry, University of Athens",
-  "Deprecated": null,
-  "Acquisition": {
-    "General": null,
-    "Instrument": "Bruker maXis Impact",
-    "Chromatography": [
+  "accession": "MSBNK-Athens_Univ-AU229201",
+  "contributor": "Athens_Univ",
+  "copyright": "Copyright (C) 2019 Department of Chemistry, University of Athens",
+  "deprecated": null,
+  "acquisition": {
+    "general": null,
+    "instrument": "Bruker maXis Impact",
+    "chromatography": [
       {
-        "Value": "Acclaim RSLC C18 2.2um, 2.1x100mm, Thermo",
-        "Subtag": "COLUMN_NAME"
+        "value": "Acclaim RSLC C18 2.2um, 2.1x100mm, Thermo",
+        "subtag": "COLUMN_NAME"
       },
       {
-        "Value": "99/1 at 0-1 min, 61/39 at 3 min, 0.1/99.9 at 14-16 min, 99/1 at 16.1-20 min",
-        "Subtag": "FLOW_GRADIENT"
+        "value": "99/1 at 0-1 min, 61/39 at 3 min, 0.1/99.9 at 14-16 min, 99/1 at 16.1-20 min",
+        "subtag": "FLOW_GRADIENT"
       },
       {
-        "Value": "200 uL/min at 0-3 min, 400 uL/min at 14 min, 480 uL/min at 16-19 min, 200 uL/min at 19.1-20 min",
-        "Subtag": "FLOW_RATE"
+        "value": "200 uL/min at 0-3 min, 400 uL/min at 14 min, 480 uL/min at 16-19 min, 200 uL/min at 19.1-20 min",
+        "subtag": "FLOW_RATE"
       },
       {
-        "Value": "4.075 min",
-        "Subtag": "RETENTION_TIME"
+        "value": "4.075 min",
+        "subtag": "RETENTION_TIME"
       },
       {
-        "Value": "A 90:10 water:methanol with 0.01% formic acid and 5mM ammonium formate",
-        "Subtag": "SOLVENT"
+        "value": "A 90:10 water:methanol with 0.01% formic acid and 5mM ammonium formate",
+        "subtag": "SOLVENT"
       },
       {
-        "Value": "B methanol with 0.01% formic acid and 5mM ammonium formate",
-        "Subtag": "SOLVENT"
+        "value": "B methanol with 0.01% formic acid and 5mM ammonium formate",
+        "subtag": "SOLVENT"
       }
     ],
-    "InstrumentType": "LC-ESI-QTOF",
-    "MassSpectrometry": [
+    "instrument_type": "LC-ESI-QTOF",
+    "mass_spectrometry": [
       {
-        "Value": "MS2",
-        "Subtag": "MS_TYPE"
+        "value": "MS2",
+        "subtag": "MS_TYPE"
       },
       {
-        "Value": "POSITIVE",
-        "Subtag": "ION_MODE"
+        "value": "POSITIVE",
+        "subtag": "ION_MODE"
       },
       {
-        "Value": "ESI",
-        "Subtag": "IONIZATION"
+        "value": "ESI",
+        "subtag": "IONIZATION"
       },
       {
-        "Value": "CID",
-        "Subtag": "FRAGMENTATION_MODE"
+        "value": "CID",
+        "subtag": "FRAGMENTATION_MODE"
       },
       {
-        "Value": "10 eV",
-        "Subtag": "COLLISION_ENERGY"
+        "value": "10 eV",
+        "subtag": "COLLISION_ENERGY"
       },
       {
-        "Value": "35000",
-        "Subtag": "RESOLUTION"
+        "value": "35000",
+        "subtag": "RESOLUTION"
       }
     ]
   },
-  "Publication": null,
-  "RecordTitle": "2-Amino-3,8-dimethylimidazo-[4,5-f]quinoxaline (MeIQx); LC-ESI-QTOF; MS2; CE: 10 eV; R=35000; [M+H]+",
-  "MassSpectrometry": {
-    "FocusedIon": [
+  "publication": null,
+  "title": "2-Amino-3,8-dimethylimidazo-[4,5-f]quinoxaline (MeIQx); LC-ESI-QTOF; MS2; CE: 10 eV; R=35000; [M+H]+",
+  "mass_spectrometry": {
+    "focused_ion": [
       {
-        "Value": "214.1081",
-        "Subtag": "BASE_PEAK"
+        "value": "214.1081",
+        "subtag": "BASE_PEAK"
       },
       {
-        "Value": "214.1087",
-        "Subtag": "PRECURSOR_M/Z"
+        "value": "214.1087",
+        "subtag": "PRECURSOR_M/Z"
       },
       {
-        "Value": "[M+H]+",
-        "Subtag": "PRECURSOR_TYPE"
+        "value": "[M+H]+",
+        "subtag": "PRECURSOR_TYPE"
       }
     ],
-    "DataProcessing": [
+    "data_processing": [
       {
-        "Value": "identity on assigned fragments and MS1",
-        "Subtag": "RECALIBRATE"
+        "value": "identity on assigned fragments and MS1",
+        "subtag": "RECALIBRATE"
       },
       {
-        "Value": "RMassBank 2.10.0",
-        "Subtag": "WHOLE"
+        "value": "RMassBank 2.10.0",
+        "subtag": "WHOLE"
       }
     ]
   }
 }', 1);
 insert into public.massbank (filename, document, metadataid)
 values ('/MassBank-data/Eawag/MSBNK-Eawag-EA018353.txt', '{
-  "Date": {
-    "Created": "2014-01-14T00:00:00Z",
-    "Updated": "2014-01-14T00:00:00Z",
-    "Modified": "0001-01-01T00:00:00Z"
+  "date": {
+    "created": "2014-01-14T00:00:00Z",
+    "updated": "2014-01-14T00:00:00Z",
+    "modified": "0001-01-01T00:00:00Z"
   },
-  "Peak": {
-    "Peak": {
-      "Mz": [
+  "peak": {
+    "peak": {
+      "mz": [
         174.0679,
         195.0234,
         230.0804,
         309.066
       ],
-      "Rel": [
+      "rel": [
         3,
         5,
         13,
         999
       ],
-      "Header": [
+      "header": [
         "m/z",
         "int.",
         "rel.int."
       ],
-      "Intensity": [
+      "intensity": [
         3134.2,
         4236.3,
         10982,
         805229.1
       ]
     },
-    "Splash": "splash10-0a4i-0009000000-ccda245feefab7d2bd86",
-    "NumPeak": {
-      "Value": 4
-    },
-    "Annotation": {
-      "Header": [
+    "splash": "splash10-0a4i-0009000000-ccda245feefab7d2bd86",
+    "n_peak": 4,
+    "annotation": {
+      "header": [
         "m/z",
         "tentative_formula",
         "formula_count",
         "mass",
         "error(ppm)"
       ],
-      "Values": {
+      "values": {
         "m/z": [
           174.0679,
           195.0234,
@@ -591,210 +571,204 @@ values ('/MassBank-data/Eawag/MSBNK-Eawag-EA018353.txt', '{
       }
     }
   },
-  "Authors": {
-    "Value": [
-      {
-        "Name": "Stravs M",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " Schymanski E",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " Singer H",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " Department of Environmental Chemistry",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " Eawag",
-        "MarcRelator": ""
-      }
-    ]
-  },
-  "License": "CC BY",
-  "Project": null,
-  "Species": {
-    "Link": null,
-    "Name": null,
-    "Sample": null,
-    "Lineage": null
-  },
-  "Comments": [
+  "authors":  [
     {
-      "Value": "standard compound",
-      "Subtag": "CONFIDENCE"
+      "name": "Stravs M",
+      "marc_relator": ""
     },
     {
-      "Value": "EAWAG_UCHEM_ID 183",
-      "Subtag": ""
+      "name": " Schymanski E",
+      "marc_relator": ""
+    },
+    {
+      "name": " Singer H",
+      "marc_relator": ""
+    },
+    {
+      "name": " Department of Environmental Chemistry",
+      "marc_relator": ""
+    },
+    {
+      "name": " Eawag",
+      "marc_relator": ""
     }
   ],
-  "Compound": {
+  "license": "CC BY",
+  "project": null,
+  "species": {
+    "link": null,
+    "name": null,
+    "Sample": null,
+    "lineage": null
+  },
+  "comments": [
+    {
+      "value": "standard compound",
+      "subtag": "CONFIDENCE"
+    },
+    {
+      "value": "EAWAG_UCHEM_ID 183",
+      "subtag": ""
+    }
+  ],
+  "compound": {
     "link": [
       {
-        "Database": "CAS",
-        "Identifier": "122-11-2"
+        "database": "CAS",
+        "identifier": "122-11-2"
       },
       {
-        "Database": "CHEBI",
-        "Identifier": "32161"
+        "database": "CHEBI",
+        "identifier": "32161"
       },
       {
-        "Database": "KEGG",
-        "Identifier": "D01142"
+        "database": "KEGG",
+        "identifier": "D01142"
       },
       {
-        "Database": "PUBCHEM",
-        "Identifier": "CID:5323"
+        "database": "PUBCHEM",
+        "identifier": "CID:5323"
       },
       {
-        "Database": "INCHIKEY",
-        "Identifier": "ZZORFUFYDOWNEF-UHFFFAOYSA-N"
+        "database": "INCHIKEY",
+        "identifier": "ZZORFUFYDOWNEF-UHFFFAOYSA-N"
       },
       {
-        "Database": "CHEMSPIDER",
-        "Identifier": "5132"
+        "database": "CHEMSPIDER",
+        "identifier": "5132"
       },
       {
-        "Database": "COMPTOX",
-        "Identifier": "DTXSID1023607"
+        "database": "COMPTOX",
+        "identifier": "DTXSID1023607"
       }
     ],
-    "mass": {
-      "Value": 310.0736
-    },
+    "mass":  310.0736,
     "name": [
       "Sulfadimethoxine",
-      {
-        "Value": "4-amino-N-(2,6-dimethoxy-4-pyrimidinyl)benzenesulfonamide"
-      }
+
+      "4-amino-N-(2,6-dimethoxy-4-pyrimidinyl)benzenesulfonamide"
     ],
     "inchi": "InChI=1S/C12H14N4O4S/c1-19-11-7-10(14-12(15-11)20-2)16-21(17,18)9-5-3-8(13)4-6-9/h3-7H,13H2,1-2H3,(H,14,15,16)",
     "smiles": "c1(NS(c2ccc(N)cc2)(=O)=O)cc(nc(n1)OC)OC",
-    "classes": {
-      "Value": [
-        "N/A",
-        "Environmental Standard"
-      ]
-    },
+    "classes":  [
+      "N/A",
+      "Environmental Standard"
+    ],
     "formula": "C12H14N4O4S",
-    "cdk-depict": null
+    "cdk_depict": null
   },
-  "Metadata": {
-    "FileName": "/MassBank-data/Eawag/MSBNK-Eawag-EA018353.txt",
-    "VersionRef": ""
+  "metadata": {
+    "file_name": "/MassBank-data/Eawag/MSBNK-Eawag-EA018353.txt",
+    "version_ref": ""
   },
-  "Accession": "MSBNK-Eawag-EA018353",
-  "Copyright": "Copyright (C) 2012 Eawag, Duebendorf, Switzerland",
-  "Deprecated": null,
-  "Acquisition": {
-    "General": null,
-    "Instrument": "LTQ Orbitrap XL Thermo Scientific",
-    "Chromatography": [
+  "accession": "MSBNK-Eawag-EA018353",
+  "contributor": "Eawag",
+  "copyright": "Copyright (C) 2012 Eawag, Duebendorf, Switzerland",
+  "deprecated": null,
+  "acquisition": {
+    "general": null,
+    "instrument": "LTQ Orbitrap XL Thermo Scientific",
+    "chromatography": [
       {
-        "Value": "XBridge C18 3.5um, 2.1x50mm, Waters",
-        "Subtag": "COLUMN_NAME"
+        "value": "XBridge C18 3.5um, 2.1x50mm, Waters",
+        "subtag": "COLUMN_NAME"
       },
       {
-        "Value": "90/10 at 0 min, 50/50 at 4 min, 5/95 at 17 min, 5/95 at 25 min, 90/10 at 25.1 min, 90/10 at 30 min",
-        "Subtag": "FLOW_GRADIENT"
+        "value": "90/10 at 0 min, 50/50 at 4 min, 5/95 at 17 min, 5/95 at 25 min, 90/10 at 25.1 min, 90/10 at 30 min",
+        "subtag": "FLOW_GRADIENT"
       },
       {
-        "Value": "200 ul/min",
-        "Subtag": "FLOW_RATE"
+        "value": "200 ul/min",
+        "subtag": "FLOW_RATE"
       },
       {
-        "Value": "5.7 min",
-        "Subtag": "RETENTION_TIME"
+        "value": "5.7 min",
+        "subtag": "RETENTION_TIME"
       },
       {
-        "Value": "A water with 0.1% formic acid",
-        "Subtag": "SOLVENT"
+        "value": "A water with 0.1% formic acid",
+        "subtag": "SOLVENT"
       },
       {
-        "Value": "B methanol with 0.1% formic acid",
-        "Subtag": "SOLVENT"
+        "value": "B methanol with 0.1% formic acid",
+        "subtag": "SOLVENT"
       }
     ],
-    "InstrumentType": "LC-ESI-ITFT",
-    "MassSpectrometry": [
+    "instrument_type": "LC-ESI-ITFT",
+    "mass_spectrometry": [
       {
-        "Value": "MS2",
-        "Subtag": "MS_TYPE"
+        "value": "MS2",
+        "subtag": "MS_TYPE"
       },
       {
-        "Value": "NEGATIVE",
-        "Subtag": "ION_MODE"
+        "value": "NEGATIVE",
+        "subtag": "ION_MODE"
       },
       {
-        "Value": "ESI",
-        "Subtag": "IONIZATION"
+        "value": "ESI",
+        "subtag": "IONIZATION"
       },
       {
-        "Value": "HCD",
-        "Subtag": "FRAGMENTATION_MODE"
+        "value": "HCD",
+        "subtag": "FRAGMENTATION_MODE"
       },
       {
-        "Value": "30 % (nominal)",
-        "Subtag": "COLLISION_ENERGY"
+        "value": "30 % (nominal)",
+        "subtag": "COLLISION_ENERGY"
       },
       {
-        "Value": "7500",
-        "Subtag": "RESOLUTION"
+        "value": "7500",
+        "subtag": "RESOLUTION"
       }
     ]
   },
-  "Publication": null,
-  "RecordTitle": "Sulfadimethoxine; LC-ESI-ITFT; MS2; CE: 30%; R=7500; [M-H]-",
-  "MassSpectrometry": {
-    "FocusedIon": [
+  "publication": null,
+  "title": "Sulfadimethoxine; LC-ESI-ITFT; MS2; CE: 30%; R=7500; [M-H]-",
+  "mass_spectrometry": {
+    "focused_ion": [
       {
-        "Value": "309.0653",
-        "Subtag": "BASE_PEAK"
+        "value": "309.0653",
+        "subtag": "BASE_PEAK"
       },
       {
-        "Value": "309.0663",
-        "Subtag": "PRECURSOR_M/Z"
+        "value": "309.0663",
+        "subtag": "PRECURSOR_M/Z"
       },
       {
-        "Value": "[M-H]-",
-        "Subtag": "PRECURSOR_TYPE"
+        "value": "[M-H]-",
+        "subtag": "PRECURSOR_TYPE"
       }
     ],
-    "DataProcessing": [
+    "data_processing": [
       {
-        "Value": "Spline",
-        "Subtag": "DEPROFILE"
+        "value": "Spline",
+        "subtag": "DEPROFILE"
       },
       {
-        "Value": "loess on assigned fragments and MS1",
-        "Subtag": "RECALIBRATE"
+        "value": "loess on assigned fragments and MS1",
+        "subtag": "RECALIBRATE"
       },
       {
-        "Value": "Peaks with additional N2/O included",
-        "Subtag": "REANALYZE"
+        "value": "Peaks with additional N2/O included",
+        "subtag": "REANALYZE"
       },
       {
-        "Value": "RMassBank 1.3.1",
-        "Subtag": "WHOLE"
+        "value": "RMassBank 1.3.1",
+        "subtag": "WHOLE"
       }
     ]
   }
 }', 1);
 insert into public.massbank (filename, document, metadataid)
 values ('/MassBank-data/Eawag_Additional_Specs/MSBNK-Eawag_Additional_Specs-ET060401.txt', '{
-  "Date": {
-    "Created": "2015-09-25T00:00:00Z",
-    "Updated": "2016-03-17T00:00:00Z",
-    "Modified": "2016-02-03T00:00:00Z"
+  "date": {
+    "created": "2015-09-25T00:00:00Z",
+    "updated": "2016-03-17T00:00:00Z",
+    "modified": "2016-02-03T00:00:00Z"
   },
-  "Peak": {
-    "Peak": {
-      "Mz": [
+  "peak": {
+    "peak": {
+      "mz": [
         60.0444,
         60.0808,
         123.1162,
@@ -805,7 +779,7 @@ values ('/MassBank-data/Eawag_Additional_Specs/MSBNK-Eawag_Additional_Specs-ET06
         214.0897,
         246.1102
       ],
-      "Rel": [
+      "rel": [
         180,
         16,
         10,
@@ -816,12 +790,12 @@ values ('/MassBank-data/Eawag_Additional_Specs/MSBNK-Eawag_Additional_Specs-ET06
         134,
         776
       ],
-      "Header": [
+      "header": [
         "m/z",
         "int.",
         "rel.int."
       ],
-      "Intensity": [
+      "intensity": [
         17595.5,
         1571.7,
         990.3,
@@ -833,19 +807,17 @@ values ('/MassBank-data/Eawag_Additional_Specs/MSBNK-Eawag_Additional_Specs-ET06
         75456.7
       ]
     },
-    "Splash": "splash10-052s-1940000000-a515d02f980838cad28d",
-    "NumPeak": {
-      "Value": 9
-    },
-    "Annotation": {
-      "Header": [
+    "splash": "splash10-052s-1940000000-a515d02f980838cad28d",
+    "n_peak":  9,
+    "annotation": {
+      "header": [
         "m/z",
         "tentative_formula",
         "formula_count",
         "mass",
         "error(ppm)"
       ],
-      "Values": {
+      "values": {
         "m/z": [
           60.0444,
           60.0808,
@@ -899,199 +871,192 @@ values ('/MassBank-data/Eawag_Additional_Specs/MSBNK-Eawag_Additional_Specs-ET06
       }
     }
   },
-  "Authors": {
-    "Value": [
-      {
-        "Name": "R. Gulde",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " E. Schymanski",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " K. Fenner",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " Department of Environmental Chemistry",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " Eawag",
-        "MarcRelator": ""
-      }
-    ]
-  },
-  "License": "CC BY",
-  "Project": null,
-  "Species": {
-    "Link": null,
-    "Name": null,
-    "Sample": null,
-    "Lineage": null
-  },
-  "Comments": [
+  "authors": [
     {
-      "Value": "Tentative identification: most likely structure (Level 3)",
-      "Subtag": "CONFIDENCE"
+      "name": "R. Gulde",
+      "marc_relator": ""
     },
     {
-      "Value": "604",
-      "Subtag": "INTERNAL_ID"
+      "name": " E. Schymanski",
+      "marc_relator": ""
+    },
+    {
+      "name": " K. Fenner",
+      "marc_relator": ""
+    },
+    {
+      "name": " Department of Environmental Chemistry",
+      "marc_relator": ""
+    },
+    {
+      "name": " Eawag",
+      "marc_relator": ""
     }
   ],
-  "Compound": {
+  "license": "CC BY",
+  "project": null,
+  "species": {
+    "link": null,
+    "name": null,
+    "Sample": null,
+    "lineage": null
+  },
+  "comments": [
+    {
+      "value": "Tentative identification: most likely structure (Level 3)",
+      "subtag": "CONFIDENCE"
+    },
+    {
+      "value": "604",
+      "subtag": "INTERNAL_ID"
+    }
+  ],
+  "compound": {
     "link": [
       {
-        "Database": "CAS",
-        "Identifier": "40552-64-5"
+        "database": "CAS",
+        "identifier": "40552-64-5"
       },
       {
-        "Database": "PUBCHEM",
-        "Identifier": "CID:38514"
+        "database": "PUBCHEM",
+        "identifier": "CID:38514"
       },
       {
-        "Database": "INCHIKEY",
-        "Identifier": "ZVKARXLKNIBGIR-UHFFFAOYSA-N"
+        "database": "INCHIKEY",
+        "identifier": "ZVKARXLKNIBGIR-UHFFFAOYSA-N"
       },
       {
-        "Database": "CHEMSPIDER",
-        "Identifier": "35298"
+        "database": "CHEMSPIDER",
+        "identifier": "35298"
       },
       {
-        "Database": "COMPTOX",
-        "Identifier": "DTXSID30891589"
+        "database": "COMPTOX",
+        "identifier": "DTXSID30891589"
       }
     ],
-    "mass": {
-      "Value": 245.1027
-    },
+    "mass":  245.1027,
     "name": [
       "FEN_246.1101_16.1",
       "N-desethyl-N-acetylfeniramine",
-      {
-        "Value": "N-[1-[3-(trifluoromethyl)phenyl]propan-2-yl]acetamide"
-      }
+      "N-[1-[3-(trifluoromethyl)phenyl]propan-2-yl]acetamide"
     ],
     "inchi": "InChI=1S/C12H14F3NO/c1-8(16-9(2)17)6-10-4-3-5-11(7-10)12(13,14)15/h3-5,7-8H,6H2,1-2H3,(H,16,17)",
     "smiles": "CC(CC1=CC(=CC=C1)C(F)(F)F)NC(C)=O",
-    "classes": {
-      "Value": [
-        "N/A",
-        "Environmental Transformation Products"
-      ]
-    },
+    "classes": [
+      "N/A",
+      "Environmental Transformation Products"
+    ],
     "formula": "C12H14F3NO",
-    "cdk-depict": null
+    "cdk_depict": null
   },
-  "Metadata": {
-    "FileName": "/MassBank-data/Eawag_Additional_Specs/MSBNK-Eawag_Additional_Specs-ET060401.txt",
-    "VersionRef": ""
+  "metadata": {
+    "file_name": "/MassBank-data/Eawag_Additional_Specs/MSBNK-Eawag_Additional_Specs-ET060401.txt",
+    "version_ref": ""
   },
-  "Accession": "MSBNK-Eawag_Additional_Specs-ET060401",
-  "Copyright": "Copyright (C) 2016 Eawag, Duebendorf, Switzerland",
-  "Deprecated": null,
-  "Acquisition": {
-    "General": null,
-    "Instrument": "Q Exactive Plus Orbitrap Thermo Scientific",
-    "Chromatography": [
+  "accession": "MSBNK-Eawag_Additional_Specs-ET060401",
+  "contributor": "Eawag_Additional_Specs",
+  "copyright": "Copyright (C) 2016 Eawag, Duebendorf, Switzerland",
+  "deprecated": null,
+  "acquisition": {
+    "general": null,
+    "instrument": "Q Exactive Plus Orbitrap Thermo Scientific",
+    "chromatography": [
       {
-        "Value": "Atlantis T3 3um, 3.0x150mm, Waters with guard column",
-        "Subtag": "COLUMN_NAME"
+        "value": "Atlantis T3 3um, 3.0x150mm, Waters with guard column",
+        "subtag": "COLUMN_NAME"
       },
       {
-        "Value": "95/5 at 0 min, 5/95 at 15 min, 5/95 at 20 min, 95/5 at 20.1 min, 95/5 at 25 min",
-        "Subtag": "FLOW_GRADIENT"
+        "value": "95/5 at 0 min, 5/95 at 15 min, 5/95 at 20 min, 95/5 at 20.1 min, 95/5 at 25 min",
+        "subtag": "FLOW_GRADIENT"
       },
       {
-        "Value": "300 uL/min",
-        "Subtag": "FLOW_RATE"
+        "value": "300 uL/min",
+        "subtag": "FLOW_RATE"
       },
       {
-        "Value": "15.8 min",
-        "Subtag": "RETENTION_TIME"
+        "value": "15.8 min",
+        "subtag": "RETENTION_TIME"
       },
       {
-        "Value": "A water with 0.1% formic acid",
-        "Subtag": "SOLVENT"
+        "value": "A water with 0.1% formic acid",
+        "subtag": "SOLVENT"
       },
       {
-        "Value": "B methanol with 0.1% formic acid",
-        "Subtag": "SOLVENT"
+        "value": "B methanol with 0.1% formic acid",
+        "subtag": "SOLVENT"
       }
     ],
-    "InstrumentType": "LC-ESI-QFT",
-    "MassSpectrometry": [
+    "instrument_type": "LC-ESI-QFT",
+    "mass_spectrometry": [
       {
-        "Value": "MS2",
-        "Subtag": "MS_TYPE"
+        "value": "MS2",
+        "subtag": "MS_TYPE"
       },
       {
-        "Value": "POSITIVE",
-        "Subtag": "ION_MODE"
+        "value": "POSITIVE",
+        "subtag": "ION_MODE"
       },
       {
-        "Value": "ESI",
-        "Subtag": "IONIZATION"
+        "value": "ESI",
+        "subtag": "IONIZATION"
       },
       {
-        "Value": "HCD",
-        "Subtag": "FRAGMENTATION_MODE"
+        "value": "HCD",
+        "subtag": "FRAGMENTATION_MODE"
       },
       {
-        "Value": "15 (nominal)",
-        "Subtag": "COLLISION_ENERGY"
+        "value": "15 (nominal)",
+        "subtag": "COLLISION_ENERGY"
       },
       {
-        "Value": "17500",
-        "Subtag": "RESOLUTION"
+        "value": "17500",
+        "subtag": "RESOLUTION"
       }
     ]
   },
-  "Publication": "Gulde, R.; Meier, U.; Schymanski, E. L.; Kohler, H.-P. E.; Helbling, D. E.; Derrer, S.; Rentsch, D.; Fenner, K. Systematic Exploration of Biotransformation Reactions of Amine-Containing Micropollutants in Activated Sludge. Environmental Science & Technology 2016, 50 (6), 2908–20. DOI:10.1021/acs.est.5b05186",
-  "RecordTitle": "FEN_246.1101_16.1; LC-ESI-QFT; MS2; CE: 15; R=17500; [M+H]+",
-  "MassSpectrometry": {
-    "FocusedIon": [
+  "publication": "Gulde, R.; Meier, U.; Schymanski, E. L.; Kohler, H.-P. E.; Helbling, D. E.; Derrer, S.; Rentsch, D.; Fenner, K. Systematic Exploration of Biotransformation Reactions of Amine-Containing Micropollutants in Activated Sludge. Environmental Science & Technology 2016, 50 (6), 2908–20. DOI:10.1021/acs.est.5b05186",
+  "title": "FEN_246.1101_16.1; LC-ESI-QFT; MS2; CE: 15; R=17500; [M+H]+",
+  "mass_spectrometry": {
+    "focused_ion": [
       {
-        "Value": "65.0597",
-        "Subtag": "BASE_PEAK"
+        "value": "65.0597",
+        "subtag": "BASE_PEAK"
       },
       {
-        "Value": "246.11",
-        "Subtag": "PRECURSOR_M/Z"
+        "value": "246.11",
+        "subtag": "PRECURSOR_M/Z"
       },
       {
-        "Value": "[M+H]+",
-        "Subtag": "PRECURSOR_TYPE"
+        "value": "[M+H]+",
+        "subtag": "PRECURSOR_TYPE"
       }
     ],
-    "DataProcessing": [
+    "data_processing": [
       {
-        "Value": "loess on assigned fragments and MS1",
-        "Subtag": "RECALIBRATE"
+        "value": "loess on assigned fragments and MS1",
+        "subtag": "RECALIBRATE"
       },
       {
-        "Value": "Peaks with additional N2/O included",
-        "Subtag": "REANALYZE"
+        "value": "Peaks with additional N2/O included",
+        "subtag": "REANALYZE"
       },
       {
-        "Value": "RMassBank 1.99.7",
-        "Subtag": "WHOLE"
+        "value": "RMassBank 1.99.7",
+        "subtag": "WHOLE"
       }
     ]
   }
 }', 1);
 insert into public.massbank (filename, document, metadataid)
 values ('/MassBank-data/Fac_Eng_Univ_Tokyo/MSBNK-Fac_Eng_Univ_Tokyo-JP009132.txt', '{
-  "Date": {
-    "Created": "2008-10-21T00:00:00Z",
-    "Updated": "2016-01-19T00:00:00Z",
-    "Modified": "2011-05-06T00:00:00Z"
+  "date": {
+    "created": "2008-10-21T00:00:00Z",
+    "updated": "2016-01-19T00:00:00Z",
+    "modified": "2011-05-06T00:00:00Z"
   },
-  "Peak": {
-    "Peak": {
-      "Mz": [
+  "peak": {
+    "peak": {
+      "mz": [
         15,
         26,
         27,
@@ -1136,7 +1101,7 @@ values ('/MassBank-data/Fac_Eng_Univ_Tokyo/MSBNK-Fac_Eng_Univ_Tokyo-JP009132.txt
         125,
         126
       ],
-      "Rel": [
+      "rel": [
         57,
         13,
         31,
@@ -1181,12 +1146,12 @@ values ('/MassBank-data/Fac_Eng_Univ_Tokyo/MSBNK-Fac_Eng_Univ_Tokyo-JP009132.txt
         83,
         48
       ],
-      "Header": [
+      "header": [
         "m/z",
         "int.",
         "rel.int."
       ],
-      "Intensity": [
+      "intensity": [
         5.68,
         1.26,
         3.11,
@@ -1232,231 +1197,208 @@ values ('/MassBank-data/Fac_Eng_Univ_Tokyo/MSBNK-Fac_Eng_Univ_Tokyo-JP009132.txt
         4.82
       ]
     },
-    "Splash": "splash10-0fk9-9500000000-e5cde2928e0b7e33c1cc",
-    "NumPeak": {
-      "Value": 43
+    "splash": "splash10-0fk9-9500000000-e5cde2928e0b7e33c1cc",
+    "n_peak": 43,
+    "annotation": null
+  },
+  "authors": [
+    {
+      "name": "SODA AROMATIC CO.",
+      "marc_relator": ""
     },
-    "Annotation": null
-  },
-  "Authors": {
-    "Value": [
-      {
-        "Name": "SODA AROMATIC CO.",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " LTD.",
-        "MarcRelator": ""
-      }
-    ]
-  },
-  "License": "CC BY-NC-SA",
-  "Project": null,
-  "Species": {
-    "Link": null,
-    "Name": null,
+    {
+      "name": " LTD.",
+      "marc_relator": ""
+    }
+  ],
+  "license": "CC BY-NC-SA",
+  "project": null,
+  "species": {
+    "link": null,
+    "name": null,
     "Sample": null,
-    "Lineage": null
+    "lineage": null
   },
-  "Comments": null,
-  "Compound": {
+  "comments": null,
+  "compound": {
     "link": [
       {
-        "Database": "INCHIKEY",
-        "Identifier": "HNKJADCVZUBCPG-UHFFFAOYSA-N"
+        "database": "INCHIKEY",
+        "identifier": "HNKJADCVZUBCPG-UHFFFAOYSA-N"
       },
       {
-        "Database": "COMPTOX",
-        "Identifier": "DTXSID8059217"
+        "database": "COMPTOX",
+        "identifier": "DTXSID8059217"
       }
     ],
-    "mass": {
-      "Value": 124.03467
-    },
+    "mass":  124.03467,
     "name": [
-      {
-        "Value": "METHYL PHENYL SULFIDE"
-      }
+      "METHYL PHENYL SULFIDE"
     ],
     "inchi": "InChI=1S/C7H8S/c1-8-7-5-3-2-4-6-7/h2-6H,1H3",
     "smiles": "CSc(c1)cccc1",
-    "classes": {
-      "Value": [
-        "N/A"
-      ]
-    },
+    "classes": [
+      "N/A"
+    ],
     "formula": "C7H8S",
-    "cdk-depict": null
+    "cdk_depict": null
   },
-  "Metadata": {
-    "FileName": "/MassBank-data/Fac_Eng_Univ_Tokyo/MSBNK-Fac_Eng_Univ_Tokyo-JP009132.txt",
-    "VersionRef": ""
+  "metadata": {
+    "file_name": "/MassBank-data/Fac_Eng_Univ_Tokyo/MSBNK-Fac_Eng_Univ_Tokyo-JP009132.txt",
+    "version_ref": ""
   },
-  "Accession": "MSBNK-Fac_Eng_Univ_Tokyo-JP009132",
-  "Copyright": null,
-  "Deprecated": null,
-  "Acquisition": {
-    "General": null,
-    "Instrument": "HITACHI M-80B",
-    "Chromatography": null,
-    "InstrumentType": "EI-B",
-    "MassSpectrometry": [
+  "accession": "MSBNK-Fac_Eng_Univ_Tokyo-JP009132",
+  "contributor": "Fac_Eng_Univ_Tokyo",
+  "copyright": null,
+  "deprecated": null,
+  "acquisition": {
+    "general": null,
+    "instrument": "HITACHI M-80B",
+    "chromatography": null,
+    "instrument_type": "EI-B",
+    "mass_spectrometry": [
       {
-        "Value": "MS",
-        "Subtag": "MS_TYPE"
+        "value": "MS",
+        "subtag": "MS_TYPE"
       },
       {
-        "Value": "POSITIVE",
-        "Subtag": "ION_MODE"
+        "value": "POSITIVE",
+        "subtag": "ION_MODE"
       },
       {
-        "Value": "70 eV",
-        "Subtag": "IONIZATION_ENERGY"
+        "value": "70 eV",
+        "subtag": "IONIZATION_ENERGY"
       }
     ]
   },
-  "Publication": null,
-  "RecordTitle": "METHYL PHENYL SULFIDE; EI-B; MS",
-  "MassSpectrometry": {
-    "FocusedIon": [
+  "publication": null,
+  "title": "METHYL PHENYL SULFIDE; EI-B; MS",
+  "mass_spectrometry": {
+    "focused_ion": [
       {
-        "Value": "[M]+*",
-        "Subtag": "ION_TYPE"
+        "value": "[M]+*",
+        "subtag": "ION_TYPE"
       }
     ],
-    "DataProcessing": null
+    "data_processing": null
   }
 }', 1);
---insert into public.massbank (id, filename, document, metadataid) values (49309, '/MassBank-data/Keio_Univ/MSBNK-Keio_Univ-KO009105.txt', '{"Date": {"Created": "2008-05-12T00:00:00Z", "Updated": "2012-10-22T00:00:00Z", "Modified": "0001-01-01T00:00:00Z"}, "Peak": {"Peak": {"Mz": [56.20000076293945, 58.20000076293945, 67.19999694824219, 68.19999694824219, 70.19999694824219, 76.69999694824219, 79.19999694824219, 80, 81.0999984741211, 82, 85, 91.0999984741211, 93.0999984741211, 94, 95.0999984741211, 96.0999984741211, 99.0999984741211, 108.0999984741211, 109.0999984741211, 110.0999984741211, 111, 113.0999984741211, 119.0999984741211, 123.0999984741211, 125.0999984741211, 134.10000610351562, 136.10000610351562, 137.10000610351562, 151.10000610351562, 162, 179.10000610351562, 180.10000610351562, 197.1999969482422], "Rel": [15, 16, 133, 4, 13, 10, 28, 5, 129, 37, 6, 20, 99, 13, 58, 20, 687, 13, 67, 24, 83, 36, 363, 23, 26, 105, 999, 27, 285, 8, 80, 110, 4], "Header": ["m/z", "int.", "rel.int."], "Intensity": [7.300000190734863, 8.100000381469727, 66.36000061035156, 1.7999999523162842, 6.699999809265137, 4.900000095367432, 14, 2.5999999046325684, 64.27999877929688, 18.489999771118164, 3, 10, 49.5, 6.690000057220459, 28.989999771118164, 10.199999809265137, 342.4599914550781, 6.599999904632568, 33.38999938964844, 12.1899995803833, 41.20000076293945, 17.899999618530273, 180.85000610351562, 11.399999618530273, 12.890000343322754, 52.209999084472656, 498.25, 13.289999961853027, 142.24000549316406, 3.9000000953674316, 39.869998931884766, 54.970001220703125, 2.200000047683716]}, "Splash": "splash10-000j-5900000000-8ad8423e2b359b500863", "NumPeak": {"Value": 33}, "Annotation": null}, "Authors": {"Value": [{"Name": "Ojima Y", "MarcRelator": ""}, {"Name": " Kakazu Y", "MarcRelator": ""}, {"Name": " Horai H", "MarcRelator": ""}, {"Name": " Soga T", "MarcRelator": ""}, {"Name": " Institute for Advanced Biosciences", "MarcRelator": ""}, {"Name": " Keio Univ.", "MarcRelator": ""}]}, "License": "CC BY-NC-SA", "Project": null, "Species": {"Link": null, "Name": null, "Sample": null, "Lineage": null}, "Comments": [{"Value": "KEIO_ID D075", "Subtag": ""}, {"Value": "[MS3] KO009104", "Subtag": ""}], "Compound": {"link": [{"Database": "CAS", "Identifier": "533-48-2"}, {"Database": "CHEBI", "Identifier": "16691"}, {"Database": "KEGG", "Identifier": "C01909"}, {"Database": "NIKKAJI", "Identifier": "J9.406D"}, {"Database": "PUBCHEM", "Identifier": "SID:5017"}, {"Database": "INCHIKEY", "Identifier": "AUTOLBMXDDTRRT-JGVFFNPUSA-N"}, {"Database": "COMPTOX", "Identifier": "DTXSID50876136"}], "mass": {"Value": 214.13174}, "name": ["Desthiobiotin", {"Value": "Dethiobiotin"}], "inchi": "InChI=1S/C10H18N2O3/c1-7-8(12-10(15)11-7)5-3-2-4-6-9(13)14/h7-8H,2-6H2,1H3,(H,13,14)(H2,11,12,15)/t7-,8+/m0/s1", "smiles": "OC(=O)CCCCCC(N1)C(C)NC(=O)1", "classes": {"Value": ["N/A"]}, "formula": "C10H18N2O3", "cdk-depict": null}, "Metadata": {"FileName": "/MassBank-data/Keio_Univ/MSBNK-Keio_Univ-KO009105.txt", "VersionRef": ""}, "Accession": "MSBNK-Keio_Univ-KO009105", "Copyright": null, "Deprecated": null, "Acquisition": {"General": null, "Instrument": "LC/MSD Trap XCT, Agilent Technologies", "Chromatography": null, "InstrumentType": "LC-ESI-IT", "MassSpectrometry": [{"Value": "MS4", "Subtag": "MS_TYPE"}, {"Value": "POSITIVE", "Subtag": "ION_MODE"}, {"Value": "0.70/0.70/0.60", "Subtag": "COLLISION_ENERGY"}]}, "Publication": null, "RecordTitle": "Desthiobiotin; LC-ESI-IT; MS4; m/z: 215/197/179; [M+H]+", "MassSpectrometry": {"FocusedIon": [{"Value": "215/197/179", "Subtag": "PRECURSOR_M/Z"}, {"Value": "[M+H]+", "Subtag": "PRECURSOR_TYPE"}], "DataProcessing": [{"Value": "LC/MSD Trap Control and Data Analysis", "Subtag": "WHOLE"}]}}', 1);
---insert into public.massbank (id, filename, document, metadataid) values (56301, '/MassBank-data/MSSJ/MSBNK-MSSJ-MSJ00284.txt', '{"Date": {"Created": "2020-03-18T00:00:00Z", "Updated": "2020-03-18T00:00:00Z", "Modified": "0001-01-01T00:00:00Z"}, "Peak": {"Peak": {"Mz": [31.990100860595703, 34.96910095214844, 41.03919982910156, 69.0342025756836, 97.02890014648438, 131.00100708007812, 149.99920654296875, 166.97740173339844, 185.97610473632812], "Rel": [97, 80, 999, 63, 97, 144, 164, 168, 152], "Header": ["m/z", "int.", "rel.int."], "Intensity": [0.02542000077664852, 0.02094000019133091, 0.26061001420021057, 0.016450000926852226, 0.025310000404715538, 0.03765999898314476, 0.04275999963283539, 0.04391999915242195, 0.03962000086903572]}, "Splash": "splash10-0006-9400000000-6b99aa683e8584601a75", "NumPeak": {"Value": 9}, "Annotation": null}, "Authors": {"Value": [{"Name": "Atsushi Yamamoto", "MarcRelator": ""}, {"Name": " Faculty of Environmental Studies", "MarcRelator": ""}, {"Name": " Tottori University of Environmental Studies", "MarcRelator": ""}, {"Name": " 1-1", "MarcRelator": ""}, {"Name": " Wakabadai-kita", "MarcRelator": ""}, {"Name": " Tottori City", "MarcRelator": ""}, {"Name": " Tottori 689-1111", "MarcRelator": ""}, {"Name": " Japan.", "MarcRelator": ""}]}, "License": "CC BY", "Project": null, "Species": {"Link": null, "Name": null, "Sample": null, "Lineage": null}, "Comments": [{"Value": "The sample was injected by direct infusion.", "Subtag": ""}, {"Value": "This record was created by the financial support of MEXT/JSPS KAKENHI Grant Number 19HP8024 to the Mass Spectrometry Society of Japan.", "Subtag": ""}], "Compound": {"link": [{"Database": "CAS", "Identifier": "110956-75-7"}, {"Database": "CHEMSPIDER", "Identifier": "9888955"}, {"Database": "INCHIKEY", "Identifier": "JZPKLLLUDLHCEL-UHFFFAOYSA-N"}, {"Database": "PUBCHEM", "Identifier": "CID:11714234"}], "mass": {"Value": 353.083}, "name": [{"Value": "Pentoxazone"}], "inchi": "InChI=1S/C17H17ClFNO4/c1-9(2)15-16(21)20(17(22)24-15)13-8-14(11(18)7-12(13)19)23-10-5-3-4-6-10/h7-8,10H,3-6H2,1-2H3", "smiles": "CC(=C1C(=O)N(C(=O)O1)c2cc(c(cc2F)Cl)OC3CCCC3)C", "classes": {"Value": ["Non-natural product"]}, "formula": "C17H17ClFNO4", "cdk-depict": null}, "Metadata": {"FileName": "/MassBank-data/MSSJ/MSBNK-MSSJ-MSJ00284.txt", "VersionRef": ""}, "Accession": "MSBNK-MSSJ-MSJ00284", "Copyright": "Atsushi Yamamoto, Faculty of Environmental Studies, Tottori University of Environmental Studies, 1-1, Wakabadai-kita, Tottori City, Tottori 689-1111, Japan.", "Deprecated": null, "Acquisition": {"General": null, "Instrument": "X500R QTOF (AB Sciex LLC, USA)", "Chromatography": null, "InstrumentType": "ESI-QTOF", "MassSpectrometry": [{"Value": "MS2", "Subtag": "MS_TYPE"}, {"Value": "NEGATIVE", "Subtag": "ION_MODE"}, {"Value": "60 V", "Subtag": "COLLISION_ENERGY"}, {"Value": "CID", "Subtag": "FRAGMENTATION_MODE"}, {"Value": "ESI", "Subtag": "IONIZATION"}]}, "Publication": null, "RecordTitle": "Pentoxazone; ESI-QTOF; MS2; NEGATIVE; [M-H]-; CID; 60 V", "MassSpectrometry": {"FocusedIon": [{"Value": "352.0757", "Subtag": "PRECURSOR_M/Z"}, {"Value": "[M-H]-", "Subtag": "PRECURSOR_TYPE"}], "DataProcessing": null}}', 1);
---insert into public.massbank (id, filename, document, metadataid) values (64943, '/MassBank-data/RIKEN/MSBNK-RIKEN-PR100978.txt', '{"Date": {"Created": "2010-06-21T00:00:00Z", "Updated": "2016-01-19T00:00:00Z", "Modified": "2011-05-06T00:00:00Z"}, "Peak": {"Peak": {"Mz": [107.01429748535156, 109.02989959716797, 121.02980041503906, 151.0034942626953, 163.00360107421875, 178.9989013671875, 255.03109741210938, 301.0353088378906, 302.043212890625, 477.06689453125, 478.0758972167969], "Rel": [79, 57, 84, 352, 63, 169, 71, 999, 82, 472, 51], "Header": ["m/z", "int.", "rel.int."], "Intensity": [370.79998779296875, 267.70001220703125, 395.3999938964844, 1650, 295.20001220703125, 793.7999877929688, 333.29998779296875, 4687, 386, 2215, 237.5]}, "Splash": "splash10-0udi-0609400000-9fd50528da25d66adfc7", "NumPeak": {"Value": 11}, "Annotation": null}, "Authors": {"Value": [{"Name": "Matsuda F", "MarcRelator": ""}, {"Name": " Suzuki M", "MarcRelator": ""}, {"Name": " Sawada Y", "MarcRelator": ""}, {"Name": " Plant Science Center", "MarcRelator": ""}, {"Name": " RIKEN.", "MarcRelator": ""}]}, "License": "CC BY-SA", "Project": null, "Species": {"Link": null, "Name": null, "Sample": null, "Lineage": null}, "Comments": [{"Value": "Acquisition and generation of the data is financially supported in part by CREST/JST.", "Subtag": ""}], "Compound": {"link": [{"Database": "CAS", "Identifier": "22688-79-5"}, {"Database": "CHEMSPIDER", "Identifier": "4438874"}, {"Database": "KNAPSACK", "Identifier": "C00005376"}, {"Database": "PUBCHEM", "Identifier": "CID:5274585"}, {"Database": "INCHIKEY", "Identifier": "DUBCCGAQYVUYEU-ZUGPOPFOSA-N"}, {"Database": "COMPTOX", "Identifier": "DTXSID70945358"}], "mass": {"Value": 478.07474}, "name": ["Quercetin-3-Glucuronide", "Quer-3-GlcA", "Miquelianin", {"Value": "Querciturone"}], "inchi": "InChI=1S/C21H18O13/c22-7-4-10(25)12-11(5-7)32-17(6-1-2-8(23)9(24)3-6)18(13(12)26)33-21-16(29)14(27)15(28)19(34-21)20(30)31/h1-5,14-16,19,21-25,27-29H,(H,30,31)/t14-,15-,16+,19-,21+/m0/s1", "smiles": "OC(=O)C(O1)C(O)C(O)C(O)C1OC(C(=O)3)=C(Oc(c4)c(c(O)cc(O)4)3)c(c2)cc(O)c(O)c2", "classes": {"Value": ["Flavonoid"]}, "formula": "C21H18O13", "cdk-depict": null}, "Metadata": {"FileName": "/MassBank-data/RIKEN/MSBNK-RIKEN-PR100978.txt", "VersionRef": ""}, "Accession": "MSBNK-RIKEN-PR100978", "Copyright": null, "Deprecated": null, "Acquisition": {"General": null, "Instrument": "UPLC Q-Tof Premier, Waters", "Chromatography": [{"Value": "3.0 kV", "Subtag": "CAPILLARY_VOLTAGE"}, {"Value": "23.0 V", "Subtag": "SAMPLING_CONE"}, {"Value": "A CH3CN(0.1%HCOOH)", "Subtag": "SOLVENT"}, {"Value": "B H2O(0.1%HCOOH)", "Subtag": "SOLVENT"}], "InstrumentType": "LC-ESI-QTOF", "MassSpectrometry": [{"Value": "MS2", "Subtag": "MS_TYPE"}, {"Value": "NEGATIVE", "Subtag": "ION_MODE"}, {"Value": "Ramp 5-60 V", "Subtag": "COLLISION_ENERGY"}, {"Value": "Continuum", "Subtag": "DATAFORMAT"}, {"Value": "600.0 L/Hr", "Subtag": "DESOLVATION_GAS_FLOW"}, {"Value": "400 C", "Subtag": "DESOLVATION_TEMPERATURE"}, {"Value": "LOW-ENERGY CID", "Subtag": "FRAGMENTATION_MODE"}, {"Value": "ESI", "Subtag": "IONIZATION"}, {"Value": "120 C", "Subtag": "SOURCE_TEMPERATURE"}]}, "Publication": null, "RecordTitle": "Quercetin-3-Glucuronide; LC-ESI-QTOF; MS2; CE:Ramp 5-60 V; [M-H]-", "MassSpectrometry": {"FocusedIon": [{"Value": "477.06692", "Subtag": "PRECURSOR_M/Z"}, {"Value": "[M-H]-", "Subtag": "PRECURSOR_TYPE"}], "DataProcessing": null}}', 1);
---insert into public.massbank (id, filename, document, metadataid) values (74094, '/MassBank-data/RIKEN/MSBNK-RIKEN-PR309089.txt', '{"Date": {"Created": "2019-03-28T00:00:00Z", "Updated": "2019-03-28T00:00:00Z", "Modified": "0001-01-01T00:00:00Z"}, "Peak": {"Peak": {"Mz": [57.084129333496094, 113.09825897216797, 172.09278869628906, 177.12295532226562, 195.13671875, 196.1464080810547, 197.18630981445312, 223.4345245361328, 233.15977478027344, 277.2161865234375, 295.22772216796875], "Rel": [12, 13, 15, 13, 38, 13, 13, 19, 12, 175, 999], "Header": ["m/z", "int.", "rel.int."], "Intensity": [18, 20, 24, 20, 59, 20, 20, 29, 19, 272, 1553]}, "Splash": "splash10-0002-0090000000-3b4035f10b24d4c3f5a0", "NumPeak": {"Value": 11}, "Annotation": null}, "Authors": {"Value": [{"Name": "Tetsuya Mori", "MarcRelator": ""}, {"Name": " Center for Sustainable Resource Science", "MarcRelator": ""}, {"Name": " RIKEN", "MarcRelator": ""}]}, "License": "CC BY-NC-SA", "Project": null, "Species": {"Link": null, "Name": null, "Sample": null, "Lineage": null}, "Comments": [{"Value": "Annotation level-3", "Subtag": ""}], "Compound": {"link": [{"Database": "INCHIKEY", "Identifier": "HNICUWMFWZBIFP-UHFFFAOYSA-N"}], "mass": {"Value": 296.451}, "name": [{"Value": "FA 18:2+1O"}], "inchi": "InChI=1S/C18H32O3/c1-2-3-11-14-17(19)15-12-9-7-5-4-6-8-10-13-16-18(20)21/h7,9,12,15,17,19H,2-6,8,10-11,13-14,16H2,1H3,(H,20,21)", "smiles": "O=C(O)CCCCCCCC=CC=CC(O)CCCCC", "classes": {"Value": ["Oxidized fatty acids"]}, "formula": "C18H32O3", "cdk-depict": null}, "Metadata": {"FileName": "/MassBank-data/RIKEN/MSBNK-RIKEN-PR309089.txt", "VersionRef": ""}, "Accession": "MSBNK-RIKEN-PR309089", "Copyright": null, "Deprecated": null, "Acquisition": {"General": null, "Instrument": "LC, Waters Acquity UPLC System; MS, Waters Xevo G2 Q-Tof", "Chromatography": [{"Value": "+3.00 kV", "Subtag": "CAPILLARY_VOLTAGE"}, {"Value": "Acquity bridged ethyl hybrid C18 (1.7 um, 2.1 mm * 100 mm, Waters)", "Subtag": "COLUMN_NAME"}, {"Value": "40 C", "Subtag": "COLUMN_TEMPERATURE"}, {"Value": "A/B = (99.5%/0.5% at 0 min, 99.5%/0.5% at 0.1 min, 20%/80% at 10 min, 0.5%/99.5% at 10.1 min, 0.5%/99.5% at 12.0 min, 99.5%/0.5% at 12.1 min, 99.5%/0.5% at 15.0 min)", "Subtag": "FLOW_GRADIENT"}, {"Value": "0.3 ml/min at 0 min, 0.3 ml/min at 10 min, 0.4 ml/min at 10.1 min, 0.4 ml/min at 14.4 min, 0.3 ml/min at 14.5 min", "Subtag": "FLOW_RATE"}, {"Value": "9.57", "Subtag": "RETENTION_TIME"}, {"Value": "A water including 0.1% formic acid", "Subtag": "SOLVENT"}, {"Value": "B acetonitrile including 0.1% formic acid", "Subtag": "SOLVENT"}], "InstrumentType": "LC-ESI-QTOF", "MassSpectrometry": [{"Value": "MS2", "Subtag": "MS_TYPE"}, {"Value": "NEGATIVE", "Subtag": "ION_MODE"}, {"Value": "6V", "Subtag": "COLLISION_ENERGY"}, {"Value": "800/h", "Subtag": "DESOLVATION_GAS_FLOW"}, {"Value": "450 C", "Subtag": "DESOLVATION_TEMPERATURE"}, {"Value": "ESI", "Subtag": "IONIZATION"}]}, "Publication": {"Value": "Tsugawa H., Nakabayashi R., Mori T., Yamada Y., Takahashi M., Rai A., Sugiyama R., Yamamoto H., Nakaya T., Yamazaki M., Kooke R., Bac-Molenaar JA., Oztolan-Erol N., Keurentjes JJB., Arita M., Saito K. (2019) \"A cheminformatics approach to characterize metabolomes in stable-isotope-labeled organisms\" Nature Methods 16(4):295-298. [doi:10.1038/s41592-019-0358-2]"}, "RecordTitle": "FA 18:2+1O; LC-ESI-QTOF; MS2", "MassSpectrometry": {"FocusedIon": [{"Value": "[M-H]-", "Subtag": "PRECURSOR_TYPE"}, {"Value": "295.2272", "Subtag": "PRECURSOR_M/Z"}], "DataProcessing": null}}', 1);
---insert into public.massbank (id, filename, document, metadataid) values (87343, '/MassBank-data/Washington_State_Univ/MSBNK-Washington_State_Univ-BML81902.txt', '{"Date": {"Created": "2012-10-26T00:00:00Z", "Updated": "2016-01-19T00:00:00Z", "Modified": "0001-01-01T00:00:00Z"}, "Peak": {"Peak": {"Mz": [249.1484832763672], "Rel": [999], "Header": ["m/z", "int.", "rel.int."], "Intensity": [310073]}, "Splash": "splash10-0002-0090000000-b81b1903703b01f61d7d", "NumPeak": {"Value": 1}, "Annotation": null}, "Authors": {"Value": [{"Name": "Cuthbertson DJ", "MarcRelator": ""}, {"Name": " Johnson SR", "MarcRelator": ""}, {"Name": " Lange BM", "MarcRelator": ""}, {"Name": " Institute of Biological Chemistry", "MarcRelator": ""}, {"Name": " Washington State University", "MarcRelator": ""}]}, "License": "CC BY-SA", "Project": null, "Species": {"Link": null, "Name": null, "Sample": null, "Lineage": null}, "Comments": [{"Value": "relative retention time with respect to 9-anthracene Carboxylic Acid is 1.002", "Subtag": ""}], "Compound": {"link": [{"Database": "CAS", "Identifier": "20554-84-1"}, {"Database": "CHEMSPIDER", "Identifier": "4554343"}, {"Database": "PUBCHEM", "Identifier": "CID:6473881"}, {"Database": "INCHIKEY", "Identifier": "KTEXNACQROZXEV-SLXBATTESA-N"}], "mass": {"Value": 248.141245}, "name": [{"Value": "Parthenolide"}], "inchi": "InChI=1S/C15H20O3/c1-9-5-4-8-15(3)13(18-15)12-11(7-6-9)10(2)14(16)17-12/h5,11-13H,2,4,6-8H2,1,3H3/b9-5+/t11-,12-,13-,15+/m0/s1", "smiles": "C/C/1=C\\CC[C@@]2([C@@H](O2)[C@@H]3[C@@H](CC1)C(=C)C(=O)O3)C", "classes": {"Value": ["N/A"]}, "formula": "C15H20O3", "cdk-depict": null}, "Metadata": {"FileName": "/MassBank-data/Washington_State_Univ/MSBNK-Washington_State_Univ-BML81902.txt", "VersionRef": ""}, "Accession": "MSBNK-Washington_State_Univ-BML81902", "Copyright": null, "Deprecated": null, "Acquisition": {"General": null, "Instrument": "Agilent 1200 RRLC; Agilent 6520 QTOF", "Chromatography": [{"Value": "Agilent C8 Cartridge Column 2.1X30mm 3.5 micron (guard); Agilent SB-Aq 2.1x50mm 1.8 micron (analytical)", "Subtag": "COLUMN_NAME"}, {"Value": "60 C", "Subtag": "COLUMN_TEMPERATURE"}, {"Value": "linear from 98A/2B at 0 min to 2A/98B at 13 min, hold 6 min at 2A/98B, reequilibration 98A/2B (5 min)", "Subtag": "FLOW_GRADIENT"}, {"Value": "0.6 ml/min", "Subtag": "FLOW_RATE"}, {"Value": "7.394", "Subtag": "RETENTION_TIME"}, {"Value": "A water with 0.2% acetic acid", "Subtag": "SOLVENT"}, {"Value": "B methanol with 0.2% acetic acid", "Subtag": "SOLVENT"}], "InstrumentType": "LC-APCI-QTOF", "MassSpectrometry": [{"Value": "MS", "Subtag": "MS_TYPE"}, {"Value": "POSITIVE", "Subtag": "ION_MODE"}, {"Value": "m/z 100-1000", "Subtag": "SCANNING"}]}, "Publication": null, "RecordTitle": "Parthenolide; LC-APCI-QTOF; MS; POSITIVE", "MassSpectrometry": {"FocusedIon": null, "DataProcessing": null}}', 1);
 INSERT INTO public.massbank (filename, document, metadataid)
 VALUES ('/MassBank3/test-data/MSBNK-test-TST00001.txt', '{
-  "Date": {
-    "Created": "2017-07-07T00:00:00Z",
-    "Updated": "2017-07-07T00:00:00Z",
-    "Modified": "0001-01-01T00:00:00Z"
+  "date": {
+    "created": "2017-07-07T00:00:00Z",
+    "updated": "2017-07-07T00:00:00Z",
+    "modified": "0001-01-01T00:00:00Z"
   },
-  "Peak": {
-    "Peak": {
-      "Mz": [
+  "peak": {
+    "peak": {
+      "mz": [
         185.1073,
         213.1022,
         258.1237
       ],
-      "Rel": [
+      "rel": [
         312,
         999,
         222
       ],
-      "Header": [
+      "header": [
         "m/z",
         "int.",
         "rel.int."
       ],
-      "Intensity": [
+      "intensity": [
         73653728,
         235010720,
         52446636
       ]
     },
-    "Splash": "splash10-03di-0290000000-8035e4fe85235c78b955",
-    "NumPeak": {
-      "Value": 3
+    "splash": "splash10-03di-0290000000-8035e4fe85235c78b955",
+    "n_peak":  3,
+    "annotation": null
+  },
+  "authors":  [
+    {
+      "name": "Megan J. Kelman",
+      "marc_relator": ""
     },
-    "Annotation": null
-  },
-  "Authors": {
-    "Value": [
-      {
-        "Name": "Megan J. Kelman",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " Justin B. Renaud",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " Mark W. Sumarah",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " Agriculture and Agri-Food Canada",
-        "MarcRelator": ""
-      }
-    ]
-  },
-  "License": "CC BY-SA",
-  "Project": null,
-  "Species": {
-    "Link": null,
-    "Name": null,
-    "Sample": null,
-    "Lineage": null
-  },
-  "Comments": null,
-  "Compound": {
+    {
+      "name": " Justin B. Renaud",
+      "marc_relator": ""
+    },
+    {
+      "name": " Mark W. Sumarah",
+      "marc_relator": ""
+    },
+    {
+      "name": " Agriculture and Agri-Food Canada",
+      "marc_relator": ""
+    }
+  ],
+  "license": "CC BY-SA",
+  "project": null,
+  "species": {
     "link": null,
-    "mass": {
-      "Value": 487.22194
-    },
+    "name": null,
+    "Sample": null,
+    "lineage": null
+  },
+  "comments": null,
+  "compound": {
+    "link": null,
+    "mass":  487.22194,
     "name": [
-      {
-        "Value": "Fiscalin C"
-      }
+      "Fiscalin C"
     ],
     "inchi": "InChI=1S/C27H29N5O4/c1-14(2)20-21-28-17-11-7-5-9-15(17)23(34)31(21)19(22(33)29-20)13-27(36)16-10-6-8-12-18(16)32-24(27)30-26(3,4)25(32)35/h5-12,14,19-20,24,30,36H,13H2,1-4H3,(H,29,33)/t19-,20+,24-,27-/m1/s1",
     "smiles": "CC(C)[C@H]1C2=NC3=CC=CC=C3C(=O)N2[C@@H](C(=O)N1)C[C@@]4([C@@H]5NC(C(=O)N5C6=CC=CC=C64)(C)C)O",
-    "classes": {
-      "Value": [
-        "Natural Product"
-      ]
-    },
+    "classes":[
+      "Natural Product"
+    ],
     "formula": "C27H29N5O4",
-    "cdk-depict": null
+    "cdk_depict": null
   },
-  "Metadata": {
-    "FileName": "/MassBank3/test-data/MSBNK-test-TST00001.txt",
-    "VersionRef": ""
+  "metadata": {
+    "file_name": "/MassBank3/test-data/MSBNK-test-TST00001.txt",
+    "version_ref": ""
   },
-  "Accession": "MSBNK-test-TST00001",
-  "Copyright": null,
-  "Deprecated": null,
-  "Acquisition": {
-    "General": null,
-    "Instrument": "Q-Exactive Orbitrap Thermo Scientific",
-    "Chromatography": null,
-    "InstrumentType": "LC-ESI-ITFT",
-    "MassSpectrometry": [
+  "accession": "MSBNK-test-TST00001",
+  "contributor": "test",
+  "copyright": null,
+  "deprecated": null,
+  "acquisition": {
+    "general": null,
+    "instrument": "Q-Exactive Orbitrap Thermo Scientific",
+    "chromatography": null,
+    "instrument_type": "LC-ESI-ITFT",
+    "mass_spectrometry": [
       {
-        "Value": "MS2",
-        "Subtag": "MS_TYPE"
+        "value": "MS2",
+        "subtag": "MS_TYPE"
       },
       {
-        "Value": "POSITIVE",
-        "Subtag": "ION_MODE"
+        "value": "POSITIVE",
+        "subtag": "ION_MODE"
       }
     ]
   },
-  "Publication": null,
-  "RecordTitle": "Fiscalin C; LC-ESI-ITFT; MS2; CE: 30; R=17500; [M+H]+",
-  "MassSpectrometry": {
-    "FocusedIon": null,
-    "DataProcessing": null
+  "publication": null,
+  "title": "Fiscalin C; LC-ESI-ITFT; MS2; CE: 30; R=17500; [M+H]+",
+  "mass_spectrometry": {
+    "focused_ion": null,
+    "data_processing": null
   }
 }', 1);
 INSERT INTO public.massbank (filename, document, metadataid)
 VALUES ('/MassBank3/test-data/MSBNK-test-TST00002.txt', '{
-  "Date": {
-    "Created": "2009-11-24T00:00:00Z",
-    "Updated": "2016-01-19T00:00:00Z",
-    "Modified": "2011-05-11T00:00:00Z"
+  "date": {
+    "created": "2009-11-24T00:00:00Z",
+    "updated": "2016-01-19T00:00:00Z",
+    "modified": "2011-05-11T00:00:00Z"
   },
-  "Peak": {
-    "Peak": {
-      "Mz": [
+  "peak": {
+    "peak": {
+      "mz": [
         1278.12,
         1279.11,
         1279.18,
@@ -1542,7 +1484,7 @@ VALUES ('/MassBank3/test-data/MSBNK-test-TST00002.txt', '{
         2092.3,
         2136.33
       ],
-      "Rel": [
+      "rel": [
         156,
         135,
         142,
@@ -1628,12 +1570,12 @@ VALUES ('/MassBank3/test-data/MSBNK-test-TST00002.txt', '{
         157,
         123
       ],
-      "Header": [
+      "header": [
         "m/z",
         "int.",
         "rel.int."
       ],
-      "Intensity": [
+      "intensity": [
         205,
         177,
         186,
@@ -1720,16 +1662,14 @@ VALUES ('/MassBank3/test-data/MSBNK-test-TST00002.txt', '{
         162
       ]
     },
-    "Splash": "splash10-03dr-0000010098-a1f70871442a6d6662d3",
-    "NumPeak": {
-      "Value": 84
-    },
-    "Annotation": {
-      "Header": [
+    "splash": "splash10-03dr-0000010098-a1f70871442a6d6662d3",
+    "n_peak":  84,
+    "annotation": {
+      "header": [
         "m/z",
         "ion"
       ],
-      "Values": {
+      "values": {
         "ion": [
           "[LH-2NeuAc+Na]+",
           "[M-2NeuAc+Na]+",
@@ -1765,228 +1705,216 @@ VALUES ('/MassBank3/test-data/MSBNK-test-TST00002.txt', '{
       }
     }
   },
-  "Authors": {
-    "Value": [
-      {
-        "Name": "Wada Y",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " Osaka Medical Center for Maternal and Child Health",
-        "MarcRelator": ""
-      }
-    ]
-  },
-  "License": "CC BY-SA",
-  "Project": "my test project",
-  "Species": {
-    "Link": [
-      {
-        "Database": "NCBI-TAXONOMY",
-        "Identifier": "9913"
-      }
-    ],
-    "Name": "Bos taurus",
-    "Sample": [
-      {
-        "Value": "brain"
-      }
-    ],
-    "Lineage": {
-      "Value": [
-        "cellular organisms",
-        "Eukaryota",
-        "Fungi/Metazoa group",
-        "Metazoa",
-        "Eumetazoa",
-        "Bilateria",
-        "Coelomata",
-        "Deuterostomia",
-        "Chordata",
-        "Craniata",
-        "Vertebrata",
-        "Gnathostomata",
-        "Teleostomi",
-        "Euteleostomi",
-        "Sarcopterygii",
-        "Tetrapoda",
-        "Amniota",
-        "Mammalia",
-        "Theria",
-        "Eutheria",
-        "Laurasiatheria",
-        "Cetartiodactyla",
-        "Ruminantia",
-        "Pecora",
-        "Bovidae",
-        "Bovinae",
-        {
-          "Value": "Bos"
-        }
-      ]
-    }
-  },
-  "Comments": [
+  "authors": [
     {
-      "Value": "[Chemical] The ceramide part has 38 carbons and 1 double bond (38:1), but its structure cannot be decided.  The displaying structure is GD1a d18:1-20:0.",
-      "Subtag": ""
+      "name": "Wada Y",
+      "marc_relator": ""
     },
     {
-      "Value": "Profile spectrum of this record is given as a JPEG file.",
-      "Subtag": ""
-    },
-    {
-      "Value": "MCH00001.jpg",
-      "Subtag": "[Profile]"
+      "name": " Osaka Medical Center for Maternal and Child Health",
+      "marc_relator": ""
     }
   ],
-  "Compound": {
+  "license": "CC BY-SA",
+  "project": "my test project",
+  "species": {
     "link": [
       {
-        "Database": "INCHIKEY",
-        "Identifier": "UPMLUBZFFWELOX-IOFMCULOSA-N"
-      },
-      {
-        "Database": "PUBCHEM",
-        "Identifier": "CID:137628549"
+        "database": "NCBI-TAXONOMY",
+        "identifier": "9913"
       }
     ],
-    "mass": {
-      "Value": 1865.00337
+    "name": "Bos taurus",
+    "Sample": [
+      "brain"
+    ],
+    "lineage": [
+      "cellular organisms",
+      "Eukaryota",
+      "Fungi/Metazoa group",
+      "Metazoa",
+      "Eumetazoa",
+      "Bilateria",
+      "Coelomata",
+      "Deuterostomia",
+      "Chordata",
+      "Craniata",
+      "Vertebrata",
+      "Gnathostomata",
+      "Teleostomi",
+      "Euteleostomi",
+      "Sarcopterygii",
+      "Tetrapoda",
+      "Amniota",
+      "Mammalia",
+      "Theria",
+      "Eutheria",
+      "Laurasiatheria",
+      "Cetartiodactyla",
+      "Ruminantia",
+      "Pecora",
+      "Bovidae",
+      "Bovinae",
+      "Bos"
+    ]
+  },
+  "comments": [
+    {
+      "value": "[Chemical] The ceramide part has 38 carbons and 1 double bond (38:1), but its structure cannot be decided.  The displaying structure is GD1a d18:1-20:0.",
+      "subtag": ""
     },
+    {
+      "value": "Profile spectrum of this record is given as a JPEG file.",
+      "subtag": ""
+    },
+    {
+      "value": "MCH00001.jpg",
+      "subtag": "[Profile]"
+    }
+  ],
+  "compound": {
+    "link": [
+      {
+        "database": "INCHIKEY",
+        "identifier": "UPMLUBZFFWELOX-IOFMCULOSA-N"
+      },
+      {
+        "database": "PUBCHEM",
+        "identifier": "CID:137628549"
+      }
+    ],
+    "mass":  1865.00337,
     "name": [
       "Disialoganglioside GD1a",
-      {
-        "Value": "another name"
-      }
+      "another name"
+
     ],
     "inchi": "InChI=1S/C86H152N4O39/c1-6-8-10-12-14-16-18-20-21-22-23-25-27-29-31-33-35-37-60(105)90-50(51(100)36-34-32-30-28-26-24-19-17-15-13-11-9-7-2)46-118-80-69(111)68(110)72(58(44-95)121-80)123-82-71(113)78(129-86(84(116)117)39-53(102)62(88-48(4)98)76(127-86)65(107)55(104)41-92)73(59(45-96)122-82)124-79-63(89-49(5)99)74(66(108)56(42-93)119-79)125-81-70(112)77(67(109)57(43-94)120-81)128-85(83(114)115)38-52(101)61(87-47(3)97)75(126-85)64(106)54(103)40-91/h34,36,50-59,61-82,91-96,100-104,106-113H,6-33,35,37-46H2,1-5H3,(H,87,97)(H,88,98)(H,89,99)(H,90,105)(H,114,115)(H,116,117)/b36-34+/t50-,51+,52-,53-,54+,55+,56+,57+,58+,59+,61+,62+,63+,64?,65?,66-,67-,68+,69+,70+,71+,72+,73-,74+,75+,76+,77-,78+,79-,80+,81-,82-,85-,86-/m0/s1",
     "smiles": "CCCCCCCCCCCCCCCCCCCC(=O)N[C@@H](CO[C@H]1[C@@H]([C@H]([C@@H]([C@H](O1)CO)O[C@H]2[C@@H]([C@H]([C@H]([C@H](O2)CO)O[C@H]3[C@@H]([C@H]([C@H]([C@H](O3)CO)O)O[C@H]4[C@@H]([C@H]([C@H]([C@H](O4)CO)O)O[C@@]5(C[C@@H]([C@H]([C@@H](O5)C([C@@H](CO)O)O)NC(=O)C)O)C(=O)O)O)NC(=O)C)O[C@@]6(C[C@@H]([C@H]([C@@H](O6)C([C@@H](CO)O)O)NC(=O)C)O)C(=O)O)O)O)O)[C@@H](/C=C/CCCCCCCCCCCCC)O",
-    "classes": {
-      "Value": [
-        "Natural Product, Glycolipid",
-        "Ceramide",
-        "Ganglioside"
-      ]
-    },
+    "classes":  [
+      "Natural Product, Glycolipid",
+      "Ceramide",
+      "Ganglioside"
+    ],
     "formula": "C86H152N4O39",
-    "cdk-depict": null
+    "cdk_depict": null
   },
-  "Metadata": {
-    "FileName": "/MassBank3/test-data/MSBNK-test-TST00002.txt",
-    "VersionRef": ""
+  "metadata": {
+    "file_name": "/MassBank3/test-data/MSBNK-test-TST00002.txt",
+    "version_ref": ""
   },
-  "Accession": "MSBNK-test-TST00002",
-  "Copyright": "Copyright (C) 2019 just a test",
-  "Deprecated": null,
-  "Acquisition": {
-    "General": null,
-    "Instrument": "Voyager DE-PRO, Applied Biosystems",
-    "Chromatography": [
+  "accession": "MSBNK-test-TST00002",
+  "contributor": "test",
+  "copyright": "Copyright (C) 2019 just a test",
+  "deprecated": null,
+  "acquisition": {
+    "general": null,
+    "instrument": "Voyager DE-PRO, Applied Biosystems",
+    "chromatography": [
       {
-        "Value": "Acclaim RSLC C18 2.2um, 2.1x100mm, Thermo",
-        "Subtag": "COLUMN_NAME"
+        "value": "Acclaim RSLC C18 2.2um, 2.1x100mm, Thermo",
+        "subtag": "COLUMN_NAME"
       },
       {
-        "Value": "99/1 at 0-1 min, 61/39 at 3 min, 0.1/99.9 at 14-16 min, 99/1 at 16.1-20 min",
-        "Subtag": "FLOW_GRADIENT"
+        "value": "99/1 at 0-1 min, 61/39 at 3 min, 0.1/99.9 at 14-16 min, 99/1 at 16.1-20 min",
+        "subtag": "FLOW_GRADIENT"
       },
       {
-        "Value": "200 uL/min at 0-3 min, 400 uL/min at 14 min, 480 uL/min at 16-19 min, 200 uL/min at 19.1-20 min",
-        "Subtag": "FLOW_RATE"
+        "value": "200 uL/min at 0-3 min, 400 uL/min at 14 min, 480 uL/min at 16-19 min, 200 uL/min at 19.1-20 min",
+        "subtag": "FLOW_RATE"
       },
       {
-        "Value": "5.680 min",
-        "Subtag": "RETENTION_TIME"
+        "value": "5.680 min",
+        "subtag": "RETENTION_TIME"
       },
       {
-        "Value": "A 90:10 water:methanol with 0.01% formic acid and 5mM ammonium formate",
-        "Subtag": "SOLVENT"
+        "value": "A 90:10 water:methanol with 0.01% formic acid and 5mM ammonium formate",
+        "subtag": "SOLVENT"
       },
       {
-        "Value": "B methanol with 0.01% formic acid and 5mM ammonium formate",
-        "Subtag": "SOLVENT"
+        "value": "B methanol with 0.01% formic acid and 5mM ammonium formate",
+        "subtag": "SOLVENT"
       }
     ],
-    "InstrumentType": "MALDI-TOF",
-    "MassSpectrometry": [
+    "instrument_type": "MALDI-TOF",
+    "mass_spectrometry": [
       {
-        "Value": "MS",
-        "Subtag": "MS_TYPE"
+        "value": "MS",
+        "subtag": "MS_TYPE"
       },
       {
-        "Value": "POSITIVE",
-        "Subtag": "ION_MODE"
+        "value": "POSITIVE",
+        "subtag": "ION_MODE"
       },
       {
-        "Value": "UV 337 nm nitrogen lazer, 20 Hz, 10 nsec",
-        "Subtag": "LASER"
+        "value": "UV 337 nm nitrogen lazer, 20 Hz, 10 nsec",
+        "subtag": "LASER"
       },
       {
-        "Value": "DHB",
-        "Subtag": "MATRIX"
+        "value": "DHB",
+        "subtag": "MATRIX"
       },
       {
-        "Value": "500 pmol",
-        "Subtag": "SAMPLE_DRIPPING"
+        "value": "500 pmol",
+        "subtag": "SAMPLE_DRIPPING"
       },
       {
-        "Value": "[MS, MS:1003294, electron activated dissociation, ]",
-        "Subtag": "FRAGMENTATION_MODE"
+        "value": "[MS, MS:1003294, electron activated dissociation, ]",
+        "subtag": "FRAGMENTATION_MODE"
       },
       {
-        "Value": "15 eV",
-        "Subtag": "KINETIC_ENERGY"
+        "value": "15 eV",
+        "subtag": "KINETIC_ENERGY"
       },
       {
-        "Value": "6500 nA",
-        "Subtag": "ELECTRON_CURRENT"
+        "value": "6500 nA",
+        "subtag": "ELECTRON_CURRENT"
       },
       {
-        "Value": "65 ms",
-        "Subtag": "REACTION_TIME"
+        "value": "65 ms",
+        "subtag": "REACTION_TIME"
       }
     ]
   },
-  "Publication": "Beisken S et al (2014) Scientific Data, 1:140029, DOI:10.1038/sdata.2014.29. http://www.ebi.ac.uk/metabolights/MTBLS38",
-  "RecordTitle": "Disialoganglioside GD1a; MALDI-TOF; MS; Pos",
-  "MassSpectrometry": {
-    "FocusedIon": [
+  "publication": "Beisken S et al (2014) Scientific Data, 1:140029, DOI:10.1038/sdata.2014.29. http://www.ebi.ac.uk/metabolights/MTBLS38",
+  "title": "Disialoganglioside GD1a; MALDI-TOF; MS; Pos",
+  "mass_spectrometry": {
+    "focused_ion": [
       {
-        "Value": "324.2092",
-        "Subtag": "BASE_PEAK"
+        "value": "324.2092",
+        "subtag": "BASE_PEAK"
       },
       {
-        "Value": "324.207",
-        "Subtag": "PRECURSOR_M/Z"
+        "value": "324.207",
+        "subtag": "PRECURSOR_M/Z"
       },
       {
-        "Value": "[M+H]+",
-        "Subtag": "PRECURSOR_TYPE"
+        "value": "[M+H]+",
+        "subtag": "PRECURSOR_TYPE"
       }
     ],
-    "DataProcessing": [
+    "data_processing": [
       {
-        "Value": "identity on assigned fragments and MS1",
-        "Subtag": "RECALIBRATE"
+        "value": "identity on assigned fragments and MS1",
+        "subtag": "RECALIBRATE"
       },
       {
-        "Value": "RMassBank 1.99.10",
-        "Subtag": "WHOLE"
+        "value": "RMassBank 1.99.10",
+        "subtag": "WHOLE"
       }
     ]
   }
 }', 1);
 INSERT INTO public.massbank (filename, document, metadataid)
 VALUES ('/MassBank3/test-data/MSBNK-test-TST00003.txt', '{
-  "Date": {
-    "Created": "2018-11-21T00:00:00Z",
-    "Updated": "2018-11-21T00:00:00Z",
-    "Modified": "0001-01-01T00:00:00Z"
+  "date": {
+    "created": "2018-11-21T00:00:00Z",
+    "updated": "2018-11-21T00:00:00Z",
+    "modified": "0001-01-01T00:00:00Z"
   },
-  "Peak": {
-    "Peak": {
-      "Mz": [
+  "peak": {
+    "peak": {
+      "mz": [
         59.013471921284996,
         95.0502389272054,
         121.1022351582845,
@@ -1998,7 +1926,7 @@ VALUES ('/MassBank3/test-data/MSBNK-test-TST00003.txt', '{
         325.2170130411784,
         343.22746022542316
       ],
-      "Rel": [
+      "rel": [
         22,
         58,
         999,
@@ -2010,12 +1938,12 @@ VALUES ('/MassBank3/test-data/MSBNK-test-TST00003.txt', '{
         115,
         824
       ],
-      "Header": [
+      "header": [
         "m/z",
         "int.",
         "rel.int."
       ],
-      "Intensity": [
+      "intensity": [
         47825.663583333335,
         123675.15916666668,
         2119825.3000000003,
@@ -2028,18 +1956,16 @@ VALUES ('/MassBank3/test-data/MSBNK-test-TST00003.txt', '{
         1749842.5083333335
       ]
     },
-    "Splash": "splash10-00dl-0914000000-bad728fe323f6890656d",
-    "NumPeak": {
-      "Value": 10
-    },
-    "Annotation": {
-      "Header": [
+    "splash": "splash10-00dl-0914000000-bad728fe323f6890656d",
+    "n_peak":  10,
+    "annotation": {
+      "header": [
         "m/z",
         "annotation",
         "exact_mass",
         "error(ppm)"
       ],
-      "Values": {
+      "values": {
         "m/z": [
           59.013471921284996,
           95.0502389272054,
@@ -2091,141 +2017,135 @@ VALUES ('/MassBank3/test-data/MSBNK-test-TST00003.txt', '{
       }
     }
   },
-  "Authors": {
-    "Value": [
-      {
-        "Name": "Nils Hoffmann",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " Dominik Kopczynski",
-        "MarcRelator": ""
-      },
-      {
-        "Name": " Bing Peng",
-        "MarcRelator": ""
-      }
-    ]
-  },
-  "License": "CC BY-SA",
-  "Project": null,
-  "Species": {
-    "Link": null,
-    "Name": null,
-    "Sample": null,
-    "Lineage": null
-  },
-  "Comments": [
+  "authors":  [
     {
-      "Value": "standard compound",
-      "Subtag": "CONFIDENCE"
+      "name": "Nils Hoffmann",
+      "marc_relator": ""
     },
     {
-      "Value": "NATIVE_RUN_ID QExHF03_NM_0001275.mzML",
-      "Subtag": ""
+      "name": " Dominik Kopczynski",
+      "marc_relator": ""
     },
     {
-      "Value": "PROCESSING averaging of repeated ion fragments at 20.0 eV within 5 ppm window [MS, MS:1000575, mean of spectra, ]",
-      "Subtag": ""
+      "name": " Bing Peng",
+      "marc_relator": ""
     }
   ],
-  "Compound": {
+  "license": "CC BY-SA",
+  "project": null,
+  "species": {
+    "link": null,
+    "name": null,
+    "Sample": null,
+    "lineage": null
+  },
+  "comments": [
+    {
+      "value": "standard compound",
+      "subtag": "CONFIDENCE"
+    },
+    {
+      "value": "NATIVE_RUN_ID QExHF03_NM_0001275.mzML",
+      "subtag": ""
+    },
+    {
+      "value": "PROCESSING averaging of repeated ion fragments at 20.0 eV within 5 ppm window [MS, MS:1000575, mean of spectra, ]",
+      "subtag": ""
+    }
+  ],
+  "compound": {
     "link": [
       {
-        "Database": "CHEBI",
-        "Identifier": "CHEBI:72794"
+        "database": "CHEBI",
+        "identifier": "CHEBI:72794"
       },
       {
-        "Database": "LIPIDMAPS",
-        "Identifier": "LMFA04000028"
+        "database": "LIPIDMAPS",
+        "identifier": "LMFA04000028"
       },
       {
-        "Database": "INCHIKEY",
-        "Identifier": "LTERDCBCHFKFRI-BGKMTWLOSA-N"
+        "database": "INCHIKEY",
+        "identifier": "LTERDCBCHFKFRI-BGKMTWLOSA-N"
       },
       {
-        "Database": "PUBCHEM",
-        "Identifier": "CID:11631564"
+        "database": "PUBCHEM",
+        "identifier": "CID:11631564"
       }
     ],
-    "mass": {
-      "Value": 344.23514
-    },
+    "mass": 344.23514,
     "name": [
-      {
-        "Value": "11-HDoHE"
-      }
+      "11-HDoHE"
+
     ],
     "inchi": "InChI=1S/C22H32O3/c1-2-3-4-5-6-7-9-12-15-18-21(23)19-16-13-10-8-11-14-17-20-22(24)25/h3-4,6-7,10-16,19,21,23H,2,5,8-9,17-18,20H2,1H3,(H,24,25)/b4-3-,7-6-,13-10-,14-11-,15-12-,19-16+",
     "smiles": "CC\\C=C/C\\C=C/C\\C=C/CC(O)\\C=C\\C=C/C\\C=C/CCC(O)=O",
-    "classes": {
-      "Value": [
-        "Natural Product",
-        "Lipid Standard"
-      ]
-    },
+    "classes": [
+      "Natural Product",
+      "Lipid Standard"
+    ],
     "formula": "C22H32O3",
-    "cdk-depict": null
+    "cdk_depict": null
   },
-  "Metadata": {
-    "FileName": "/MassBank3/test-data/MSBNK-test-TST00003.txt",
-    "VersionRef": ""
+  "metadata": {
+    "file_name": "/MassBank3/test-data/MSBNK-test-TST00003.txt",
+    "version_ref": ""
   },
-  "Accession": "MSBNK-test-TST00003",
-  "Copyright": "Copyright (C) 2019, Leibniz Institut fuer Analytische Wissenschaften - ISAS - e.V., Dortmund, Germany",
-  "Deprecated": {
-    "Date": "2019-11-25T00:00:00Z",
-    "Reason": "Wrong MS measurement assigned"
+  "accession": "MSBNK-test-TST00003",
+  "contributor": "test",
+  "copyright": "Copyright (C) 2019, Leibniz Institut fuer Analytische Wissenschaften - ISAS - e.V., Dortmund, Germany",
+  "deprecated": {
+    "date": "2019-11-25T00:00:00Z",
+    "reason": "Wrong MS measurement assigned"
   },
-  "Acquisition": {
-    "General": null,
-    "Instrument": "Q-Exactive HF, Thermo Scientific [MS:1002523]",
-    "Chromatography": null,
-    "InstrumentType": "LC-ESI-QTOF",
-    "MassSpectrometry": [
+  "acquisition": {
+    "general": null,
+    "instrument": "Q-Exactive HF, Thermo Scientific [MS:1002523]",
+    "chromatography": null,
+    "instrument_type": "LC-ESI-QTOF",
+    "mass_spectrometry": [
       {
-        "Value": "MS2",
-        "Subtag": "MS_TYPE"
+        "value": "MS2",
+        "subtag": "MS_TYPE"
       },
       {
-        "Value": "NEGATIVE",
-        "Subtag": "ION_MODE"
+        "value": "NEGATIVE",
+        "subtag": "ION_MODE"
       },
       {
-        "Value": "ESI",
-        "Subtag": "IONIZATION"
+        "value": "ESI",
+        "subtag": "IONIZATION"
       },
       {
-        "Value": "HCD",
-        "Subtag": "FRAGMENTATION_MODE"
+        "value": "HCD",
+        "subtag": "FRAGMENTATION_MODE"
       },
       {
-        "Value": "20.0 eV",
-        "Subtag": "COLLISION_ENERGY"
+        "value": "20.0 eV",
+        "subtag": "COLLISION_ENERGY"
       },
       {
-        "Value": "N/A",
-        "Subtag": "RESOLUTION"
+        "value": "N/A",
+        "subtag": "RESOLUTION"
       }
     ]
   },
-  "Publication": null,
-  "RecordTitle": "11-HDoHE; LC-ESI-QTOF; MS2; CE: 20.0; R=N/A; [M-H]-",
-  "MassSpectrometry": {
-    "FocusedIon": [
+  "publication": null,
+  "title": "11-HDoHE; LC-ESI-QTOF; MS2; CE: 20.0; R=N/A; [M-H]-",
+  "mass_spectrometry": {
+    "focused_ion": [
       {
-        "Value": "343.2279",
-        "Subtag": "BASE_PEAK"
+        "value": "343.2279",
+        "subtag": "BASE_PEAK"
       },
       {
-        "Value": "343.2279",
-        "Subtag": "PRECURSOR_M/Z"
+        "value": "343.2279",
+        "subtag": "PRECURSOR_M/Z"
       },
       {
-        "Value": "[M-H]-",
-        "Subtag": "PRECURSOR_TYPE"
+        "value": "[M-H]-",
+        "subtag": "PRECURSOR_TYPE"
       }
     ],
-    "DataProcessing": null
+    "data_processing": null
   }
 }', 1);

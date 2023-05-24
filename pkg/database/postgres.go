@@ -151,7 +151,7 @@ func (p *PostgresSQLDB) DropAllRecords() error {
 func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	var result massbank.MassBank2
 	var b []byte
-	if err := p.database.QueryRow("SELECT document FROM massbank WHERE document->>'Accession' = $1", *s).Scan(&b); err != nil {
+	if err := p.database.QueryRow("SELECT document FROM massbank WHERE document->>'accession' = $1", *s).Scan(&b); err != nil {
 		return nil, err
 	}
 	var err = json.Unmarshal(b, &result)
@@ -172,39 +172,39 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.MassBank2, int6
 
 	where := bqb.Optional("WHERE")
 	if filters.InstrumentType != nil {
-		where.And("document->'Acquisition'->>'InstrumentType' IN (?)", *filters.InstrumentType)
+		where.And("document->'acquisition'->>'instrument_type' IN (?)", *filters.InstrumentType)
 	}
 	if filters.MsType != nil {
 		var msTypes []string
 		for _, ms := range *filters.MsType {
 			msTypes = append(msTypes, ms.String())
 		}
-		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Acquisition'->'MassSpectrometry') ms WHERE ms->>'Subtag' = 'MS_TYPE' AND ms->>'Value' IN (?))", msTypes)
+		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'acquisition'->'mass_spectrometry') ms WHERE ms->>'subtag' = 'MS_TYPE' AND ms->>'value' IN (?))", msTypes)
 	}
 	if filters.IonMode != massbank.ANY {
-		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Acquisition'->'MassSpectrometry') ms WHERE ms->>'Subtag' = 'ION_MODE' AND ms->>'Value' = ?)", string(filters.IonMode))
+		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'acquisition'->'mass_spectrometry') ms WHERE ms->>'subtag' = 'ION_MODE' AND ms->>'value' = ?)", string(filters.IonMode))
 	}
 	if filters.Mass != nil {
-		where.And("(document->'Compound'->>'mass')::float BETWEEN ? AND ?", *filters.Mass-*filters.MassEpsilon, *filters.Mass+*filters.MassEpsilon)
+		where.And("(document->'compound'->>'mass')::float BETWEEN ? AND ?", *filters.Mass-*filters.MassEpsilon, *filters.Mass+*filters.MassEpsilon)
 	}
 	if filters.Splash != "" {
-		where.And("document->'Peak'->>'Splash' = ?", filters.Splash)
+		where.And("document->'peak'->>'splash' = ?", filters.Splash)
 	}
 	if filters.CompoundName != "" {
-		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Compound'->'name') name WHERE name::text ILIKE ?)", "%"+filters.CompoundName+"%")
+		where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'compound'->'name') name WHERE name::text ILIKE ?)", "%"+filters.CompoundName+"%")
 	}
 	if filters.Formula != "" {
-		where.And("document->'Compound'->>'formula' ILIKE ?", "%"+filters.Formula+"%")
+		where.And("document->'compound'->>'formula' ILIKE ?", "%"+filters.Formula+"%")
 	}
 	if filters.Contributor != "" {
-		where.And("document->>'Accession' ILIKE ?", "%"+filters.Contributor+"%")
+		where.And("document->>'accession' ILIKE ?", "%"+filters.Contributor+"%")
 	}
 	if filters.InchiKey != "" {
-		where.And("jsonb_typeof(document->'Compound'->'link') = 'array' AND EXISTS (SELECT * FROM jsonb_array_elements(document->'Compound'->'link') link WHERE link->>'Database' = 'INCHIKEY' AND link->>'Identifier' = ?)", filters.InchiKey)
+		where.And("jsonb_typeof(document->'compound'->'link') = 'array' AND EXISTS (SELECT * FROM jsonb_array_elements(document->'compound'->'link') link WHERE link->>'database' = 'INCHIKEY' AND link->>'identifier' = ?)", filters.InchiKey)
 	}
 	if filters.Peaks != nil {
 		for _, p := range *filters.Peaks {
-			where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'Peak'->'Peak'->'Mz') mz WHERE mz BETWEEN ? AND ?)", p-*filters.MassEpsilon, p+*filters.MassEpsilon)
+			where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'peak'->'peak'->'mz') mz WHERE mz BETWEEN ? AND ?)", p-*filters.MassEpsilon, p+*filters.MassEpsilon)
 		}
 	}
 
@@ -216,7 +216,7 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.MassBank2, int6
 			diff.Or("(t1.mz-t2.mz BETWEEN ? AND ?)", pd-*filters.MassEpsilon, pd+*filters.MassEpsilon)
 		}
 		innerwhere.And("?", diff)
-		query = bqb.New("SELECT massbank.document FROM massbank JOIN (WITH t AS (SELECT mz,id FROM (SELECT jsonb_array_elements(document->'Peak'->'Peak'->'Mz')::float AS mz,jsonb_array_elements(document->'Peak'->'Peak'->'Rel')::int AS rel,id FROM massbank) as relmz WHERE relmz.rel>=?) SELECT DISTINCT t1.id FROM t as t1 LEFT JOIN t as t2 ON t1.id=t2.id ?) AS diff ON massbank.id = diff.id", *filters.IntensityCutoff, innerwhere)
+		query = bqb.New("SELECT massbank.document FROM massbank JOIN (WITH t AS (SELECT mz,id FROM (SELECT jsonb_array_elements(document->'peak'->'peak'->'mz')::float AS mz,jsonb_array_elements(document->'peak'->'peak'->'rel')::int AS rel,id FROM massbank) as relmz WHERE relmz.rel>=?) SELECT DISTINCT t1.id FROM t as t1 LEFT JOIN t as t2 ON t1.id=t2.id ?) AS diff ON massbank.id = diff.id", *filters.IntensityCutoff, innerwhere)
 
 	}
 	query.Space("ORDER BY massbank.id LIMIT ? OFFSET ?", filters.Limit, filters.Offset)
@@ -254,34 +254,34 @@ SELECT to_json(co) as contributor,
        i.maxi      as max_intensity,
        i.mini      as min_intensity
 FROM (SELECT ARRAY(SELECT t
-                   FROM (SELECT document ->> 'Contributor' as val,
+                   FROM (SELECT document ->> 'contributor' as val,
                                 count(id)
                          from massbank
-                         GROUP BY document ->> 'Contributor' ORDER BY document ->> 'Contributor') t)) as co,
+                         GROUP BY document ->> 'contributor' ORDER BY document ->> 'contributor') t)) as co,
     (SELECT ARRAY(SELECT t
-                   FROM (SELECT document -> 'Acquisition' ->> 'InstrumentType' as val,
+                   FROM (SELECT document -> 'acquisition' ->> 'instrument_type' as val,
                                 count(id)
                          from massbank
-                         GROUP BY document -> 'Acquisition' ->> 'InstrumentType' ORDER BY document -> 'Acquisition' ->> 'InstrumentType' ) t)) as it,
+                         GROUP BY document -> 'acquisition' ->> 'instrument_type' ORDER BY document -> 'acquisition' ->> 'instrument_type' ) t)) as it,
      (SELECT ARRAY(SELECT t
-                   FROM (select t.ms ->> 'Value' as val, count(t.ms)
-                         FROM (Select jsonb_array_elements(document -> 'Acquisition' -> 'MassSpectrometry') as ms
+                   FROM (select t.ms ->> 'value' as val, count(t.ms)
+                         FROM (Select jsonb_array_elements(document -> 'acquisition' -> 'mass_spectrometry') as ms
                                from massbank) t
-                         where ms ->> 'Subtag' = 'MS_TYPE'
+                         where ms ->> 'subtag' = 'MS_TYPE'
                          GROUP BY t.ms ORDER BY t.ms) t)) as mt,
      (SELECT ARRAY(SELECT t
-                   FROM (select t.ms ->> 'Value' as val, count(t.ms)
-                         FROM (Select jsonb_array_elements(document -> 'Acquisition' -> 'MassSpectrometry') as ms
+                   FROM (select t.ms ->> 'value' as val, count(t.ms)
+                         FROM (Select jsonb_array_elements(document -> 'acquisition' -> 'mass_spectrometry') as ms
                                from massbank) t
-                         where ms ->> 'Subtag' = 'ION_MODE'
+                         where ms ->> 'subtag' = 'ION_MODE'
                          GROUP BY t.ms ORDER BY t.ms) t)) as im,
-     (SELECT MIN((document -> 'Compound' ->> 'mass' )::float8) as minm,
-             MAX((document -> 'Compound' ->> 'mass' )::float8) as maxm
+     (SELECT MIN((document -> 'compound' ->> 'mass' )::float8) as minm,
+             MAX((document -> 'compound' ->> 'mass' )::float8) as maxm
       from massbank) as mass,
      (SELECT MIN(t.mz) as minmz, MAX(t.mz) as maxmz
-      from (SELECT jsonb_array_elements(document -> 'Peak' -> 'Peak' -> 'Mz')::float8 as mz FROM massbank) t) as mz,
+      from (SELECT jsonb_array_elements(document -> 'peak' -> 'peak' -> 'mz')::float8 as mz FROM massbank) t) as mz,
      (SELECT MIN(t.i) as mini, MAX(t.i) as maxi
-      FROM (SELECT jsonb_array_elements(document -> 'Peak' -> 'Peak' -> 'Intensity')::float8 as i
+      FROM (SELECT jsonb_array_elements(document -> 'peak' -> 'peak' -> 'intensity')::float8 as i
             FROM massbank) t) as i`
 	var val MB3Values
 	row := p.database.QueryRow(query)
@@ -416,7 +416,7 @@ func (p *PostgresSQLDB) UpdateRecords(records []*massbank.MassBank2, metaDataId 
                      document,
                      metadataid)
 			VALUES ($1,$2,$3)
-			ON CONFLICT ((document->'Accession'),metadataid) DO UPDATE 
+			ON CONFLICT ((document->'accession'),metadataid) DO UPDATE 
 				SET filename = $1,
 				    document = $2;
 		`
@@ -426,7 +426,7 @@ func (p *PostgresSQLDB) UpdateRecords(records []*massbank.MassBank2, metaDataId 
 		UPDATE massbank 
 			SET filename = $1,
 			    document = $2
-			WHERE (document->'Accession') = $4 
+			WHERE (document->'accession') = $4 
 			  AND  metadataid= $3 `
 	}
 	tx, err := p.database.Begin()
@@ -489,8 +489,8 @@ func (p *PostgresSQLDB) init() error {
 			 metadataId INT,
 			 FOREIGN KEY  (metadataId) REFERENCES metadata(id))
  		`,
-		`CREATE INDEX IF NOT EXISTS mb_accession_idx ON massbank((document->'Accession'))`,
-		`CREATE UNIQUE INDEX IF NOT EXISTS mb_accession_metadata_idx ON massbank((document->'Accession'),metadataid)`,
+		`CREATE INDEX IF NOT EXISTS mb_accession_idx ON massbank((document->'accession'))`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS mb_accession_metadata_idx ON massbank((document->'accession'),metadataid)`,
 	}
 	for _, q := range queries {
 		if _, err = p.database.Exec(q); err != nil {
