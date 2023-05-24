@@ -43,13 +43,17 @@ func initDB() error {
 
 }
 
-func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, contributor string) (*BrowseOptions, error) {
+func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, contributor []string) (*BrowseOptions, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
 	it := &instrumentTyoe
 	if len(*it) == 0 || (len(*it) == 1 && (*it)[0] == "") {
 		it = nil
+	}
+	co := &contributor
+	if len(*co) == 0 || (len(*co) == 1 && (*co)[0] == "") {
+		co = nil
 	}
 	filters := database.Filters{
 		InstrumentType:  it,
@@ -63,7 +67,7 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 		Peaks:           nil,
 		PeakDifferences: nil,
 		InchiKey:        "",
-		Contributor:     contributor,
+		Contributor:     co,
 		IntensityCutoff: nil,
 		Limit:           0,
 		Offset:          0,
@@ -112,7 +116,7 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 	return &result, nil
 }
 
-func GetRecords(limit int32, page int32, contributor string, instrumentType []string, msType []string, ionMode string) (*SearchResult, error) {
+func GetRecords(limit int32, page int32, contributor []string, instrumentType []string, msType []string, ionMode string) (*SearchResult, error) {
 	if limit <= 0 {
 		limit = 20
 	}
@@ -123,6 +127,10 @@ func GetRecords(limit int32, page int32, contributor string, instrumentType []st
 	it := &instrumentType
 	if len(*it) == 0 || (len(*it) == 1 && (*it)[0] == "") {
 		it = nil
+	}
+	co := &contributor
+	if len(*co) == 0 || (len(*co) == 1 && (*co)[0] == "") {
+		co = nil
 	}
 
 	var offset = (page - 1) * limit
@@ -142,7 +150,7 @@ func GetRecords(limit int32, page int32, contributor string, instrumentType []st
 		Peaks:           nil,
 		PeakDifferences: nil,
 		InchiKey:        "",
-		Contributor:     contributor,
+		Contributor:     co,
 		IntensityCutoff: nil,
 		Limit:           int64(limit),
 		Offset:          int64(offset),

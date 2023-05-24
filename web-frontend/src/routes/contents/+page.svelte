@@ -9,8 +9,13 @@
     let base: string;
     let cur_page: number = 1;
     let pages: number = 10;
-    async function getFilters(base) {
-        let resp = await fetch(base + "/v1/filter/browse");
+    async function getFilters() {
+        let url = new URL("/v1/filter/browse",base)
+        url.searchParams.append('instrument_type',instrumentType.join())
+        url.searchParams.append('ms_type',msType.join())
+        url.searchParams.append('ion-mode',ionMode.join())
+        url.searchParams.append('contributor',contributors.join())
+        let resp = await fetch(url);
         let jsonData = await resp.json();
         if (resp.ok) {
             return jsonData
@@ -28,8 +33,6 @@
         url.searchParams.append('ms_type',msType.join())
         url.searchParams.append('ion-mode',ionMode.join())
         url.searchParams.append('contributor',contributors.join())
-
-        console.log(url)
         let resp = await fetch(url)
         let jsonData = await  resp.json();
         if(resp.ok) {
@@ -54,19 +57,19 @@
 </script>
 <div class="pure-g">
     <div class="pure-u-1-5">
-        {#await getFilters(base)}
+        {#await getFilters()}
             <div class="info">loading filters...</div>
         {:then filters}
             <div class="card">
                 <h2>Filters</h2>
-                <h3>Contributor</h3>
-                <FilterButton bind:result={contributors} group="cont" values={filters.contributor}></FilterButton>
                 <h3>Instrument Type</h3>
                 <FilterButton bind:result={instrumentType} group="itype" values={filters.instrument_type}></FilterButton>
                 <h3>MS Type</h3>
                 <FilterButton bind:result={msType} group="mstype" values={filters.ms_type}></FilterButton>
                 <h3>Ion Mode</h3>
                 <FilterButton bind:result={ionMode} group="imode" values={filters.ion_mode}></FilterButton>
+                <h3>Contributor</h3>
+                <FilterButton bind:result={contributors} group="cont" values={filters.contributor}></FilterButton>
             </div>
         {:catch error}
             <div class="error">Error during Filter loading</div>

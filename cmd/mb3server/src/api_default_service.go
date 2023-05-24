@@ -27,7 +27,7 @@ func NewDefaultApiService() DefaultApiServicer {
 }
 
 // GetBrowseOptions - get browse options
-func (s *DefaultApiService) GetBrowseOptions(ctx context.Context, instrumentType []string, msType []string, ionMode string, contributor string) (ImplResponse, error) {
+func (s *DefaultApiService) GetBrowseOptions(ctx context.Context, instrumentType []string, msType []string, ionMode string, contributor []string) (ImplResponse, error) {
 	opt, err := GetBrowseOptions(instrumentType, msType, ionMode, contributor)
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), errors.New("Could not get results")
@@ -38,7 +38,7 @@ func (s *DefaultApiService) GetBrowseOptions(ctx context.Context, instrumentType
 // GetFilterOptions - get filter options
 func (s *DefaultApiService) GetFilterOptions(ctx context.Context) (ImplResponse, error) {
 
-	opt, err := GetBrowseOptions()
+	opt, err := GetBrowseOptions([]string{}, []string{}, "", []string{})
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), errors.New("Could not get results")
 	}
@@ -69,7 +69,7 @@ func (s *DefaultApiService) GetRecord(ctx context.Context, accession string) (Im
 }
 
 // GetRecords - Get a list of records
-func (s *DefaultApiService) GetRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, limit int32, page int32, intensityCutoff int32, inchiKey string, contributor string) (ImplResponse, error) {
+func (s *DefaultApiService) GetRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, limit int32, page int32, intensityCutoff int32, inchiKey string, contributor []string) (ImplResponse, error) {
 	result, err := GetRecords(limit, page, contributor, instrumentType, msType, ionMode)
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), errors.New("Could not get results")

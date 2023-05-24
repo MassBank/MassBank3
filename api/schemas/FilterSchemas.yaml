@@ -63,4 +63,7 @@ components:
       minimum: 1
       default: 1
     Contributor:
-      type: string
+      type: array
+      items:
+        type: string
+        description: "The short version of the contributor name"

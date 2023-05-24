@@ -88,7 +88,7 @@ func (c *DefaultApiController) GetBrowseOptions(w http.ResponseWriter, r *http.R
 	instrumentTypeParam := strings.Split(query.Get("instrument_type"), ",")
 	msTypeParam := strings.Split(query.Get("ms_type"), ",")
 	ionModeParam := query.Get("ion-mode")
-	contributorParam := query.Get("contributor")
+	contributorParam := strings.Split(query.Get("contributor"), ",")
 	result, err := c.service.GetBrowseOptions(r.Context(), instrumentTypeParam, msTypeParam, ionModeParam, contributorParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -180,7 +180,7 @@ func (c *DefaultApiController) GetRecords(w http.ResponseWriter, r *http.Request
 		return
 	}
 	inchiKeyParam := query.Get("inchi_key")
-	contributorParam := query.Get("contributor")
+	contributorParam := strings.Split(query.Get("contributor"), ",")
 	result, err := c.service.GetRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, limitParam, pageParam, intensityCutoffParam, inchiKeyParam, contributorParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {

@@ -313,7 +313,10 @@ components:
     InChIKey:
       type: string
     Contributor:
-      type: string
+      items:
+        description: The short version of the contributor name
+        type: string
+      type: array
     SearchResult:
       example:
         metadata:
