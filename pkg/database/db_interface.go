@@ -8,21 +8,22 @@ import (
 // Filters is the abstract description of filters used to find MassBank records
 // in the database
 type Filters struct {
-	InstrumentType  *[]string
-	Splash          string
-	MsType          *[]massbank.MsType
-	IonMode         massbank.IonMode
-	CompoundName    string //regex
-	Mass            *float64
-	MassEpsilon     *float64
-	Formula         string // regex
-	Peaks           *[]float64
-	PeakDifferences *[]float64
-	InchiKey        string
-	Contributor     *[]string
-	IntensityCutoff *int64
-	Limit           int64
-	Offset          int64
+	InstrumentType    *[]string
+	Splash            string
+	MsType            *[]massbank.MsType
+	IonMode           massbank.IonMode
+	CompoundName      string //regex
+	Mass              *float64
+	MassEpsilon       *float64
+	Formula           string // regex
+	Peaks             *[]float64
+	PeakDifferences   *[]float64
+	InchiKey          string
+	Contributor       *[]string
+	IntensityCutoff   *int64
+	Limit             int64
+	Offset            int64
+	IncludeDeprecated bool
 }
 
 // DatabaseType is an enum containing the database type

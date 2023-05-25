@@ -28,7 +28,72 @@ type Mb3MongoDB struct {
 }
 
 func (db *Mb3MongoDB) GetMetaData() (*MB3MetaData, error) {
-	var query = ``
+	var query = `
+	    [
+       	{ "$match": {"deprecated": null}},
+        {
+            "$facet": {
+                "IsomerCount": [
+                    {
+                        "$project": {
+                            "ikey": {
+                                "$filter": {
+                                    "input": "$compound.link",
+                                    "as": "link",
+                                    "cond": { "$eq": ["$$link.key", "INCHIKEY"]
+                                    }
+                                }
+                    }}},
+                    {
+                        "$unwind": "$ikey"
+                    },
+                    {
+                        "$group": {
+                            "_id": "$ikey.value",
+                        }
+                    },
+                    {
+                        "$count": "count"
+                    },
+                ],
+                "CompoundCount": [
+                    {
+                        "$project": {
+                            "ikey": {
+                                "$filter": {
+                                    "input": "$compound.link",
+                                    "as": "link",
+                                    "cond": { "$eq": ["$$link.key", "INCHIKEY"]
+                                    }
+                                }
+                            }}},
+                    {
+                        "$unwind": "$ikey"
+                    },
+                    {
+                        "$group": {
+                            "_id": {"$substr": ["$ikey.value",0,14]},
+                        }
+                    },
+                    {
+                        "$count": "count"
+                    },
+                ],
+                "SpectraCount": [
+                    {
+                        "$count": "count"
+                    },
+                ]
+            }
+        },
+        {
+            "$project": {
+                "IsomerCount": {"$first": "$IsomerCount.count"},
+                "CompoundCount": {"$first": "$CompoundCount.count"},
+                "SpectraCount": {"$first": "$SpectraCount.count"}
+            }
+        }
+    ]`
 	var bdoc interface{}
 	if err := bson2.UnmarshalJSON([]byte(query), &bdoc); err != nil {
 		return nil, err
@@ -37,7 +102,7 @@ func (db *Mb3MongoDB) GetMetaData() (*MB3MetaData, error) {
 	if err != nil {
 		return nil, err
 	}
-	var temp = make([]bson.D, 0)
+	var temp []bson.M
 	if err = cur.All(context.Background(), &temp); err != nil {
 		return nil, err
 	}
@@ -45,9 +110,9 @@ func (db *Mb3MongoDB) GetMetaData() (*MB3MetaData, error) {
 		Version:       "",
 		TimeStamp:     "",
 		GitCommit:     "",
-		SpectraCount:  0,
-		CompoundCount: 0,
-		IsomerCount:   0,
+		SpectraCount:  int(temp[0]["SpectraCount"].(int32)),
+		CompoundCount: int(temp[0]["CompoundCount"].(int32)),
+		IsomerCount:   int(temp[0]["IsomerCount"].(int32)),
 	}
 	return &result, nil
 }
@@ -435,6 +500,9 @@ func (db *Mb3MongoDB) GetRecords(
 func getQuery(filters Filters) bson.D {
 	result := bson.D{}
 	eps := 0.3
+	if !filters.IncludeDeprecated {
+		result = append(result, bson.E{"deprecated", bson.M{"$exists": false}})
+	}
 	if filters.MassEpsilon != nil {
 		eps = *filters.MassEpsilon
 	}

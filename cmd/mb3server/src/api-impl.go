@@ -56,27 +56,30 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 		co = nil
 	}
 	filters := database.Filters{
-		InstrumentType:  it,
-		Splash:          "",
-		MsType:          getMsTypes(msType),
-		IonMode:         getIonMode(ionMode),
-		CompoundName:    "",
-		Mass:            nil,
-		MassEpsilon:     nil,
-		Formula:         "",
-		Peaks:           nil,
-		PeakDifferences: nil,
-		InchiKey:        "",
-		Contributor:     co,
-		IntensityCutoff: nil,
-		Limit:           0,
-		Offset:          0,
+		InstrumentType:    it,
+		Splash:            "",
+		MsType:            getMsTypes(msType),
+		IonMode:           getIonMode(ionMode),
+		CompoundName:      "",
+		Mass:              nil,
+		MassEpsilon:       nil,
+		Formula:           "",
+		Peaks:             nil,
+		PeakDifferences:   nil,
+		InchiKey:          "",
+		Contributor:       co,
+		IntensityCutoff:   nil,
+		Limit:             0,
+		Offset:            0,
+		IncludeDeprecated: false,
 	}
 	vals, err := db.GetUniqueValues(filters)
 	if err != nil {
 		return nil, err
 	}
 	var result = BrowseOptions{}
+	metadata, err := db.GetMetaData()
+	println(metadata)
 	result.Metadata = Metadata{
 		Version:       "",
 		Timestamp:     "",
@@ -139,21 +142,22 @@ func GetRecords(limit int32, page int32, contributor []string, instrumentType []
 	}
 
 	var filters = database.Filters{
-		InstrumentType:  it,
-		Splash:          "",
-		MsType:          getMsTypes(msType),
-		IonMode:         getIonMode(ionMode),
-		CompoundName:    "",
-		Mass:            nil,
-		MassEpsilon:     nil,
-		Formula:         "",
-		Peaks:           nil,
-		PeakDifferences: nil,
-		InchiKey:        "",
-		Contributor:     co,
-		IntensityCutoff: nil,
-		Limit:           int64(limit),
-		Offset:          int64(offset),
+		InstrumentType:    it,
+		Splash:            "",
+		MsType:            getMsTypes(msType),
+		IonMode:           getIonMode(ionMode),
+		CompoundName:      "",
+		Mass:              nil,
+		MassEpsilon:       nil,
+		Formula:           "",
+		Peaks:             nil,
+		PeakDifferences:   nil,
+		InchiKey:          "",
+		Contributor:       co,
+		IntensityCutoff:   nil,
+		Limit:             int64(limit),
+		Offset:            int64(offset),
+		IncludeDeprecated: false,
 	}
 	records, count, err := db.GetRecords(filters)
 	if err != nil {
