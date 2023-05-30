@@ -32,6 +32,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"purecss": "^3.0.0"
+		"purecss": "^3.0.0",
+		"svelte-chartjs": "^3.1.2"
 	}
 }

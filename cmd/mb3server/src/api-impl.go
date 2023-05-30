@@ -81,15 +81,12 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 	metadata, err := db.GetMetaData()
 	println(metadata)
 	result.Metadata = Metadata{
-		Version:       "",
-		Timestamp:     "",
-		GitCommit:     "",
-		SpectraCount:  0,
-		CompoundCount: 0,
-		IsomerCount:   0,
-		ResultCount:   0,
-		Page:          0,
-		Limit:         0,
+		Version:       metadata.Version,
+		Timestamp:     metadata.TimeStamp,
+		GitCommit:     metadata.GitCommit,
+		SpectraCount:  int32(metadata.SpectraCount),
+		CompoundCount: int32(metadata.CompoundCount),
+		IsomerCount:   int32(metadata.IsomerCount),
 	}
 	for _, val := range vals.IonMode {
 		result.IonMode = append(result.IonMode, StringCountInner{

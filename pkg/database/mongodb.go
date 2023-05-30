@@ -27,7 +27,12 @@ type Mb3MongoDB struct {
 	dirty    bool            // if true, the database connection was changed and the database will reconnect.
 }
 
+var metadata *MB3MetaData
+
 func (db *Mb3MongoDB) GetMetaData() (*MB3MetaData, error) {
+	if metadata != nil {
+		return metadata, nil
+	}
 	var query = `
 	    [
        	{ "$match": {"deprecated": null}},
@@ -102,18 +107,22 @@ func (db *Mb3MongoDB) GetMetaData() (*MB3MetaData, error) {
 	if err != nil {
 		return nil, err
 	}
-	var temp []bson.M
-	if err = cur.All(context.Background(), &temp); err != nil {
+	var dataMap []bson.M
+	if err = cur.All(context.Background(), &dataMap); err != nil {
 		return nil, err
 	}
+	md := db.database.Collection(mbMetaCollection).FindOne(context.Background(), bson.D{})
+	var mdMap bson.M
+	md.Decode(&mdMap)
 	result := MB3MetaData{
-		Version:       "",
-		TimeStamp:     "",
-		GitCommit:     "",
-		SpectraCount:  int(temp[0]["SpectraCount"].(int32)),
-		CompoundCount: int(temp[0]["CompoundCount"].(int32)),
-		IsomerCount:   int(temp[0]["IsomerCount"].(int32)),
+		Version:       mdMap["version"].(string),
+		TimeStamp:     mdMap["timestamp"].(string),
+		GitCommit:     mdMap["commit"].(string),
+		SpectraCount:  int(dataMap[0]["SpectraCount"].(int32)),
+		CompoundCount: int(dataMap[0]["CompoundCount"].(int32)),
+		IsomerCount:   int(dataMap[0]["IsomerCount"].(int32)),
 	}
+	metadata = &result
 	return &result, nil
 }
 

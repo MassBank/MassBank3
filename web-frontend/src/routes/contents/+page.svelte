@@ -1,14 +1,53 @@
 <script lang="ts">
-    import Header from "$lib/components/Header.svelte";
     import FilterButton from "$component/FilterBox.svelte";
     import ShortRecordSummary from "$component/ShortRecordSummary.svelte";
     import Pagination from "$component/Pagination.svelte";
+    import {Pie} from "svelte-chartjs";
 
-    /** @type {import('./$types').PageData} */
+    import {
+        Chart as ChartJS,
+        Title,
+        Tooltip,
+        Legend,
+        ArcElement,
+        CategoryScale,
+        Colors
+    } from 'chart.js';
+
+    /** @type {import('./$typesunknownPageData} */
     export let data: any;
     let base: string;
-    let cur_page: number = 1;
-    let pages: number = 10;
+    let curPage = 1;
+    let pages = 10;
+
+    let chartData = {
+        contributorsData: {
+            labels: [],
+            datasets: [
+                {
+                    data: [],
+                },
+            ],
+        },
+        InstrumentType: {
+            labels: [],
+            datasets: [
+                {
+                    data: [],
+                },
+            ],
+        },
+        msType: {
+            labels: [],
+            datasets: [
+                {
+                    data: [],
+                },
+            ],
+        },
+
+    }
+
     async function getFilters() {
         let url = new URL("/v1/filter/browse",base)
         url.searchParams.append('instrument_type',instrumentType.join())
@@ -18,6 +57,25 @@
         let resp = await fetch(url);
         let jsonData = await resp.json();
         if (resp.ok) {
+            chartData.contributorsData.labels = []
+            chartData.contributorsData.datasets[0].data = []
+            for (const co of jsonData.contributor) {
+                chartData.contributorsData.labels.push(co.value)
+                chartData.contributorsData.datasets[0].data.push(co.count)
+            }
+            chartData.msType.labels = []
+            chartData.msType.datasets[0].data = []
+            for (const co of jsonData.ms_type) {
+                chartData.msType.labels.push(co.value)
+                chartData.msType.datasets[0].data.push(co.count)
+            }
+            chartData.InstrumentType.labels = []
+            chartData.InstrumentType.datasets[0].data = []
+            for (const co of jsonData.instrument_type) {
+                chartData.InstrumentType.labels.push(co.value)
+                chartData.InstrumentType.datasets[0].data.push(co.count)
+            }
+            chartData = chartData
             return jsonData
         } else {
             console.log(jsonData);
@@ -38,8 +96,8 @@
         if(resp.ok) {
             console.log(JSON.stringify(jsonData))
             pages = Math.floor(Number(jsonData.metadata.result_count)/20+1)
-            if (cur_page>pages) {
-                cur_page=1
+            if (curPage>pages) {
+                curPage=1
             }
             return jsonData
 
@@ -53,6 +111,9 @@
     let msType = [];
     let instrumentType = [];
     let ionMode = [];
+
+    ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, Colors);
+
     $: base = data.baseurl
 </script>
 <div class="pure-g">
@@ -75,13 +136,13 @@
             <div class="error">Error during Filter loading</div>
         {/await}
     </div>
-    <div class="pure-u-4-5">
+    <div class="pure-u-3-5">
         <h2>Results</h2>
         {#key ionMode,msType,contributors,instrumentType}
-        {#await getResults(cur_page)}
+        {#await getResults(curPage)}
             <div class="info">Loading results...</div>
             {:then records}
-            <Pagination bind:currentPage={cur_page} pages={pages}>
+            <Pagination bind:currentPage={curPage} pages={pages}>
             {#each records.data as record}
                 <ShortRecordSummary record="{record}"></ShortRecordSummary>
             {/each}
@@ -90,6 +151,24 @@
             <div class="error">Error while loading results</div>
         {/await}
         {/key}
+    </div>
+    <div class="pure-u-1-5">
+         {#await getFilters()}
+             <div class="info">loading filters...</div>
+         {:then filters}
+             <div class="card">
+                 <b>MassBank Version: </b>{filters.metadata.version}<br>
+                 <br>
+                 <b>Compounds: </b>{filters.metadata.compound_count}<br>
+                 <b>Isomers: </b>{filters.metadata.isomer_count}<br>
+                 <b>Spectra: </b>{filters.metadata.spectra_count}<br>
+                 <br>
+                 <Pie data={chartData.contributorsData} ></Pie>
+                 <Pie data={chartData.InstrumentType} ></Pie>
+                 <Pie data={chartData.msType} ></Pie>
+
+             </div>
+         {/await}
     </div>
 </div>
 
