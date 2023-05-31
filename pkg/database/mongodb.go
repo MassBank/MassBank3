@@ -462,13 +462,15 @@ func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 // GetRecords see [MB3Database.GetRecords]
 func (db *Mb3MongoDB) GetRecords(
 	filters Filters,
-) ([]*massbank.MassBank2, int64, error) {
+) (map[string][]*massbank.MassBank2, int64, error) {
 	if db.database == nil {
 		return nil, 0, errors.New("database not ready")
 	}
 	var err error
 	var cur *mongo.Cursor
 	var count int64
+	var groupStage = bson.D{{"$group", bson.D{{"_id", "$compound.inchi"},
+		{"spectra", bson.D{{"$push", "$$ROOT"}}}}}}
 	if filters.Limit <= 0 {
 		filters.Limit = DefaultValues.Limit
 	}
@@ -485,7 +487,14 @@ func (db *Mb3MongoDB) GetRecords(
 		cur, err = db.GetPeakDifferenceResult(filters.PeakDifferences, *filters.MassEpsilon, *filters.IntensityCutoff, filters.Limit, filters.Offset)
 	} else {
 		query := getQuery(filters)
-		cur, err = db.database.Collection(mbCollection).Find(context.Background(), query, options.Find().SetLimit(filters.Limit).SetSkip(filters.Offset))
+		matchstage := bson.D{{"$match", query}}
+		skipstage := bson.D{{"$skip", filters.Offset}}
+		limitstage := bson.D{{"$limit", filters.Limit}}
+		facets := bson.D{{"$facet", bson.D{{"count", mongo.Pipeline{bson.D{{"$count", "count"}}}}, {"records", mongo.Pipeline{skipstage, limitstage}}}}}
+		cur, err = db.database.Collection(mbCollection).Aggregate(context.Background(), mongo.Pipeline{matchstage, groupStage, facets})
+		if err != nil {
+			return nil, 0, err
+		}
 		count, err = db.database.Collection(mbCollection).CountDocuments(context.Background(), query)
 	}
 	if err != nil {
@@ -495,15 +504,21 @@ func (db *Mb3MongoDB) GetRecords(
 	if err := cur.All(context.Background(), &bsonResult); err != nil {
 		return nil, 0, err
 	}
-	var mbResult = []*massbank.MassBank2{}
-	for _, val := range bsonResult {
-		mb, err := unmarshal2Massbank(err, &val)
-		if err != nil {
-			return nil, 0, err
+	var mbResult = map[string][]*massbank.MassBank2{}
+	for _, val := range bsonResult[0]["records"].(bson.A) {
+		valM := val.(bson.M)
+		inchi := valM["_id"].(string)
+		for _, spi := range valM["spectra"].(bson.A) {
+			sp := spi.(bson.M)
+			mb, err := unmarshal2Massbank(err, &sp)
+			if err != nil {
+				return nil, 0, err
+			}
+			mbResult[inchi] = append(mbResult[inchi], mb)
 		}
-		mbResult = append(mbResult, mb)
 	}
-	return mbResult, count, nil
+	println(count)
+	return mbResult, int64(bsonResult[0]["count"].(bson.A)[0].(bson.M)["count"].(int32)), nil
 }
 
 func getQuery(filters Filters) bson.D {

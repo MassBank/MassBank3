@@ -9,12 +9,18 @@ properties:
       description: Data for a single compound.
       type: object
       properties:
-
         data:
           type: object
         name:
-          description: Compound name.
-          type: string
+          description: Compound names.
+          type: array
+          items:
+            type string
+        synonyms:
+          type: array
+          description: More compound names.
+          items:
+            type: string
         formula:
           description: Formula of the compound.
           type: string

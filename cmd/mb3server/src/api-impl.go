@@ -164,11 +164,14 @@ func GetRecords(limit int32, page int32, contributor []string, instrumentType []
 	for _, record := range records {
 		var val = SearchResultDataInner{
 			Data:    map[string]interface{}{},
-			Name:    (*record.Compound.Names)[0],
-			Formula: *record.Compound.Formula,
-			Mass:    *record.Compound.Mass,
-			Smiles:  *record.Compound.Smiles,
-			Spectra: []SearchResultDataInnerSpectraInner{{*record.RecordTitle, *record.Accession}},
+			Name:    (*record[0].Compound.Names)[0],
+			Formula: *record[0].Compound.Formula,
+			Mass:    *record[0].Compound.Mass,
+			Smiles:  *record[0].Compound.Smiles,
+			Spectra: []SearchResultDataInnerSpectraInner{},
+		}
+		for _, sp := range record {
+			val.Spectra = append(val.Spectra, SearchResultDataInnerSpectraInner{*sp.RecordTitle, *sp.Accession})
 		}
 		result.Data = append(result.Data, val)
 	}
