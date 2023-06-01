@@ -13,8 +13,11 @@ package mb3server
 type SearchResultDataInner struct {
 	Data map[string]interface{} `json:"data,omitempty"`
 
-	// Compound name.
-	Name string `json:"name,omitempty"`
+	// Compound names.
+	Name []string `json:"name,omitempty"`
+
+	// More compound names.
+	Synonyms []string `json:"synonyms,omitempty"`
 
 	// Formula of the compound.
 	Formula string `json:"formula,omitempty"`
@@ -23,7 +26,7 @@ type SearchResultDataInner struct {
 	Mass float64 `json:"mass,omitempty"`
 
 	// Smiles to generate structure.
-	Smiles string `json:"smiles,omitempty"`
+	Svg string `json:"svg,omitempty"`
 
 	// A list of spectra for the compound
 	Spectra []SearchResultDataInnerSpectraInner `json:"spectra,omitempty"`

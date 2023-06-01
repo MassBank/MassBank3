@@ -44,3 +44,8 @@ services:
     restart: always
     environment:
       VITE_SERVER_API_URL: "http://localhost:8081"
+
+  cdkdepict:
+    image: simolecule/cdkdepict:latest
+    ports:
+      - "8085:8080"

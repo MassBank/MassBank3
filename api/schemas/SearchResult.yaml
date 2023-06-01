@@ -15,7 +15,7 @@ properties:
           description: Compound names.
           type: array
           items:
-            type string
+            type: string
         synonyms:
           type: array
           description: More compound names.
@@ -28,9 +28,10 @@ properties:
           description: Exact Mass of the compound.
           type: number
           format: double
-        smiles:
+        svg:
           description: Smiles to generate structure.
           type: string
+          contentEncoding: "base64"
         spectra:
           description: A list of spectra for the compound
           type: array

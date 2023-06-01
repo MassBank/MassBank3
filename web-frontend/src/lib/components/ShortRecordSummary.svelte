@@ -4,8 +4,12 @@
 <div class="card short-record">
                 <div class="record-name">{record.name}</div>
                 <div>{record.formula}</div>
-                <div>{record.smiles}</div>
-                <div>{record.mass}</div>
+    <svg width="30%">
+            {@html record.svg}
+        </svg>
+
+
+    <div>{record.mass}</div>
                     <div class="spectra">{record.spectra.length} Spectra :</div>
                         {#each record.spectra as spectrum}
                             <a href="/record/{spectrum.id}"><div>{spectrum.id} {spectrum.title}</div></a>

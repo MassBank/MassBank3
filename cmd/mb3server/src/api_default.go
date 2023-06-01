@@ -79,6 +79,12 @@ func (c *DefaultApiController) Routes() Routes {
 			"/v1/records",
 			c.GetRecords,
 		},
+		{
+			"GetSVG",
+			strings.ToUpper("Get"),
+			"/v1/records/{accession}/svg",
+			c.GetSVG,
+		},
 	}
 }
 
@@ -182,6 +188,21 @@ func (c *DefaultApiController) GetRecords(w http.ResponseWriter, r *http.Request
 	inchiKeyParam := query.Get("inchi_key")
 	contributorParam := strings.Split(query.Get("contributor"), ",")
 	result, err := c.service.GetRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, limitParam, pageParam, intensityCutoffParam, inchiKeyParam, contributorParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+
+}
+
+// GetSVG - The SVG image for an accession
+func (c *DefaultApiController) GetSVG(w http.ResponseWriter, r *http.Request) {
+	accessionParam := chi.URLParam(r, "accession")
+
+	result, err := c.service.GetSVG(r.Context(), accessionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

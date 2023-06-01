@@ -459,6 +459,14 @@ func (db *Mb3MongoDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	return mb, err
 }
 
+func (db *Mb3MongoDB) GetSmiles(accession *string) (*string, error) {
+	rec, err := db.GetRecord(accession)
+	if err != nil {
+		return nil, err
+	}
+	return rec.Compound.Smiles, nil
+}
+
 // GetRecords see [MB3Database.GetRecords]
 func (db *Mb3MongoDB) GetRecords(
 	filters Filters,

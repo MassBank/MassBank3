@@ -188,4 +188,6 @@ type MB3Database interface {
 	// This should return number of  modified and inserted records, but this is
 	// not implemented for all databases.
 	UpdateRecords(records []*massbank.MassBank2, metaDataId string, upsert bool) (uint64, uint64, error)
+
+	GetSmiles(accession *string) (*string, error)
 }

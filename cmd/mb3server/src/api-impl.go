@@ -3,8 +3,12 @@ package mb3server
 import (
 	"github.com/MassBank/MassBank3/pkg/database"
 	"github.com/MassBank/MassBank3/pkg/massbank"
+	"io"
 	"log"
+	"net/http"
+	"net/url"
 	"os"
+	"regexp"
 )
 
 var db database.MB3Database = nil
@@ -162,12 +166,22 @@ func GetRecords(limit int32, page int32, contributor []string, instrumentType []
 	}
 	var result = SearchResult{}
 	for _, record := range records {
+		smiles := *record[0].Compound.Smiles
+		svg, err := getSvgFromSmiles(&smiles)
+		re := regexp.MustCompile("<\\?xml[^>]*>\\n<!DOCTYPE[^>]*>\\n")
+		svgS := string(re.ReplaceAll([]byte(*svg), []byte("")))
+		re = regexp.MustCompile("\\n")
+		svgS = string(re.ReplaceAll([]byte(svgS), []byte(" ")))
+		if err != nil {
+			log.Println(err)
+			*svg = ""
+		}
 		var val = SearchResultDataInner{
 			Data:    map[string]interface{}{},
-			Name:    (*record[0].Compound.Names)[0],
+			Name:    *record[0].Compound.Names,
 			Formula: *record[0].Compound.Formula,
 			Mass:    *record[0].Compound.Mass,
-			Smiles:  *record[0].Compound.Smiles,
+			Svg:     svgS,
 			Spectra: []SearchResultDataInnerSpectraInner{},
 		}
 		for _, sp := range record {
@@ -208,6 +222,35 @@ func getMsTypes(msType []string) *[]massbank.MsType {
 		result = nil
 	}
 	return result
+}
+
+func GetSvg(accession string) (*string, error) {
+	if err := initDB(); err != nil {
+		return nil, err
+	}
+	smiles, err := db.GetSmiles(&accession)
+	if err != nil {
+		return nil, err
+	}
+	svg, err := getSvgFromSmiles(smiles)
+	if err != nil {
+		return nil, err
+	}
+	return svg, nil
+}
+
+func getSvgFromSmiles(smiles *string) (*string, error) {
+	smilesEsc := url.QueryEscape(*smiles)
+	resp, err := http.Get("http://cdkdepict:8080/depict/bot/svg?smi=" + smilesEsc + "&w=-1&h=-1&abbr=on&hdisp=bridgehead&showtitle=false&zoom=1.25&annotate=none&r=0")
+	if err != nil {
+		return nil, err
+	}
+	svgB, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	svgS := string(svgB)
+	return &svgS, nil
 }
 
 func GetRecord(accession string) (*MbRecord, error) {

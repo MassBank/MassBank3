@@ -23,6 +23,7 @@ type DefaultApiRouter interface {
 	GetMetadata(http.ResponseWriter, *http.Request)
 	GetRecord(http.ResponseWriter, *http.Request)
 	GetRecords(http.ResponseWriter, *http.Request)
+	GetSVG(http.ResponseWriter, *http.Request)
 }
 
 // DefaultApiServicer defines the api actions for the DefaultApi service
@@ -35,4 +36,5 @@ type DefaultApiServicer interface {
 	GetMetadata(context.Context) (ImplResponse, error)
 	GetRecord(context.Context, string) (ImplResponse, error)
 	GetRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, int32, int32, string, []string) (ImplResponse, error)
+	GetSVG(context.Context, string) (ImplResponse, error)
 }
