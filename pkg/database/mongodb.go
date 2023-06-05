@@ -115,9 +115,11 @@ func (db *Mb3MongoDB) GetMetaData() (*MB3MetaData, error) {
 	var mdMap bson.M
 	md.Decode(&mdMap)
 	result := MB3MetaData{
-		Version:       mdMap["version"].(string),
-		TimeStamp:     mdMap["timestamp"].(string),
-		GitCommit:     mdMap["commit"].(string),
+		StoredMetadata: MB3StoredMetaData{
+			Version:   mdMap["version"].(string),
+			TimeStamp: mdMap["timestamp"].(string),
+			GitCommit: mdMap["commit"].(string),
+		},
 		SpectraCount:  int(dataMap[0]["SpectraCount"].(int32)),
 		CompoundCount: int(dataMap[0]["CompoundCount"].(int32)),
 		IsomerCount:   int(dataMap[0]["IsomerCount"].(int32)),
@@ -470,15 +472,21 @@ func (db *Mb3MongoDB) GetSmiles(accession *string) (*string, error) {
 // GetRecords see [MB3Database.GetRecords]
 func (db *Mb3MongoDB) GetRecords(
 	filters Filters,
-) (map[string][]*massbank.MassBank2, int64, error) {
+) (*SearchResult, error) {
 	if db.database == nil {
-		return nil, 0, errors.New("database not ready")
+		return nil, errors.New("database not ready")
 	}
 	var err error
 	var cur *mongo.Cursor
-	var count int64
-	var groupStage = bson.D{{"$group", bson.D{{"_id", "$compound.inchi"},
-		{"spectra", bson.D{{"$push", "$$ROOT"}}}}}}
+	var specCount int64
+	var groupStage = bson.D{{"$group", bson.D{
+		{"_id", "$compound.inchi"},
+		{"formula", bson.D{{"$addToSet", "$compound.formula"}}},
+		{"mass", bson.D{{"$addToSet", "$compound.mass"}}},
+		{"names", bson.D{{"$push", "$compound.names"}}},
+		{"smiles", bson.D{{"$addToSet", "$compound.smiles"}}},
+		{"spectra", bson.D{{"$push", bson.D{{"title", "$recordtitle"}, {"id", "$accession"}}}}},
+	}}}
 	if filters.Limit <= 0 {
 		filters.Limit = DefaultValues.Limit
 	}
@@ -496,37 +504,57 @@ func (db *Mb3MongoDB) GetRecords(
 	} else {
 		query := getQuery(filters)
 		matchstage := bson.D{{"$match", query}}
+		sortstage := bson.D{{"$sort", bson.D{{"names.0", 1}}}}
+		projectstage := bson.D{{"$project", bson.D{
+			{"names", bson.D{
+				{"$reduce", bson.D{
+					{"input", "$names"},
+					{"initialValue", bson.A{}},
+					{"in", bson.E{"$setUnion", bson.A{"$$value", "$$this"}}},
+				}},
+			}},
+			{"formula", 1},
+			{"mass", 1},
+			{"spectra", 1},
+			{"smiles", 1},
+			{"inchi", "$_id"},
+			{"_id", 0},
+		},
+		}}
 		skipstage := bson.D{{"$skip", filters.Offset}}
 		limitstage := bson.D{{"$limit", filters.Limit}}
-		facets := bson.D{{"$facet", bson.D{{"count", mongo.Pipeline{bson.D{{"$count", "count"}}}}, {"records", mongo.Pipeline{skipstage, limitstage}}}}}
+		facets := bson.D{{"$facet", bson.D{{"count", mongo.Pipeline{bson.D{{"$count", "count"}}}},
+			{"records", mongo.Pipeline{projectstage, sortstage, skipstage, limitstage}}}}}
 		cur, err = db.database.Collection(mbCollection).Aggregate(context.Background(), mongo.Pipeline{matchstage, groupStage, facets})
 		if err != nil {
-			return nil, 0, err
+			return nil, err
 		}
-		count, err = db.database.Collection(mbCollection).CountDocuments(context.Background(), query)
+		specCount, err = db.database.Collection(mbCollection).CountDocuments(context.Background(), query)
 	}
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 	var bsonResult []bson.M
 	if err := cur.All(context.Background(), &bsonResult); err != nil {
-		return nil, 0, err
+		return nil, err
 	}
-	var mbResult = map[string][]*massbank.MassBank2{}
+	var mbResult = SearchResult{
+		SpectraCount: 0,
+		ResultCount:  0,
+		Data:         map[string]SearchResultData{},
+	}
 	for _, val := range bsonResult[0]["records"].(bson.A) {
 		valM := val.(bson.M)
-		inchi := valM["_id"].(string)
-		for _, spi := range valM["spectra"].(bson.A) {
-			sp := spi.(bson.M)
-			mb, err := unmarshal2Massbank(err, &sp)
-			if err != nil {
-				return nil, 0, err
-			}
-			mbResult[inchi] = append(mbResult[inchi], mb)
+		inchi := valM["inchi"].(string)
+		mb, err := unmarshal2SearchResult(valM)
+		if err != nil {
+			return nil, err
 		}
+		mbResult.Data[inchi] = *mb
 	}
-	println(count)
-	return mbResult, int64(bsonResult[0]["count"].(bson.A)[0].(bson.M)["count"].(int32)), nil
+	mbResult.ResultCount = int(bsonResult[0]["count"].(bson.A)[0].(bson.M)["count"].(int32))
+	mbResult.SpectraCount = int(specCount)
+	return &mbResult, nil
 }
 
 func getQuery(filters Filters) bson.D {
@@ -779,6 +807,33 @@ func (db *Mb3MongoDB) addPeakDiffs() {
 	db.database.Collection(mbCollection).Aggregate(
 		context.Background(),
 		mongo.Pipeline{matchStage})
+}
+
+func unmarshal2SearchResult(value bson.M) (*SearchResultData, error) {
+	var names = []string{}
+	for _, nameV := range value["names"].(bson.M)["value"].(bson.A) {
+		for _, name := range nameV.(bson.M)["value"].(bson.A) {
+			names = append(names, name.(string))
+		}
+	}
+	spectra := []SpectrumMetaData{}
+	for _, sp := range value["spectra"].(bson.A) {
+		spm := sp.(bson.M)
+		s := SpectrumMetaData{spm["id"].(string), spm["title"].(string)}
+		spectra = append(spectra, s)
+	}
+
+	for _, name := range value["names"].(bson.M)["value"].(bson.A) {
+		names = append(names, name.(string))
+	}
+	var result = SearchResultData{
+		Names:   names,
+		Formula: value["formula"].(string),
+		Mass:    value["mass"].(float64),
+		Smiles:  value["smiles"].(string),
+		Spectra: spectra,
+	}
+	return &result, nil
 }
 
 func unmarshal2Massbank(err error, value *bson.M) (*massbank.MassBank2, error) {

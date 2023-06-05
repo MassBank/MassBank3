@@ -159,7 +159,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 }
 
 // GetRecords see [MB3Database.GetRecords]
-func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.MassBank2, int64, error) {
+func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 	if filters.Limit <= 0 {
 		filters.Limit = DefaultValues.Limit
 	}
@@ -223,21 +223,21 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) ([]*massbank.MassBank2, int6
 	sql, params, err := query.ToPgsql()
 	rows, err := p.database.Query(sql, params...)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 	var result = []*massbank.MassBank2{}
 	for rows.Next() {
 		var mb massbank.MassBank2
 		var b []byte
 		if err = rows.Scan(&b); err != nil {
-			return nil, 0, err
+			return nil, err
 		}
 		if err := json.Unmarshal(b, &mb); err != nil {
-			return nil, 0, err
+			return nil, err
 		}
 		result = append(result, &mb)
 	}
-	return result, 0, nil
+	return &SearchResult{}, nil
 }
 
 // GetUniqueValues see [MB3Database.GetUniqueValues]
@@ -505,4 +505,8 @@ func (p *PostgresSQLDB) checkDatabase() error {
 		return errors.New("database not ready")
 	}
 	return p.database.Ping()
+}
+
+func (p *PostgresSQLDB) GetSmiles(accession *string) (*string, error) {
+	return nil, nil
 }

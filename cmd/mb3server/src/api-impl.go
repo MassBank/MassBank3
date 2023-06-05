@@ -85,9 +85,9 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 	metadata, err := db.GetMetaData()
 	println(metadata)
 	result.Metadata = Metadata{
-		Version:       metadata.Version,
-		Timestamp:     metadata.TimeStamp,
-		GitCommit:     metadata.GitCommit,
+		Version:       metadata.StoredMetadata.Version,
+		Timestamp:     metadata.StoredMetadata.TimeStamp,
+		GitCommit:     metadata.StoredMetadata.GitCommit,
 		SpectraCount:  int32(metadata.SpectraCount),
 		CompoundCount: int32(metadata.CompoundCount),
 		IsomerCount:   int32(metadata.IsomerCount),
@@ -121,6 +121,9 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 }
 
 func GetRecords(limit int32, page int32, contributor []string, instrumentType []string, msType []string, ionMode string) (*SearchResult, error) {
+	if err := initDB(); err != nil {
+		return nil, err
+	}
 	if limit <= 0 {
 		limit = 20
 	}
@@ -160,13 +163,13 @@ func GetRecords(limit int32, page int32, contributor []string, instrumentType []
 		Offset:            int64(offset),
 		IncludeDeprecated: false,
 	}
-	records, count, err := db.GetRecords(filters)
+	searchResult, err := db.GetRecords(filters)
 	if err != nil {
 		return nil, err
 	}
 	var result = SearchResult{}
-	for _, record := range records {
-		smiles := *record[0].Compound.Smiles
+	for _, value := range searchResult.Data {
+		smiles := (value.Smiles)
 		svg, err := getSvgFromSmiles(&smiles)
 		re := regexp.MustCompile("<\\?xml[^>]*>\\n<!DOCTYPE[^>]*>\\n")
 		svgS := string(re.ReplaceAll([]byte(*svg), []byte("")))
@@ -178,18 +181,19 @@ func GetRecords(limit int32, page int32, contributor []string, instrumentType []
 		}
 		var val = SearchResultDataInner{
 			Data:    map[string]interface{}{},
-			Name:    *record[0].Compound.Names,
-			Formula: *record[0].Compound.Formula,
-			Mass:    *record[0].Compound.Mass,
+			Name:    value.Names,
+			Formula: value.Formula,
+			Mass:    value.Mass,
 			Svg:     svgS,
 			Spectra: []SearchResultDataInnerSpectraInner{},
 		}
-		for _, sp := range record {
-			val.Spectra = append(val.Spectra, SearchResultDataInnerSpectraInner{*sp.RecordTitle, *sp.Accession})
+		for _, sp := range value.Spectra {
+			val.Spectra = append(val.Spectra, SearchResultDataInnerSpectraInner{sp.Title, sp.Id})
 		}
 		result.Data = append(result.Data, val)
 	}
-	result.Metadata.ResultCount = int32(count)
+	result.Metadata.ResultCount = int32(searchResult.ResultCount)
+	result.Metadata.SpectraCount = int32(searchResult.SpectraCount)
 	return &result, nil
 }
 

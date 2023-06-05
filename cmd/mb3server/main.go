@@ -24,5 +24,5 @@ func main() {
 
 	router := mb3server.NewRouter(DefaultApiController)
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":8083", router))
 }
