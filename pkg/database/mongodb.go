@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/MassBank/MassBank3/pkg/massbank"
+	"github.com/mpvl/unique"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -811,11 +812,7 @@ func (db *Mb3MongoDB) addPeakDiffs() {
 
 func unmarshal2SearchResult(value bson.M) (*SearchResultData, error) {
 	var names = []string{}
-	for _, nameV := range value["names"].(bson.M)["value"].(bson.A) {
-		for _, name := range nameV.(bson.M)["value"].(bson.A) {
-			names = append(names, name.(string))
-		}
-	}
+	names = getNestedValues(value["names"].(bson.M))
 	spectra := []SpectrumMetaData{}
 	for _, sp := range value["spectra"].(bson.A) {
 		spm := sp.(bson.M)
@@ -823,17 +820,30 @@ func unmarshal2SearchResult(value bson.M) (*SearchResultData, error) {
 		spectra = append(spectra, s)
 	}
 
-	for _, name := range value["names"].(bson.M)["value"].(bson.A) {
-		names = append(names, name.(string))
-	}
 	var result = SearchResultData{
 		Names:   names,
-		Formula: value["formula"].(string),
-		Mass:    value["mass"].(float64),
-		Smiles:  value["smiles"].(string),
+		Formula: value["formula"].(bson.A)[0].(string),
+		Mass:    value["mass"].(bson.A)[0].(float64),
+		Smiles:  value["smiles"].(bson.A)[0].(string),
 		Spectra: spectra,
 	}
 	return &result, nil
+}
+
+func getNestedValues(value interface{}) []string {
+	var names = []string{}
+	switch reflect.TypeOf(value) {
+	case reflect.TypeOf(bson.M{}):
+		names = append(names, getNestedValues(value.(bson.M)["value"])...)
+	case reflect.TypeOf(""):
+		names = append(names, value.(string))
+	case reflect.TypeOf(bson.A{}):
+		for _, name := range value.(bson.A) {
+			names = append(names, getNestedValues(name)...)
+		}
+	}
+	unique.Strings(&names)
+	return names
 }
 
 func unmarshal2Massbank(err error, value *bson.M) (*massbank.MassBank2, error) {

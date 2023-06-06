@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"regexp"
 )
 
 var db database.MB3Database = nil
@@ -169,22 +168,22 @@ func GetRecords(limit int32, page int32, contributor []string, instrumentType []
 	}
 	var result = SearchResult{}
 	for _, value := range searchResult.Data {
-		smiles := (value.Smiles)
-		svg, err := getSvgFromSmiles(&smiles)
-		re := regexp.MustCompile("<\\?xml[^>]*>\\n<!DOCTYPE[^>]*>\\n")
-		svgS := string(re.ReplaceAll([]byte(*svg), []byte("")))
-		re = regexp.MustCompile("\\n")
-		svgS = string(re.ReplaceAll([]byte(svgS), []byte(" ")))
-		if err != nil {
-			log.Println(err)
-			*svg = ""
-		}
+		//		smiles := (value.Smiles)
+		//		svg, err := getSvgFromSmiles(&smiles)
+		//		re := regexp.MustCompile("<\\?xml[^>]*>\\n<!DOCTYPE[^>]*>\\n")
+		//		svgS := string(re.ReplaceAll([]byte(*svg), []byte("")))
+		//		re = regexp.MustCompile("\\n")
+		//		svgS = string(re.ReplaceAll([]byte(svgS), []byte(" ")))
+		//		if err != nil {
+		//			log.Println(err)
+		//			*svg = ""
+		//		}
 		var val = SearchResultDataInner{
 			Data:    map[string]interface{}{},
 			Name:    value.Names,
 			Formula: value.Formula,
 			Mass:    value.Mass,
-			Svg:     svgS,
+			//			Svg:     svgS,
 			Spectra: []SearchResultDataInnerSpectraInner{},
 		}
 		for _, sp := range value.Spectra {
