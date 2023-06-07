@@ -1,49 +1,26 @@
 package mb3server
 
 import (
+	"github.com/MassBank/MassBank3/pkg/config"
 	"github.com/MassBank/MassBank3/pkg/database"
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
-	"os"
+	"regexp"
 )
 
 var db database.MB3Database = nil
+var ServerConfig *config.ServerConfig = nil
 
 func initDB() error {
-	if db == nil {
-		var mongoUri = os.Getenv("MONGO_URI")
-		var mongoName = os.Getenv("MONGO_DB_NAME")
-		log.Println("MongoDB URI: ", mongoUri)
-		log.Println("Database_Name", mongoName)
-		var err error = nil
-		var config = database.DBConfig{
-			Database:  database.MongoDB,
-			DbUser:    "",
-			DbPwd:     "",
-			DbHost:    "",
-			DbName:    os.Getenv("MONGO_DB_NAME"),
-			DbPort:    0,
-			DbConnStr: os.Getenv("MONGO_URI"),
-		}
-
-		db, err = database.NewMongoDB(config)
-		if err != nil {
-			return err
-		}
-		err = db.Connect()
-		if err != nil {
-			return err
-		}
+	var err error
+	if db != nil && db.Ping == nil {
+		return nil
 	}
-	err := db.Ping()
-	if err != nil {
-		db = nil
-	}
+	db, err = database.InitDb(ServerConfig.DBConfig)
 	return err
-
 }
 
 func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, contributor []string) (*BrowseOptions, error) {
@@ -168,22 +145,22 @@ func GetRecords(limit int32, page int32, contributor []string, instrumentType []
 	}
 	var result = SearchResult{}
 	for _, value := range searchResult.Data {
-		//		smiles := (value.Smiles)
-		//		svg, err := getSvgFromSmiles(&smiles)
-		//		re := regexp.MustCompile("<\\?xml[^>]*>\\n<!DOCTYPE[^>]*>\\n")
-		//		svgS := string(re.ReplaceAll([]byte(*svg), []byte("")))
-		//		re = regexp.MustCompile("\\n")
-		//		svgS = string(re.ReplaceAll([]byte(svgS), []byte(" ")))
-		//		if err != nil {
-		//			log.Println(err)
-		//			*svg = ""
-		//		}
+		smiles := (value.Smiles)
+		svg, err := getSvgFromSmiles(&smiles)
+		re := regexp.MustCompile("<\\?xml[^>]*>\\n<!DOCTYPE[^>]*>\\n")
+		svgS := string(re.ReplaceAll([]byte(*svg), []byte("")))
+		re = regexp.MustCompile("\\n")
+		svgS = string(re.ReplaceAll([]byte(svgS), []byte(" ")))
+		if err != nil {
+			log.Println(err)
+			*svg = ""
+		}
 		var val = SearchResultDataInner{
 			Data:    map[string]interface{}{},
 			Name:    value.Names,
 			Formula: value.Formula,
 			Mass:    value.Mass,
-			//			Svg:     svgS,
+			Svg:     svgS,
 			Spectra: []SearchResultDataInnerSpectraInner{},
 		}
 		for _, sp := range value.Spectra {
@@ -244,7 +221,7 @@ func GetSvg(accession string) (*string, error) {
 
 func getSvgFromSmiles(smiles *string) (*string, error) {
 	smilesEsc := url.QueryEscape(*smiles)
-	resp, err := http.Get("http://cdkdepict:8080/depict/bot/svg?smi=" + smilesEsc + "&w=-1&h=-1&abbr=on&hdisp=bridgehead&showtitle=false&zoom=1.25&annotate=none&r=0")
+	resp, err := http.Get(ServerConfig.CdkDepictUrl + "/depict/bot/svg?smi=" + smilesEsc + "&w=50&h=50&abbr=on&hdisp=bridgehead&showtitle=false&zoom=1&annotate=none&r=1")
 	if err != nil {
 		return nil, err
 	}

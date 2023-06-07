@@ -330,7 +330,7 @@ func (db *Mb3MongoDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 const (
 	mbCollection        = "massbank"
 	mbMetaCollection    = "mb_metadata"
-	MongoConnectTimeout = "200ms"
+	MongoConnectTimeout = "20s"
 )
 
 // NewMongoDB creates a mongodb database handle implementing [MB3Database] from the configuration.
@@ -505,7 +505,7 @@ func (db *Mb3MongoDB) GetRecords(
 	} else {
 		query := getQuery(filters)
 		matchstage := bson.D{{"$match", query}}
-		sortstage := bson.D{{"$sort", bson.D{{"names.0", 1}}}}
+		sortstage := bson.D{{"$sort", bson.D{{"spectra.0.title", 1}}}}
 		projectstage := bson.D{{"$project", bson.D{
 			{"names", bson.D{
 				{"$reduce", bson.D{

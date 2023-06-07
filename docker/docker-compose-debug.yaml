@@ -47,3 +47,7 @@ services:
       - "${MB3_FRONTEND_PORT}:5173"
     volumes:
       - ../web-frontend:/app
+
+  cdkdepict:
+    ports:
+      - "8085:8080"

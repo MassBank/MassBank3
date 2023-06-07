@@ -1,7 +1,9 @@
 package database
 
 import (
+	"github.com/Code-Hex/dd"
 	"github.com/MassBank/MassBank3/pkg/massbank"
+	"log"
 	"math"
 )
 
@@ -213,4 +215,32 @@ type MB3Database interface {
 	UpdateRecords(records []*massbank.MassBank2, metaDataId string, upsert bool) (uint64, uint64, error)
 
 	GetSmiles(accession *string) (*string, error)
+}
+
+var db MB3Database
+
+func InitDb(dbConfig DBConfig) (MB3Database, error) {
+	if db == nil {
+		var err error
+		if dbConfig.Database == MongoDB {
+			db, err = NewMongoDB(dbConfig)
+			if err != nil {
+				panic(err)
+			}
+		} else if dbConfig.Database == Postgres {
+			db, err = NewPostgresSQLDb(dbConfig)
+			log.Println(dd.Dump(db))
+			if err != nil {
+				panic(err)
+			}
+		}
+		if err = db.Connect(); err != nil {
+			panic(err)
+		}
+	}
+	err := db.Ping()
+	if err != nil {
+		db = nil
+	}
+	return db, err
 }
