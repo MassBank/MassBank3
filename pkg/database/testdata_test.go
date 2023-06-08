@@ -3224,7 +3224,7 @@ var UniqueValueTestData = map[string]MB3Values{
 			{"Keio_Univ", 1},
 			{"MSSJ", 1},
 			{"RIKEN", 2},
-			{"test", 3},
+			{"test", 2},
 			{"Washington_State_Univ", 1},
 		},
 		[]MBCountValues{
@@ -3254,7 +3254,7 @@ var UniqueValueTestData = map[string]MB3Values{
 			},
 			{
 				Val:   "LC-ESI-QTOF",
-				Count: 4,
+				Count: 3,
 			},
 			{
 				Val:   "MALDI-TOF",
@@ -3268,7 +3268,7 @@ var UniqueValueTestData = map[string]MB3Values{
 			},
 			{
 				Val:   "MS2",
-				Count: 9,
+				Count: 8,
 			},
 			{
 				Val:   "MS4",
@@ -3278,7 +3278,7 @@ var UniqueValueTestData = map[string]MB3Values{
 		[]MBCountValues{
 			{
 				Val:   "NEGATIVE",
-				Count: 5,
+				Count: 4,
 			},
 			{
 				Val:   "POSITIVE",

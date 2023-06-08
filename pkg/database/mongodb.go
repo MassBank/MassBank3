@@ -544,16 +544,22 @@ func (db *Mb3MongoDB) GetRecords(
 		ResultCount:  0,
 		Data:         map[string]SearchResultData{},
 	}
-	for _, val := range bsonResult[0]["records"].(bson.A) {
-		valM := val.(bson.M)
-		inchi := valM["inchi"].(string)
-		mb, err := unmarshal2SearchResult(valM)
-		if err != nil {
-			return nil, err
+	if len(bsonResult) > 0 && bsonResult[0]["records"] != nil {
+		for _, val := range bsonResult[0]["records"].(bson.A) {
+			valM := val.(bson.M)
+			inchi := valM["inchi"].(string)
+			mb, err := unmarshal2SearchResult(valM)
+			if err != nil {
+				return nil, err
+			}
+			mbResult.Data[inchi] = *mb
 		}
-		mbResult.Data[inchi] = *mb
 	}
-	mbResult.ResultCount = int(bsonResult[0]["count"].(bson.A)[0].(bson.M)["count"].(int32))
+	if len(bsonResult) > 0 && bsonResult[0]["count"] != nil && len(bsonResult[0]["count"].(bson.A)) > 0 {
+		mbResult.ResultCount = int(bsonResult[0]["count"].(bson.A)[0].(bson.M)["count"].(int32))
+	} else {
+		mbResult.ResultCount = 0
+	}
 	mbResult.SpectraCount = int(specCount)
 	return &mbResult, nil
 }
@@ -562,7 +568,7 @@ func getQuery(filters Filters) bson.D {
 	result := bson.D{}
 	eps := 0.3
 	if !filters.IncludeDeprecated {
-		result = append(result, bson.E{"deprecated", bson.M{"$exists": false}})
+		result = append(result, bson.E{"deprecated", bson.M{"$eq": nil}})
 	}
 	if filters.MassEpsilon != nil {
 		eps = *filters.MassEpsilon
