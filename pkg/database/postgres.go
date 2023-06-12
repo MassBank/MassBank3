@@ -243,6 +243,7 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 // GetUniqueValues see [MB3Database.GetUniqueValues]
 func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	var query = `
+WITH mbdeprecated as (SELECT * FROM massbank WHERE document->>'deprecated' is null)
 SELECT to_json(co) as contributor,
        to_json(it) as instrument_type,
        to_json(mt) as ms_type,
@@ -253,36 +254,37 @@ SELECT to_json(co) as contributor,
        mz.minmz    as min_mz,
        i.maxi      as max_intensity,
        i.mini      as min_intensity
-FROM (SELECT ARRAY(SELECT t
+FROM
+    (SELECT ARRAY(SELECT t
                    FROM (SELECT document ->> 'contributor' as val,
                                 count(id)
-                         from massbank
+                         from mbdeprecated
                          GROUP BY document ->> 'contributor' ORDER BY document ->> 'contributor') t)) as co,
-    (SELECT ARRAY(SELECT t
+     (SELECT ARRAY(SELECT t
                    FROM (SELECT document -> 'acquisition' ->> 'instrument_type' as val,
                                 count(id)
-                         from massbank
+                         from mbdeprecated
                          GROUP BY document -> 'acquisition' ->> 'instrument_type' ORDER BY document -> 'acquisition' ->> 'instrument_type' ) t)) as it,
      (SELECT ARRAY(SELECT t
                    FROM (select t.ms ->> 'value' as val, count(t.ms)
                          FROM (Select jsonb_array_elements(document -> 'acquisition' -> 'mass_spectrometry') as ms
-                               from massbank) t
+                               from mbdeprecated) t
                          where ms ->> 'subtag' = 'MS_TYPE'
                          GROUP BY t.ms ORDER BY t.ms) t)) as mt,
      (SELECT ARRAY(SELECT t
                    FROM (select t.ms ->> 'value' as val, count(t.ms)
                          FROM (Select jsonb_array_elements(document -> 'acquisition' -> 'mass_spectrometry') as ms
-                               from massbank) t
+                               from mbdeprecated) t
                          where ms ->> 'subtag' = 'ION_MODE'
                          GROUP BY t.ms ORDER BY t.ms) t)) as im,
      (SELECT MIN((document -> 'compound' ->> 'mass' )::float8) as minm,
              MAX((document -> 'compound' ->> 'mass' )::float8) as maxm
-      from massbank) as mass,
+      from mbdeprecated) as mass,
      (SELECT MIN(t.mz) as minmz, MAX(t.mz) as maxmz
-      from (SELECT jsonb_array_elements(document -> 'peak' -> 'peak' -> 'mz')::float8 as mz FROM massbank) t) as mz,
+      from (SELECT jsonb_array_elements(document -> 'peak' -> 'peak' -> 'mz')::float8 as mz FROM mbdeprecated) t) as mz,
      (SELECT MIN(t.i) as mini, MAX(t.i) as maxi
       FROM (SELECT jsonb_array_elements(document -> 'peak' -> 'peak' -> 'intensity')::float8 as i
-            FROM massbank) t) as i`
+            FROM mbdeprecated) t) as i`
 	var val MB3Values
 	row := p.database.QueryRow(query)
 	cojs := make([]uint8, 0)
