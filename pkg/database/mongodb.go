@@ -500,38 +500,45 @@ func (db *Mb3MongoDB) GetRecords(
 	if filters.Offset < 0 {
 		filters.Offset = DefaultValues.Offset
 	}
+	var peakDifferenceStages []bson.D
 	if filters.PeakDifferences != nil && len(*filters.PeakDifferences) > 0 {
-		cur, err = db.GetPeakDifferenceResult(filters.PeakDifferences, *filters.MassEpsilon, *filters.IntensityCutoff, filters.Limit, filters.Offset)
-	} else {
-		query := getQuery(filters)
-		matchstage := bson.D{{"$match", query}}
-		sortstage := bson.D{{"$sort", bson.D{{"spectra.0.title", 1}}}}
-		projectstage := bson.D{{"$project", bson.D{
-			{"names", bson.D{
-				{"$reduce", bson.D{
-					{"input", "$names"},
-					{"initialValue", bson.A{}},
-					{"in", bson.E{"$setUnion", bson.A{"$$value", "$$this"}}},
-				}},
-			}},
-			{"formula", 1},
-			{"mass", 1},
-			{"spectra", 1},
-			{"smiles", 1},
-			{"inchi", "$_id"},
-			{"_id", 0},
-		},
-		}}
-		skipstage := bson.D{{"$skip", filters.Offset}}
-		limitstage := bson.D{{"$limit", filters.Limit}}
-		facets := bson.D{{"$facet", bson.D{{"count", mongo.Pipeline{bson.D{{"$count", "count"}}}},
-			{"records", mongo.Pipeline{projectstage, sortstage, skipstage, limitstage}}}}}
-		cur, err = db.database.Collection(mbCollection).Aggregate(context.Background(), mongo.Pipeline{matchstage, groupStage, facets})
-		if err != nil {
-			return nil, err
-		}
-		specCount, err = db.database.Collection(mbCollection).CountDocuments(context.Background(), query)
+		peakDifferenceStages = db.GetPeakDifferenceResult(filters.PeakDifferences, *filters.MassEpsilon, *filters.IntensityCutoff, filters.Limit, filters.Offset)
 	}
+	query := getQuery(filters)
+	matchstage := bson.D{{"$match", query}}
+	sortstage := bson.D{{"$sort", bson.D{{"spectra.0.title", 1}}}}
+	projectstage := bson.D{{"$project", bson.D{
+		{"names", bson.D{
+			{"$reduce", bson.D{
+				{"input", "$names"},
+				{"initialValue", bson.A{}},
+				{"in", bson.E{"$setUnion", bson.A{"$$value", "$$this"}}},
+			}},
+		}},
+		{"formula", 1},
+		{"mass", 1},
+		{"spectra", 1},
+		{"smiles", 1},
+		{"inchi", "$_id"},
+		{"_id", 0},
+	},
+	}}
+	skipstage := bson.D{{"$skip", filters.Offset}}
+	limitstage := bson.D{{"$limit", filters.Limit}}
+	facets := bson.D{{"$facet", bson.D{{"count", mongo.Pipeline{bson.D{{"$count", "count"}}}},
+		{"records", mongo.Pipeline{projectstage, sortstage, skipstage, limitstage}}}}}
+	pipeline := mongo.Pipeline{matchstage}
+	if peakDifferenceStages != nil {
+		for _, d := range peakDifferenceStages {
+			pipeline = append(pipeline, d)
+		}
+	}
+	pipeline = append(pipeline, groupStage, facets)
+	cur, err = db.database.Collection(mbCollection).Aggregate(context.Background(), pipeline)
+	if err != nil {
+		return nil, err
+	}
+	specCount, err = db.database.Collection(mbCollection).CountDocuments(context.Background(), query)
 	if err != nil {
 		return nil, err
 	}
@@ -610,6 +617,10 @@ func getQuery(filters Filters) bson.D {
 		im := bson.E{"compound.link", bson.D{bson.E{"key", "INCHIKEY"}, bson.E{"value", filters.InchiKey}}}
 		result = append(result, im)
 	}
+	if filters.PeakDifferences != nil {
+		pd := bson.E{"peak.peak.mz.1", bson.M{"$exists": true}}
+		result = append(result, pd)
+	}
 	if filters.Contributor != nil {
 		arr := bson.A{}
 		for _, co := range *filters.Contributor {
@@ -627,41 +638,37 @@ func getQuery(filters Filters) bson.D {
 	return result
 }
 
-func (db *Mb3MongoDB) GetPeakDifferenceResult(search *[]float64, tolerance float64, intensityOffset int64, limit int64, skip int64) (*mongo.Cursor, error) {
-	query :=
-		bson.A{
-			bson.D{{"$match", bson.D{{"peak.peak.mz.1", bson.D{{"$exists", 1}}}}}},
-			bson.D{{"$addFields", bson.D{{
-				"peak.peak.diff", bson.D{{
-					"$function", bson.D{{
-						"body", "function(mz,search,tol) {" +
-							"let result = {};" +
-							"for (let i=0; i < mz.length; i++) { for (let j=i+1; j < mz.length; j++) {" +
-							"for (let p=0; p < search.length; p++) {" +
-							"if (Math.abs(Math.abs(mz[i].mz - mz[j].mz)-search[p]) <= tol) {" +
-							"return true;}}}}" +
-							"return false;}"},
-						{"args", bson.A{
-							bson.D{{"$filter", bson.D{
-								{"input", bson.D{
-									{"$map", bson.D{
-										{"input", "$peak.peak.rel"},
-										{"as", "rel"},
-										{"in", bson.D{
-											{"rel", "$$rel"},
-											{"mz",
-												bson.D{{"$arrayElemAt",
-													bson.A{"$peak.peak.mz", bson.D{{"$indexOfArray", bson.A{"$peak.peak.rel", "$$rel"}}}}}}}}}}}}},
-								{"as", "relmz"},
-								{"cond", bson.D{{"$gte", bson.A{"$$relmz.rel", intensityOffset}}}}}}},
-							search,
-							tolerance}},
-						{"lang", "js"}}}}}}}},
-			bson.D{{"$match", bson.D{{"peak.peak.diff", true}}}},
-			bson.D{{"$skip", skip}},
-			bson.D{{"$limit", limit}},
-		}
-	return db.database.Collection(mbCollection).Aggregate(context.TODO(), query)
+func (db *Mb3MongoDB) GetPeakDifferenceResult(search *[]float64, tolerance float64, intensityOffset int64, limit int64, skip int64) []bson.D {
+	query := []bson.D{
+		{{"$addFields", bson.D{{
+			"peak.peak.diff", bson.D{{
+				"$function", bson.D{{
+					"body", "function(mz,search,tol) {" +
+						"let result = {};" +
+						"for (let i=0; i < mz.length; i++) { for (let j=i+1; j < mz.length; j++) {" +
+						"for (let p=0; p < search.length; p++) {" +
+						"if (Math.abs(Math.abs(mz[i].mz - mz[j].mz)-search[p]) <= tol) {" +
+						"return true;}}}}" +
+						"return false;}"},
+					{"args", bson.A{
+						bson.D{{"$filter", bson.D{
+							{"input", bson.D{
+								{"$map", bson.D{
+									{"input", "$peak.peak.rel"},
+									{"as", "rel"},
+									{"in", bson.D{
+										{"rel", "$$rel"},
+										{"mz",
+											bson.D{{"$arrayElemAt",
+												bson.A{"$peak.peak.mz", bson.D{{"$indexOfArray", bson.A{"$peak.peak.rel", "$$rel"}}}}}}}}}}}}},
+							{"as", "relmz"},
+							{"cond", bson.D{{"$gte", bson.A{"$$relmz.rel", intensityOffset}}}}}}},
+						search,
+						tolerance}},
+					{"lang", "js"}}}}}}}},
+		{{"$match", bson.D{{"peak.peak.diff", true}}}},
+	}
+	return query
 }
 
 // UpdateMetadata see [MB3Database.UpdateMetadata]
