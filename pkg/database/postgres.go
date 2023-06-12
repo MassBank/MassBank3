@@ -171,6 +171,9 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 	}
 
 	where := bqb.Optional("WHERE")
+	if !filters.IncludeDeprecated {
+		where.And("document->>'deprecated' is null")
+	}
 	if filters.InstrumentType != nil {
 		where.And("document->'acquisition'->>'instrument_type' IN (?)", *filters.InstrumentType)
 	}
@@ -208,7 +211,7 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 		}
 	}
 
-	query := bqb.New("SELECT document FROM massbank ?", where)
+	query := bqb.New("WITH mbdeprecated as (select json_build_object('id', document->>'accession','title', document->>'title')::json spectrum, document->'compound' compound FROM massbank ?) SELECT  compound->>'inchi' inchi, array_agg(spectrum) spectra, array_agg(DISTINCT compound->>'formula') formula, array_agg(DISTINCT compound->>'mass') mass, array_agg(DISTINCT compound->'name') names ,array_agg(DISTINCT compound->>'smiles') smiles FROM mbdeprecated GROUP BY inchi", where)
 	if filters.PeakDifferences != nil {
 		innerwhere := bqb.New("WHERE t1.mz > t2.mz")
 		diff := bqb.Optional("")
@@ -219,23 +222,47 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 		query = bqb.New("SELECT massbank.document FROM massbank JOIN (WITH t AS (SELECT mz,id FROM (SELECT jsonb_array_elements(document->'peak'->'peak'->'mz')::float AS mz,jsonb_array_elements(document->'peak'->'peak'->'rel')::int AS rel,id FROM massbank) as relmz WHERE relmz.rel>=?) SELECT DISTINCT t1.id FROM t as t1 LEFT JOIN t as t2 ON t1.id=t2.id ?) AS diff ON massbank.id = diff.id", *filters.IntensityCutoff, innerwhere)
 
 	}
-	query.Space("ORDER BY massbank.id LIMIT ? OFFSET ?", filters.Limit, filters.Offset)
+	query.Space("ORDER BY (array_agg(spectrum))[0]->>'title' ASC LIMIT ? OFFSET ?", filters.Limit, filters.Offset)
 	sql, params, err := query.ToPgsql()
 	rows, err := p.database.Query(sql, params...)
 	if err != nil {
 		return nil, err
 	}
-	var result = []*massbank.MassBank2{}
+	var searchResult = SearchResult{}
 	for rows.Next() {
-		var mb massbank.MassBank2
+		var row struct {
+			inchi   string
+			spectra []SpectrumMetaData
+			formula []string
+			mass    []float64
+			names   [][]string
+			smiles  []string
+		}
 		var b []byte
 		if err = rows.Scan(&b); err != nil {
 			return nil, err
 		}
-		if err := json.Unmarshal(b, &mb); err != nil {
+		if err := json.Unmarshal(b, &row); err != nil {
 			return nil, err
 		}
-		result = append(result, &mb)
+		var namesMap = map[string]bool{}
+		for _, nn := range row.names {
+			for _, n := range nn {
+				namesMap[n] = true
+			}
+		}
+		names := []string{}
+		for k := range namesMap {
+			names = append(names, k)
+		}
+		data := SearchResultData{
+			Names:   names,
+			Formula: row.formula[0],
+			Mass:    row.mass[0],
+			Smiles:  row.smiles[0],
+			Spectra: row.spectra,
+		}
+		searchResult.Data[row.inchi] = data
 	}
 	return &SearchResult{}, nil
 }
