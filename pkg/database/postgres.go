@@ -210,8 +210,7 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 			where.And("EXISTS (SELECT * FROM jsonb_array_elements(document->'peak'->'peak'->'mz') mz WHERE mz BETWEEN ? AND ?)", p-*filters.MassEpsilon, p+*filters.MassEpsilon)
 		}
 	}
-
-	query := bqb.New("WITH mbdeprecated as (select json_build_object('id', document->>'accession','title', document->>'title')::json spectrum, document->'compound' compound FROM massbank ?) SELECT  compound->>'inchi' inchi, array_to_json(array_agg(spectrum)) spectra, array_to_json(array_agg(DISTINCT compound->>'formula')) formula, array_to_json(array_agg(DISTINCT compound->>'mass')) mass, array_to_json(array_agg(DISTINCT compound->'name')) names , array_to_json(array_agg(DISTINCT compound->>'smiles')) smiles FROM mbdeprecated GROUP BY inchi", where)
+	var peakdiffquery = bqb.New("")
 	if filters.PeakDifferences != nil {
 		innerwhere := bqb.New("WHERE t1.mz > t2.mz")
 		diff := bqb.Optional("")
@@ -219,10 +218,11 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 			diff.Or("(t1.mz-t2.mz BETWEEN ? AND ?)", pd-*filters.MassEpsilon, pd+*filters.MassEpsilon)
 		}
 		innerwhere.And("?", diff)
-		query = bqb.New("SELECT massbank.document FROM massbank JOIN (WITH t AS (SELECT mz,id FROM (SELECT jsonb_array_elements(document->'peak'->'peak'->'mz')::float AS mz,jsonb_array_elements(document->'peak'->'peak'->'rel')::int AS rel,id FROM massbank) as relmz WHERE relmz.rel>=?) SELECT DISTINCT t1.id FROM t as t1 LEFT JOIN t as t2 ON t1.id=t2.id ?) AS diff ON massbank.id = diff.id", *filters.IntensityCutoff, innerwhere)
+		peakdiffquery = bqb.New("JOIN (WITH t AS (SELECT mz,id FROM (SELECT jsonb_array_elements(document->'peak'->'peak'->'mz')::float AS mz,jsonb_array_elements(document->'peak'->'peak'->'rel')::int AS rel,id FROM massbank) as relmz WHERE relmz.rel>=?) SELECT DISTINCT t1.id FROM t as t1 LEFT JOIN t as t2 ON t1.id=t2.id ?) AS diff ON mbdeprecated.id = diff.id", *filters.IntensityCutoff, innerwhere)
 
 	}
-	query.Space("ORDER BY (array_agg(spectrum))[0]->>'title' ASC LIMIT ? OFFSET ?", filters.Limit, filters.Offset)
+	query := bqb.New("WITH mbdeprecated as (select id, json_build_object('id', document->>'accession','title', document->>'title')::json spectrum, document->'compound' compound FROM massbank ?) SELECT  compound->>'inchi' inchi, array_to_json(array_agg(spectrum ORDER BY spectrum->>'id')) spectra, array_to_json(array_agg(DISTINCT compound->>'formula')) formula, array_to_json(array_agg(DISTINCT compound->>'mass')) mass, array_to_json(array_agg(DISTINCT compound->'name')) names , array_to_json(array_agg(DISTINCT compound->>'smiles')) smiles FROM mbdeprecated ? GROUP BY inchi", where, peakdiffquery)
+	query.Space("ORDER BY (array_agg(spectrum))[1]->>'title' ASC LIMIT ? OFFSET ?", filters.Limit, filters.Offset)
 	sql, params, err := query.ToPgsql()
 	rows, err := p.database.Query(sql, params...)
 	if err != nil {
