@@ -211,7 +211,7 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 		}
 	}
 
-	query := bqb.New("WITH mbdeprecated as (select json_build_object('id', document->>'accession','title', document->>'title')::json spectrum, document->'compound' compound FROM massbank ?) SELECT  compound->>'inchi' inchi, array_agg(spectrum) spectra, array_agg(DISTINCT compound->>'formula') formula, array_agg(DISTINCT compound->>'mass') mass, array_agg(DISTINCT compound->'name') names ,array_agg(DISTINCT compound->>'smiles') smiles FROM mbdeprecated GROUP BY inchi", where)
+	query := bqb.New("WITH mbdeprecated as (select json_build_object('id', document->>'accession','title', document->>'title')::json spectrum, document->'compound' compound FROM massbank ?) SELECT  compound->>'inchi' inchi, array_to_json(array_agg(spectrum)) spectra, array_to_json(array_agg(DISTINCT compound->>'formula')) formula, array_to_json(array_agg(DISTINCT compound->>'mass')) mass, array_to_json(array_agg(DISTINCT compound->'name')) names , array_to_json(array_agg(DISTINCT compound->>'smiles')) smiles FROM mbdeprecated GROUP BY inchi", where)
 	if filters.PeakDifferences != nil {
 		innerwhere := bqb.New("WHERE t1.mz > t2.mz")
 		diff := bqb.Optional("")
@@ -228,7 +228,11 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 	if err != nil {
 		return nil, err
 	}
-	var searchResult = SearchResult{}
+	var searchResult = SearchResult{
+		SpectraCount: 0,
+		ResultCount:  0,
+		Data:         map[string]SearchResultData{},
+	}
 	for rows.Next() {
 		var row struct {
 			inchi   string
@@ -238,12 +242,30 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 			names   [][]string
 			smiles  []string
 		}
-		var b []byte
-		if err = rows.Scan(&b); err != nil {
+		var rawBytes struct {
+			spectra []byte
+			formula []byte
+			mass    []byte
+			names   []byte
+			smiles  []byte
+		}
+		if err = rows.Scan(&row.inchi, &rawBytes.spectra, &rawBytes.formula, &rawBytes.mass, &rawBytes.names, &rawBytes.smiles); err != nil {
 			return nil, err
 		}
-		if err := json.Unmarshal(b, &row); err != nil {
-			return nil, err
+		var massStr []string
+		json.Unmarshal(rawBytes.spectra, &row.spectra)
+		json.Unmarshal(rawBytes.formula, &row.formula)
+		json.Unmarshal(rawBytes.mass, &massStr)
+		json.Unmarshal(rawBytes.names, &row.names)
+		json.Unmarshal(rawBytes.smiles, &row.smiles)
+
+		for _, ms := range massStr {
+			m, err := strconv.ParseFloat(ms, 64)
+			if err != nil {
+				log.Println("Could not convert mass to float: ", ms, err.Error())
+			}
+			row.mass = append(row.mass, m)
+
 		}
 		var namesMap = map[string]bool{}
 		for _, nn := range row.names {
@@ -264,7 +286,7 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 		}
 		searchResult.Data[row.inchi] = data
 	}
-	return &SearchResult{}, nil
+	return &searchResult, nil
 }
 
 // GetUniqueValues see [MB3Database.GetUniqueValues]
