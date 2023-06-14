@@ -579,9 +579,9 @@ func compareDbResults(t *testing.T, want SearchResult, got SearchResult) {
 			if g.Mass != w.Mass {
 				t.Errorf("Result mass does not match: got %v , want %v", g.Mass, w.Mass)
 			}
-			/*if len(g.Names) != len(w.Names) {
+			if len(g.Names) != len(w.Names) {
 				t.Errorf("Count of names differs in Result wanted %v, got %v", w.Names, g.Names)
-			}*/
+			}
 			bg, errg := json.Marshal(w)
 			for _, spw := range w.Spectra {
 				for _, sp := range g.Spectra {
