@@ -57,6 +57,10 @@ func testSearchResults(names []uint64, specCount int, resultCount int) SearchRes
 			dataset.Spectra = []SpectrumMetaData{}
 		}
 		dataset.Spectra = append(dataset.Spectra, SpectrumMetaData{*record.Accession, *record.RecordTitle})
+		dataset.Smiles = *record.Compound.Smiles
+		dataset.Formula = *record.Compound.Formula
+		dataset.Mass = *record.Compound.Mass
+		dataset.Names = append(dataset.Names, *record.Compound.Names...)
 		data[*record.Compound.InChI] = dataset
 	}
 	searchResult.Data = data
@@ -331,21 +335,21 @@ func TestMB3Database_GetRecords(t *testing.T) {
 				db,
 				db.name + " " + "Get first 3 records",
 				Filters{Limit: 3, Offset: 0},
-				testSearchResults([]uint64{1, 5, 11}, 3, 3),
+				testSearchResults([]uint64{1, 5, 11}, 12, 12),
 				false,
 			},
 			{
 				db,
 				db.name + " " + "Get second page with 3 records",
 				Filters{Limit: 3, Offset: 3},
-				testSearchResults([]uint64{3, 8, 10}, 3, 3),
+				testSearchResults([]uint64{3, 8, 10}, 12, 12),
 				false,
 			},
 			{
 				db,
 				db.name + " " + "Get all but first  3 records",
 				Filters{Limit: 0, Offset: 3},
-				testSearchResults([]uint64{0, 2, 3, 4, 6, 7, 8, 9, 10}, 9, 9),
+				testSearchResults([]uint64{0, 2, 3, 4, 6, 7, 8, 9, 10}, 12, 12),
 				false,
 			},
 			{
@@ -538,6 +542,12 @@ func TestMB3Database_GetRecords(t *testing.T) {
 					t.Errorf("%s: GetRecords() error = %v, wantErr %v", tt.db.name, err, tt.wantErr)
 					return
 				}
+				if got.ResultCount != tt.want.ResultCount {
+					t.Errorf("Got wrong result count expected %v, got %v", tt.want.ResultCount, got.ResultCount)
+				}
+				if got.SpectraCount != tt.want.SpectraCount {
+					t.Errorf("Got wrong spectra count expected %v, got %v", tt.want.SpectraCount, got.SpectraCount)
+				}
 				if (tt.args.Limit != 0 && len(got.Data) > int(tt.args.Limit)) ||
 					len(got.Data) != len(tt.want.Data) {
 					gotNames := []string{}
@@ -556,10 +566,22 @@ func TestMB3Database_GetRecords(t *testing.T) {
 }
 
 func compareDbResults(t *testing.T, want SearchResult, got SearchResult) {
-	for _, w := range want.Data {
+	for wk, w := range want.Data {
 		bw, errw := json.Marshal(w)
 		found := false
-		for _, g := range got.Data {
+		if g, ok := got.Data[wk]; ok {
+			if g.Formula != w.Formula {
+				t.Errorf("Result formula does not match: got %v , want %v", g.Formula, w.Formula)
+			}
+			if g.Smiles != w.Smiles {
+				t.Errorf("Result smiles does not match: got %v , want %v", g.Smiles, w.Smiles)
+			}
+			if g.Mass != w.Mass {
+				t.Errorf("Result mass does not match: got %v , want %v", g.Mass, w.Mass)
+			}
+			/*if len(g.Names) != len(w.Names) {
+				t.Errorf("Count of names differs in Result wanted %v, got %v", w.Names, g.Names)
+			}*/
 			bg, errg := json.Marshal(w)
 			for _, spw := range w.Spectra {
 				for _, sp := range g.Spectra {
@@ -571,6 +593,8 @@ func compareDbResults(t *testing.T, want SearchResult, got SearchResult) {
 					}
 				}
 			}
+		} else {
+			t.Errorf("Could not find spectra for %v in result", wk)
 		}
 		if found == false {
 			for _, spw := range w.Spectra {

@@ -479,7 +479,6 @@ func (db *Mb3MongoDB) GetRecords(
 	}
 	var err error
 	var cur *mongo.Cursor
-	var specCount int64
 	var groupStage = bson.D{{"$group", bson.D{
 		{"_id", "$compound.inchi"},
 		{"formula", bson.D{{"$addToSet", "$compound.formula"}}},
@@ -487,6 +486,7 @@ func (db *Mb3MongoDB) GetRecords(
 		{"names", bson.D{{"$push", "$compound.names"}}},
 		{"smiles", bson.D{{"$addToSet", "$compound.smiles"}}},
 		{"spectra", bson.D{{"$push", bson.D{{"title", "$recordtitle"}, {"id", "$accession"}}}}},
+		{"specCount", bson.D{{"$count", bson.D{}}}},
 	}}}
 	if filters.Limit <= 0 {
 		filters.Limit = DefaultValues.Limit
@@ -525,8 +525,11 @@ func (db *Mb3MongoDB) GetRecords(
 	}}
 	skipstage := bson.D{{"$skip", filters.Offset}}
 	limitstage := bson.D{{"$limit", filters.Limit}}
-	facets := bson.D{{"$facet", bson.D{{"count", mongo.Pipeline{bson.D{{"$count", "count"}}}},
-		{"records", mongo.Pipeline{projectstage, sortstage, skipstage, limitstage}}}}}
+	facets := bson.D{{"$facet", bson.D{
+		{"ResultCount", mongo.Pipeline{bson.D{{"$count", "count"}}}},
+		{"SpecCount", mongo.Pipeline{bson.D{{"$group", bson.D{{"_id", nil}, {"count", bson.D{{"$sum", "$specCount"}}}}}}}},
+		{"records", mongo.Pipeline{projectstage, sortstage, skipstage, limitstage}},
+	}}}
 	pipeline := mongo.Pipeline{matchstage}
 	if peakDifferenceStages != nil {
 		for _, d := range peakDifferenceStages {
@@ -535,10 +538,6 @@ func (db *Mb3MongoDB) GetRecords(
 	}
 	pipeline = append(pipeline, groupStage, facets)
 	cur, err = db.database.Collection(mbCollection).Aggregate(context.Background(), pipeline)
-	if err != nil {
-		return nil, err
-	}
-	specCount, err = db.database.Collection(mbCollection).CountDocuments(context.Background(), query)
 	if err != nil {
 		return nil, err
 	}
@@ -562,12 +561,16 @@ func (db *Mb3MongoDB) GetRecords(
 			mbResult.Data[inchi] = *mb
 		}
 	}
-	if len(bsonResult) > 0 && bsonResult[0]["count"] != nil && len(bsonResult[0]["count"].(bson.A)) > 0 {
-		mbResult.ResultCount = int(bsonResult[0]["count"].(bson.A)[0].(bson.M)["count"].(int32))
+	if len(bsonResult) > 0 && bsonResult[0]["ResultCount"] != nil && len(bsonResult[0]["ResultCount"].(bson.A)) > 0 {
+		mbResult.ResultCount = int(bsonResult[0]["ResultCount"].(bson.A)[0].(bson.M)["count"].(int32))
 	} else {
 		mbResult.ResultCount = 0
 	}
-	mbResult.SpectraCount = int(specCount)
+	if len(bsonResult) > 0 && bsonResult[0]["SpecCount"] != nil && len(bsonResult[0]["SpecCount"].(bson.A)) > 0 {
+		mbResult.SpectraCount = int(bsonResult[0]["SpecCount"].(bson.A)[0].(bson.M)["count"].(int32))
+	} else {
+		mbResult.SpectraCount = 0
+	}
 	return &mbResult, nil
 }
 
