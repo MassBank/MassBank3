@@ -73,7 +73,7 @@ func GetServerConfig() *ServerConfig {
 	}
 	serverConfig = &ServerConfig{DBConfig: getDBConfig()}
 	var err error
-	var serverPortEnv = getEnv("SERVER_PORT", serverPortDefault)
+	var serverPortEnv = getEnv("MB3_SERVER_PORT", serverPortDefault)
 	var serverPort uint64
 	serverPort, err = strconv.ParseUint(serverPortEnv, 10, 16)
 	if err != nil {
