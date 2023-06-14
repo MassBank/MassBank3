@@ -16,7 +16,7 @@ var ServerConfig *config.ServerConfig = nil
 
 func initDB() error {
 	var err error
-	if db != nil && db.Ping == nil {
+	if db != nil && db.Ping() == nil {
 		return nil
 	}
 	db, err = database.InitDb(ServerConfig.DBConfig)
