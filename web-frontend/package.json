@@ -2,6 +2,7 @@
 	"name": "web-frontend",
 	"version": "0.0.1",
 	"private": true,
+	"prepare": "svelte-kit sync",
 	"scripts": {
 		"dev": "vite dev --host -d",
 		"build": "vite build",
