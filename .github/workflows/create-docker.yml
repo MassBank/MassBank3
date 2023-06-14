@@ -1,0 +1,49 @@
+name: Create Docker Container
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'dev'
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - dockerfile: ./Dockerfile-dbtool
+            image: ipbhalle/mb3dbtool
+          - dockerfile: ./Dockerfile
+            image: ipbhalle/mb3server
+          - dockerfile: ./Dockerfile-svelte
+            image: ipbhalle/mb3frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ matrix.image }}
+          tags: |
+            type=ref,event=branch
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+        if: github.event_name != 'pull_request'
+
+      - name: Build and push mb3dbtool
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
