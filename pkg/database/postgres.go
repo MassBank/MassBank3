@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/Code-Hex/dd"
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
@@ -218,10 +219,10 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 			diff.Or("(t1.mz-t2.mz BETWEEN ? AND ?)", pd-*filters.MassEpsilon, pd+*filters.MassEpsilon)
 		}
 		innerwhere.And("?", diff)
-		peakdiffquery = bqb.New("JOIN (WITH t AS (SELECT mz,id FROM (SELECT jsonb_array_elements(document->'peak'->'peak'->'mz')::float AS mz,jsonb_array_elements(document->'peak'->'peak'->'rel')::int AS rel,id FROM massbank) as relmz WHERE relmz.rel>=?) SELECT DISTINCT t1.id FROM t as t1 LEFT JOIN t as t2 ON t1.id=t2.id ?) AS diff ON mbdeprecated.id = diff.id", *filters.IntensityCutoff, innerwhere)
+		peakdiffquery = bqb.New("JOIN (WITH t AS (SELECT mz,id FROM (SELECT jsonb_array_elements(document->'peak'->'peak'->'mz')::float AS mz,jsonb_array_elements(document->'peak'->'peak'->'rel')::int AS rel,id FROM massbank) as relmz WHERE relmz.rel>=?) SELECT DISTINCT t1.id FROM t as t1 LEFT JOIN t as t2 ON t1.id=t2.id ?) AS diff ON massbank.id = diff.id", *filters.IntensityCutoff, innerwhere)
 
 	}
-	query := bqb.New("WITH mbdeprecated as (select id, json_build_object('id', document->>'accession','title', document->>'title')::json spectrum, document->'compound' compound FROM massbank ?) SELECT  compound->>'inchi' inchi, array_to_json(array_agg(spectrum ORDER BY spectrum->>'id')) spectra, array_to_json(array_agg(DISTINCT compound->>'formula')) formula, array_to_json(array_agg(DISTINCT compound->>'mass')) mass, array_to_json(array_agg(DISTINCT compound->'name')) names , array_to_json(array_agg(DISTINCT compound->>'smiles')) smiles FROM mbdeprecated ? GROUP BY inchi", where, peakdiffquery)
+	query := bqb.New("WITH mbdeprecated as (select count(*) OVER() spectraCount, json_build_object('id', document->>'accession','title', document->>'title')::json spectrum, document->'compound' compound FROM massbank ? ?) SELECT  count(*) OVER() resultCount, (array_agg(DISTINCT spectraCount))[1] spectraCount, compound->>'inchi' inchi, array_to_json(array_agg(spectrum ORDER BY spectrum->>'id')) spectra, array_to_json(array_agg(DISTINCT compound->>'formula')) formula, array_to_json(array_agg(DISTINCT compound->>'mass')) mass, array_to_json(array_agg(DISTINCT compound->'name')) names , array_to_json(array_agg(DISTINCT compound->>'smiles')) smiles FROM mbdeprecated GROUP BY inchi", peakdiffquery, where)
 	query.Space("ORDER BY (array_agg(spectrum))[1]->>'title' ASC LIMIT ? OFFSET ?", filters.Limit, filters.Offset)
 	sql, params, err := query.ToPgsql()
 	rows, err := p.database.Query(sql, params...)
@@ -234,22 +235,23 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 		Data:         map[string]SearchResultData{},
 	}
 	for rows.Next() {
-		var row struct {
+		var row = struct {
 			inchi   string
 			spectra []SpectrumMetaData
 			formula []string
 			mass    []float64
 			names   [][]string
 			smiles  []string
-		}
-		var rawBytes struct {
+		}{}
+		var rawBytes = struct {
 			spectra []byte
 			formula []byte
 			mass    []byte
 			names   []byte
 			smiles  []byte
-		}
-		if err = rows.Scan(&row.inchi, &rawBytes.spectra, &rawBytes.formula, &rawBytes.mass, &rawBytes.names, &rawBytes.smiles); err != nil {
+		}{}
+
+		if err = rows.Scan(&searchResult.ResultCount, &searchResult.SpectraCount, &row.inchi, &rawBytes.spectra, &rawBytes.formula, &rawBytes.mass, &rawBytes.names, &rawBytes.smiles); err != nil {
 			return nil, err
 		}
 		var massStr []string
@@ -258,7 +260,6 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 		json.Unmarshal(rawBytes.mass, &massStr)
 		json.Unmarshal(rawBytes.names, &row.names)
 		json.Unmarshal(rawBytes.smiles, &row.smiles)
-
 		for _, ms := range massStr {
 			m, err := strconv.ParseFloat(ms, 64)
 			if err != nil {
@@ -559,5 +560,12 @@ func (p *PostgresSQLDB) checkDatabase() error {
 }
 
 func (p *PostgresSQLDB) GetSmiles(accession *string) (*string, error) {
-	return nil, nil
+	var result string
+	var b []byte
+	if err := p.database.QueryRow("SELECT document->'compound'->>'smiles' FROM massbank WHERE document->>'accession' = $1", *accession).Scan(&b); err != nil {
+		return nil, err
+	}
+	println(dd.Dump(b))
+	result = string(b)
+	return &result, nil
 }
