@@ -299,6 +299,55 @@ func ptr[T any](v T) *T {
 	return &v
 }
 
+func TestMB3Database_GetSmiles(t *testing.T) {
+	type args struct {
+		s string
+	}
+	DBs, err := initDBs(All)
+	if err != nil {
+		t.Fatal("Could not init Databases: ", err.Error())
+	}
+	for _, db := range DBs {
+
+		type testData struct {
+			db      testDB
+			name    string
+			args    args
+			want    *string
+			wantErr bool
+		}
+		var tests = []testData{}
+		for _, record := range recordnames {
+			var test = testData{
+				db,
+				db.name + " " + record,
+				args{record},
+				mbTestRecords[record].Compound.Smiles,
+				false,
+			}
+			tests = append(tests, test)
+		}
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				got, err := tt.db.db.GetSmiles(&tt.args.s)
+				if (err != nil) != tt.wantErr {
+					t.Errorf("%s: GetSmiles() error = %v, wantErr %v", tt.db.name, err, tt.wantErr)
+					return
+				}
+				if tt.want != nil && got != nil && *got != *tt.want {
+					t.Errorf("\nwant: %v \ngot : %v\n", *tt.want, *got)
+				}
+				if tt.want == nil && got != nil {
+					t.Errorf("\nwant: %v \ngot : %v\n", tt.want, *got)
+				}
+				if tt.want != nil && got == nil {
+					t.Errorf("\nwant: %v \ngot : %v\n", *tt.want, got)
+				}
+			})
+		}
+	}
+}
+
 func TestMB3Database_GetRecords(t *testing.T) {
 	DBs, err := initDBs(All)
 	if err != nil {
