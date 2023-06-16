@@ -3,32 +3,33 @@ version: '3.1'
 services:
 
   testmongo:
-    image: docker.io/mongo:latest
-    restart: always
+    extends:
+      file: docker-compose-common.yaml
+      service: mongodb
     environment:
       MONGO_INITDB_ROOT_USERNAME: "mbtestuser"
       MONGO_INITDB_ROOT_PASSWORD: "mbtestpwd"
-    healthcheck:
-      test: [ "CMD","mongosh", "--eval", "\"db.adminCommand('ping')\"" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+  
   testpostgres:
-    image: docker.io/postgres:latest
-    restart: always
+    extends:
+      file: docker-compose-common.yaml
+      service: postgres
     environment:
       POSTGRES_PASSWORD: "mbtestpwd"
       POSTGRES_USER:     "mbtestuser"
       POSTGRES_DB:       "mbtestdb"
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready", "-d", "${POSTGRES_DB_NAME}","-U", "${POSTGRES_USER}" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+
   mb3server:
+    extends:
+      file: docker-compose-common.yaml
+      service: mb3server
     build: ../
+    depends_on:
+      testpostgres:
+        condition: service_healthy
+      testmongo:
+        condition: service_healthy
+  
   mb3test:
     build:
       context: ..

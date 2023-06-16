@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   mongodb:
-    image: mongo:latest
+    image: docker.io/mongo:latest
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
@@ -16,14 +16,14 @@ services:
       start_period: 40s
 
   postgres:
-    image: postgres:latest
+    image: docker.io/postgres:latest
     restart: always
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_DB: ${DB_NAME}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "${DB_NAME}","-U", "${DB_USER}"]
+      test: ["CMD-SHELL", "pg_isready", "-d", "$$POSTGRES_DB","-U", "$$POSTGRES_USER"]
       interval: 30s
       timeout: 60s
       retries: 5
@@ -42,9 +42,6 @@ services:
       - DB_CONN_STRING
       - MB3_SERVER_PORT
       - CDKDEPICT_URL
-    depends_on:
-      - mongodb
-      - postgres
 
   mb3frontend:
     restart: always
@@ -52,4 +49,21 @@ services:
       VITE_SERVER_API_URL: "http://${MB3_API_HOST}:${MB3_API_PORT}"
 
   cdkdepict:
-    image: simolecule/cdkdepict:latest
+    image: docker.io/simolecule/cdkdepict:latest
+
+  mb3tool:
+    build:
+      context: ..
+      dockerfile: Dockerfile-dbtool
+    environment:
+      - DB_TYPE
+      - DB_PORT
+      - DB_USER
+      - DB_PASSWORD
+      - DB_HOST
+      - DB_NAME
+      - DB_CONN_STRING
+      - MB_GIT_REPO
+      - MB_GIT_BRANCH
+      - MB_DATA_DIRECTORY
+      - MB_DROP_ALL
