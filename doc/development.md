@@ -92,14 +92,14 @@ default values in *docker/.env*.
 
     docker-compose -f docker/docker-compose-deploy.yaml up
 
-#### Starting a service and initialize the database
+#### Starting a service for production and initialize the database
    
     docker-compose -f docker-compose-deploy.yaml --profile dbinit up
 
-### Starting a docker-container for debugging
+### Starting a service for debugging
 
 This command starts a docker container for remote debugging with a 
 [delve](https://github.com/go-delve/delve) debugging server listening on 
 port 40000.
 
-    docker-compose -f docker/docker-compose-common.yaml -f docker-compose-debug.yaml up
+    docker-compose -f docker-compose-debug.yaml up
