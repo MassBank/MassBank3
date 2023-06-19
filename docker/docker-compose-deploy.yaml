@@ -28,6 +28,8 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile-svelte
+    environment:
+      MB3_API_URL: "http://${MB3_API_HOST}:${MB3_API_PORT}"
     ports:
       - "${MB3_FRONTEND_PORT}:3000"
 

@@ -45,8 +45,7 @@ services:
 
   mb3frontend:
     restart: always
-    environment:
-      VITE_SERVER_API_URL: "http://${MB3_API_HOST}:${MB3_API_PORT}"
+
 
   cdkdepict:
     image: docker.io/simolecule/cdkdepict:latest

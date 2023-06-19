@@ -42,8 +42,10 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile-svelte-debug
+    environment:
+      VITE_SERVER_API_URL: "http://${MB3_API_HOST}:${MB3_API_PORT}"
     ports:
-      - "${MB3_FRONTEND_PORT}:5173"
+      - "127.0.0.1:${MB3_FRONTEND_PORT}:5173/tcp"
     volumes:
       - ../web-frontend:/app
 
