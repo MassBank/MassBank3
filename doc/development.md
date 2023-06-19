@@ -84,18 +84,22 @@ Get help with:
 
 ### Using docker
 
-To run the server in docker containers you need docker and docker-compose. 
+To run the server in docker containers you need docker and docker-compose (min V2). 
 Copy the *docker/env.dist* file to *docker/.env* and edit it to change the 
 default values in *docker/.env*.
 
-### Starting a docker for production
+### Starting a service for production
 
-    docker-compose -f docker/docker-compose-common.yaml -f docker/docker-compose-deploy.yaml up
+    docker-compose -f docker/docker-compose-deploy.yaml up
 
-### Starting a docker-container for debugging
+#### Starting a service for production and initialize the database
+   
+    docker-compose -f docker-compose-deploy.yaml --profile dbinit up
+
+### Starting a service for debugging
 
 This command starts a docker container for remote debugging with a 
 [delve](https://github.com/go-delve/delve) debugging server listening on 
 port 40000.
 
-    docker-compose -f docker/docker-compose-common.yaml -f docker-compose-debug.yaml up
+    docker-compose -f docker-compose-debug.yaml up

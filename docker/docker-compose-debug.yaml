@@ -1,12 +1,25 @@
 version: '3.1'
+
 services:
+
   mongodb:
+    extends:
+      file: docker-compose-common.yaml
+      service: mongodb
     ports:
       - "27017:27017"
+
   postgres:
+    extends:
+      file: docker-compose-common.yaml
+      service: postgres
     ports:
       - "5432:5432"
+
   mb3server:
+    extends:
+      file: docker-compose-common.yaml
+      service: mb3server
     build:
       context: ..
       dockerfile: Dockerfile-debug
@@ -18,15 +31,27 @@ services:
       - "apparmor=unconfined"
     volumes:
       - ./debuglog:/var/log
+    depends_on:
+      - mongodb
+      - postgres
+
   mb3frontend:
+    extends:
+      file: docker-compose-common.yaml
+      service: mb3frontend
     build:
       context: ..
       dockerfile: Dockerfile-svelte-debug
+    environment:
+      VITE_SERVER_API_URL: "http://${MB3_API_HOST}:${MB3_API_PORT}"
     ports:
-      - "${MB3_FRONTEND_PORT}:5173"
+      - "127.0.0.1:${MB3_FRONTEND_PORT}:5173/tcp"
     volumes:
       - ../web-frontend:/app
 
   cdkdepict:
+    extends:
+      file: docker-compose-common.yaml
+      service: cdkdepict
     ports:
       - "8085:8080"
