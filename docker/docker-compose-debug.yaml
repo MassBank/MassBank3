@@ -49,6 +49,16 @@ services:
     volumes:
       - ../web-frontend:/app
 
+  mb3tool:
+    extends:
+      file: docker-compose-common.yaml
+      service: mb3tool
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+
   cdkdepict:
     extends:
       file: docker-compose-common.yaml

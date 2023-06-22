@@ -5,7 +5,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/Code-Hex/dd"
 	"github.com/MassBank/MassBank3/pkg/config"
 	"github.com/MassBank/MassBank3/pkg/database"
 	"github.com/MassBank/MassBank3/pkg/massbank"
@@ -29,7 +28,6 @@ func main() {
 		}
 	} else if userConfig.Database == database.Postgres {
 		db, err = database.NewPostgresSQLDb(userConfig.DBConfig)
-		log.Println(dd.Dump(db))
 		if err != nil {
 			panic(err)
 		}
@@ -60,6 +58,7 @@ func main() {
 	if err != nil {
 		println(err.Error())
 	}
+	println("Start updating database.")
 	metaId, err := db.UpdateMetadata(versionData)
 	if err != nil {
 		panic(err)
@@ -81,6 +80,9 @@ func main() {
 	if mbfiles == nil {
 		panic("No files found")
 	}
+	count, err = db.Count()
+
+	println("Database update was succesful. ", count, " records in database.")
 }
 
 func readDirectoryData(dir string) ([]*massbank.MassBank2, *massbank.MbMetaData, error) {
@@ -118,6 +120,7 @@ func readDirectoryData(dir string) ([]*massbank.MassBank2, *massbank.MbMetaData,
 		file.Close()
 		mbfiles = append(mbfiles, mb)
 	}
+	println("Reading of data finished.")
 	return mbfiles, &mbmeta, nil
 }
 
@@ -157,6 +160,7 @@ func readGitData(repo string, branch string) ([]*massbank.MassBank2, *massbank.M
 			mbfiles = append(mbfiles, mb)
 		}
 	}
+	println("Reading of data finished.")
 	return mbfiles, &mbmeta, nil
 }
 
