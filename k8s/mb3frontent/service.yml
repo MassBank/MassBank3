@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: massbank3-frontent
+  namespace: massbank3
+spec:
+  selector:
+    app: massbank3-frontent
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 3000
+  type: NodePort

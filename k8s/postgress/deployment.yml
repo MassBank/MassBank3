@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: massbank3-postgres
+  namespace: massbank3
+  labels:
+    app: massbank3-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: massbank3-postgres
+  template:
+    metadata:
+      name: massbank3-postgres
+      labels:
+        app: massbank3-postgres
+    spec:
+      containers:
+        - name: massbank3-postgres
+          image: docker.io/postgres:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: postgres-config
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim
+      restartPolicy: Always
