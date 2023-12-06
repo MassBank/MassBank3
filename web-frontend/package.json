@@ -1,39 +1,67 @@
 {
-	"name": "web-frontend",
-	"version": "0.0.1",
-	"private": true,
-	"prepare": "svelte-kit sync",
-	"scripts": {
-		"dev": "vite dev --host -d",
-		"build": "vite build",
-		"preview": "vite preview",
-		"test": "playwright test",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"test:unit": "vitest",
-		"lint": "eslint ."
-	},
-	"devDependencies": {
-		"@playwright/test": "^1.28.1",
-		"@sveltejs/adapter-auto": "^2.0.0",
-		"@sveltejs/adapter-node": "^1.2.3",
-		"@sveltejs/kit": "^1.5.0",
-		"@tsconfig/svelte": "^4.0.1",
-		"@typescript-eslint/eslint-plugin": "^5.45.0",
-		"@typescript-eslint/parser": "^5.45.0",
-		"eslint": "^8.28.0",
-		"eslint-plugin-svelte3": "^4.0.0",
-		"svelte": "^3.54.0",
-		"svelte-check": "^3.3.1",
-		"svelte-preprocess": "^5.0.3",
-		"tslib": "^2.4.1",
-		"typescript": "^5.0.4",
-		"vite": "^4.2.0",
-		"vitest": "^0.25.3"
-	},
-	"type": "module",
-	"dependencies": {
-		"purecss": "^3.0.0",
-		"svelte-chartjs": "^3.1.2"
-	}
+  "name": "test-app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "vite --host localhost --port 3000 --strictPort --open",
+    "build": "rimraf dist && tsc && vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 3000",
+    "compile": "tsc",
+    "clean-install": "rm package-lock.json && rm -rf node_modules && npm i --legacy-peer-deps",
+    "eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "eslint-fix": "npm run eslint --fix",
+    "prettier": "prettier --check src",
+    "prettier-write": "prettier --write src"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "react": ">=18.2.0",
+    "react-dom": ">=18.2.0"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.23.3",
+    "@babel/preset-react": "^7.23.3",
+    "@babel/preset-typescript": "^7.23.3",
+    "@types/node": "^20.10.2",
+    "@types/react": "^18.2.41",
+    "@types/react-dom": "^18.2.17",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1",
+    "@vitejs/plugin-react": "^4.2.0",
+    "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^3.1.0",
+    "react-router-dom": "^6.20.1",
+    "rimraf": "^5.0.5",
+    "sass": "^1.69.5",
+    "typescript": "^5.3.2",
+    "vite": "^5.0.4",
+    "vite-plugin-node-stdlib-browser": "^0.2.1"
+  },
+  "volta": {
+    "node": "20.10.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.2.0",
+    "react-dom": ">=18.2.0"
+  }
 }
