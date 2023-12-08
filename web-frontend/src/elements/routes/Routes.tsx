@@ -1,14 +1,30 @@
-import { useRoutes } from 'react-router-dom';
-
+import { Routes, Route } from 'react-router-dom';
 import routes from '../../constants/routes';
 
-function Routes() {
-  const paths = Object.keys(routes).map((r) => {
-    const route = routes[r];
-    return { path: route.path, element: route.element };
-  });
-
-  return useRoutes(paths);
+function Routing() {
+  return (
+    <Routes>
+      <Route path={routes.home.path} element={<routes.home.element />} />
+      <Route path={routes.search.path} element={<routes.search.element />} />
+      <Route path={routes.content.path} element={<routes.content.element />} />
+      <Route
+        path={routes.download.path}
+        element={<routes.download.element />}
+      />
+      <Route
+        path={routes.accession.path}
+        element={<routes.accession.element />}
+      >
+        <Route path=":id" element={<routes.accession.element />} />
+      </Route>
+      <Route
+        path={routes.documentation.path}
+        element={<routes.documentation.element />}
+      />
+      <Route path={routes.about.path} element={<routes.about.element />} />
+      <Route path={routes.news.path} element={<routes.news.element />} />
+    </Routes>
+  );
 }
 
-export default Routes;
+export default Routing;

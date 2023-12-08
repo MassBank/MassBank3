@@ -7,14 +7,12 @@ function Header() {
 
   const logoLink = (
     <li className="custom-li" key="logo-li">
-      {/* <Link to="/" className="link"> */}
       <img src="/logos/logo.svg" alt="MassBank Europe" />
-      {/* </Link> */}
     </li>
   );
 
   const routeLinks = Object.keys(routes)
-    .filter((r) => r != 'notFound')
+    .filter((r) => r !== 'notFound')
     .map((r) => {
       const route = routes[r];
       return (

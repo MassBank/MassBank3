@@ -1,12 +1,12 @@
 {
-  "name": "test-app",
+  "name": "massbank3-frontend",
   "version": "1.0.0",
   "scripts": {
     "start": "vite --host localhost --port 3000 --strictPort --open",
     "build": "rimraf dist && tsc && vite build",
     "preview": "vite preview --host 0.0.0.0 --port 3000",
     "compile": "tsc",
-    "clean-install": "rm package-lock.json && rm -rf node_modules && npm i --legacy-peer-deps",
+    "clean-install": "rm package-lock.json && rm -rf node_modules && npm i",
     "eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "eslint-fix": "npm run eslint --fix",
     "prettier": "prettier --check src",
@@ -31,19 +31,22 @@
     ]
   },
   "dependencies": {
+    "openchemlib": "^8.7.2",
     "react": ">=18.2.0",
-    "react-dom": ">=18.2.0"
+    "react-dom": ">=18.2.0",
+    "react-loader-spinner": "^6.0.0",
+    "react-ocl": "^6.1.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.23.3",
     "@babel/preset-react": "^7.23.3",
     "@babel/preset-typescript": "^7.23.3",
-    "@types/node": "^20.10.2",
-    "@types/react": "^18.2.41",
+    "@types/node": "^20.10.4",
+    "@types/react": "^18.2.42",
     "@types/react-dom": "^18.2.17",
-    "@typescript-eslint/eslint-plugin": "^6.13.1",
-    "@typescript-eslint/parser": "^6.13.1",
-    "@vitejs/plugin-react": "^4.2.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
+    "@vitejs/plugin-react": "^4.2.1",
     "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.0.1",
@@ -53,9 +56,8 @@
     "react-router-dom": "^6.20.1",
     "rimraf": "^5.0.5",
     "sass": "^1.69.5",
-    "typescript": "^5.3.2",
-    "vite": "^5.0.4",
-    "vite-plugin-node-stdlib-browser": "^0.2.1"
+    "typescript": "^5.3.3",
+    "vite": "^5.0.6"
   },
   "volta": {
     "node": "20.10.0"

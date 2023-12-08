@@ -13,7 +13,7 @@ function App() {
         <Body />
         <Footer />
       </Router>
-    </div >
+    </div>
   );
 }
 

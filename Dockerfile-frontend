@@ -1,20 +1,3 @@
-# FROM node:19-alpine AS build
-
-# WORKDIR /app
-
-# COPY web-frontend/package.json ./
-# RUN npm install
-# COPY web-frontend/static ./static
-# COPY web-frontend/src ./src
-# COPY web-frontend/svelte.config.js  web-frontend/tsconfig.json  web-frontend/vite.config.ts ./
-# RUN npm run build
-
-# FROM node:19-alpine
-# COPY --from=build /app/package.json /app/package-lock.json ./
-# RUN npm ci --omit dev
-# COPY --from=build /app/build ./build
-# ENTRYPOINT ["node", "build"]
-
 FROM node:19-alpine
 # Create app directory
 WORKDIR /app
@@ -23,7 +6,9 @@ WORKDIR /app
 COPY ./web-frontend/ .
 
 # install dependencies
-RUN npm install --legacy-peer-deps
+# RUN npm install --legacy-peer-deps
+RUN npm install
+
 # for production mode
 RUN node ./node_modules/rimraf dist && node ./node_modules/typescript/bin/tsc && node ./node_modules/vite/bin/vite.js build
 

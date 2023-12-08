@@ -10,8 +10,9 @@ import Search from '../elements/routes/pages/search/Search';
 
 interface ifc1 {
   path: string;
-  element: JSX.Element;
   label: string;
+  // eslint-disable-next-line no-unused-vars
+  element: (props) => JSX.Element;
 }
 
 interface ifc2 {
@@ -19,19 +20,19 @@ interface ifc2 {
 }
 
 const routes: ifc2 = {
-  home: { path: '/', element: Home(), label: 'Home' },
-  search: { path: '/search', element: Search(), label: 'Search' },
-  content: { path: '/content', element: Content(), label: 'Content' },
-  download: { path: '/download', element: Download(), label: 'Download' },
-  accession: { path: '/accession', element: Accession(), label: 'Accession' },
+  home: { path: '/', label: 'Home', element: Home },
+  search: { path: '/search', label: 'Search', element: Search },
+  content: { path: '/content', label: 'Content', element: Content },
+  download: { path: '/download', label: 'Download', element: Download },
+  accession: { path: '/accession', label: 'Accession', element: Accession },
   documentation: {
     path: '/documentation',
-    element: Documentation(),
     label: 'Documentation',
+    element: Documentation,
   },
-  about: { path: '/about', element: About(), label: 'About' },
-  news: { path: '/news', element: News(), label: 'News' },
-  notFound: { path: '*', element: NotFound(), label: 'Not Found' },
+  about: { path: '/about', label: 'About', element: About },
+  news: { path: '/news', label: 'News', element: News },
+  notFound: { path: '*', label: 'Not Found', element: NotFound },
 };
 
 export default routes;
