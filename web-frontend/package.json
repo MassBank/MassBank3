@@ -31,10 +31,13 @@
     ]
   },
   "dependencies": {
+    "@types/d3": "^7.4.3",
+    "d3": "^7.8.5",
     "openchemlib": "^8.7.2",
     "react": ">=18.2.0",
     "react-dom": ">=18.2.0",
     "react-loader-spinner": "^6.0.0",
+    "react-mf": "^2.0.2",
     "react-ocl": "^6.1.0"
   },
   "devDependencies": {

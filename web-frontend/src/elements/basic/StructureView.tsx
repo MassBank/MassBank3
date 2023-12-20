@@ -6,6 +6,7 @@ interface InputProps {
   imageWidth?: number;
   imageHeight?: number;
   onDoubleClick?: () => void;
+  className?: string;
 }
 
 function StructureView({
@@ -13,20 +14,21 @@ function StructureView({
   imageWidth,
   imageHeight,
   onDoubleClick = () => {},
+  className = 'StructureView',
 }: InputProps) {
   return useMemo(
     () => (
-      <div onDoubleClick={onDoubleClick}>
+      <div className={className} onDoubleClick={onDoubleClick}>
         <SmilesSvgRenderer
           smiles={smiles}
           width={imageWidth}
           height={imageHeight}
-          // autoCrop={true}
-          // autoCropMargin={10}
+          autoCrop={true}
+          autoCropMargin={10}
         />
       </div>
     ),
-    [imageHeight, imageWidth, onDoubleClick, smiles],
+    [className, imageHeight, imageWidth, onDoubleClick, smiles],
   );
 }
 

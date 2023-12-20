@@ -1,7 +1,7 @@
 import './RecordView.scss';
 
 import Record from '../../types/record';
-import StructureView from '../basic/StructureView';
+import InfoTable from './InfoTable';
 
 type inputProps = {
   record: Record;
@@ -10,11 +10,7 @@ type inputProps = {
 function RecordView({ record }: inputProps) {
   return (
     <div className="record-view-panel">
-      <p>{record.accession}</p>
-      <p>{record.title}</p>
-      {record.compound.smiles && record.compound.smiles !== '' ? (
-        <StructureView smiles={record.compound.smiles} />
-      ) : undefined}
+      <InfoTable record={record} />
     </div>
   );
 }

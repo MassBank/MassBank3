@@ -66,40 +66,46 @@ function Accession() {
     }
   }, [handleOnSearch, params.id]);
 
-  return (
-    <div className="accession-panel">
-      <div className="input-panel">
-        <Input
-          type="search"
-          placeholder="e.g. MSBNK-AAFC-AC000114"
-          defaultValue={accession && accession !== '' ? accession : undefined}
-          label="Search for accession: "
-          onChange={(acc: string) => setAccession(acc.trim())}
-          inputWidth="300px"
-        />
-        <Button
-          child="Search"
-          onClick={() => handleOnSearch(base, accession)}
-          disabled={accession.trim() === ''}
-          buttonStyle={
-            accession.trim() === '' ? { color: 'grey' } : { color: 'black' }
-          }
-        />
-      </div>
-      <div className="result-panel">
-        {isRequesting ? (
-          <Spinner
-            buttonText="Please Wait..."
-            buttonDisabled={true}
-            spinnerWidth={200}
-            spinnerHeight={200}
+  const accessionView = useMemo(
+    () => (
+      <div className="accession-panel">
+        <div className="input-panel">
+          <Input
+            type="search"
+            placeholder="e.g. MSBNK-AAFC-AC000114"
+            defaultValue={accession && accession !== '' ? accession : undefined}
+            label="Search for accession: "
+            onChange={(acc: string) => setAccession(acc.trim())}
+            inputWidth="300px"
           />
-        ) : (
-          recordView
-        )}
+          <Button
+            child="Search"
+            onClick={() => handleOnSearch(base, accession)}
+            disabled={accession.trim() === ''}
+            buttonStyle={
+              accession.trim() === '' ? { color: 'grey' } : { color: 'black' }
+            }
+          />
+        </div>
+        <div className="result-panel">
+          {isRequesting ? (
+            <Spinner
+              buttonText="Please Wait..."
+              buttonDisabled={true}
+              spinnerWidth={200}
+              spinnerHeight={200}
+            />
+          ) : (
+            recordView
+          )}
+        </div>
       </div>
-    </div>
+    ),
+
+    [accession, handleOnSearch, isRequesting, recordView],
   );
+
+  return accessionView;
 }
 
 export default Accession;
