@@ -26,7 +26,7 @@ function ChartElement({ pd, xScale, yScale }: InputProps) {
   }, []);
 
   return (
-    pd.relIntensity > 0 && (
+    pd.rel > 0 && (
       <g
         key={'data-point-' + xScaled}
         className="entry"
@@ -37,34 +37,34 @@ function ChartElement({ pd, xScale, yScale }: InputProps) {
           x1={xScaled}
           x2={xScaled}
           y1={yScale.range()[0]}
-          y2={yScale(pd.relIntensity)}
+          y2={yScale(pd.rel)}
         />
-        {/* <circle cx={xScaled} cy={yScale(d.relIntensity)} r={3} /> */}
+        {/* <circle cx={xScaled} cy={yScale(pd.rel)} r={3} /> */}
         {isOnHover && (
           <text
             className="hover-label"
             x={xScale(String(pd.mz))}
-            y={yScale(pd.relIntensity) - 20}
+            y={yScale(pd.rel) - 20}
           >
-            <tspan x={xScale(String(pd.mz))} y={yScale(pd.relIntensity) - 40}>
+            <tspan x={xScale(String(pd.mz))} y={yScale(pd.rel) - 40}>
               {'mz: ' + pd.mz}
             </tspan>
-            <tspan x={xScale(String(pd.mz))} y={yScale(pd.relIntensity) - 20}>
+            <tspan x={xScale(String(pd.mz))} y={yScale(pd.rel) - 20}>
               {'intensity: ' + pd.intensity.toFixed(2)}
             </tspan>
           </text>
         )}
-        {/* {isOnHover && (
+        {isOnHover && (
           <line
             x1={xScale.range()[0]}
-            y1={yScale(pd.relIntensity)}
-            y2={yScale(pd.relIntensity)}
+            y1={yScale(pd.rel)}
+            y2={yScale(pd.rel)}
             x2={xScale.range()[xScale.range().length - 1]}
             stroke="grey"
             strokeOpacity={0.5}
             strokeDasharray={5}
           />
-        )} */}
+        )}
       </g>
     )
   );

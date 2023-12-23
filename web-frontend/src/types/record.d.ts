@@ -1,3 +1,5 @@
+import PeakData from "./PeakData";
+
 export default interface Record {
   accession: string;
   deprecated: {};
@@ -28,6 +30,9 @@ export default interface Record {
     splash: string;
     annotation: {};
     numPeak: number;
-    peak: {};
+    peak: {
+      header: string[];
+      values: PeakData[];
+    };
   };
 }

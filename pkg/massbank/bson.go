@@ -2,10 +2,11 @@ package massbank
 
 import (
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/bsontype"
 	"strings"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/bsontype"
 )
 
 func (p DatabaseProperty) MarshalBSONValue() (bsontype.Type, []byte, error) {
@@ -39,9 +40,9 @@ func (p RecordDate) MarshalBSONValue() (bsontype.Type, []byte, error) {
 func (p PkPeak) MarshalBSONValue() (bsontype.Type, []byte, error) {
 	return bson.MarshalValue(struct {
 		Header    []string
-		Mz        []float64
+		Mz        []float32
 		Intensity []float64
-		Rel       []uint
+		Rel       []uint16
 	}{p.Header, p.Mz, p.Intensity, p.Rel})
 }
 

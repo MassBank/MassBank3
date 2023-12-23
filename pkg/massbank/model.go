@@ -106,9 +106,9 @@ type RecordAuthorName struct {
 
 type PkPeak struct {
 	Header    []string  `json:"header"`
-	Mz        []float64 `json:"mz"`
+	Mz        []float32 `json:"mz"`
 	Intensity []float64 `json:"intensity"`
-	Rel       []uint    `json:"rel"`
+	Rel       []uint16  `json:"rel"`
 }
 
 type PkAnnotation struct {

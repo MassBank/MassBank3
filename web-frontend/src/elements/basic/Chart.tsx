@@ -24,7 +24,7 @@ function Chart({
   const boundsHeight = height - MARGIN.top - MARGIN.bottom;
 
   const integerRangeX = useMemo(() => {
-    const minX = 0;
+    const minX = Math.floor(Math.min(...peakData.map((d) => d.mz))) - 30; //0;
     const maxX = Math.ceil(Math.max(...peakData.map((d) => d.mz))) + 30;
 
     const range: number[] = [];
@@ -130,7 +130,7 @@ function Chart({
             (yScale.range()[0] - yScale.range()[1]) / 2
           })`}
         >
-          Abundance
+          Relative Abundance
         </text>
       </g>
     );
@@ -152,8 +152,8 @@ function Chart({
                 {y}
               </text>
               <line
-                x1={xScale('0')}
-                x2={Number(xScale('0')) - 10}
+                x1={xScale.range()[0]}
+                x2={xScale.range()[0] - 10}
                 y1={yScale(y)}
                 y2={yScale(y)}
                 stroke="black"
@@ -181,7 +181,6 @@ function Chart({
     <div ref={ref} className={className}>
       <svg width={width} height={height}>
         <g
-          // className="entryContainer"
           width={boundsWidth}
           height={boundsHeight}
           transform={`translate(${[MARGIN.left, MARGIN.top].join(',')})`}
