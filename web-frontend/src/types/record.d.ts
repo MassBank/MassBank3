@@ -1,4 +1,4 @@
-import PeakData from "./PeakData";
+import PeakData from './PeakData';
 
 export default interface Record {
   accession: string;

@@ -5,6 +5,7 @@ import StructureView from '../basic/StructureView';
 import { MF } from 'react-mf';
 import { useMemo } from 'react';
 import Chart from '../basic/Chart';
+import PeakTable from './PeakTable';
 
 type InputProps = {
   record: Record;
@@ -71,6 +72,12 @@ function InfoTable({ record, className = 'InfoTable' }: InputProps) {
               </td>
             </tr>
             <tr>
+              <td>Peaks</td>
+              <td>
+                <PeakTable pd={record.peak.peak.values} />
+              </td>
+            </tr>
+            <tr>
               <td>Mass</td>
               <td>{record.compound.mass}</td>
             </tr>
@@ -78,7 +85,6 @@ function InfoTable({ record, className = 'InfoTable' }: InputProps) {
               <td>SPLASH</td>
               <td>{record.peak.splash}</td>
             </tr>
-
             <tr>
               <td>Formula</td>
               <td>

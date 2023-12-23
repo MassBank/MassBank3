@@ -1,0 +1,25 @@
+.PeakTable {
+  width: 100%;
+  min-height: 100px;
+  max-height: 350px;
+
+  overflow-y: scroll;
+
+  table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    text-align: center;
+
+    thead th {
+      position: sticky;
+      position: -webkit-sticky;
+      top: 0;
+      background: lightgrey;
+    }
+
+    tr:hover {
+      background-color: lightcyan;
+    }
+  }
+}
