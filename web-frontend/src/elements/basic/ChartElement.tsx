@@ -1,8 +1,9 @@
 import './ChartElement.scss';
 
-import { MouseEvent, useCallback, useState } from 'react';
+import { MouseEvent, useCallback, useMemo } from 'react';
 import PeakData from '../../types/PeakData';
 import { ScaleBand, ScaleLinear } from 'd3';
+import { useHighlight } from '../../highlight';
 
 type InputProps = {
   pd: PeakData;
@@ -11,27 +12,42 @@ type InputProps = {
 };
 
 function ChartElement({ pd, xScale, yScale }: InputProps) {
-  const [isOnHover, setIsOnHover] = useState<boolean>(false);
+  const highlight = useHighlight([pd.id]);
 
   const xScaled = xScale(String(pd.mz));
 
-  const handleOnMouseEnter = useCallback((e: MouseEvent<SVGGElement>) => {
-    e.preventDefault();
-    setIsOnHover(true);
-  }, []);
+  const handleOnMouseEnter = useCallback(
+    (e: MouseEvent<SVGGElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-  const handleOnMouseLeave = useCallback((e: MouseEvent<SVGGElement>) => {
-    e.preventDefault();
-    setIsOnHover(false);
-  }, []);
+      highlight.show();
+    },
+    [highlight],
+  );
 
-  return (
-    pd.rel > 0 && (
+  const handleOnMouseLeave = useCallback(
+    (e: MouseEvent<SVGGElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      highlight.hide();
+    },
+    [highlight],
+  );
+
+  const chartElement = useMemo(
+    () => (
       <g
         key={'data-point-' + xScaled}
         className="entry"
         onMouseEnter={handleOnMouseEnter}
         onMouseLeave={handleOnMouseLeave}
+        style={
+          highlight.isActive
+            ? { opacity: 1, stroke: 'blue', strokeWidth: 1.5 }
+            : {}
+        }
       >
         <line
           x1={xScaled}
@@ -39,22 +55,24 @@ function ChartElement({ pd, xScale, yScale }: InputProps) {
           y1={yScale.range()[0]}
           y2={yScale(pd.rel)}
         />
-        {/* <circle cx={xScaled} cy={yScale(pd.rel)} r={3} /> */}
-        {isOnHover && (
+        {highlight.isActive && (
+          <circle cx={xScaled} cy={yScale(pd.rel)} r={3} />
+        )}
+        {highlight.isActive && (
           <text
             className="hover-label"
             x={xScale(String(pd.mz))}
             y={yScale(pd.rel) - 20}
           >
-            <tspan x={xScale(String(pd.mz))} y={yScale(pd.rel) - 40}>
+            <tspan x={xScale(String(pd.mz))} y={yScale(pd.rel) - 30}>
               {'mz: ' + pd.mz}
             </tspan>
-            <tspan x={xScale(String(pd.mz))} y={yScale(pd.rel) - 20}>
+            <tspan x={xScale(String(pd.mz))} y={yScale(pd.rel) - 10}>
               {'intensity: ' + pd.intensity.toFixed(2)}
             </tspan>
           </text>
         )}
-        {isOnHover && (
+        {highlight.isActive && (
           <line
             x1={xScale.range()[0]}
             y1={yScale(pd.rel)}
@@ -66,8 +84,22 @@ function ChartElement({ pd, xScale, yScale }: InputProps) {
           />
         )}
       </g>
-    )
+    ),
+
+    [
+      handleOnMouseEnter,
+      handleOnMouseLeave,
+      highlight.isActive,
+      pd.intensity,
+      pd.mz,
+      pd.rel,
+      xScale,
+      xScaled,
+      yScale,
+    ],
   );
+
+  return pd.rel > 0 && chartElement;
 }
 
 export default ChartElement;

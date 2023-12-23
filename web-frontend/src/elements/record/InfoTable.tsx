@@ -1,11 +1,11 @@
 import './InfoTable.scss';
 
-import Record from '../../types/record';
 import StructureView from '../basic/StructureView';
 import { MF } from 'react-mf';
 import { useMemo } from 'react';
 import Chart from '../basic/Chart';
 import PeakTable from './PeakTable';
+import Record from '../../types/Record';
 
 type InputProps = {
   record: Record;

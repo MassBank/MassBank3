@@ -1,12 +1,13 @@
 import './Accession.scss';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import record from '../../../../types/record';
 import Input from '../../../basic/Input';
 import Spinner from '../../../basic/Spinner';
 import Button from '../../../basic/Button';
 import RecordView from '../../../record/RecordView';
 import { useParams } from 'react-router';
+import generateID from '../../../../utils/generateID';
+import Record from '../../../../types/Record';
 
 const base = 'http://localhost:8081';
 
@@ -16,7 +17,7 @@ function Accession() {
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [accession, setAccession] = useState<string>('');
   const [requestedAccession, setRequestedAccession] = useState<string>('');
-  const [record, setRecord] = useState<record | undefined>();
+  const [record, setRecord] = useState<Record | undefined>();
 
   async function getRecord(base: string, id: string) {
     const url = base + '/v1/records/' + id;
@@ -37,6 +38,13 @@ function Accession() {
 
   const search = useCallback(async (base: string, id: string) => {
     const rec = await getRecord(base, id);
+    if (rec) {
+      rec.peak.peak.values = rec.peak.peak.values.map((v) => {
+        const _v = v;
+        _v.id = generateID();
+        return _v;
+      });
+    }
     setRecord(rec);
     setIsRequesting(false);
   }, []);
@@ -50,13 +58,15 @@ function Accession() {
     [search],
   );
 
-  const recordView = useMemo(() => {
-    return record ? (
-      <RecordView record={record} />
-    ) : requestedAccession !== '' ? (
-      <p>No database entry found for "{requestedAccession}"!</p>
-    ) : undefined;
-  }, [requestedAccession, record]);
+  const recordView = useMemo(
+    () =>
+      record ? (
+        <RecordView record={record} />
+      ) : requestedAccession !== '' ? (
+        <p>No database entry found for "{requestedAccession}"!</p>
+      ) : undefined,
+    [requestedAccession, record],
+  );
 
   useEffect(() => {
     if (params.id) {

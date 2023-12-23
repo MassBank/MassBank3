@@ -1,7 +1,7 @@
 import './RecordView.scss';
 
-import Record from '../../types/record';
 import InfoTable from './InfoTable';
+import Record from '../../types/Record';
 
 type inputProps = {
   record: Record;
