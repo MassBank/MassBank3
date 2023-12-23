@@ -3,7 +3,7 @@ import './ChartElement.scss';
 import { MouseEvent, useCallback, useMemo } from 'react';
 import PeakData from '../../types/PeakData';
 import { ScaleBand, ScaleLinear } from 'd3';
-import { useHighlight } from '../../highlight';
+import { useHighlight } from '../../highlight/Index';
 
 type InputProps = {
   pd: PeakData;

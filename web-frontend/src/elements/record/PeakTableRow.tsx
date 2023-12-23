@@ -1,5 +1,5 @@
 import { MouseEvent, useCallback, useMemo } from 'react';
-import { useHighlight } from '../../highlight';
+import { useHighlight } from '../../highlight/Index';
 import PeakData from '../../types/PeakData';
 
 type InputProps = {

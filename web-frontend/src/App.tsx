@@ -4,7 +4,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import Footer from './elements/footer/Footer';
 import Body from './elements/body/Body';
 import Header from './elements/header/Header';
-import { HighlightProvider } from './highlight';
+import { HighlightProvider } from './highlight/Index';
 
 function App() {
   return (

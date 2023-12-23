@@ -6,7 +6,7 @@ import {
   useCallback,
   useEffect,
 } from 'react';
-import Highlight from '../../types/Highlight';
+import Highlight from '../types/Highlight';
 
 type HighlightActions = 'HIDE' | 'SHOW';
 
