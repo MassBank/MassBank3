@@ -1,5 +1,5 @@
-import { useMemo, useRef } from 'react';
-import { scaleBand, scaleLinear } from 'd3';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { brushX, scaleBand, scaleLinear, select } from 'd3';
 import PeakData from '../../types/PeakData';
 import ChartElement from './ChartElement';
 
@@ -18,14 +18,30 @@ function Chart({
   height = 300,
   className = 'Chart',
 }: InputProps) {
-  const ref = useRef(null);
+  const wrapperRef = useRef(null);
+  const svgRef = useRef(null);
 
   const boundsWidth = width - MARGIN.right - MARGIN.left;
   const boundsHeight = height - MARGIN.top - MARGIN.bottom;
 
+  const [brushXDomain, setBrushXDomain] = useState<
+    { min: number; max: number } | undefined
+  >();
+
+  const filteredPeakData = useMemo(() => {
+    let _peakData = peakData;
+    if (brushXDomain)
+      _peakData = peakData.filter(
+        (pd) => pd.mz >= brushXDomain.min && pd.mz <= brushXDomain.max,
+      );
+
+    return _peakData;
+  }, [brushXDomain, peakData]);
+
   const integerRangeX = useMemo(() => {
-    const minX = Math.floor(Math.min(...peakData.map((d) => d.mz))) - 30; //0;
-    const maxX = Math.ceil(Math.max(...peakData.map((d) => d.mz))) + 30;
+    const m = filteredPeakData.length <= 3 ? 2 : 10;
+    const minX = Math.floor(Math.min(...filteredPeakData.map((d) => d.mz))) - m;
+    const maxX = Math.ceil(Math.max(...filteredPeakData.map((d) => d.mz))) + m;
 
     const range: number[] = [];
     for (let i = minX; i <= maxX; i++) {
@@ -33,7 +49,7 @@ function Chart({
     }
 
     return range;
-  }, [peakData]);
+  }, [filteredPeakData]);
 
   const integerRangeY = useMemo(() => {
     const minY = 0;
@@ -48,14 +64,14 @@ function Chart({
   }, []);
 
   const xScale = useMemo(() => {
-    const groups = peakData
-      .map((d) => d.mz)
+    const groups = filteredPeakData
+      .map((pd) => pd.mz)
       .concat(integerRangeX)
       .sort((a, b) => a - b)
       .map((d) => String(d));
 
     return scaleBand().domain(groups).range([0, boundsWidth]);
-  }, [boundsWidth, peakData, integerRangeX]);
+  }, [filteredPeakData, integerRangeX, boundsWidth]);
 
   const yScale = useMemo(() => {
     const maxY = Math.max(...integerRangeY);
@@ -63,33 +79,33 @@ function Chart({
     return scaleLinear().domain([0, maxY]).range([boundsHeight, 0]);
   }, [boundsHeight, integerRangeY]);
 
-  const xLabels = useMemo(
-    () =>
-      integerRangeX.map(
-        (x) =>
-          x % 50 === 0 && (
-            <g key={'x_axis_label' + x}>
-              <text
-                x={xScale(String(x))}
-                y={yScale.range()[0] + 20}
-                textAnchor="middle"
-                alignmentBaseline="central"
-                fontSize={15}
-              >
-                {x}
-              </text>
-              <line
-                x1={xScale(String(x))}
-                x2={xScale(String(x))}
-                y1={yScale.range()[0]}
-                y2={yScale.range()[0] + 10}
-                stroke="black"
-              />
-            </g>
-          ),
-      ),
-    [integerRangeX, xScale, yScale],
-  );
+  const xLabels = useMemo(() => {
+    const steps = Math.floor(integerRangeX.length / 5);
+
+    return integerRangeX.map(
+      (x) =>
+        x % steps === 0 && (
+          <g key={'x_axis_label' + x}>
+            <text
+              x={xScale(String(x))}
+              y={yScale.range()[0] + 20}
+              textAnchor="middle"
+              alignmentBaseline="central"
+              fontSize={15}
+            >
+              {x}
+            </text>
+            <line
+              x1={xScale(String(x))}
+              x2={xScale(String(x))}
+              y1={yScale.range()[0]}
+              y2={yScale.range()[0] + 10}
+              stroke="black"
+            />
+          </g>
+        ),
+    );
+  }, [integerRangeX, xScale, yScale]);
 
   const xAxis = useMemo(() => {
     return (
@@ -166,7 +182,7 @@ function Chart({
 
   const allShapes = useMemo(
     () =>
-      peakData.map((d) => (
+      filteredPeakData.map((d) => (
         <ChartElement
           key={'chart_element' + d.mz}
           pd={d}
@@ -174,17 +190,48 @@ function Chart({
           yScale={yScale}
         />
       )),
-    [peakData, xScale, yScale],
+    [filteredPeakData, xScale, yScale],
   );
 
+  const invertScaleBand = useCallback(
+    (value: number) => {
+      const domain = xScale.domain();
+      const paddingOuter = Number(xScale(domain[0]));
+      const eachBand = xScale.step();
+
+      const index = Math.floor((value - paddingOuter) / eachBand);
+      return domain[Math.max(0, Math.min(index, domain.length - 1))];
+    },
+    [xScale],
+  );
+
+  useEffect(() => {
+    const svg = select(svgRef.current);
+    const brush = brushX()
+      .extent([
+        [0, 0],
+        [width, height],
+      ])
+      .on('end', (e) => {
+        if (e.selection) {
+          const inverted: number[] = e.selection.map(invertScaleBand);
+          setBrushXDomain({ min: inverted[0], max: inverted[1] });
+        }
+      });
+
+    svg.select('.brush').call(brush).call(brush.move, undefined);
+    svg.on('dblclick', () => setBrushXDomain(undefined));
+  }, [height, invertScaleBand, width]);
+
   return (
-    <div ref={ref} className={className}>
-      <svg width={width} height={height}>
+    <div ref={wrapperRef} className={className}>
+      <svg ref={svgRef} width={width} height={height}>
         <g
           width={boundsWidth}
           height={boundsHeight}
           transform={`translate(${[MARGIN.left, MARGIN.top].join(',')})`}
         >
+          {<g className="brush" />}
           {allShapes}
           {xAxis}
           {xLabels}
