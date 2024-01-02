@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { brushX, scaleBand, scaleLinear, select } from 'd3';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { brushX, scaleLinear, select } from 'd3';
 import PeakData from '../../types/PeakData';
 import ChartElement from './ChartElement';
 
@@ -39,7 +39,7 @@ function Chart({
   }, [brushXDomain, peakData]);
 
   const integerRangeX = useMemo(() => {
-    const m = filteredPeakData.length <= 3 ? 2 : 10;
+    const m = filteredPeakData.length <= 3 ? 1 : 10;
     const minX = Math.floor(Math.min(...filteredPeakData.map((d) => d.mz))) - m;
     const maxX = Math.ceil(Math.max(...filteredPeakData.map((d) => d.mz))) + m;
 
@@ -64,13 +64,11 @@ function Chart({
   }, []);
 
   const xScale = useMemo(() => {
-    const groups = filteredPeakData
-      .map((pd) => pd.mz)
-      .concat(integerRangeX)
-      .sort((a, b) => a - b)
-      .map((d) => String(d));
+    const values = filteredPeakData.map((pd) => pd.mz).concat(integerRangeX);
+    const minX = Math.min(...values);
+    const maxX = Math.max(...values);
 
-    return scaleBand().domain(groups).range([0, boundsWidth]);
+    return scaleLinear().domain([minX, maxX]).range([0, boundsWidth]);
   }, [filteredPeakData, integerRangeX, boundsWidth]);
 
   const yScale = useMemo(() => {
@@ -80,14 +78,23 @@ function Chart({
   }, [boundsHeight, integerRangeY]);
 
   const xLabels = useMemo(() => {
-    const steps = Math.floor(integerRangeX.length / 5);
+    const steps =
+      integerRangeX.length > 200
+        ? 50
+        : integerRangeX.length >= 100
+          ? 25
+          : integerRangeX.length >= 50
+            ? 10
+            : integerRangeX.length >= 10
+              ? 2
+              : 1;
 
     return integerRangeX.map(
       (x) =>
         x % steps === 0 && (
           <g key={'x_axis_label' + x}>
             <text
-              x={xScale(String(x))}
+              x={xScale(x)}
               y={yScale.range()[0] + 20}
               textAnchor="middle"
               alignmentBaseline="central"
@@ -96,8 +103,8 @@ function Chart({
               {x}
             </text>
             <line
-              x1={xScale(String(x))}
-              x2={xScale(String(x))}
+              x1={xScale(x)}
+              x2={xScale(x)}
               y1={yScale.range()[0]}
               y2={yScale.range()[0] + 10}
               stroke="black"
@@ -180,7 +187,7 @@ function Chart({
     [integerRangeY, xScale, yScale],
   );
 
-  const allShapes = useMemo(
+  const chartElements = useMemo(
     () =>
       filteredPeakData.map((d) => (
         <ChartElement
@@ -193,18 +200,6 @@ function Chart({
     [filteredPeakData, xScale, yScale],
   );
 
-  const invertScaleBand = useCallback(
-    (value: number) => {
-      const domain = xScale.domain();
-      const paddingOuter = Number(xScale(domain[0]));
-      const eachBand = xScale.step();
-
-      const index = Math.floor((value - paddingOuter) / eachBand);
-      return domain[Math.max(0, Math.min(index, domain.length - 1))];
-    },
-    [xScale],
-  );
-
   useEffect(() => {
     const svg = select(svgRef.current);
     const brush = brushX()
@@ -214,14 +209,14 @@ function Chart({
       ])
       .on('end', (e) => {
         if (e.selection) {
-          const inverted: number[] = e.selection.map(invertScaleBand);
+          const inverted: number[] = e.selection.map((x) => xScale.invert(x));
           setBrushXDomain({ min: inverted[0], max: inverted[1] });
         }
       });
 
     svg.select('.brush').call(brush).call(brush.move, undefined);
     svg.on('dblclick', () => setBrushXDomain(undefined));
-  }, [height, invertScaleBand, width]);
+  }, [height, width, xScale]);
 
   return (
     <div ref={wrapperRef} className={className}>
@@ -232,7 +227,7 @@ function Chart({
           transform={`translate(${[MARGIN.left, MARGIN.top].join(',')})`}
         >
           {<g className="brush" />}
-          {allShapes}
+          {chartElements}
           {xAxis}
           {xLabels}
           {yAxis}

@@ -2,19 +2,19 @@ import './ChartElement.scss';
 
 import { MouseEvent, useCallback, useMemo } from 'react';
 import PeakData from '../../types/PeakData';
-import { ScaleBand, ScaleLinear } from 'd3';
+import { ScaleLinear } from 'd3';
 import { useHighlight } from '../../highlight/Index';
 
 type InputProps = {
   pd: PeakData;
-  xScale: ScaleBand<string>;
+  xScale: ScaleLinear<number, number, never>;
   yScale: ScaleLinear<number, number, never>;
 };
 
 function ChartElement({ pd, xScale, yScale }: InputProps) {
   const highlight = useHighlight([pd.id]);
 
-  const xScaled = xScale(String(pd.mz));
+  const xScaled = xScale(pd.mz);
 
   const handleOnMouseEnter = useCallback(
     (e: MouseEvent<SVGGElement>) => {
@@ -61,13 +61,13 @@ function ChartElement({ pd, xScale, yScale }: InputProps) {
         {highlight.isActive && (
           <text
             className="hover-label"
-            x={xScale(String(pd.mz))}
+            x={xScale(pd.mz)}
             y={yScale(pd.rel) - 20}
           >
-            <tspan x={xScale(String(pd.mz))} y={yScale(pd.rel) - 30}>
+            <tspan x={xScale(pd.mz)} y={yScale(pd.rel) - 30}>
               {'mz: ' + pd.mz}
             </tspan>
-            <tspan x={xScale(String(pd.mz))} y={yScale(pd.rel) - 10}>
+            <tspan x={xScale(pd.mz)} y={yScale(pd.rel) - 10}>
               {'intensity: ' + pd.intensity.toFixed(2)}
             </tspan>
           </text>
