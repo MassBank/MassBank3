@@ -275,6 +275,7 @@ function Chart({
         }
       });
 
+    // @ts-ignore
     svg.select('.brush').call(brush).call(brush.move, undefined);
     svg.on('dblclick', handleDoubleClick);
   }, [brushXDomains, handleDoubleClick, height, width, xScale]);
