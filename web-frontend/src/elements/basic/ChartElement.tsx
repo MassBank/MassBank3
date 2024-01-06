@@ -82,17 +82,6 @@ function ChartElement({ pd, xScale, yScale, showLabel }: InputProps) {
             {pd.mz}
           </text>
         )}
-        {/* {highlight.isActive && (
-          <line
-            x1={xScale.range()[0]}
-            y1={yScale(pd.rel)}
-            y2={yScale(pd.rel)}
-            x2={xScale.range()[xScale.range().length - 1]}
-            stroke="grey"
-            strokeOpacity={0.5}
-            strokeDasharray={5}
-          />
-        )} */}
       </g>
     ),
 
@@ -110,7 +99,7 @@ function ChartElement({ pd, xScale, yScale, showLabel }: InputProps) {
     ],
   );
 
-  return pd.rel > 0 && chartElement;
+  return chartElement;
 }
 
 export default ChartElement;

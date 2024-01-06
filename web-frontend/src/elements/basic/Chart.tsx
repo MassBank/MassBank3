@@ -46,6 +46,7 @@ function Chart({
 
   const xScale = useMemo(() => {
     const values = filteredPeakData.map((pd) => pd.mz);
+
     const minX =
       brushXDomains && brushXDomains.length > 0
         ? brushXDomains[brushXDomains.length - 1].min
@@ -55,7 +56,11 @@ function Chart({
         ? brushXDomains[brushXDomains.length - 1].max
         : Math.max(...values);
 
-    return scaleLinear().domain([minX, maxX]).range([0, boundsWidth]);
+    const m = Math.abs(minX - maxX) / 10;
+
+    return scaleLinear()
+      .domain([minX - m, maxX + m])
+      .range([0, boundsWidth]);
   }, [boundsWidth, brushXDomains, filteredPeakData]);
 
   const yScale = useMemo(() => {
@@ -64,22 +69,67 @@ function Chart({
     return scaleLinear().domain([0, maxY]).range([boundsHeight, 0]);
   }, [boundsHeight]);
 
-  const xLabels = useMemo(() => {
-    const min = xScale.domain()[0];
-    const max = xScale.domain()[1];
-
-    const r = Math.abs(min - max);
-    const steps = 5;
-    const range: number[] = [];
-
-    const stepSize = r / steps;
-    range.push(min - stepSize);
-    for (let i = 0; i <= steps; i++) {
-      range.push(min + i * stepSize);
+  function buildLabelValues(minX: number, maxX: number, stepSize: number) {
+    const labelValues: number[] = [];
+    let minValue = Math.floor(minX / stepSize) * stepSize;
+    if (minValue < minX) {
+      minValue += stepSize;
     }
-    range.push(max + stepSize);
+    let maxValue = Math.ceil(maxX / stepSize) * stepSize;
+    if (maxValue > maxX) {
+      maxValue -= stepSize;
+    }
+    for (let i = 0; minValue + i * stepSize <= maxValue; i++) {
+      labelValues.push(minValue + i * stepSize);
+    }
 
-    return range.map((x) => (
+    return labelValues;
+  }
+
+  const xLabels = useMemo(() => {
+    const minX = xScale.domain()[0];
+    const maxX = xScale.domain()[1];
+
+    const range = Math.abs(minX - maxX);
+    let labelValues: number[] = [];
+    let precision;
+
+    if (range > 200) {
+      const stepSize = 50;
+      labelValues = buildLabelValues(minX, maxX, stepSize);
+      precision = 0;
+    } else if (range >= 100) {
+      const stepSize = 20;
+      labelValues = buildLabelValues(minX, maxX, stepSize);
+      precision = 0;
+    } else if (range >= 50) {
+      const stepSize = 10;
+      labelValues = buildLabelValues(minX, maxX, stepSize);
+      precision = 0;
+    } else if (range >= 25) {
+      const stepSize = 5;
+      labelValues = buildLabelValues(minX, maxX, stepSize);
+      precision = 0;
+    } else if (range >= 10) {
+      const stepSize = 2;
+      labelValues = buildLabelValues(minX, maxX, stepSize);
+      precision = 0;
+    } else if (range >= 5) {
+      const stepSize = 1;
+      labelValues = buildLabelValues(minX, maxX, stepSize);
+      precision = 0;
+    } else if (range >= 1) {
+      const stepSize = 0.5;
+      labelValues = buildLabelValues(minX, maxX, stepSize);
+      precision = 1;
+    } else {
+      const steps = 5;
+      const stepSize = range / steps;
+      labelValues = buildLabelValues(minX, maxX, stepSize);
+      precision = 4;
+    }
+
+    return labelValues.map((x) => (
       <g key={'x_axis_label' + x}>
         <text
           x={xScale(x)}
@@ -88,7 +138,7 @@ function Chart({
           alignmentBaseline="central"
           fontSize={15}
         >
-          {x.toFixed(4)}
+          {x.toFixed(precision)}
         </text>
         <line
           x1={xScale(x)}
@@ -147,10 +197,10 @@ function Chart({
   }, [xScale, yScale]);
 
   const yLabels = useMemo(() => {
-    const min = Math.floor(Math.min(...yScale.domain()));
-    const max = Math.ceil(Math.max(...yScale.domain()));
+    const minY = Math.floor(Math.min(...yScale.domain()));
+    const maxY = Math.ceil(Math.max(...yScale.domain()));
     const range: number[] = [];
-    for (let i = min; i <= max; i++) {
+    for (let i = minY; i <= maxY; i++) {
       range.push(i);
     }
 
