@@ -1,18 +1,32 @@
 import './ChartElement.scss';
 
-import { MouseEvent, useCallback, useMemo } from 'react';
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import PeakData from '../../types/PeakData';
 import { ScaleLinear } from 'd3';
-import { useHighlight } from '../../highlight/Index';
+import { useHighlight, useHighlightData } from '../../highlight/Index';
 
 type InputProps = {
   pd: PeakData;
   xScale: ScaleLinear<number, number, never>;
   yScale: ScaleLinear<number, number, never>;
+  showLabel: boolean;
 };
 
-function ChartElement({ pd, xScale, yScale }: InputProps) {
+function ChartElement({ pd, xScale, yScale, showLabel }: InputProps) {
   const highlight = useHighlight([pd.id]);
+  const highlightData = useHighlightData();
+
+  const [disableShowLabel, setDisableShowLabel] = useState<boolean>(false);
+
+  useEffect(() => {
+    const highlighted = highlightData.highlight.highlighted;
+
+    if (highlighted.size > 0 && !highlighted.has(pd.id)) {
+      setDisableShowLabel(true);
+    } else {
+      setDisableShowLabel(false);
+    }
+  }, [disableShowLabel, highlightData.highlight.highlighted, pd.id]);
 
   const xScaled = xScale(pd.mz);
 
@@ -45,7 +59,7 @@ function ChartElement({ pd, xScale, yScale }: InputProps) {
         onMouseLeave={handleOnMouseLeave}
         style={
           highlight.isActive
-            ? { opacity: 1, stroke: 'blue', strokeWidth: 1.5 }
+            ? { opacity: 1, stroke: 'black', strokeWidth: 2 }
             : {}
         }
       >
@@ -58,21 +72,17 @@ function ChartElement({ pd, xScale, yScale }: InputProps) {
         {highlight.isActive && (
           <circle cx={xScaled} cy={yScale(pd.rel)} r={3} />
         )}
-        {highlight.isActive && (
+        {((!disableShowLabel && showLabel) || highlight.isActive) && (
           <text
             className="hover-label"
-            x={xScale(pd.mz)}
-            y={yScale(pd.rel) - 20}
+            transform={`translate(${xScale(pd.mz)} ${
+              yScale(pd.rel) - 10
+            }) rotate(-30)`}
           >
-            <tspan x={xScale(pd.mz)} y={yScale(pd.rel) - 30}>
-              {'mz: ' + pd.mz}
-            </tspan>
-            <tspan x={xScale(pd.mz)} y={yScale(pd.rel) - 10}>
-              {'intensity: ' + pd.intensity.toFixed(2)}
-            </tspan>
+            {pd.mz}
           </text>
         )}
-        {highlight.isActive && (
+        {/* {highlight.isActive && (
           <line
             x1={xScale.range()[0]}
             y1={yScale(pd.rel)}
@@ -82,17 +92,18 @@ function ChartElement({ pd, xScale, yScale }: InputProps) {
             strokeOpacity={0.5}
             strokeDasharray={5}
           />
-        )}
+        )} */}
       </g>
     ),
 
     [
+      disableShowLabel,
       handleOnMouseEnter,
       handleOnMouseLeave,
       highlight.isActive,
-      pd.intensity,
       pd.mz,
       pd.rel,
+      showLabel,
       xScale,
       xScaled,
       yScale,

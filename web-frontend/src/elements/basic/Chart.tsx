@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { brushX, scaleLinear, select } from 'd3';
 import PeakData from '../../types/PeakData';
 import ChartElement from './ChartElement';
+import Button from './Button';
 
 const MARGIN = { top: 60, right: 50, bottom: 60, left: 70 };
 
@@ -21,98 +22,84 @@ function Chart({
   const wrapperRef = useRef(null);
   const svgRef = useRef(null);
 
+  const [isShowLabel, setIsShowLabel] = useState<boolean>(false);
+
   const boundsWidth = width - MARGIN.right - MARGIN.left;
   const boundsHeight = height - MARGIN.top - MARGIN.bottom;
 
-  const [brushXDomain, setBrushXDomain] = useState<
-    { min: number; max: number } | undefined
+  const [brushXDomains, setBrushXDomains] = useState<
+    { min: number; max: number }[] | undefined
   >();
 
   const filteredPeakData = useMemo(() => {
     let _peakData = peakData;
-    if (brushXDomain)
+    if (brushXDomains) {
       _peakData = peakData.filter(
-        (pd) => pd.mz >= brushXDomain.min && pd.mz <= brushXDomain.max,
+        (pd) =>
+          pd.mz >= brushXDomains[brushXDomains.length - 1].min &&
+          pd.mz <= brushXDomains[brushXDomains.length - 1].max,
       );
+    }
 
     return _peakData;
-  }, [brushXDomain, peakData]);
-
-  const integerRangeX = useMemo(() => {
-    const m = filteredPeakData.length <= 3 ? 1 : 10;
-    const minX = Math.floor(Math.min(...filteredPeakData.map((d) => d.mz))) - m;
-    const maxX = Math.ceil(Math.max(...filteredPeakData.map((d) => d.mz))) + m;
-
-    const range: number[] = [];
-    for (let i = minX; i <= maxX; i++) {
-      range.push(i);
-    }
-
-    return range;
-  }, [filteredPeakData]);
-
-  const integerRangeY = useMemo(() => {
-    const minY = 0;
-    const maxY = 1000; //Math.ceil(Math.max(...data.map((d) => d.relIntensity))) + 50;
-
-    const range: number[] = [];
-    for (let i = minY; i <= maxY; i++) {
-      range.push(i);
-    }
-
-    return range;
-  }, []);
+  }, [brushXDomains, peakData]);
 
   const xScale = useMemo(() => {
-    const values = filteredPeakData.map((pd) => pd.mz).concat(integerRangeX);
-    const minX = Math.min(...values);
-    const maxX = Math.max(...values);
+    const values = filteredPeakData.map((pd) => pd.mz);
+    const minX =
+      brushXDomains && brushXDomains.length > 0
+        ? brushXDomains[brushXDomains.length - 1].min
+        : Math.min(...values);
+    const maxX =
+      brushXDomains && brushXDomains.length > 0
+        ? brushXDomains[brushXDomains.length - 1].max
+        : Math.max(...values);
 
     return scaleLinear().domain([minX, maxX]).range([0, boundsWidth]);
-  }, [filteredPeakData, integerRangeX, boundsWidth]);
+  }, [boundsWidth, brushXDomains, filteredPeakData]);
 
   const yScale = useMemo(() => {
-    const maxY = Math.max(...integerRangeY);
+    const maxY = 1000;
 
     return scaleLinear().domain([0, maxY]).range([boundsHeight, 0]);
-  }, [boundsHeight, integerRangeY]);
+  }, [boundsHeight]);
 
   const xLabels = useMemo(() => {
-    const steps =
-      integerRangeX.length > 200
-        ? 50
-        : integerRangeX.length >= 100
-          ? 25
-          : integerRangeX.length >= 50
-            ? 10
-            : integerRangeX.length >= 10
-              ? 2
-              : 1;
+    const min = xScale.domain()[0];
+    const max = xScale.domain()[1];
 
-    return integerRangeX.map(
-      (x) =>
-        x % steps === 0 && (
-          <g key={'x_axis_label' + x}>
-            <text
-              x={xScale(x)}
-              y={yScale.range()[0] + 20}
-              textAnchor="middle"
-              alignmentBaseline="central"
-              fontSize={15}
-            >
-              {x}
-            </text>
-            <line
-              x1={xScale(x)}
-              x2={xScale(x)}
-              y1={yScale.range()[0]}
-              y2={yScale.range()[0] + 10}
-              stroke="black"
-            />
-          </g>
-        ),
-    );
-  }, [integerRangeX, xScale, yScale]);
+    const r = Math.abs(min - max);
+    const steps = 5;
+    const range: number[] = [];
+
+    const stepSize = r / steps;
+    range.push(min - stepSize);
+    for (let i = 0; i <= steps; i++) {
+      range.push(min + i * stepSize);
+    }
+    range.push(max + stepSize);
+
+    return range.map((x) => (
+      <g key={'x_axis_label' + x}>
+        <text
+          x={xScale(x)}
+          y={yScale.range()[0] + 20}
+          textAnchor="middle"
+          alignmentBaseline="central"
+          fontSize={15}
+        >
+          {x.toFixed(4)}
+        </text>
+        <line
+          x1={xScale(x)}
+          x2={xScale(x)}
+          y1={yScale.range()[0]}
+          y2={yScale.range()[0] + 10}
+          stroke="black"
+        />
+      </g>
+    ));
+  }, [xScale, yScale]);
 
   const xAxis = useMemo(() => {
     return (
@@ -159,33 +146,38 @@ function Chart({
     );
   }, [xScale, yScale]);
 
-  const yLabels = useMemo(
-    () =>
-      integerRangeY.map(
-        (y) =>
-          y % 200 === 0 && (
-            <g key={'x_axis_label' + y}>
-              <text
-                x={xScale.range()[0] - 30}
-                y={yScale(y)}
-                textAnchor="middle"
-                alignmentBaseline="central"
-                fontSize={15}
-              >
-                {y}
-              </text>
-              <line
-                x1={xScale.range()[0]}
-                x2={xScale.range()[0] - 10}
-                y1={yScale(y)}
-                y2={yScale(y)}
-                stroke="black"
-              />
-            </g>
-          ),
-      ),
-    [integerRangeY, xScale, yScale],
-  );
+  const yLabels = useMemo(() => {
+    const min = Math.floor(Math.min(...yScale.domain()));
+    const max = Math.ceil(Math.max(...yScale.domain()));
+    const range: number[] = [];
+    for (let i = min; i <= max; i++) {
+      range.push(i);
+    }
+
+    return range.map(
+      (y) =>
+        y % 200 === 0 && (
+          <g key={'x_axis_label' + y}>
+            <text
+              x={xScale.range()[0] - 30}
+              y={yScale(y)}
+              textAnchor="middle"
+              alignmentBaseline="central"
+              fontSize={15}
+            >
+              {y}
+            </text>
+            <line
+              x1={xScale.range()[0]}
+              x2={xScale.range()[0] - 10}
+              y1={yScale(y)}
+              y2={yScale(y)}
+              stroke="black"
+            />
+          </g>
+        ),
+    );
+  }, [xScale, yScale]);
 
   const chartElements = useMemo(
     () =>
@@ -195,10 +187,25 @@ function Chart({
           pd={d}
           xScale={xScale}
           yScale={yScale}
+          showLabel={isShowLabel}
         />
       )),
-    [filteredPeakData, xScale, yScale],
+    [filteredPeakData, isShowLabel, xScale, yScale],
   );
+
+  const handleDoubleClick = useCallback(() => {
+    const _brushXDomains = brushXDomains ? [...brushXDomains] : undefined;
+    if (_brushXDomains && _brushXDomains.length > 0) {
+      _brushXDomains.pop();
+      if (_brushXDomains.length > 0) {
+        setBrushXDomains(_brushXDomains);
+      } else {
+        setBrushXDomains(undefined);
+      }
+    } else {
+      setBrushXDomains(undefined);
+    }
+  }, [brushXDomains]);
 
   useEffect(() => {
     const svg = select(svgRef.current);
@@ -210,13 +217,17 @@ function Chart({
       .on('end', (e) => {
         if (e.selection) {
           const inverted: number[] = e.selection.map((x) => xScale.invert(x));
-          setBrushXDomain({ min: inverted[0], max: inverted[1] });
+          const newBrushXDomains = brushXDomains
+            ? [...brushXDomains].concat({ min: inverted[0], max: inverted[1] })
+            : [{ min: inverted[0], max: inverted[1] }];
+
+          setBrushXDomains(newBrushXDomains);
         }
       });
 
     svg.select('.brush').call(brush).call(brush.move, undefined);
-    svg.on('dblclick', () => setBrushXDomain(undefined));
-  }, [height, width, xScale]);
+    svg.on('dblclick', handleDoubleClick);
+  }, [brushXDomains, handleDoubleClick, height, width, xScale]);
 
   return (
     <div ref={wrapperRef} className={className}>
@@ -234,6 +245,14 @@ function Chart({
           {yLabels}
         </g>
       </svg>
+      <Button
+        child={isShowLabel ? 'Hide Labels' : 'Show Labels'}
+        onClick={() => setIsShowLabel(!isShowLabel)}
+        buttonStyle={{
+          border: 'black solid 1px',
+          padding: '3px',
+        }}
+      />
     </div>
   );
 }
