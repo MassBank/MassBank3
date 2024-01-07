@@ -7,11 +7,17 @@ import Button from '../../../basic/Button';
 import RecordView from '../../../record/RecordView';
 import generateID from '../../../../utils/generateID';
 import Record from '../../../../types/Record';
-import { useSearchParams } from 'react-router-dom';
+import {
+  createSearchParams,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
+import routes from '../../../../constants/routes';
 
 const base = 'http://localhost:8081';
 
 function Accession() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
@@ -90,7 +96,12 @@ function Accession() {
           />
           <Button
             child="Search"
-            onClick={() => handleOnSearch(base, accession)}
+            onClick={() =>
+              navigate({
+                pathname: routes.accession.path,
+                search: `?${createSearchParams({ id: accession })}`,
+              })
+            }
             disabled={accession.trim() === ''}
             buttonStyle={
               accession.trim() === '' ? { color: 'grey' } : { color: 'black' }
@@ -112,7 +123,7 @@ function Accession() {
       </div>
     ),
 
-    [accession, handleOnSearch, isRequesting, recordView],
+    [accession, isRequesting, navigate, recordView],
   );
 
   return accessionView;

@@ -12,7 +12,7 @@ function Header() {
   );
 
   const routeLinks = Object.keys(routes)
-    .filter((r) => r !== 'notFound')
+    .filter((r) => r !== 'notFound' && r !== 'accessionExternal')
     .map((r) => {
       const route = routes[r];
       return (
