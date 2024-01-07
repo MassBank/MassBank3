@@ -8,6 +8,8 @@ const MARGIN = { top: 60, right: 50, bottom: 60, left: 70 };
 
 type InputProps = {
   peakData: PeakData[];
+  // eslint-disable-next-line no-unused-vars
+  onZoom: (fpd: PeakData[]) => void;
   width?: number;
   height?: number;
   className?: string;
@@ -15,6 +17,7 @@ type InputProps = {
 
 function Chart({
   peakData,
+  onZoom,
   width = 400,
   height = 300,
   className = 'Chart',
@@ -43,6 +46,10 @@ function Chart({
 
     return _peakData;
   }, [brushXDomains, peakData]);
+
+  useEffect(() => {
+    onZoom(filteredPeakData);
+  }, [filteredPeakData, onZoom]);
 
   const xScale = useMemo(() => {
     const values = filteredPeakData.map((pd) => pd.mz);

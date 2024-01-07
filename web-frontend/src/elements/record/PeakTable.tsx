@@ -25,7 +25,10 @@ function PeakTable({ pd, className = 'PeakTable' }: InputProps) {
             <th>Relative Intensity</th>
           </tr>
         </thead>
-        <tbody>{rows}</tbody>
+        <tbody>
+          {rows}
+          <tr className="auto-height"></tr>
+        </tbody>
       </table>
     </div>
   );

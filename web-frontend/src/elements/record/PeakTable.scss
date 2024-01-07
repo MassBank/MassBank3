@@ -1,14 +1,12 @@
 .PeakTable {
   width: 100%;
-  min-height: 100px;
-  max-height: 350px;
+  height: 400px;
 
   overflow-y: scroll;
 
   table {
     width: 100%;
     table-layout: fixed;
-    border-collapse: collapse;
     text-align: center;
 
     thead th {
@@ -20,6 +18,14 @@
 
     tr:hover {
       background-color: lightcyan;
+    }
+
+    tr {
+      height: 10px;
+    }
+
+    .auto-height {
+      height: 100%;
     }
   }
 }

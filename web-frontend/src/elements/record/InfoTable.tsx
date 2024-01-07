@@ -2,10 +2,11 @@ import './InfoTable.scss';
 
 import StructureView from '../basic/StructureView';
 import { MF } from 'react-mf';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Chart from '../basic/Chart';
 import PeakTable from './PeakTable';
 import Record from '../../types/Record';
+import PeakData from '../../types/PeakData';
 
 type InputProps = {
   record: Record;
@@ -15,6 +16,14 @@ type InputProps = {
 function InfoTable({ record, className = 'InfoTable' }: InputProps) {
   console.log(record);
 
+  const [filteredPeakData, setFilteredPeakData] = useState<PeakData[]>(
+    record.peak.peak.values,
+  );
+
+  const handleOnZoom = useCallback((fpd: PeakData[]) => {
+    setFilteredPeakData(fpd);
+  }, []);
+
   const infoTable = useMemo(
     () => (
       <div className={className}>
@@ -22,17 +31,53 @@ function InfoTable({ record, className = 'InfoTable' }: InputProps) {
           <thead>
             <tr>
               <th>Property</th>
-              <th>Value</th>
+              <th colSpan={2}>Value</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>Accession</td>
               <td>{record.accession}</td>
+              <td
+                style={{
+                  borderBottom: '1px solid grey',
+                  width: '100%',
+                  height: '100%',
+                }}
+                rowSpan={5}
+              >
+                <div
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  {record.compound.smiles && record.compound.smiles !== '' ? (
+                    <StructureView
+                      smiles={record.compound.smiles}
+                      imageWidth={400}
+                      imageHeight={400}
+                    />
+                  ) : undefined}
+                </div>
+              </td>
             </tr>
             <tr>
               <td>Title</td>
-              <td>{record.title}</td>
+              <td>
+                {record.title.split(';').map((r) => {
+                  return (
+                    <span key={r}>
+                      <label>{r}</label>
+                      <br />
+                    </span>
+                  );
+                })}
+              </td>
             </tr>
             <tr>
               <td>Date</td>
@@ -44,68 +89,53 @@ function InfoTable({ record, className = 'InfoTable' }: InputProps) {
             </tr>
             <tr>
               <td style={{ borderBottom: '1px solid grey' }}>License</td>
-              <td style={{ borderBottom: '1px solid grey' }}>
+              <td style={{ borderBottom: '1px solid grey', width: '100%' }}>
                 {record.license}
               </td>
             </tr>
             <tr>
-              <td>
-                <span>Structure /</span>
-                <br />
-                <span>Spectrum</span>
-              </td>
-              <td>
+              <td>Spectrum</td>
+              <td colSpan={2}>
                 <div className="structure-spectrum-view">
-                  {record.compound.smiles && record.compound.smiles !== '' ? (
-                    <StructureView
-                      smiles={record.compound.smiles}
-                      imageWidth={400}
-                      imageHeight={400}
-                    />
-                  ) : undefined}
                   <Chart
                     peakData={record.peak.peak.values}
-                    width={600}
+                    onZoom={handleOnZoom}
+                    width={700}
                     height={400}
                   />
+                  <PeakTable pd={filteredPeakData} />
                 </div>
               </td>
             </tr>
             <tr>
-              <td>Peaks</td>
-              <td>
-                <PeakTable pd={record.peak.peak.values} />
-              </td>
-            </tr>
-            <tr>
               <td>Mass</td>
-              <td>{record.compound.mass}</td>
+              <td colSpan={2}>{record.compound.mass}</td>
             </tr>
             <tr>
               <td>SPLASH</td>
-              <td>{record.peak.splash}</td>
+              <td colSpan={2}>{record.peak.splash}</td>
             </tr>
             <tr>
               <td>Formula</td>
-              <td>
+              <td colSpan={2}>
                 <MF mf={record.compound.formula} />{' '}
               </td>
             </tr>
             <tr>
               <td>Names</td>
-              <td>{record.compound.names}</td>
+              <td colSpan={2}>{record.compound.names}</td>
             </tr>
             <tr>
               <td>Classes</td>
-              <td>{record.compound.classes}</td>
+              <td colSpan={2}>{record.compound.classes}</td>
             </tr>
             <tr>
               <td>InChI</td>
-              <td>{record.compound.inchi}</td>
+              <td colSpan={2}>{record.compound.inchi}</td>
             </tr>
             <tr>
               <td style={{ borderBottom: '1px solid grey' }}>SMILES</td>
-              <td style={{ borderBottom: '1px solid grey' }}>
+              <td style={{ borderBottom: '1px solid grey' }} colSpan={2}>
                 {record.compound.smiles}
               </td>
             </tr>
@@ -115,6 +145,8 @@ function InfoTable({ record, className = 'InfoTable' }: InputProps) {
     ),
     [
       className,
+      filteredPeakData,
+      handleOnZoom,
       record.accession,
       record.authors,
       record.compound.classes,
