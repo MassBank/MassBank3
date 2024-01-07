@@ -4,7 +4,7 @@ import PeakData from '../../types/PeakData';
 import ChartElement from './ChartElement';
 import Button from './Button';
 
-const MARGIN = { top: 20, right: 30, bottom: 50, left: 70, button: 35 };
+const MARGIN = { top: 30, right: 30, bottom: 50, left: 70, button: 35 };
 
 type InputProps = {
   peakData: PeakData[];

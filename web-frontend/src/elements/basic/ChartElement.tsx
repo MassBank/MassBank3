@@ -76,9 +76,7 @@ function ChartElement({ pd, xScale, yScale, showLabel }: InputProps) {
           {((!disableShowLabel && showLabel) || highlight.isActive) && (
             <text
               className="hover-label"
-              transform={`translate(${xScale(pd.mz)} ${
-                yScale(pd.rel) - 10
-              }) rotate(-30)`}
+              transform={`translate(${xScale(pd.mz)} ${yScale(pd.rel) - 10})`} //rotate(-30)`}
             >
               {pd.mz}
             </text>
