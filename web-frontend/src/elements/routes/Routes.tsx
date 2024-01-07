@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import routes from '../../constants/routes';
+import Redirect from './Redirect';
 
 function Routing() {
   return (
@@ -14,9 +15,11 @@ function Routing() {
       <Route
         path={routes.accession.path}
         element={<routes.accession.element />}
-      >
-        <Route path=":id" element={<routes.accession.element />} />
-      </Route>
+      />
+      <Route
+        path={routes.accessionExternal.path}
+        element={<Redirect to={routes.accession.path} />}
+      />
       <Route
         path={routes.documentation.path}
         element={<routes.documentation.element />}

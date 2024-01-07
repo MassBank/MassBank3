@@ -24,7 +24,8 @@ const routes: ifc2 = {
   search: { path: '/search', label: 'Search', element: Search },
   content: { path: '/content', label: 'Content', element: Content },
   download: { path: '/download', label: 'Download', element: Download },
-  accession: { path: '/accession', label: 'Accession', element: Accession },
+  accession: { path: '/recordDisplay', label: 'Accession', element: Accession },
+  accessionExternal: { path: '/MassBank/RecordDisplay', label: 'Accession', element: Accession },
   documentation: {
     path: '/documentation',
     label: 'Documentation',

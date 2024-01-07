@@ -5,14 +5,14 @@ import Input from '../../../basic/Input';
 import Spinner from '../../../basic/Spinner';
 import Button from '../../../basic/Button';
 import RecordView from '../../../record/RecordView';
-import { useParams } from 'react-router';
 import generateID from '../../../../utils/generateID';
 import Record from '../../../../types/Record';
+import { useSearchParams } from 'react-router-dom';
 
 const base = 'http://localhost:8081';
 
 function Accession() {
-  const params = useParams();
+  const [searchParams] = useSearchParams();
 
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [accession, setAccession] = useState<string>('');
@@ -69,12 +69,12 @@ function Accession() {
   );
 
   useEffect(() => {
-    if (params.id) {
-      const id = params.id;
+    const id = searchParams.get('id');
+    if (id) {
       setAccession(id);
       handleOnSearch(base, id);
     }
-  }, [handleOnSearch, params.id]);
+  }, [handleOnSearch, searchParams]);
 
   const accessionView = useMemo(
     () => (
