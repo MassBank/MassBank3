@@ -6,17 +6,16 @@ import PeakTableRow from './PeakTableRow';
 
 type InputProps = {
   pd: PeakData[];
-  className?: string;
 };
 
-function PeakTable({ pd, className = 'PeakTable' }: InputProps) {
+function PeakTable({ pd }: InputProps) {
   const rows = useMemo(
     () => pd.map((r) => <PeakTableRow rowData={r} key={r.id} />),
     [pd],
   );
 
   return (
-    <div className={className}>
+    <div className="PeakTable">
       <table>
         <thead>
           <tr>

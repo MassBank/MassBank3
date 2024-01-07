@@ -4,7 +4,7 @@ import PeakData from '../../types/PeakData';
 import ChartElement from './ChartElement';
 import Button from './Button';
 
-const MARGIN = { top: 60, right: 50, bottom: 60, left: 70 };
+const MARGIN = { top: 20, right: 30, bottom: 50, left: 70, button: 35 };
 
 type InputProps = {
   peakData: PeakData[];
@@ -15,20 +15,14 @@ type InputProps = {
   className?: string;
 };
 
-function Chart({
-  peakData,
-  onZoom,
-  width = 400,
-  height = 300,
-  className = 'Chart',
-}: InputProps) {
+function Chart({ peakData, onZoom, width = 400, height = 300 }: InputProps) {
   const wrapperRef = useRef(null);
   const svgRef = useRef(null);
 
   const [isShowLabel, setIsShowLabel] = useState<boolean>(false);
 
   const boundsWidth = width - MARGIN.right - MARGIN.left;
-  const boundsHeight = height - MARGIN.top - MARGIN.bottom;
+  const boundsHeight = height - MARGIN.top - MARGIN.bottom - MARGIN.button;
 
   const [brushXDomains, setBrushXDomains] = useState<
     { min: number; max: number }[] | undefined
@@ -169,7 +163,7 @@ function Chart({
           stroke="black"
         />
         <text
-          x={(xScale.range()[1] - xScale.range()[0]) / 2}
+          x={(xScale.range()[1] - xScale.range()[0]) / 2 - 30}
           y={yScale.range()[0] + 50}
         >
           m/z
@@ -288,8 +282,14 @@ function Chart({
   }, [brushXDomains, handleDoubleClick, height, width, xScale]);
 
   return (
-    <div ref={wrapperRef} className={className}>
-      <svg ref={svgRef} width={width} height={height}>
+    <div
+      ref={wrapperRef}
+      style={{
+        width: width,
+        height: height,
+      }}
+    >
+      <svg ref={svgRef} width={width} height={height - MARGIN.button}>
         <g
           width={boundsWidth}
           height={boundsHeight}
@@ -310,6 +310,7 @@ function Chart({
           border: 'black solid 1px',
           padding: '3px',
         }}
+        style={{ height: MARGIN.button }}
       />
     </div>
   );

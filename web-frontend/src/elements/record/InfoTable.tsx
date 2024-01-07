@@ -101,7 +101,7 @@ function InfoTable({ record, className = 'InfoTable' }: InputProps) {
                     peakData={record.peak.peak.values}
                     onZoom={handleOnZoom}
                     width={700}
-                    height={400}
+                    height={500}
                   />
                   <PeakTable pd={filteredPeakData} />
                 </div>
