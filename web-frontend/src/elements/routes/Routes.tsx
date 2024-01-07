@@ -23,6 +23,10 @@ function Routing() {
       />
       <Route path={routes.about.path} element={<routes.about.element />} />
       <Route path={routes.news.path} element={<routes.news.element />} />
+      <Route
+        path={routes.notFound.path}
+        element={<routes.notFound.element />}
+      />
     </Routes>
   );
 }
