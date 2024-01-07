@@ -51,39 +51,40 @@ function ChartElement({ pd, xScale, yScale, showLabel }: InputProps) {
   );
 
   const chartElement = useMemo(
-    () => (
-      <g
-        key={'data-point-' + xScaled}
-        className="entry"
-        onMouseEnter={handleOnMouseEnter}
-        onMouseLeave={handleOnMouseLeave}
-        style={
-          highlight.isActive
-            ? { opacity: 1, stroke: 'black', strokeWidth: 2 }
-            : {}
-        }
-      >
-        <line
-          x1={xScaled}
-          x2={xScaled}
-          y1={yScale.range()[0]}
-          y2={yScale(pd.rel)}
-        />
-        {highlight.isActive && (
-          <circle cx={xScaled} cy={yScale(pd.rel)} r={3} />
-        )}
-        {((!disableShowLabel && showLabel) || highlight.isActive) && (
-          <text
-            className="hover-label"
-            transform={`translate(${xScale(pd.mz)} ${
-              yScale(pd.rel) - 10
-            }) rotate(-30)`}
-          >
-            {pd.mz}
-          </text>
-        )}
-      </g>
-    ),
+    () =>
+      pd.rel && (
+        <g
+          key={'data-point-' + xScaled}
+          className="entry"
+          onMouseEnter={handleOnMouseEnter}
+          onMouseLeave={handleOnMouseLeave}
+          style={
+            highlight.isActive
+              ? { opacity: 1, stroke: 'black', strokeWidth: 2 }
+              : {}
+          }
+        >
+          <line
+            x1={xScaled}
+            x2={xScaled}
+            y1={yScale.range()[0]}
+            y2={yScale(pd.rel)}
+          />
+          {highlight.isActive && (
+            <circle cx={xScaled} cy={yScale(pd.rel)} r={3} />
+          )}
+          {((!disableShowLabel && showLabel) || highlight.isActive) && (
+            <text
+              className="hover-label"
+              transform={`translate(${xScale(pd.mz)} ${
+                yScale(pd.rel) - 10
+              }) rotate(-30)`}
+            >
+              {pd.mz}
+            </text>
+          )}
+        </g>
+      ),
 
     [
       disableShowLabel,
