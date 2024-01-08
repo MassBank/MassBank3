@@ -18,10 +18,6 @@ import PeakData from '../../../../types/PeakData';
 const base = 'http://localhost:8081';
 
 function Accession() {
-  useEffect(() => {
-    console.log('Accession');
-  }, []);
-
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
