@@ -2,7 +2,7 @@ import './RecordView.scss';
 
 import Record from '../../types/Record';
 import useContainerDimensions from '../../utils/useContainerDimensions';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import PeakData from '../../types/PeakData';
 import StructureView from '../basic/StructureView';
 import Chart from '../basic/Chart';
@@ -14,7 +14,9 @@ type inputProps = {
 };
 
 function RecordView({ record }: inputProps) {
-  console.log(record);
+  useEffect(() => {
+    console.log(record);
+  }, [record]);
 
   const containerRef = useRef(null);
   const { height: containerHeight } = useContainerDimensions(containerRef);

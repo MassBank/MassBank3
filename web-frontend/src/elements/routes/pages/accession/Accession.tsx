@@ -18,6 +18,10 @@ import PeakData from '../../../../types/PeakData';
 const base = 'http://localhost:8081';
 
 function Accession() {
+  useEffect(() => {
+    console.log('Accession');
+  }, []);
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -43,7 +47,10 @@ function Accession() {
     }
   }
 
-  const search = useCallback(async (base: string, id: string) => {
+  const handleOnSearch = useCallback(async (base: string, id: string) => {
+    setIsRequesting(true);
+    setRequestedAccession(id);
+
     const rec = await getRecord(base, id);
     if (rec) {
       rec.peak.peak.values = rec.peak.peak.values.map((v: PeakData) => {
@@ -55,15 +62,6 @@ function Accession() {
     setRecord(rec);
     setIsRequesting(false);
   }, []);
-
-  const handleOnSearch = useCallback(
-    (base: string, id: string) => {
-      setIsRequesting(true);
-      setRequestedAccession(id);
-      search(base, id);
-    },
-    [search],
-  );
 
   const recordView = useMemo(
     () =>
