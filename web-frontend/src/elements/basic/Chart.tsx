@@ -12,7 +12,6 @@ type InputProps = {
   onZoom: (fpd: PeakData[]) => void;
   width?: number;
   height?: number;
-  className?: string;
 };
 
 function Chart({ peakData, onZoom, width = 400, height = 300 }: InputProps) {
@@ -287,6 +286,7 @@ function Chart({ peakData, onZoom, width = 400, height = 300 }: InputProps) {
       style={{
         width: width,
         height: height,
+        marginRight: 5,
       }}
     >
       <svg ref={svgRef} width={width} height={height - MARGIN.button}>
@@ -303,15 +303,28 @@ function Chart({ peakData, onZoom, width = 400, height = 300 }: InputProps) {
           {yLabels}
         </g>
       </svg>
-      <Button
-        child={isShowLabel ? 'Hide Labels' : 'Show Labels'}
-        onClick={() => setIsShowLabel(!isShowLabel)}
-        buttonStyle={{
-          border: 'black solid 1px',
-          padding: '3px',
+      <div
+        style={{
+          width: '100%',
+          height: MARGIN.button,
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
-        style={{ height: MARGIN.button }}
-      />
+      >
+        <Button
+          child={isShowLabel ? 'Hide Labels' : 'Show Labels'}
+          onClick={() => setIsShowLabel(!isShowLabel)}
+          buttonStyle={{
+            border: 'black solid 1px',
+            padding: '3px',
+          }}
+        />
+        <p>
+          {filteredPeakData.length}/{peakData.length}
+        </p>
+      </div>
     </div>
   );
 }
