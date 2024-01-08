@@ -1,6 +1,6 @@
 import './Spinner.scss';
 import Button from './Button';
-import { useEffect, useMemo, useState } from 'react';
+import { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { MagnifyingGlass } from 'react-loader-spinner';
 
 type InputProps = {
@@ -9,6 +9,7 @@ type InputProps = {
   classNameButton?: string;
   buttonText?: string;
   buttonDisabled?: boolean;
+  buttonStyle?: CSSProperties;
   showTimer?: boolean;
   spinnerWidth?: number;
   spinnerHeight?: number;
@@ -20,6 +21,7 @@ function Spinner({
   classNameButton,
   buttonText = 'Cancel',
   buttonDisabled = false,
+  buttonStyle,
   showTimer,
   spinnerWidth = 100,
   spinnerHeight = 100,
@@ -68,17 +70,19 @@ function Spinner({
             onClick={onClickCancel}
             className={classNameButton}
             disabled={buttonDisabled}
-            style={
-              buttonDisabled
+            style={{
+              ...(buttonDisabled
                 ? { border: 'none', backgroundColor: 'transparent' }
-                : {}
-            }
+                : undefined),
+              ...buttonStyle,
+            }}
           />
         )}
       </div>
     ),
     [
       buttonDisabled,
+      buttonStyle,
       buttonText,
       className,
       classNameButton,

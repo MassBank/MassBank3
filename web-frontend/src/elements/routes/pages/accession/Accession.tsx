@@ -13,6 +13,7 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 import routes from '../../../../constants/routes';
+import PeakData from '../../../../types/PeakData';
 
 const base = 'http://localhost:8081';
 
@@ -45,7 +46,7 @@ function Accession() {
   const search = useCallback(async (base: string, id: string) => {
     const rec = await getRecord(base, id);
     if (rec) {
-      rec.peak.peak.values = rec.peak.peak.values.map((v) => {
+      rec.peak.peak.values = rec.peak.peak.values.map((v: PeakData) => {
         const _v = v;
         _v.id = generateID();
         return _v;
@@ -111,8 +112,7 @@ function Accession() {
         <div className="result-panel">
           {isRequesting ? (
             <Spinner
-              buttonText="Please Wait..."
-              buttonDisabled={true}
+              buttonStyle={{ display: 'none' }}
               spinnerWidth={200}
               spinnerHeight={200}
             />
