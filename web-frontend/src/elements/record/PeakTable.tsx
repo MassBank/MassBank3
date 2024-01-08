@@ -6,22 +6,24 @@ import PeakTableRow from './PeakTableRow';
 
 type InputProps = {
   pd: PeakData[];
+  width: number;
+  height: number;
 };
 
-function PeakTable({ pd }: InputProps) {
+function PeakTable({ pd, width, height }: InputProps) {
   const rows = useMemo(
     () => pd.map((r) => <PeakTableRow rowData={r} key={r.id} />),
     [pd],
   );
 
   return (
-    <div className="PeakTable">
+    <div className="PeakTable" style={{ width, height }}>
       <table>
         <thead>
           <tr>
             <th>m/z</th>
             <th>Intensity</th>
-            <th>Relative Intensity</th>
+            <th>Relative Int.</th>
           </tr>
         </thead>
         <tbody>

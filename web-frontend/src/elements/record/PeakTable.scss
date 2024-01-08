@@ -1,11 +1,9 @@
 .PeakTable {
-  width: 100%;
-  height: 500px;
-
-  overflow-y: scroll;
+  overflow: scroll;
 
   table {
     width: 100%;
+    height: 100%;
     table-layout: fixed;
     text-align: center;
 
