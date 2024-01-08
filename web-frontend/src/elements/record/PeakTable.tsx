@@ -23,7 +23,7 @@ function PeakTable({ pd, width, height }: InputProps) {
           <tr>
             <th>m/z</th>
             <th>Intensity</th>
-            <th>Relative Int.</th>
+            <th>Rel. Intensity</th>
           </tr>
         </thead>
         <tbody>
