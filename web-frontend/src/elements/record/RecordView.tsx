@@ -62,16 +62,7 @@ function RecordView({ record }: inputProps) {
                 }}
                 rowSpan={5}
               >
-                <div
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
+                <div className="structure-view">
                   {record.compound.smiles && record.compound.smiles !== '' ? (
                     <StructureView
                       smiles={record.compound.smiles}
