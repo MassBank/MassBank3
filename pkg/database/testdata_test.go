@@ -402,7 +402,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					"int.",
 					"rel.int.",
 				},
-				Mz: []float32{
+				Mz: []float64{
 					105.0698,
 					115.054,
 					133.0643,
@@ -418,7 +418,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					2536772.25,
 					204606.65625,
 				},
-				Rel: []uint16{
+				Rel: []uint{
 					422,
 					36,
 					999,
@@ -662,7 +662,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					"int.",
 					"rel.int.",
 				},
-				Mz: []float32{
+				Mz: []float64{
 					214.1085,
 					215.111,
 					216.113,
@@ -672,7 +672,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					289484,
 					16528,
 				},
-				Rel: []uint16{
+				Rel: []uint{
 					999,
 					125,
 					7,
@@ -928,7 +928,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					"int.",
 					"rel.int.",
 				},
-				Mz: []float32{
+				Mz: []float64{
 					174.0679,
 					195.0234,
 					230.0804,
@@ -940,7 +940,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					10982,
 					805229.1,
 				},
-				Rel: []uint16{
+				Rel: []uint{
 					3,
 					5,
 					13,
@@ -1206,7 +1206,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					"int.",
 					"rel.int.",
 				},
-				Mz: []float32{
+				Mz: []float64{
 					60.0444,
 					60.0808,
 					123.1162,
@@ -1228,7 +1228,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					13043.94434,
 					75456.7,
 				},
-				Rel: []uint16{
+				Rel: []uint{
 					180,
 					16,
 					10,
@@ -1342,7 +1342,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					"int.",
 					"rel.int.",
 				},
-				Mz: []float32{
+				Mz: []float64{
 					15.000000,
 					26.000000,
 					27.000000,
@@ -1390,7 +1390,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 				Intensity: []float64{
 					5.68, 1.26, 3.11, 1.85, 4.41, 19.29, 28.64, 7.9, 5.09, 1.39, 18.14, 34.82, 3.18, 2.3, 2.04, 1.25, 6.11, 6.12, 22.52, 1.38, 14.67, 1.15, 1.48, 1.16, 6.23, 2.84, 1.81, 12.7, 42.96, 6.05, 2.1, 5.12, 1.61, 31.68, 2.02, 5.64, 46.38, 3.12, 1.97, 8.22, 99.99, 8.31, 4.82,
 				},
-				Rel: []uint16{
+				Rel: []uint{
 					57,
 					13,
 					31,
@@ -1594,7 +1594,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					"int.",
 					"rel.int.",
 				},
-				Mz: []float32{
+				Mz: []float64{
 					56.2,
 					58.2,
 					67.2,
@@ -1664,7 +1664,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					54.97,
 					2.20,
 				},
-				Rel: []uint16{
+				Rel: []uint{
 					15,
 					16,
 					133,
@@ -1855,7 +1855,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					"int.",
 					"rel.int.",
 				},
-				Mz: []float32{
+				Mz: []float64{
 					31.9901,
 					34.9691,
 					41.0392,
@@ -1877,7 +1877,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					0.04392,
 					0.03962,
 				},
-				Rel: []uint16{
+				Rel: []uint{
 					97,
 					80,
 					999,
@@ -2075,7 +2075,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					"int.",
 					"rel.int.",
 				},
-				Mz: []float32{
+				Mz: []float64{
 					107.0143,
 					109.0299,
 					121.0298,
@@ -2101,7 +2101,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					2215,
 					237.5,
 				},
-				Rel: []uint16{
+				Rel: []uint{
 					79,
 					57,
 					84,
@@ -2272,7 +2272,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					"int.",
 					"rel.int.",
 				},
-				Mz: []float32{
+				Mz: []float64{
 					57.08413,
 					113.09826,
 					172.09279,
@@ -2298,7 +2298,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					272.0,
 					1553.0,
 				},
-				Rel: []uint16{
+				Rel: []uint{
 					12,
 					13,
 					15,
@@ -2464,13 +2464,13 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					"int.",
 					"rel.int.",
 				},
-				Mz: []float32{
+				Mz: []float64{
 					249.1484765,
 				},
 				Intensity: []float64{
 					310073.000000,
 				},
-				Rel: []uint16{
+				Rel: []uint{
 					999,
 				},
 			},
@@ -2566,7 +2566,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					"int.",
 					"rel.int.",
 				},
-				Mz: []float32{
+				Mz: []float64{
 					185.1073,
 					213.1022,
 					258.1237,
@@ -2576,7 +2576,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					235010720.0,
 					52446636.0,
 				},
-				Rel: []uint16{
+				Rel: []uint{
 					312,
 					999,
 					222,
@@ -2842,7 +2842,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					"int.",
 					"rel.int.",
 				},
-				Mz: []float32{
+				Mz: []float64{
 					1278.12, 1279.11, 1279.18, 1306.21, 1309.13, 1366.03, 1375.23, 1527.60, 1569.08, 1591.14, 1595.21, 1597.12, 1598.11, 1599.07, 1620.30, 1620.80, 1621.18, 1843.21, 1860.16, 1861.17, 1862.18, 1863.19, 1864.22, 1866.26, 1867.23, 1871.18, 1876.14, 1877.14, 1878.13, 1879.19, 1882.18, 1883.18, 1884.18, 1885.20, 1886.19, 1888.20, 1889.21, 1890.21, 1891.22, 1892.24, 1893.23, 1894.24, 1895.21, 1897.14, 1898.15, 1899.16, 1900.17, 1902.16, 1903.20, 1904.19, 1905.20, 1906.20, 1907.23, 1908.19, 1910.21, 1911.21, 1912.21, 1913.22, 1914.21, 1915.20, 1920.18, 1921.21, 1922.19, 1926.20, 1927.19, 1928.20, 1929.21, 1930.20, 1931.32, 1932.22, 1933.23, 1934.23, 1935.22, 1943.20, 1948.24, 1949.22, 1950.22, 1960.26, 1965.23, 1971.32, 2064.29, 2091.32, 2092.30, 2136.33,
 				},
 				Intensity: []float64{
@@ -2931,7 +2931,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					206.000000,
 					162.000000,
 				},
-				Rel: []uint16{
+				Rel: []uint{
 					156,
 					135,
 					142,
@@ -3191,13 +3191,13 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					"int.",
 					"rel.int.",
 				},
-				Mz: []float32{
+				Mz: []float64{
 					59.013471921284996, 95.0502389272054, 121.1022351582845, 149.13346735636392, 165.09201685587564, 194.09474436442056, 281.22726186116535, 299.2378336588542, 325.2170130411784, 343.22746022542316,
 				},
 				Intensity: []float64{
 					47825.663583333335, 123675.15916666668, 2119825.3000000003, 538442.9091666666, 717615.9775, 348560.26666666666, 577177.7541666667, 162688.84041666667, 246360.69083333333, 1749842.5083333335,
 				},
-				Rel: []uint16{
+				Rel: []uint{
 					22,
 					58,
 					999,
