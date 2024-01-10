@@ -5,6 +5,7 @@ on:
     branches:
       - 'main'
       - 'dev'
+      - 'dev-*'
     tags:
       - 'v*'
 
@@ -18,7 +19,7 @@ jobs:
             image: ipbhalle/mb3dbtool
           - dockerfile: ./Dockerfile
             image: ipbhalle/mb3server
-          - dockerfile: ./Dockerfile-svelte
+          - dockerfile: ./Dockerfile-frontend
             image: ipbhalle/mb3frontend
     steps:
       - name: Checkout

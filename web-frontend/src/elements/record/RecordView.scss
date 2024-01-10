@@ -1,0 +1,53 @@
+.RecordView {
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+  display: block;
+
+  table {
+    border-spacing: 0;
+    border: 1px solid #dedede;
+    width: 100%;
+    height: 100%;
+  }
+
+  thead tr {
+    background-color: white !important;
+  }
+
+  th {
+    background-color: white;
+  }
+
+  th,
+  td {
+    white-space: nowrap;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0.4rem;
+    border-bottom: 1px solid #dedede;
+    border-right: 1px solid #dedede;
+
+    button {
+      background-color: transparent;
+      border: none;
+    }
+  }
+
+  .structure-view {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .spectrum-peak-table-view {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

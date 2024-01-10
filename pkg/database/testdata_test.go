@@ -1,9 +1,10 @@
 package database
 
 import (
-	"github.com/MassBank/MassBank3/pkg/massbank"
 	"os"
 	"time"
+
+	"github.com/MassBank/MassBank3/pkg/massbank"
 )
 
 func getEnv(name string, fallback string) string {

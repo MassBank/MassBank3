@@ -217,6 +217,7 @@ func (mb *MassBank2) parsePeakValue(line string) error {
 	var mz, intens float64
 	var err error
 	var rel uint64
+
 	if mz, err = strconv.ParseFloat(svals[0], 32); err != nil {
 		return errors.New("could not parse mz Value")
 	}
