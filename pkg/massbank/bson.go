@@ -40,9 +40,9 @@ func (p RecordDate) MarshalBSONValue() (bsontype.Type, []byte, error) {
 func (p PkPeak) MarshalBSONValue() (bsontype.Type, []byte, error) {
 	return bson.MarshalValue(struct {
 		Header    []string
-		Mz        []float32
+		Mz        []float64
 		Intensity []float64
-		Rel       []uint16
+		Rel       []uint
 	}{p.Header, p.Mz, p.Intensity, p.Rel})
 }
 
