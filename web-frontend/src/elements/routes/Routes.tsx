@@ -16,10 +16,10 @@ function Routing() {
         path={routes.accession.path}
         element={<routes.accession.element />}
       />
-      <Route
+      {/* <Route
         path={routes.accessionExternal.path}
         element={<Redirect to={routes.accession.path} />}
-      />
+      /> */}
       <Route
         path={routes.documentation.path}
         element={<routes.documentation.element />}
