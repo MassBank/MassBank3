@@ -1,6 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
 import routes from '../../constants/routes';
-import Redirect from './Redirect';
 
 function Routing() {
   return (
