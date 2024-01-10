@@ -2,10 +2,11 @@ package massbank
 
 import (
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/bsontype"
 	"strings"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/bsontype"
 )
 
 func (p DatabaseProperty) MarshalBSONValue() (bsontype.Type, []byte, error) {

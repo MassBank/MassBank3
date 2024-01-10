@@ -1,0 +1,16 @@
+FROM node:19-alpine
+# Create app directory
+WORKDIR /app
+
+# Bundle app source
+COPY ./web-frontend/ .
+
+# install dependencies
+# RUN npm install --legacy-peer-deps
+RUN npm install
+
+# for production mode
+RUN node ./node_modules/rimraf dist && node ./node_modules/typescript/bin/tsc && node ./node_modules/vite/bin/vite.js build
+
+EXPOSE 3000
+CMD npm run preview

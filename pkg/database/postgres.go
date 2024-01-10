@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
+	"strconv"
+
 	"github.com/Code-Hex/dd"
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"github.com/nullism/bqb"
-	"log"
-	"strconv"
 )
 
 // PostgresSQLDB is a struct representing a postgres connection. This should implement

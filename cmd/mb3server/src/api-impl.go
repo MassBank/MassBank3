@@ -1,14 +1,15 @@
 package mb3server
 
 import (
-	"github.com/MassBank/MassBank3/pkg/config"
-	"github.com/MassBank/MassBank3/pkg/database"
-	"github.com/MassBank/MassBank3/pkg/massbank"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"regexp"
+
+	"github.com/MassBank/MassBank3/pkg/config"
+	"github.com/MassBank/MassBank3/pkg/database"
+	"github.com/MassBank/MassBank3/pkg/massbank"
 )
 
 var db database.MB3Database = nil
@@ -307,6 +308,44 @@ func GetRecord(accession string) (*MbRecord, error) {
 			MarcRelator: author.MarcRelator,
 		})
 	}
+
+	var mzs = *&record.Peak.Peak.Mz         //[]float64{}
+	var ints = *&record.Peak.Peak.Intensity //[]float64{}
+	var rels = *&record.Peak.Peak.Rel       //[]uint{}
+	// for _, mz := range *&record.Peak.Peak.Mz {
+	// 	mzs = append(mzs, mz)
+	// }
+	// for _, int := range *&record.Peak.Peak.Intensity {
+	// 	ints = append(ints, int)
+	// }
+	// for _, rel := range *&record.Peak.Peak.Rel {
+	// 	rels = append(rels, rel)
+	// }
+
+	for i := 0; i < len(mzs); i++ {
+		result.Peak.Peak.Values = append(result.Peak.Peak.Values, MbRecordPeakPeakValuesInner{
+			Mz:        mzs[i],
+			Intensity: ints[i],
+			Rel:       rels[i],
+		})
+	}
+
+	// var header = []string{}
+	// for _, h := range *&record.Peak.Annotation.Header {
+	// 	fmt.Printf("%v\n", h)
+	// 	header = append(header, h)
+	// }
+	// result.Peak.Annotation.Header = header
+
+	// for _, v := range *&record.Peak.Annotation.Values {
+	// 	fmt.Printf("%v\n", v)
+	// 	// for _, k := range *&v {
+	// 	// 	fmt.Printf("%v\n", k)
+	// 	// }
+	// }
+
+	// // result.Peak.Annotation.Values =
+
 	return &result, nil
 
 }
