@@ -1,12 +1,17 @@
-FROM docker.io/node:19-alpine AS build
-
+FROM node:19-alpine
+# Create app directory
 WORKDIR /app
 
-COPY web-frontend/package.json ./
+# Bundle app source
+COPY ./web-frontend/ .
+
+# install dependencies
+# RUN npm install --legacy-peer-deps
 RUN npm install
-COPY web-frontend/static ./static
-COPY web-frontend/src ./src
-COPY web-frontend/svelte.config.js  web-frontend/tsconfig.json  web-frontend/vite.config.ts ./
+
+# for production mode
+RUN node ./node_modules/rimraf dist && node ./node_modules/typescript/bin/tsc && node ./node_modules/vite/bin/vite.js build
+
 EXPOSE 5173
-ENTRYPOINT ["npm", "run", "dev"]
+ENTRYPOINT ["npm", "run", "preview"]
 

@@ -1,7 +1,6 @@
-version: '3.1'
+version: "3.1"
 
 services:
-
   mongodb:
     extends:
       file: docker-compose-common.yaml
@@ -41,13 +40,11 @@ services:
       service: mb3frontend
     build:
       context: ..
-      dockerfile: Dockerfile-svelte-debug
+      dockerfile: Dockerfile-frontend-debug
     environment:
       VITE_SERVER_API_URL: "http://${MB3_API_HOST}:${MB3_API_PORT}"
     ports:
       - "127.0.0.1:${MB3_FRONTEND_PORT}:5173/tcp"
-    volumes:
-      - ../web-frontend:/app
 
   mb3tool:
     extends:
