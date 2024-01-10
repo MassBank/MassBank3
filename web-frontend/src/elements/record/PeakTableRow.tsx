@@ -38,7 +38,7 @@ function PeakTableRow({ rowData }: InputProps) {
           backgroundColor: highlightRow.isActive ? 'lightblue' : 'transparent',
         }}
       >
-        <td>{rowData.mz}</td>
+        <td>{rowData.mz.toFixed(4)}</td>
         <td>{rowData.intensity.toFixed(2)}</td>
         <td>{rowData.rel || 0}</td>
       </tr>
