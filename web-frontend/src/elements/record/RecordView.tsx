@@ -24,7 +24,7 @@ function RecordView({ record }: inputProps) {
   const { width: chartContainerWidth } =
     useContainerDimensions(chartContainerRef);
 
-  const chartHeight = useMemo(() => containerHeight * 0.5, [containerHeight]);
+  const chartHeight = useMemo(() => containerHeight * 0.7, [containerHeight]);
   const chartWidth = useMemo(
     () => chartContainerWidth * 0.7,
     [chartContainerWidth],
