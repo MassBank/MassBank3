@@ -1,10 +1,10 @@
 {
-  "name": "massbank3-frontend",
+  "name": "web-frontend",
   "version": "1.0.0",
   "scripts": {
     "start": "vite --host localhost --port 3000 --strictPort --open",
     "build": "rimraf dist && tsc && vite build",
-    "preview": "vite preview --host 0.0.0.0 --port 3000",
+    "preview": "vite preview --host 127.0.0.1 --port 5173 -d --strictPort",
     "compile": "tsc",
     "clean-install": "rm package-lock.json && rm -rf node_modules && npm i",
     "eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
