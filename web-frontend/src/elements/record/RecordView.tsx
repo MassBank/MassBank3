@@ -25,7 +25,7 @@ function RecordView({ record }: inputProps) {
   const { width: chartContainerWidth } =
     useContainerDimensions(chartContainerRef);
 
-  const chartHeight = useMemo(() => containerHeight * 0.7, [containerHeight]);
+  const chartHeight = useMemo(() => containerHeight * 0.6, [containerHeight]);
   const chartWidth = useMemo(
     () => chartContainerWidth * 0.7,
     [chartContainerWidth],
@@ -147,7 +147,7 @@ function RecordView({ record }: inputProps) {
                     <AnnotationTable
                       annotation={record.peak.annotation}
                       width="100%"
-                      height={400}
+                      height={300}
                     />
                   )}
               </td>
