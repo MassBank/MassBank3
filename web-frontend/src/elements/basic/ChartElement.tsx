@@ -1,12 +1,12 @@
 import './ChartElement.scss';
 
 import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import PeakData from '../../types/PeakData';
 import { ScaleLinear } from 'd3';
 import { useHighlight, useHighlightData } from '../../highlight/Index';
+import Peak from '../../types/peak/Peak';
 
 type InputProps = {
-  pd: PeakData;
+  pd: Peak;
   xScale: ScaleLinear<number, number, never>;
   yScale: ScaleLinear<number, number, never>;
   showLabel: boolean;
@@ -79,7 +79,7 @@ function ChartElement({ pd, xScale, yScale, showLabel }: InputProps) {
               yScale(pd.rel || 0) - 10
             }) rotate(-30)`}
           >
-            {pd.mz}
+            {pd.mz.toFixed(4)}
           </text>
         )}
       </g>

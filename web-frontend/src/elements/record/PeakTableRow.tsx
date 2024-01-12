@@ -1,13 +1,13 @@
 import { MouseEvent, useCallback, useMemo } from 'react';
 import { useHighlight } from '../../highlight/Index';
-import PeakData from '../../types/PeakData';
+import Peak from '../../types/peak/Peak';
 
 type InputProps = {
-  rowData: PeakData;
+  peak: Peak;
 };
 
-function PeakTableRow({ rowData }: InputProps) {
-  const highlightRow = useHighlight([rowData.id]);
+function PeakTableRow({ peak }: InputProps) {
+  const highlightRow = useHighlight([peak.id]);
 
   const handleOnMouseEnter = useCallback(
     (e: MouseEvent<HTMLTableRowElement>) => {
@@ -38,18 +38,18 @@ function PeakTableRow({ rowData }: InputProps) {
           backgroundColor: highlightRow.isActive ? 'lightblue' : 'transparent',
         }}
       >
-        <td>{rowData.mz.toFixed(4)}</td>
-        <td>{rowData.intensity.toFixed(2)}</td>
-        <td>{rowData.rel || 0}</td>
+        <td>{peak.mz.toFixed(4)}</td>
+        <td>{peak.intensity.toFixed(1)}</td>
+        <td>{peak.rel || 0}</td>
       </tr>
     ),
     [
       handleOnMouseEnter,
       handleOnMouseLeave,
       highlightRow.isActive,
-      rowData.intensity,
-      rowData.mz,
-      rowData.rel,
+      peak.intensity,
+      peak.mz,
+      peak.rel,
     ],
   );
 

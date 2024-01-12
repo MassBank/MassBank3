@@ -1,4 +1,4 @@
-import PeakData from './PeakData';
+import PeakData from './peak/PeakData';
 
 export default interface Record {
   accession: string;
@@ -26,13 +26,5 @@ export default interface Record {
     mass_spectrometry: {};
   };
   mass_spectrometry: {};
-  peak: {
-    splash: string;
-    annotation: {};
-    numPeak: number;
-    peak: {
-      header: string[];
-      values: PeakData[];
-    };
-  };
+  peak: PeakData;
 }

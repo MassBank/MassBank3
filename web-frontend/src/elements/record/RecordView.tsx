@@ -3,11 +3,12 @@ import './RecordView.scss';
 import Record from '../../types/Record';
 import useContainerDimensions from '../../utils/useContainerDimensions';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import PeakData from '../../types/PeakData';
 import StructureView from '../basic/StructureView';
 import Chart from '../basic/Chart';
 import PeakTable from './PeakTable';
 import { MF } from 'react-mf';
+import Peak from '../../types/peak/Peak';
+import AnnotationTable from './AnnotationTable';
 
 type inputProps = {
   record: Record;
@@ -34,11 +35,11 @@ function RecordView({ record }: inputProps) {
     [chartContainerWidth],
   );
 
-  const [filteredPeakData, setFilteredPeakData] = useState<PeakData[]>(
+  const [filteredPeakData, setFilteredPeakData] = useState<Peak[]>(
     record.peak.peak.values,
   );
 
-  const handleOnZoom = useCallback((fpd: PeakData[]) => {
+  const handleOnZoom = useCallback((fpd: Peak[]) => {
     setFilteredPeakData(fpd);
   }, []);
 
@@ -125,17 +126,30 @@ function RecordView({ record }: inputProps) {
               </td>
             </tr>
             <tr>
-              <td>Mass</td>
-              <td colSpan={2}>{record.compound.mass}</td>
-            </tr>
-            <tr>
               <td>SPLASH</td>
               <td colSpan={2}>{record.peak.splash}</td>
+            </tr>
+            <tr>
+              <td>Mass</td>
+              <td colSpan={2}>{record.compound.mass}</td>
             </tr>
             <tr>
               <td>Formula</td>
               <td colSpan={2}>
                 <MF mf={record.compound.formula} />{' '}
+              </td>
+            </tr>
+            <tr>
+              <td>Annotation</td>
+              <td colSpan={2}>
+                {record.peak.annotation &&
+                  Object.keys(record.peak.annotation).length > 0 && (
+                    <AnnotationTable
+                      annotation={record.peak.annotation}
+                      width="100%"
+                      height={400}
+                    />
+                  )}
               </td>
             </tr>
             <tr>
@@ -172,11 +186,10 @@ function RecordView({ record }: inputProps) {
       record.date.created,
       record.authors,
       record.license,
-      record.peak.peak.values,
-      record.peak.splash,
+      record.peak,
+      chartHeight,
       handleOnZoom,
       chartWidth,
-      chartHeight,
       filteredPeakData,
       peakTableWidth,
     ],
