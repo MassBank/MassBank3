@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { brushX, scaleLinear, select } from 'd3';
-import PeakData from '../../types/PeakData';
 import ChartElement from './ChartElement';
 import Button from './Button';
+import Peak from '../../types/peak/Peak';
 
 const MARGIN = { top: 55, right: 30, bottom: 50, left: 70, button: 35 };
 
 type InputProps = {
-  peakData: PeakData[];
+  peakData: Peak[];
   // eslint-disable-next-line no-unused-vars
-  onZoom: (fpd: PeakData[]) => void;
+  onZoom: (fpd: Peak[]) => void;
   width?: number;
   height?: number;
 };

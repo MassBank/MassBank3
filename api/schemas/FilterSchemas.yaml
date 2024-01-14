@@ -13,7 +13,7 @@ components:
         enum: [ MS,MS2,MS3,MS4 ]
     IonMode:
       type: string
-      desciption: "enum: [ POSITIVE, NEGATIVE ]"
+      description: "enum: [ POSITIVE, NEGATIVE ]"
     CompoundName:
       type: string
     ExactMass:
@@ -35,7 +35,7 @@ components:
         description: 'A m/z prefixed with "and" or "or" before a colon, e.g. "or:143.0".'
         pattern: "(and|or):[0-9]+(\\.[0-9]*)?"
     Intensity:
-      description: "Releative intensity for peak search"
+      description: "Relative intensity for peak search"
       type: integer
       default: 100
       minimum: 1

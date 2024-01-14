@@ -1,18 +1,18 @@
 import './PeakTable.scss';
 
 import { useMemo } from 'react';
-import PeakData from '../../types/PeakData';
 import PeakTableRow from './PeakTableRow';
+import Peak from '../../types/peak/Peak';
 
 type InputProps = {
-  pd: PeakData[];
+  pd: Peak[];
   width: number;
   height: number;
 };
 
 function PeakTable({ pd, width, height }: InputProps) {
   const rows = useMemo(
-    () => pd.map((r) => <PeakTableRow rowData={r} key={r.id} />),
+    () => pd.map((p) => <PeakTableRow peak={p} key={p.id} />),
     [pd],
   );
 
@@ -28,7 +28,7 @@ function PeakTable({ pd, width, height }: InputProps) {
         </thead>
         <tbody>
           {rows}
-          <tr className="auto-height"></tr>
+          <tr className="auto-height" />
         </tbody>
       </table>
     </div>

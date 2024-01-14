@@ -1,4 +1,4 @@
-.PeakTable {
+.AnnotationTable {
   overflow: scroll;
 
   table {
@@ -11,10 +11,6 @@
       position: -webkit-sticky;
       top: 0;
       background: lightgrey;
-    }
-
-    tr:hover {
-      background-color: lightcyan;
     }
 
     .auto-height {

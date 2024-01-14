@@ -13,7 +13,6 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 import routes from '../../../../constants/routes';
-import PeakData from '../../../../types/PeakData';
 
 const base = 'http://localhost:8081';
 
@@ -47,12 +46,12 @@ function Accession() {
     setIsRequesting(true);
     setRequestedAccession(id);
 
-    const rec = await getRecord(base, id);
+    const rec: Record | undefined = await getRecord(base, id);
     if (rec) {
-      rec.peak.peak.values = rec.peak.peak.values.map((v: PeakData) => {
-        const _v = v;
-        _v.id = generateID();
-        return _v;
+      rec.peak.peak.values = rec.peak.peak.values.map((p) => {
+        const _p = p;
+        _p.id = generateID();
+        return _p;
       });
     }
     setRecord(rec);

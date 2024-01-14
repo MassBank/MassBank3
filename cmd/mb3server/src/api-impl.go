@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"strconv"
 
 	"github.com/MassBank/MassBank3/pkg/config"
 	"github.com/MassBank/MassBank3/pkg/database"
@@ -309,19 +310,12 @@ func GetRecord(accession string) (*MbRecord, error) {
 		})
 	}
 
-	var mzs = *&record.Peak.Peak.Mz         //[]float64{}
-	var ints = *&record.Peak.Peak.Intensity //[]float64{}
-	var rels = *&record.Peak.Peak.Rel       //[]uint{}
-	// for _, mz := range *&record.Peak.Peak.Mz {
-	// 	mzs = append(mzs, mz)
-	// }
-	// for _, int := range *&record.Peak.Peak.Intensity {
-	// 	ints = append(ints, int)
-	// }
-	// for _, rel := range *&record.Peak.Peak.Rel {
-	// 	rels = append(rels, rel)
-	// }
+	// insert peak data
+	result.Peak.Peak.Header = record.Peak.Peak.Header
 
+	var mzs = record.Peak.Peak.Mz
+	var ints = record.Peak.Peak.Intensity
+	var rels = record.Peak.Peak.Rel
 	for i := 0; i < len(mzs); i++ {
 		result.Peak.Peak.Values = append(result.Peak.Peak.Values, MbRecordPeakPeakValuesInner{
 			Mz:        mzs[i],
@@ -330,21 +324,31 @@ func GetRecord(accession string) (*MbRecord, error) {
 		})
 	}
 
-	// var header = []string{}
-	// for _, h := range *&record.Peak.Annotation.Header {
-	// 	fmt.Printf("%v\n", h)
-	// 	header = append(header, h)
-	// }
-	// result.Peak.Annotation.Header = header
+	// insert annotation data
+	if record.Peak.Annotation != nil {
 
-	// for _, v := range *&record.Peak.Annotation.Values {
-	// 	fmt.Printf("%v\n", v)
-	// 	// for _, k := range *&v {
-	// 	// 	fmt.Printf("%v\n", k)
-	// 	// }
-	// }
+		result.Peak.Annotation.Header = record.Peak.Annotation.Header
 
-	// // result.Peak.Annotation.Values =
+		var annotationValues = [][]string{}
+		for _, headerKey := range record.Peak.Annotation.Header {
+			annotationValues = append(annotationValues, []string{})
+
+			for _, v := range record.Peak.Annotation.Values[headerKey] {
+				m, ok := v.(float64)
+				if ok {
+					s := strconv.FormatFloat(m, 'f', -1, 64)
+					annotationValues[len(annotationValues)-1] = append(annotationValues[len(annotationValues)-1], s)
+				} else {
+					m, ok := v.(string)
+					if ok {
+						annotationValues[len(annotationValues)-1] = append(annotationValues[len(annotationValues)-1], m)
+					}
+				}
+			}
+		}
+
+		result.Peak.Annotation.Values = annotationValues
+	}
 
 	return &result, nil
 
