@@ -78,16 +78,7 @@ function RecordView({ record }: inputProps) {
             </tr>
             <tr>
               <td>Title</td>
-              <td>
-                {record.title.split(';').map((r) => {
-                  return (
-                    <span key={r}>
-                      <label>{r}</label>
-                      <br />
-                    </span>
-                  );
-                })}
-              </td>
+              <td>{record.title}</td>
             </tr>
             <tr>
               <td>Date</td>
@@ -154,11 +145,11 @@ function RecordView({ record }: inputProps) {
             </tr>
             <tr>
               <td>Names</td>
-              <td colSpan={2}>{record.compound.names}</td>
+              <td colSpan={2}>{record.compound.names.join('; ')}</td>
             </tr>
             <tr>
               <td>Classes</td>
-              <td colSpan={2}>{record.compound.classes}</td>
+              <td colSpan={2}>{record.compound.classes.join('; ')}</td>
             </tr>
             <tr>
               <td>InChI</td>

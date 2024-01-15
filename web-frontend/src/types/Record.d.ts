@@ -12,8 +12,8 @@ export default interface Record {
   authors: [{ name: string }];
   license: string;
   compound: {
-    names: string;
-    classes: string;
+    names: string[];
+    classes: string[];
     formula: string;
     mass: number;
     smiles: string;

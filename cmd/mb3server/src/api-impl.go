@@ -149,13 +149,14 @@ func GetRecords(limit int32, page int32, contributor []string, instrumentType []
 	for _, value := range searchResult.Data {
 		smiles := (value.Smiles)
 		svg, err := getSvgFromSmiles(&smiles)
-		re := regexp.MustCompile("<\\?xml[^>]*>\\n<!DOCTYPE[^>]*>\\n")
-		svgS := string(re.ReplaceAll([]byte(*svg), []byte("")))
-		re = regexp.MustCompile("\\n")
-		svgS = string(re.ReplaceAll([]byte(svgS), []byte(" ")))
+		var svgS string = ""
 		if err != nil {
 			log.Println(err)
-			*svg = ""
+		} else {
+			re := regexp.MustCompile("<\\?xml[^>]*>\\n<!DOCTYPE[^>]*>\\n")
+			svgS = string(re.ReplaceAll([]byte(*svg), []byte("")))
+			re = regexp.MustCompile("\\n")
+			svgS = string(re.ReplaceAll([]byte(svgS), []byte(" ")))
 		}
 		var val = SearchResultDataInner{
 			Data:    map[string]interface{}{},
@@ -259,8 +260,8 @@ func GetRecord(accession string) (*MbRecord, error) {
 		Project:     "",
 		Comments:    nil,
 		Compound: MbRecordCompound{
-			Names:     nil,
-			Classes:   nil,
+			Names:     *record.Compound.Names,
+			Classes:   *record.Compound.Classes,
 			Formula:   *record.Compound.Formula,
 			CdkDepict: nil,
 			Mass:      *record.Compound.Mass,
