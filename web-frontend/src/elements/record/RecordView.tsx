@@ -63,7 +63,7 @@ function RecordView({ record }: inputProps) {
                   width: '100%',
                   height: '100%',
                 }}
-                rowSpan={5}
+                rowSpan={6}
               >
                 <div className="structure-view">
                   {record.compound.smiles && record.compound.smiles !== '' ? (
@@ -78,7 +78,7 @@ function RecordView({ record }: inputProps) {
             </tr>
             <tr>
               <td>Title</td>
-              <td>{record.title}</td>
+              <td className="long-text">{record.title}</td>
             </tr>
             <tr>
               <td>Date</td>
@@ -86,12 +86,27 @@ function RecordView({ record }: inputProps) {
             </tr>
             <tr>
               <td>Authors</td>
-              <td>{record.authors.map((a) => a.name).join(', ')}</td>
+              <td className="long-text">
+                {record.authors.map((a) => a.name).join(', ')}
+              </td>
             </tr>
             <tr>
-              <td style={{ borderBottom: '1px solid grey' }}>License</td>
+              <td>Publication</td>
+              <td className="long-text">{record.publication}</td>
+            </tr>
+
+            <tr>
+              <td
+                style={{
+                  borderBottom: '1px solid grey',
+                  wordBreak: 'break-all',
+                  whiteSpace: 'pre-wrap',
+                }}
+              >
+                Copyright/License
+              </td>
               <td style={{ borderBottom: '1px solid grey', width: '100%' }}>
-                {record.license}
+                {record.copyright + ' / ' + record.license}
               </td>
             </tr>
             <tr>
@@ -145,15 +160,21 @@ function RecordView({ record }: inputProps) {
             </tr>
             <tr>
               <td>Names</td>
-              <td colSpan={2}>{record.compound.names.join('; ')}</td>
+              <td colSpan={2} className="long-text">
+                {record.compound.names.join('; ')}
+              </td>
             </tr>
             <tr>
               <td>Classes</td>
-              <td colSpan={2}>{record.compound.classes.join('; ')}</td>
+              <td colSpan={2} className="long-text">
+                {record.compound.classes.join('; ')}
+              </td>
             </tr>
             <tr>
               <td>InChI</td>
-              <td colSpan={2}>{record.compound.inchi}</td>
+              <td colSpan={2} className="long-text">
+                {record.compound.inchi}
+              </td>
             </tr>
             <tr>
               <td style={{ borderBottom: '1px solid grey' }}>SMILES</td>
@@ -176,8 +197,12 @@ function RecordView({ record }: inputProps) {
       record.title,
       record.date.created,
       record.authors,
+      record.publication,
+      record.copyright,
       record.license,
-      record.peak,
+      record.peak.peak.values,
+      record.peak.splash,
+      record.peak.annotation,
       chartHeight,
       handleOnZoom,
       chartWidth,

@@ -255,8 +255,8 @@ func GetRecord(accession string) (*MbRecord, error) {
 		},
 		Authors:     nil,
 		License:     *record.License,
-		Copyright:   "",
-		Publication: "",
+		Copyright:   *record.Copyright,
+		Publication: *record.Publication,
 		Project:     "",
 		Comments:    nil,
 		Compound: MbRecordCompound{
@@ -299,7 +299,7 @@ func GetRecord(accession string) (*MbRecord, error) {
 			},
 			NumPeak: int32(*record.Peak.NumPeak),
 			Peak: MbRecordPeakPeak{
-				Header: nil,
+				Header: record.Peak.Peak.Header,
 				Values: nil,
 			},
 		},
@@ -312,8 +312,6 @@ func GetRecord(accession string) (*MbRecord, error) {
 	}
 
 	// insert peak data
-	result.Peak.Peak.Header = record.Peak.Peak.Header
-
 	var mzs = record.Peak.Peak.Mz
 	var ints = record.Peak.Peak.Intensity
 	var rels = record.Peak.Peak.Rel

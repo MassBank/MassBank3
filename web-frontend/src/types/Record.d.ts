@@ -10,7 +10,9 @@ export default interface Record {
     modified: string;
   };
   authors: [{ name: string }];
+  publication: string;
   license: string;
+  copyright: string;
   compound: {
     names: string[];
     classes: string[];
