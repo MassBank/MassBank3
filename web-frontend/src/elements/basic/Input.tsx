@@ -3,6 +3,7 @@ import './Input.scss';
 import {
   ChangeEvent,
   CSSProperties,
+  KeyboardEvent,
   RefObject,
   useCallback,
   useMemo,
@@ -10,7 +11,9 @@ import {
 
 type InputProps = {
   type: React.HTMLInputTypeAttribute;
-  onChange: Function;
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
+  onChange: (value: any) => void;
+  onKeyDown: () => void;
   defaultValue?: string | number;
   label?: string;
   min?: number;
@@ -26,6 +29,7 @@ type InputProps = {
 function Input({
   type,
   onChange,
+  onKeyDown,
   defaultValue,
   label,
   min,
@@ -50,6 +54,15 @@ function Input({
     [onChange, type],
   );
 
+  const handleOnKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        onKeyDown();
+      }
+    },
+    [onKeyDown],
+  );
+
   return useMemo(
     () => (
       <div className={className}>
@@ -58,6 +71,7 @@ function Input({
           ref={ref}
           type={type}
           onChange={handleOnChange}
+          onKeyDown={handleOnKeyDown}
           defaultValue={defaultValue}
           placeholder={placeholder}
           min={min}
@@ -77,6 +91,7 @@ function Input({
       defaultValue,
       fontStyle,
       handleOnChange,
+      handleOnKeyDown,
       inputWidth,
       label,
       max,

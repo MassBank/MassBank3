@@ -58,6 +58,13 @@ function Accession() {
     setIsRequesting(false);
   }, []);
 
+  const handleOnClick = useCallback(() => {
+    navigate({
+      pathname: routes.accession.path,
+      search: `?${createSearchParams({ id: accession })}`,
+    });
+  }, [accession, navigate]);
+
   const recordView = useMemo(
     () =>
       record ? (
@@ -86,16 +93,12 @@ function Accession() {
             defaultValue={accession && accession !== '' ? accession : undefined}
             label="Search for accession: "
             onChange={(acc: string) => setAccession(acc.trim())}
+            onKeyDown={handleOnClick}
             inputWidth="300px"
           />
           <Button
             child="Search"
-            onClick={() =>
-              navigate({
-                pathname: routes.accession.path,
-                search: `?${createSearchParams({ id: accession })}`,
-              })
-            }
+            onClick={handleOnClick}
             disabled={accession.trim() === ''}
             buttonStyle={
               accession.trim() === '' ? { color: 'grey' } : { color: 'black' }
@@ -116,7 +119,7 @@ function Accession() {
       </div>
     ),
 
-    [accession, isRequesting, navigate, recordView],
+    [accession, handleOnClick, isRequesting, recordView],
   );
 
   return accessionView;

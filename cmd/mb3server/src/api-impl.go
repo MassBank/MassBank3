@@ -149,13 +149,14 @@ func GetRecords(limit int32, page int32, contributor []string, instrumentType []
 	for _, value := range searchResult.Data {
 		smiles := (value.Smiles)
 		svg, err := getSvgFromSmiles(&smiles)
-		re := regexp.MustCompile("<\\?xml[^>]*>\\n<!DOCTYPE[^>]*>\\n")
-		svgS := string(re.ReplaceAll([]byte(*svg), []byte("")))
-		re = regexp.MustCompile("\\n")
-		svgS = string(re.ReplaceAll([]byte(svgS), []byte(" ")))
+		var svgS string = ""
 		if err != nil {
 			log.Println(err)
-			*svg = ""
+		} else {
+			re := regexp.MustCompile("<\\?xml[^>]*>\\n<!DOCTYPE[^>]*>\\n")
+			svgS = string(re.ReplaceAll([]byte(*svg), []byte("")))
+			re = regexp.MustCompile("\\n")
+			svgS = string(re.ReplaceAll([]byte(svgS), []byte(" ")))
 		}
 		var val = SearchResultDataInner{
 			Data:    map[string]interface{}{},
@@ -254,13 +255,13 @@ func GetRecord(accession string) (*MbRecord, error) {
 		},
 		Authors:     nil,
 		License:     *record.License,
-		Copyright:   "",
-		Publication: "",
+		Copyright:   *record.Copyright,
+		Publication: *record.Publication,
 		Project:     "",
 		Comments:    nil,
 		Compound: MbRecordCompound{
-			Names:     nil,
-			Classes:   nil,
+			Names:     *record.Compound.Names,
+			Classes:   *record.Compound.Classes,
 			Formula:   *record.Compound.Formula,
 			CdkDepict: nil,
 			Mass:      *record.Compound.Mass,
@@ -298,7 +299,7 @@ func GetRecord(accession string) (*MbRecord, error) {
 			},
 			NumPeak: int32(*record.Peak.NumPeak),
 			Peak: MbRecordPeakPeak{
-				Header: nil,
+				Header: record.Peak.Peak.Header,
 				Values: nil,
 			},
 		},
@@ -311,8 +312,6 @@ func GetRecord(accession string) (*MbRecord, error) {
 	}
 
 	// insert peak data
-	result.Peak.Peak.Header = record.Peak.Peak.Header
-
 	var mzs = record.Peak.Peak.Mz
 	var ints = record.Peak.Peak.Intensity
 	var rels = record.Peak.Peak.Rel
