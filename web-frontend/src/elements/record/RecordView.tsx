@@ -47,12 +47,6 @@ function RecordView({ record }: inputProps) {
     () => (
       <div className="RecordView" ref={containerRef}>
         <table>
-          <thead>
-            <tr>
-              <th>Property</th>
-              <th colSpan={2}>Value</th>
-            </tr>
-          </thead>
           <tbody>
             <tr>
               <td>Accession</td>
