@@ -53,6 +53,9 @@ function Accession() {
         _p.id = generateID();
         return _p;
       });
+      if (rec.compound && rec.compound.names && rec.compound.names.length > 0) {
+        document.title = rec.compound.names[0] + ' Mass Spectrum';
+      }
     }
     setRecord(rec);
     setIsRequesting(false);
