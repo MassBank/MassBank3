@@ -1,7 +1,6 @@
-version: '3.1'
+version: "3.1"
 
 services:
-
   mongodb:
     extends:
       file: docker-compose-common.yaml
@@ -28,8 +27,8 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile-frontend
-    environment:
-      MB3_API_URL: "http://${MB3_API_HOST}:${MB3_API_PORT}"
+      args:
+        MB3_API_URL: "http://${MB3_API_HOST}:${MB3_API_PORT}"
     ports:
       - "${MB3_FRONTEND_PORT}:3000"
 

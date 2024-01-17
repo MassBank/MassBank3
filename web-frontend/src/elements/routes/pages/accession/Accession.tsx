@@ -14,8 +14,6 @@ import {
 } from 'react-router-dom';
 import routes from '../../../../constants/routes';
 
-const base = 'http://localhost:8081';
-
 function Accession() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -25,8 +23,8 @@ function Accession() {
   const [requestedAccession, setRequestedAccession] = useState<string>('');
   const [record, setRecord] = useState<Record | undefined>();
 
-  async function getRecord(base: string, id: string) {
-    const url = base + '/v1/records/' + id;
+  async function getRecord(id: string) {
+    const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/' + id;
 
     const resp = await fetch(url);
     if (resp.ok) {
@@ -42,11 +40,11 @@ function Accession() {
     }
   }
 
-  const handleOnSearch = useCallback(async (base: string, id: string) => {
+  const handleOnSearch = useCallback(async (id: string) => {
     setIsRequesting(true);
     setRequestedAccession(id);
 
-    const rec: Record | undefined = await getRecord(base, id);
+    const rec: Record | undefined = await getRecord(id);
     if (rec) {
       rec.peak.peak.values = rec.peak.peak.values.map((p) => {
         const _p = p;
@@ -82,7 +80,7 @@ function Accession() {
     const id = searchParams.get('id');
     if (id) {
       setAccession(id);
-      handleOnSearch(base, id);
+      handleOnSearch(id);
     }
   }, [handleOnSearch, searchParams]);
 
