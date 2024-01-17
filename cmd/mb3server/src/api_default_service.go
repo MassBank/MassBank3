@@ -21,11 +21,6 @@ import (
 type DefaultApiService struct {
 }
 
-func (s *DefaultApiService) GetSVG(ctx context.Context, s2 string) (ImplResponse, error) {
-	svg, err := GetSvg(s2)
-	return Response(http.StatusOK, *svg), err
-}
-
 // NewDefaultApiService creates a default api service
 func NewDefaultApiService() DefaultApiServicer {
 	return &DefaultApiService{}
@@ -38,6 +33,16 @@ func (s *DefaultApiService) GetBrowseOptions(ctx context.Context, instrumentType
 		return Response(http.StatusInternalServerError, nil), errors.New("Could not get results")
 	}
 	return Response(http.StatusOK, opt), nil
+}
+
+// GetCount - get record count
+func (s *DefaultApiService) GetCount(ctx context.Context) (ImplResponse, error) {
+	count, err := GetCount()
+	if err != nil {
+		return Response(http.StatusInternalServerError, nil), errors.New("Could not get result count")
+	}
+
+	return Response(200, count), nil
 }
 
 // GetFilterOptions - get filter options
@@ -81,4 +86,10 @@ func (s *DefaultApiService) GetRecords(ctx context.Context, instrumentType []str
 	}
 	return Response(200, result), nil
 
+}
+
+func (s *DefaultApiService) GetSVG(ctx context.Context, s2 string) (ImplResponse, error) {
+	svg, err := GetSvg(s2)
+
+	return Response(http.StatusOK, *svg), err
 }

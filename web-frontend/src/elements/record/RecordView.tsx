@@ -47,12 +47,6 @@ function RecordView({ record }: inputProps) {
     () => (
       <div className="RecordView" ref={containerRef}>
         <table>
-          <thead>
-            <tr>
-              <th>Property</th>
-              <th colSpan={2}>Value</th>
-            </tr>
-          </thead>
           <tbody>
             <tr>
               <td>Accession</td>
@@ -81,33 +75,22 @@ function RecordView({ record }: inputProps) {
               <td className="long-text">{record.title}</td>
             </tr>
             <tr>
-              <td>Date</td>
-              <td>{record.date.created}</td>
+              <td>Names</td>
+              <td className="long-text">{record.compound.names.join('; ')}</td>
             </tr>
             <tr>
-              <td>Authors</td>
+              <td>Classes</td>
               <td className="long-text">
-                {record.authors.map((a) => a.name).join(', ')}
+                {record.compound.classes.join('; ')}
               </td>
             </tr>
             <tr>
-              <td>Publication</td>
-              <td className="long-text">{record.publication}</td>
+              <td>InChI</td>
+              <td className="long-text">{record.compound.inchi}</td>
             </tr>
-
             <tr>
-              <td
-                style={{
-                  borderBottom: '1px solid grey',
-                  wordBreak: 'break-all',
-                  whiteSpace: 'pre-wrap',
-                }}
-              >
-                Copyright/License
-              </td>
-              <td style={{ borderBottom: '1px solid grey', width: '100%' }}>
-                {record.copyright + ' / ' + record.license}
-              </td>
+              <td>SMILES</td>
+              <td>{record.compound.smiles}</td>
             </tr>
             <tr>
               <td>Spectrum</td>
@@ -159,27 +142,32 @@ function RecordView({ record }: inputProps) {
               </td>
             </tr>
             <tr>
-              <td>Names</td>
+              <td>Date</td>
+              <td colSpan={2}>{record.date.created}</td>
+            </tr>
+            <tr>
+              <td>Authors</td>
               <td colSpan={2} className="long-text">
-                {record.compound.names.join('; ')}
+                {record.authors.map((a) => a.name).join(', ')}
               </td>
             </tr>
             <tr>
-              <td>Classes</td>
+              <td>Publication</td>
               <td colSpan={2} className="long-text">
-                {record.compound.classes.join('; ')}
+                {record.publication}
               </td>
             </tr>
             <tr>
-              <td>InChI</td>
-              <td colSpan={2} className="long-text">
-                {record.compound.inchi}
+              <td
+                style={{
+                  wordBreak: 'break-all',
+                  whiteSpace: 'pre-wrap',
+                }}
+              >
+                Copyright/License
               </td>
-            </tr>
-            <tr>
-              <td style={{ borderBottom: '1px solid grey' }}>SMILES</td>
-              <td style={{ borderBottom: '1px solid grey' }} colSpan={2}>
-                {record.compound.smiles}
+              <td colSpan={2} style={{ width: '100%' }}>
+                {record.copyright + ' / ' + record.license}
               </td>
             </tr>
           </tbody>

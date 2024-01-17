@@ -236,6 +236,18 @@ func getSvgFromSmiles(smiles *string) (*string, error) {
 	return &svgS, nil
 }
 
+func GetCount() (*int64, error) {
+	if err := initDB(); err != nil {
+		return nil, err
+	}
+
+	count, err := db.Count()
+	if err != nil {
+		return nil, err
+	}
+	return &count, nil
+}
+
 func GetRecord(accession string) (*MbRecord, error) {
 	if err := initDB(); err != nil {
 		return nil, err
@@ -254,9 +266,9 @@ func GetRecord(accession string) (*MbRecord, error) {
 			Modified: record.Date.Modified.String(),
 		},
 		Authors:     nil,
-		License:     *record.License,
-		Copyright:   *record.Copyright,
-		Publication: *record.Publication,
+		License:     "",
+		Copyright:   "",
+		Publication: "",
 		Project:     "",
 		Comments:    nil,
 		Compound: MbRecordCompound{
@@ -304,6 +316,18 @@ func GetRecord(accession string) (*MbRecord, error) {
 			},
 		},
 	}
+	// insert publication, license, copyright
+	if record.Publication != nil {
+		result.Publication = *record.Publication
+	}
+	if record.License != nil {
+		result.License = *record.License
+	}
+	if record.Copyright != nil {
+		result.Copyright = *record.Copyright
+	}
+
+	// insert authors
 	for _, author := range *record.Authors {
 		result.Authors = append(result.Authors, AuthorsInner{
 			Name:        author.Name,
@@ -325,7 +349,6 @@ func GetRecord(accession string) (*MbRecord, error) {
 
 	// insert annotation data
 	if record.Peak.Annotation != nil {
-
 		result.Peak.Annotation.Header = record.Peak.Annotation.Header
 
 		var annotationValues = [][]string{}

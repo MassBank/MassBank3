@@ -2,8 +2,9 @@
   "name": "web-frontend",
   "version": "1.0.0",
   "scripts": {
-    "start": "vite --host localhost --port 3000 --strictPort --open",
-    "build": "rimraf dist && tsc && vite build",
+    "dev": "vite --mode development --host localhost --port 3000 --strictPort --open",
+    "build": "rimraf dist && tsc && vite build --mode production",
+    "start": "vite --mode production --host 0.0.0.0 --port 3000 --strictPort",
     "preview": "vite preview --host 0.0.0.0 --port 3000 -d --strictPort",
     "compile": "tsc",
     "clean-install": "rm package-lock.json && rm -rf node_modules && npm i",
