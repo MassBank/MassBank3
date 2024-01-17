@@ -51,14 +51,7 @@ function RecordView({ record }: inputProps) {
             <tr>
               <td>Accession</td>
               <td>{record.accession}</td>
-              <td
-                style={{
-                  borderBottom: '1px solid grey',
-                  width: '100%',
-                  height: '100%',
-                }}
-                rowSpan={6}
-              >
+              <td className="long-text" rowSpan={6}>
                 <div className="structure-view">
                   {record.compound.smiles && record.compound.smiles !== '' ? (
                     <StructureView
@@ -90,7 +83,7 @@ function RecordView({ record }: inputProps) {
             </tr>
             <tr>
               <td>SMILES</td>
-              <td>{record.compound.smiles}</td>
+              <td className="long-text">{record.compound.smiles}</td>
             </tr>
             <tr>
               <td>Spectrum</td>
@@ -158,17 +151,12 @@ function RecordView({ record }: inputProps) {
               </td>
             </tr>
             <tr>
-              <td
-                style={{
-                  wordBreak: 'break-all',
-                  whiteSpace: 'pre-wrap',
-                }}
-              >
-                Copyright/License
-              </td>
-              <td colSpan={2} style={{ width: '100%' }}>
-                {record.copyright + ' / ' + record.license}
-              </td>
+              <td>Copyright</td>
+              <td colSpan={2}>{record.copyright}</td>
+            </tr>
+            <tr>
+              <td>License</td>
+              <td colSpan={2}>{record.license}</td>
             </tr>
           </tbody>
         </table>

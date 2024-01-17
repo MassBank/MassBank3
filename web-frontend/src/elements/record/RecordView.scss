@@ -13,13 +13,11 @@
 
   th,
   td {
-    white-space: nowrap;
     justify-content: center;
     align-items: center;
     margin: 0;
-    padding: 0.4rem;
-    border-bottom: 1px solid #dedede;
-    border-right: 1px solid #dedede;
+    padding: 0.3rem;
+    border: 1px solid #dedede;
 
     button {
       background-color: transparent;
@@ -28,6 +26,7 @@
   }
 
   .long-text {
+    width: 100%;
     word-break: break-word;
     white-space: pre-wrap;
   }
