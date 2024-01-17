@@ -56,6 +56,12 @@ func (c *DefaultApiController) Routes() Routes {
 			c.GetBrowseOptions,
 		},
 		{
+			"GetCount",
+			strings.ToUpper("Get"),
+			"/v1/records/count",
+			c.GetCount,
+		},
+		{
 			"GetFilterOptions",
 			strings.ToUpper("Get"),
 			"/v1/filter/options",
@@ -96,6 +102,20 @@ func (c *DefaultApiController) GetBrowseOptions(w http.ResponseWriter, r *http.R
 	ionModeParam := query.Get("ion-mode")
 	contributorParam := strings.Split(query.Get("contributor"), ",")
 	result, err := c.service.GetBrowseOptions(r.Context(), instrumentTypeParam, msTypeParam, ionModeParam, contributorParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+
+}
+
+// GetCount - The number of all records
+func (c *DefaultApiController) GetCount(w http.ResponseWriter, r *http.Request) {
+
+	result, err := c.service.GetCount(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

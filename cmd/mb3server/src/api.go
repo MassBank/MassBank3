@@ -19,6 +19,7 @@ import (
 // pass the data to a DefaultApiServicer to perform the required actions, then write the service results to the http response.
 type DefaultApiRouter interface {
 	GetBrowseOptions(http.ResponseWriter, *http.Request)
+	GetCount(http.ResponseWriter, *http.Request)
 	GetFilterOptions(http.ResponseWriter, *http.Request)
 	GetMetadata(http.ResponseWriter, *http.Request)
 	GetRecord(http.ResponseWriter, *http.Request)
@@ -32,6 +33,7 @@ type DefaultApiRouter interface {
 // and updated with the logic required for the API.
 type DefaultApiServicer interface {
 	GetBrowseOptions(context.Context, []string, []string, string, []string) (ImplResponse, error)
+	GetCount(context.Context) (ImplResponse, error)
 	GetFilterOptions(context.Context) (ImplResponse, error)
 	GetMetadata(context.Context) (ImplResponse, error)
 	GetRecord(context.Context, string) (ImplResponse, error)

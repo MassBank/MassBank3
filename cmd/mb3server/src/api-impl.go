@@ -236,6 +236,18 @@ func getSvgFromSmiles(smiles *string) (*string, error) {
 	return &svgS, nil
 }
 
+func GetCount() (*int64, error) {
+	if err := initDB(); err != nil {
+		return nil, err
+	}
+
+	count, err := db.Count()
+	if err != nil {
+		return nil, err
+	}
+	return &count, nil
+}
+
 func GetRecord(accession string) (*MbRecord, error) {
 	if err := initDB(); err != nil {
 		return nil, err

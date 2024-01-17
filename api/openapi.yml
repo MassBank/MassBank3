@@ -152,6 +152,17 @@ paths:
            image/svg+xml:
               schema:
                 type: string
+  /records/count:    
+    get:
+      summary: The number of all records
+      operationId: getCount
+      responses:
+        '200':
+          description: "The record count"
+          content:
+            application/json:
+              schema:
+                type: string
   /filter/options:
     get:
       summary: get filter options
