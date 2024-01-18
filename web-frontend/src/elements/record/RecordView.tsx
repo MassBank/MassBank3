@@ -20,7 +20,8 @@ function RecordView({ record }: inputProps) {
   }, [record]);
 
   const containerRef = useRef(null);
-  const { height: containerHeight } = useContainerDimensions(containerRef);
+  const { width: containerWidth, height: containerHeight } =
+    useContainerDimensions(containerRef);
   const chartContainerRef = useRef(null);
   const { width: chartContainerWidth } =
     useContainerDimensions(chartContainerRef);
@@ -51,15 +52,23 @@ function RecordView({ record }: inputProps) {
             <tr>
               <td>Accession</td>
               <td>{record.accession}</td>
-              <td className="long-text" rowSpan={6}>
+              <td rowSpan={6} style={{ width: '100%' }}>
                 <div className="structure-view">
-                  {record.compound.smiles && record.compound.smiles !== '' ? (
+                  {record.compound.smiles &&
+                  record.compound.smiles !== '' &&
+                  containerWidth > 0 ? (
                     <StructureView
                       smiles={record.compound.smiles}
-                      imageWidth={400}
-                      imageHeight={400}
+                      imageWidth={containerWidth * 0.4}
+                      imageHeight={containerHeight / 3}
                     />
                   ) : undefined}
+                  <div className="structure-view-info">
+                    <label>
+                      Formula: {<MF mf={record.compound.formula} />}
+                    </label>
+                    <label>Mass: {record.compound.mass}</label>
+                  </div>
                 </div>
               </td>
             </tr>
@@ -78,12 +87,14 @@ function RecordView({ record }: inputProps) {
               </td>
             </tr>
             <tr>
-              <td>InChI</td>
-              <td className="long-text">{record.compound.inchi}</td>
+              <td>Authors</td>
+              <td className="long-text">
+                {record.authors.map((a) => a.name).join(', ')}
+              </td>
             </tr>
             <tr>
-              <td>SMILES</td>
-              <td className="long-text">{record.compound.smiles}</td>
+              <td>Publication</td>
+              <td className="long-text">{record.publication}</td>
             </tr>
             <tr>
               <td>Spectrum</td>
@@ -135,19 +146,15 @@ function RecordView({ record }: inputProps) {
               </td>
             </tr>
             <tr>
-              <td>Date</td>
-              <td colSpan={2}>{record.date.created}</td>
-            </tr>
-            <tr>
-              <td>Authors</td>
+              <td>InChI</td>
               <td colSpan={2} className="long-text">
-                {record.authors.map((a) => a.name).join(', ')}
+                {record.compound.inchi}
               </td>
             </tr>
             <tr>
-              <td>Publication</td>
+              <td>SMILES</td>
               <td colSpan={2} className="long-text">
-                {record.publication}
+                {record.compound.smiles}
               </td>
             </tr>
             <tr>
@@ -158,6 +165,10 @@ function RecordView({ record }: inputProps) {
               <td>License</td>
               <td colSpan={2}>{record.license}</td>
             </tr>
+            <tr>
+              <td>Date</td>
+              <td colSpan={2}>{record.date.created}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -165,20 +176,22 @@ function RecordView({ record }: inputProps) {
     [
       record.accession,
       record.compound.smiles,
-      record.compound.mass,
-      record.compound.formula,
       record.compound.names,
       record.compound.classes,
       record.compound.inchi,
+      record.compound.mass,
+      record.compound.formula,
       record.title,
+      record.peak.peak.values,
+      record.peak.splash,
+      record.peak.annotation,
       record.date.created,
       record.authors,
       record.publication,
       record.copyright,
       record.license,
-      record.peak.peak.values,
-      record.peak.splash,
-      record.peak.annotation,
+      containerWidth,
+      containerHeight,
       chartHeight,
       handleOnZoom,
       chartWidth,
