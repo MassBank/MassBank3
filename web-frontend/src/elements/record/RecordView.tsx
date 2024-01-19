@@ -112,8 +112,6 @@ function RecordView({ record }: inputProps) {
       count += record.species.link.length;
     }
 
-    console.log(count);
-
     return count;
   }, [
     record.species.lineage,
