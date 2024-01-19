@@ -1,7 +1,6 @@
 package mb3server
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -424,7 +423,6 @@ func GetRecord(accession string) (*MbRecord, error) {
 		spectrometry := AcMassSpec{}
 
 		for _, spec := range *record.Acquisition.MassSpectrometry {
-			fmt.Printf("%v\n", spec)
 			if spec.Subtag == "ION_MODE" {
 				spectrometry.IonMode = spec.Value
 			} else if spec.Subtag == "MS_TYPE" {

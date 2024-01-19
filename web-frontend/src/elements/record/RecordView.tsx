@@ -9,9 +9,11 @@ import PeakTable from './PeakTable';
 import { MF } from 'react-mf';
 import Peak from '../../types/peak/Peak';
 import AnnotationTable from './AnnotationTable';
-import { splitStringAndCapitaliseFirstLetter } from '../../utils/stringUtils';
 import getLinkedAnnotations from '../../utils/getLinkedAnnotations';
 import LinkedPeakAnnotation from '../../types/peak/LinkedPeakAnnotation';
+import SubTagTableRows from './SubTagTableRows';
+
+const borderStyle = '2px solid grey';
 
 type inputProps = {
   record: Record;
@@ -63,6 +65,62 @@ function RecordView({ record }: inputProps) {
     },
     [record.peak.annotation],
   );
+
+  const rowSpanAcquisition = useMemo(() => {
+    let count = 1;
+    if (record.acquisition.instrument) {
+      count++;
+    }
+    if (record.acquisition.instrument_type) {
+      count++;
+    }
+    if (record.acquisition.mass_spectrometry.ms_type) {
+      count++;
+    }
+    if (record.acquisition.mass_spectrometry.ion_mode) {
+      count++;
+    }
+    if (record.acquisition.mass_spectrometry.subtags) {
+      count += record.acquisition.mass_spectrometry.subtags.length;
+    }
+    if (record.acquisition.chromatography) {
+      count += record.acquisition.chromatography.length;
+    }
+
+    return count;
+  }, [
+    record.acquisition.chromatography,
+    record.acquisition.instrument,
+    record.acquisition.instrument_type,
+    record.acquisition.mass_spectrometry.ion_mode,
+    record.acquisition.mass_spectrometry.ms_type,
+    record.acquisition.mass_spectrometry.subtags,
+  ]);
+
+  const rowSpanSpecies = useMemo(() => {
+    let count = 1;
+    if (record.species.name) {
+      count++;
+    }
+    if (record.species.lineage) {
+      count += record.species.lineage.length;
+    }
+    if (record.species.sample) {
+      count += record.species.sample.length;
+    }
+    if (record.species.link) {
+      count += record.species.link.length;
+    }
+
+    console.log(count);
+
+    return count;
+  }, [
+    record.species.lineage,
+    record.species.link,
+    record.species.name,
+    record.species.sample,
+  ]);
 
   const recordView = useMemo(
     () => (
@@ -134,19 +192,21 @@ function RecordView({ record }: inputProps) {
                 </div>
               </td>
             </tr>
-            <tr>
-              <td>Annotation</td>
-              <td colSpan={2}>
-                {record.peak.annotation &&
-                  Object.keys(record.peak.annotation).length > 0 && (
-                    <AnnotationTable
-                      annotation={record.peak.annotation}
-                      width="100%"
-                      height={300}
-                    />
-                  )}
-              </td>
-            </tr>
+            {record.peak.annotation &&
+              Object.keys(record.peak.annotation).length > 0 && (
+                <tr>
+                  <td>Annotation</td>
+                  <td colSpan={2}>
+                    {
+                      <AnnotationTable
+                        annotation={record.peak.annotation}
+                        width="100%"
+                        height={300}
+                      />
+                    }
+                  </td>
+                </tr>
+              )}
             <tr>
               <td>SPLASH</td>
               <td colSpan={2}>{record.peak.splash}</td>
@@ -158,101 +218,141 @@ function RecordView({ record }: inputProps) {
               </td>
             </tr>
             <tr>
-              <td style={{ borderBottom: '1px solid grey' }}>SMILES</td>
+              <td style={{ borderBottom: borderStyle }}>SMILES</td>
               <td
                 colSpan={2}
                 className="long-text"
-                style={{ borderBottom: '1px solid grey' }}
+                style={{ borderBottom: borderStyle }}
               >
                 {record.compound.smiles}
               </td>
             </tr>
+            {record.compound.link && (
+              <tr>
+                <td rowSpan={record.compound.link.length + 1}>Links</td>
+              </tr>
+            )}
+            {/* ########### Links ########### */}
+            {record.compound.link &&
+              record.compound.link.map((link) => (
+                <tr key={'link-' + link.database + '-' + link.identifier}>
+                  <td>{link.database}</td>
+                  <td>{link.identifier}</td>
+                </tr>
+              ))}
+            {/* ########### Acquisition ########### */}
             <tr>
-              <td>Instrument</td>
-              <td colSpan={2} className="long-text">
+              <td
+                rowSpan={rowSpanAcquisition}
+                style={{ borderTop: borderStyle }}
+              >
+                Acquisition
+              </td>
+            </tr>
+            <tr>
+              <td style={{ borderTop: borderStyle }}>Instrument</td>
+              <td className="long-text" style={{ borderTop: borderStyle }}>
                 {record.acquisition.instrument}
               </td>
             </tr>
             <tr>
-              <td
-                style={
-                  !record.acquisition.chromatography ||
-                  record.acquisition.chromatography.length === 0
-                    ? { borderBottom: '1px solid grey' }
-                    : undefined
-                }
-              >
-                Instrument Type
-              </td>
-              <td
-                colSpan={2}
-                className="long-text"
-                style={
-                  !record.acquisition.chromatography ||
-                  record.acquisition.chromatography.length === 0
-                    ? { borderBottom: '1px solid grey' }
-                    : undefined
-                }
-              >
+              <td>Instrument Type</td>
+              <td className="long-text">
                 {record.acquisition.instrument_type}
               </td>
             </tr>
-            {record.acquisition &&
-              record.acquisition.chromatography &&
-              record.acquisition.chromatography.map((subtag, i) => {
-                return (
-                  <tr key={'acqu-chrom-' + subtag.subtag + '-' + subtag.value}>
-                    <td
-                      style={
-                        i === record.acquisition.chromatography.length - 1
-                          ? { borderBottom: '1px solid grey' }
-                          : undefined
-                      }
-                    >
-                      {splitStringAndCapitaliseFirstLetter(
-                        subtag.subtag,
-                        '_',
-                        ' ',
-                      )}
-                    </td>
-                    <td
-                      colSpan={2}
-                      className="long-text"
-                      style={
-                        i === record.acquisition.chromatography.length - 1
-                          ? { borderBottom: '1px solid grey' }
-                          : undefined
-                      }
-                    >
-                      {subtag.value}
-                    </td>
-                  </tr>
-                );
-              })}
             <tr>
-              <td>Authors</td>
-              <td colSpan={2} className="long-text">
+              <td>MS Type</td>
+              <td className="long-text">
+                {record.acquisition.mass_spectrometry.ms_type}
+              </td>
+            </tr>
+            <tr>
+              <td>Ion Mode</td>
+              <td className="long-text">
+                {record.acquisition.mass_spectrometry.ion_mode}
+              </td>
+            </tr>
+            {record.acquisition && record.acquisition.mass_spectrometry && (
+              <SubTagTableRows
+                subtags={record.acquisition.mass_spectrometry.subtags}
+              />
+            )}
+            {record.acquisition && record.acquisition.chromatography && (
+              <SubTagTableRows subtags={record.acquisition.chromatography} />
+            )}
+            {/* ########### Species ########### */}
+            {record.species && Object.keys(record.species).length > 0 && (
+              <tr>
+                <td rowSpan={rowSpanSpecies}>Species</td>
+              </tr>
+            )}
+            {record.species && record.species.name && (
+              <tr>
+                <td>Name</td>
+                <td>{record.species.name}</td>
+              </tr>
+            )}
+            {record.species && record.species.lineage && (
+              <tr>
+                <td>Lineage</td>
+                <td>{record.species.lineage.join('; ')}</td>
+              </tr>
+            )}
+            {record.species && record.species.sample && (
+              <tr>
+                <td>Sample</td>
+                <td>{record.species.sample.join('; ')}</td>
+              </tr>
+            )}
+            {record.species && record.species.link && (
+              <tr>
+                <td>Link</td>
+                <td>
+                  {record.species.link
+                    .map((link) => link.database + ': ' + link.identifier)
+                    .join('; ')}
+                </td>
+              </tr>
+            )}
+            {/* ########### Rest ########### */}
+            <tr>
+              <td style={{ borderTop: borderStyle }}>Authors</td>
+              <td
+                style={{ borderTop: borderStyle }}
+                className="long-text"
+                colSpan={2}
+              >
                 {record.authors.map((a) => a.name).join(', ')}
               </td>
             </tr>
-            <tr>
-              <td>Publication</td>
-              <td colSpan={2} className="long-text">
-                {record.publication}
-              </td>
-            </tr>
-            <tr>
-              <td>Copyright</td>
-              <td colSpan={2}>{record.copyright}</td>
-            </tr>
-            <tr>
-              <td>License</td>
-              <td colSpan={2}>{record.license}</td>
-            </tr>
-            <tr>
-              <td>Date</td>
-              <td colSpan={2}>{record.date.created}</td>
-            </tr>
+            {record.publication && (
+              <tr>
+                <td>Publication</td>
+                <td colSpan={2} className="long-text">
+                  {record.publication}
+                </td>
+              </tr>
+            )}
+            {record.copyright && (
+              <tr>
+                <td>Copyright</td>
+                <td colSpan={2}>{record.copyright}</td>
+              </tr>
+            )}
+            {record.license && (
+              <tr>
+                <td>License</td>
+                <td colSpan={2}>{record.license}</td>
+              </tr>
+            )}
+            {record.date && (
+              <tr>
+                <td>Date</td>
+                <td colSpan={2}>{record.date.created}</td>
+              </tr>
+            )}
+            {record.comments && <SubTagTableRows subtags={record.comments} />}
           </tbody>
         </table>
       </div>
@@ -265,16 +365,19 @@ function RecordView({ record }: inputProps) {
       record.compound.mass,
       record.compound.formula,
       record.compound.inchi,
+      record.compound.link,
       record.title,
       record.peak.peak.values,
       record.peak.annotation,
       record.peak.splash,
       record.acquisition,
+      record.species,
       record.authors,
       record.publication,
       record.copyright,
       record.license,
-      record.date.created,
+      record.date,
+      record.comments,
       containerWidth,
       containerHeight,
       chartHeight,
@@ -283,6 +386,8 @@ function RecordView({ record }: inputProps) {
       filteredPeakData,
       filteredLinkedAnnotations,
       peakTableWidth,
+      rowSpanAcquisition,
+      rowSpanSpecies,
     ],
   );
 

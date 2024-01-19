@@ -2,7 +2,8 @@ import Acquisition from './Acquisition';
 import Compound from './Compound';
 import Date from './Date';
 import MassSpectrometry from './MassSpectrometry';
-import Subtag from './Subtag';
+import Species from './Species';
+import SubTag from './SubTag';
 import PeakData from './peak/PeakData';
 
 export default interface Record {
@@ -15,9 +16,9 @@ export default interface Record {
   license: string;
   copyright: string;
   compound: Compound;
-  species: {};
+  species: Species;
   acquisition: Acquisition;
   mass_spectrometry: MassSpectrometry;
   peak: PeakData;
-  comments: Subtag[];
+  comments: SubTag[];
 }

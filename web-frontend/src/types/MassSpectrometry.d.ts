@@ -1,6 +1,6 @@
-import Subtag from './Subtag';
+import SubTag from './SubTag';
 
 export default interface MassSpectrometry {
-  focused_ion: Subtag[];
-  data_processing: Subtag[];
+  focused_ion: SubTag[];
+  data_processing: SubTag[];
 }

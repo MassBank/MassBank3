@@ -1,4 +1,4 @@
-import Subtag from './Subtag';
+import Subtag from './SubTag';
 
 export default interface Acquisition {
   instrument: string;

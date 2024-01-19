@@ -1,4 +1,4 @@
-export default interface Subtag {
+export default interface SubTag {
   subtag: string;
   value: string;
 }
