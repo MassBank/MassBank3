@@ -9,6 +9,7 @@ import PeakTable from './PeakTable';
 import { MF } from 'react-mf';
 import Peak from '../../types/peak/Peak';
 import AnnotationTable from './AnnotationTable';
+import { splitStringAndCapitaliseFirstLetter } from '../../utils/stringUtils';
 
 type inputProps = {
   record: Record;
@@ -63,12 +64,6 @@ function RecordView({ record }: inputProps) {
                       imageHeight={containerHeight / 3}
                     />
                   ) : undefined}
-                  <div className="structure-view-info">
-                    <label>
-                      Formula: {<MF mf={record.compound.formula} />}
-                    </label>
-                    <label>Mass: {record.compound.mass}</label>
-                  </div>
                 </div>
               </td>
             </tr>
@@ -87,14 +82,14 @@ function RecordView({ record }: inputProps) {
               </td>
             </tr>
             <tr>
-              <td>Authors</td>
-              <td className="long-text">
-                {record.authors.map((a) => a.name).join(', ')}
-              </td>
+              <td>Mass</td>
+              <td>{record.compound.mass}</td>
             </tr>
             <tr>
-              <td>Publication</td>
-              <td className="long-text">{record.publication}</td>
+              <td>Formula</td>
+              <td>
+                <MF mf={record.compound.formula} />{' '}
+              </td>
             </tr>
             <tr>
               <td>Spectrum</td>
@@ -119,20 +114,6 @@ function RecordView({ record }: inputProps) {
               </td>
             </tr>
             <tr>
-              <td>SPLASH</td>
-              <td colSpan={2}>{record.peak.splash}</td>
-            </tr>
-            <tr>
-              <td>Mass</td>
-              <td colSpan={2}>{record.compound.mass}</td>
-            </tr>
-            <tr>
-              <td>Formula</td>
-              <td colSpan={2}>
-                <MF mf={record.compound.formula} />{' '}
-              </td>
-            </tr>
-            <tr>
               <td>Annotation</td>
               <td colSpan={2}>
                 {record.peak.annotation &&
@@ -146,15 +127,97 @@ function RecordView({ record }: inputProps) {
               </td>
             </tr>
             <tr>
+              <td>SPLASH</td>
+              <td colSpan={2}>{record.peak.splash}</td>
+            </tr>
+            <tr>
               <td>InChI</td>
               <td colSpan={2} className="long-text">
                 {record.compound.inchi}
               </td>
             </tr>
             <tr>
-              <td>SMILES</td>
-              <td colSpan={2} className="long-text">
+              <td style={{ borderBottom: '1px solid grey' }}>SMILES</td>
+              <td
+                colSpan={2}
+                className="long-text"
+                style={{ borderBottom: '1px solid grey' }}
+              >
                 {record.compound.smiles}
+              </td>
+            </tr>
+            <tr>
+              <td>Instrument</td>
+              <td colSpan={2} className="long-text">
+                {record.acquisition.instrument}
+              </td>
+            </tr>
+            <tr>
+              <td
+                style={
+                  !record.acquisition.chromatography ||
+                  record.acquisition.chromatography.length === 0
+                    ? { borderBottom: '1px solid grey' }
+                    : undefined
+                }
+              >
+                Instrument Type
+              </td>
+              <td
+                colSpan={2}
+                className="long-text"
+                style={
+                  !record.acquisition.chromatography ||
+                  record.acquisition.chromatography.length === 0
+                    ? { borderBottom: '1px solid grey' }
+                    : undefined
+                }
+              >
+                {record.acquisition.instrument_type}
+              </td>
+            </tr>
+            {record.acquisition &&
+              record.acquisition.chromatography &&
+              record.acquisition.chromatography.map((subtag, i) => {
+                return (
+                  <tr key={'acqu-chrom-' + subtag.subtag + '-' + subtag.value}>
+                    <td
+                      style={
+                        i === record.acquisition.chromatography.length - 1
+                          ? { borderBottom: '1px solid grey' }
+                          : undefined
+                      }
+                    >
+                      {splitStringAndCapitaliseFirstLetter(
+                        subtag.subtag,
+                        '_',
+                        ' ',
+                      )}
+                    </td>
+                    <td
+                      colSpan={2}
+                      className="long-text"
+                      style={
+                        i === record.acquisition.chromatography.length - 1
+                          ? { borderBottom: '1px solid grey' }
+                          : undefined
+                      }
+                    >
+                      {subtag.value}
+                    </td>
+                  </tr>
+                );
+              })}
+            <tr>
+              <td>Authors</td>
+              <td colSpan={2} className="long-text">
+                {record.authors.map((a) => a.name).join(', ')}
+              </td>
+            </tr>
+            <tr>
+              <td>Publication</td>
+              <td colSpan={2} className="long-text">
+                {record.publication}
               </td>
             </tr>
             <tr>
@@ -176,20 +239,21 @@ function RecordView({ record }: inputProps) {
     [
       record.accession,
       record.compound.smiles,
+      record.compound.formula,
+      record.compound.mass,
       record.compound.names,
       record.compound.classes,
       record.compound.inchi,
-      record.compound.mass,
-      record.compound.formula,
       record.title,
+      record.authors,
+      record.publication,
       record.peak.peak.values,
       record.peak.splash,
       record.peak.annotation,
-      record.date.created,
-      record.authors,
-      record.publication,
+      record.acquisition,
       record.copyright,
       record.license,
+      record.date.created,
       containerWidth,
       containerHeight,
       chartHeight,
