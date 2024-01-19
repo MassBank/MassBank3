@@ -10,6 +10,8 @@ import { MF } from 'react-mf';
 import Peak from '../../types/peak/Peak';
 import AnnotationTable from './AnnotationTable';
 import { splitStringAndCapitaliseFirstLetter } from '../../utils/stringUtils';
+import getLinkedAnnotations from '../../utils/getLinkedAnnotations';
+import LinkedPeakAnnotation from '../../types/peak/LinkedPeakAnnotation';
 
 type inputProps = {
   record: Record;
@@ -41,9 +43,26 @@ function RecordView({ record }: inputProps) {
     record.peak.peak.values,
   );
 
-  const handleOnZoom = useCallback((fpd: Peak[]) => {
-    setFilteredPeakData(fpd);
-  }, []);
+  const linkedAnnotations = useMemo(
+    () => getLinkedAnnotations(record.peak.peak.values, record.peak.annotation),
+    [record.peak],
+  );
+
+  const [filteredLinkedAnnotations, setFilteredLinkedAnnotations] =
+    useState<LinkedPeakAnnotation[]>(linkedAnnotations);
+
+  const handleOnZoom = useCallback(
+    (fpd: Peak[]) => {
+      setFilteredPeakData(fpd);
+
+      const _filteredLinkedAnnotations = getLinkedAnnotations(
+        fpd,
+        record.peak.annotation,
+      );
+      setFilteredLinkedAnnotations(_filteredLinkedAnnotations);
+    },
+    [record.peak.annotation],
+  );
 
   const recordView = useMemo(
     () => (
@@ -106,7 +125,9 @@ function RecordView({ record }: inputProps) {
                     height={chartHeight}
                   />
                   <PeakTable
-                    pd={filteredPeakData}
+                    peaks={filteredPeakData}
+                    annotations={record.peak.annotation}
+                    linkedAnnotations={filteredLinkedAnnotations}
                     width={peakTableWidth}
                     height={chartHeight}
                   />
@@ -239,18 +260,18 @@ function RecordView({ record }: inputProps) {
     [
       record.accession,
       record.compound.smiles,
-      record.compound.formula,
-      record.compound.mass,
       record.compound.names,
       record.compound.classes,
+      record.compound.mass,
+      record.compound.formula,
       record.compound.inchi,
       record.title,
+      record.peak.peak.values,
+      record.peak.annotation,
+      record.peak.splash,
+      record.acquisition,
       record.authors,
       record.publication,
-      record.peak.peak.values,
-      record.peak.splash,
-      record.peak.annotation,
-      record.acquisition,
       record.copyright,
       record.license,
       record.date.created,
@@ -260,6 +281,7 @@ function RecordView({ record }: inputProps) {
       handleOnZoom,
       chartWidth,
       filteredPeakData,
+      filteredLinkedAnnotations,
       peakTableWidth,
     ],
   );
