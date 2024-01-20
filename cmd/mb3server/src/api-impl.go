@@ -316,7 +316,6 @@ func GetRecord(accession string) (*MbRecord, error) {
 			},
 		},
 	}
-	// insert publication, license, copyright
 	if record.Publication != nil {
 		result.Publication = *record.Publication
 	}
@@ -326,13 +325,13 @@ func GetRecord(accession string) (*MbRecord, error) {
 	if record.Copyright != nil {
 		result.Copyright = *record.Copyright
 	}
+	if record.Project != nil {
+		result.Project = *record.Project
+	}
 
 	// insert authors
 	for _, author := range *record.Authors {
-		result.Authors = append(result.Authors, AuthorsInner{
-			Name:        author.Name,
-			MarcRelator: author.MarcRelator,
-		})
+		result.Authors = append(result.Authors, AuthorsInner(author))
 	}
 
 	// insert peak data
@@ -370,6 +369,97 @@ func GetRecord(accession string) (*MbRecord, error) {
 		}
 
 		result.Peak.Annotation.Values = annotationValues
+	}
+
+	// insert compound link data
+	if record.Compound.Link != nil {
+		links := []DatabaseObject{}
+		for _, link := range *record.Compound.Link {
+			links = append(links, DatabaseObject(link))
+		}
+		result.Compound.Link = links
+	}
+
+	// insert species data
+	if record.Species.Name != nil {
+		result.Species.Name = *record.Species.Name
+	}
+	if record.Species.Lineage != nil {
+		result.Species.Lineage = *record.Species.Lineage
+	}
+	if record.Species.Link != nil {
+		links := []DatabaseObject{}
+		for _, link := range *record.Species.Link {
+			links = append(links, DatabaseObject(link))
+		}
+		result.Species.Link = links
+	}
+	if record.Species.Sample != nil {
+		result.Species.Sample = *record.Species.Sample
+	}
+
+	// insert acquisition data
+	if *record.Acquisition.Instrument != "" {
+		result.Acquisition.Instrument = *record.Acquisition.Instrument
+	}
+	if *record.Acquisition.InstrumentType != "" {
+		result.Acquisition.InstrumentType = *record.Acquisition.InstrumentType
+	}
+	if record.Acquisition.Chromatography != nil {
+		chromatographies := []AcChromatographyInner{}
+		for _, chrom := range *record.Acquisition.Chromatography {
+			chromatographies = append(chromatographies, AcChromatographyInner(chrom))
+		}
+		result.Acquisition.Chromatography = chromatographies
+	}
+	if record.Acquisition.General != nil {
+		generals := []AcGeneralInner{}
+		for _, general := range *record.Acquisition.General {
+			generals = append(generals, AcGeneralInner(general))
+		}
+		result.Acquisition.General = generals
+	}
+	if record.Acquisition.MassSpectrometry != nil {
+		spectrometry := AcMassSpec{}
+
+		for _, spec := range *record.Acquisition.MassSpectrometry {
+			if spec.Subtag == "ION_MODE" {
+				spectrometry.IonMode = spec.Value
+			} else if spec.Subtag == "MS_TYPE" {
+				spectrometry.MsType = spec.Value
+			} else {
+				if spectrometry.Subtags == nil {
+					spectrometry.Subtags = []AcMassSpecSubtagsInner{}
+				}
+				spectrometry.Subtags = append(spectrometry.Subtags, AcMassSpecSubtagsInner(spec))
+			}
+		}
+		result.Acquisition.MassSpectrometry = spectrometry
+	}
+
+	// insert comments data
+	if record.Comments != nil {
+		comments := []massbank.SubtagProperty{}
+		for _, comment := range *record.Comments {
+			comments = append(comments, massbank.SubtagProperty(comment))
+		}
+		*record.Comments = comments
+	}
+
+	// insert mass spectrometry data
+	if record.MassSpectrometry.DataProcessing != nil {
+		dps := []MsDataProcessingInner{}
+		for _, dp := range *record.MassSpectrometry.DataProcessing {
+			dps = append(dps, MsDataProcessingInner(dp))
+		}
+		result.MassSpectrometry.DataProcessing = dps
+	}
+	if record.MassSpectrometry.FocusedIon != nil {
+		ions := []MsFocusedIonInner{}
+		for _, ion := range *record.MassSpectrometry.FocusedIon {
+			ions = append(ions, MsFocusedIonInner(ion))
+		}
+		result.MassSpectrometry.FocusedIon = ions
 	}
 
 	return &result, nil

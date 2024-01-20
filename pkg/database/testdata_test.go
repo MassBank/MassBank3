@@ -244,7 +244,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 			Link:    nil,
 			Sample:  nil,
 		},
-		Acquisition: massbank.AcquisitionPropterties{
+		Acquisition: massbank.AcquisitionProperties{
 			Instrument: toPtr("Q-Exactive Orbitrap Thermo Scientific"),
 
 			InstrumentType: toPtr("LC-ESI-ITFT"),
@@ -532,7 +532,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 			Link:    nil,
 			Sample:  nil,
 		},
-		Acquisition: massbank.AcquisitionPropterties{
+		Acquisition: massbank.AcquisitionProperties{
 			Instrument:     toPtr("Bruker maXis Impact"),
 			InstrumentType: toPtr("LC-ESI-QTOF"),
 			MassSpectrometry: &[]massbank.SubtagProperty{
@@ -785,7 +785,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 			Link:    nil,
 			Sample:  nil,
 		},
-		Acquisition: massbank.AcquisitionPropterties{
+		Acquisition: massbank.AcquisitionProperties{
 			Instrument:     toPtr("LTQ Orbitrap XL Thermo Scientific"),
 			InstrumentType: toPtr("LC-ESI-ITFT"),
 			MassSpectrometry: &[]massbank.SubtagProperty{
@@ -1047,7 +1047,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 			Link:    nil,
 			Sample:  nil,
 		},
-		Acquisition: massbank.AcquisitionPropterties{
+		Acquisition: massbank.AcquisitionProperties{
 			Instrument:     toPtr("Q Exactive Plus Orbitrap Thermo Scientific"),
 			InstrumentType: toPtr("LC-ESI-QFT"),
 			MassSpectrometry: &[]massbank.SubtagProperty{
@@ -1302,7 +1302,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 			Link:    nil,
 			Sample:  nil,
 		},
-		Acquisition: massbank.AcquisitionPropterties{
+		Acquisition: massbank.AcquisitionProperties{
 			Instrument:     toPtr("HITACHI M-80B"),
 			InstrumentType: toPtr("EI-B"),
 			MassSpectrometry: &[]massbank.SubtagProperty{
@@ -1545,7 +1545,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 			Link:    nil,
 			Sample:  nil,
 		},
-		Acquisition: massbank.AcquisitionPropterties{
+		Acquisition: massbank.AcquisitionProperties{
 			Instrument:     toPtr("LC/MSD Trap XCT, Agilent Technologies"),
 			InstrumentType: toPtr("LC-ESI-IT"),
 			MassSpectrometry: &[]massbank.SubtagProperty{
@@ -1803,7 +1803,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 			Link:    nil,
 			Sample:  nil,
 		},
-		Acquisition: massbank.AcquisitionPropterties{
+		Acquisition: massbank.AcquisitionProperties{
 			Instrument:     toPtr("X500R QTOF (AB Sciex LLC, USA)"),
 			InstrumentType: toPtr("ESI-QTOF"),
 			MassSpectrometry: &[]massbank.SubtagProperty{
@@ -1990,7 +1990,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 			Link:    nil,
 			Sample:  nil,
 		},
-		Acquisition: massbank.AcquisitionPropterties{
+		Acquisition: massbank.AcquisitionProperties{
 			Instrument:     toPtr("UPLC Q-Tof Premier, Waters"),
 			InstrumentType: toPtr("LC-ESI-QTOF"),
 			MassSpectrometry: &[]massbank.SubtagProperty{
@@ -2183,7 +2183,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 			Link:    nil,
 			Sample:  nil,
 		},
-		Acquisition: massbank.AcquisitionPropterties{
+		Acquisition: massbank.AcquisitionProperties{
 			Instrument:     toPtr("LC, Waters Acquity UPLC System; MS, Waters Xevo G2 Q-Tof"),
 			InstrumentType: toPtr("LC-ESI-QTOF"),
 			MassSpectrometry: &[]massbank.SubtagProperty{
@@ -2400,7 +2400,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 			Link:    nil,
 			Sample:  nil,
 		},
-		Acquisition: massbank.AcquisitionPropterties{
+		Acquisition: massbank.AcquisitionProperties{
 			Instrument:     toPtr("Agilent 1200 RRLC; Agilent 6520 QTOF"),
 			InstrumentType: toPtr("LC-APCI-QTOF"),
 			MassSpectrometry: &[]massbank.SubtagProperty{
@@ -2535,7 +2535,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 			Link:    nil,
 			Sample:  nil,
 		},
-		Acquisition: massbank.AcquisitionPropterties{
+		Acquisition: massbank.AcquisitionProperties{
 			Instrument:     toPtr("Q-Exactive Orbitrap Thermo Scientific"),
 			InstrumentType: toPtr("LC-ESI-ITFT"),
 			MassSpectrometry: &[]massbank.SubtagProperty{
@@ -2696,7 +2696,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 				"brain",
 			},
 		},
-		Acquisition: massbank.AcquisitionPropterties{
+		Acquisition: massbank.AcquisitionProperties{
 			Instrument:     toPtr("Voyager DE-PRO, Applied Biosystems"),
 			InstrumentType: toPtr("MALDI-TOF"),
 			MassSpectrometry: &[]massbank.SubtagProperty{
@@ -3109,7 +3109,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 			Link:    nil,
 			Sample:  nil,
 		},
-		Acquisition: massbank.AcquisitionPropterties{
+		Acquisition: massbank.AcquisitionProperties{
 			Instrument:     toPtr("Q-Exactive HF, Thermo Scientific [MS:1002523]"),
 			InstrumentType: toPtr("LC-ESI-QTOF"),
 			MassSpectrometry: &[]massbank.SubtagProperty{

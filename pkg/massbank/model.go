@@ -43,7 +43,7 @@ type SpeciesProperties struct {
 	Sample  *[]string           `mb2:"SP$SAMPLE" optional:"true" json:"sample"`
 }
 
-type AcquisitionPropterties struct {
+type AcquisitionProperties struct {
 	Instrument       *string           `mb2:"AC$INSTRUMENT" json:"instrument"`
 	InstrumentType   *string           `mb2:"AC$INSTRUMENT_TYPE" json:"instrument_type"`
 	MassSpectrometry *[]SubtagProperty `mb2:"AC$MASS_SPECTROMETRY" optional:"true" json:"mass_spectrometry"`
@@ -69,23 +69,23 @@ type Metadata struct {
 }
 
 type MassBank2 struct {
-	Metadata         Metadata               `json:"metadata"`
-	Accession        *string                `mb2:"ACCESSION" json:"accession"`
-	Contributor      *string                `json:"contributor"`
-	Deprecated       *RecordDeprecated      `mb2:"DEPRECATED" optional:"true" bson:"deprecated,omitempty" json:"deprecated"`
-	RecordTitle      *string                `mb2:"RECORD_TITLE" json:"title"`
-	Date             *RecordDate            `mb2:"DATE" json:"date"`
-	Authors          *[]RecordAuthorName    `mb2:"AUTHORS" json:"authors"`
-	License          *string                `mb2:"LICENSE" json:"license"`
-	Copyright        *string                `mb2:"COPYRIGHT" optional:"true" json:"copyright"`
-	Publication      *string                `mb2:"PUBLICATION" optional:"true" json:"publication"`
-	Project          *string                `mb2:"PROJECT" optional:"true" bson:"project,omitempty" json:"project"`
-	Comments         *[]SubtagProperty      `mb2:"COMMENT" optional:"true" json:"comments"`
-	Compound         CompoundProperties     `json:"compound"`
-	Species          SpeciesProperties      `json:"species"`
-	Acquisition      AcquisitionPropterties `json:"acquisition"`
-	MassSpectrometry MassSpecProperties     `json:"mass_spectrometry"`
-	Peak             PeakProperties         `json:"peak"`
+	Metadata         Metadata              `json:"metadata"`
+	Accession        *string               `mb2:"ACCESSION" json:"accession"`
+	Contributor      *string               `json:"contributor"`
+	Deprecated       *RecordDeprecated     `mb2:"DEPRECATED" optional:"true" bson:"deprecated,omitempty" json:"deprecated"`
+	RecordTitle      *string               `mb2:"RECORD_TITLE" json:"title"`
+	Date             *RecordDate           `mb2:"DATE" json:"date"`
+	Authors          *[]RecordAuthorName   `mb2:"AUTHORS" json:"authors"`
+	License          *string               `mb2:"LICENSE" json:"license"`
+	Copyright        *string               `mb2:"COPYRIGHT" optional:"true" json:"copyright"`
+	Publication      *string               `mb2:"PUBLICATION" optional:"true" json:"publication"`
+	Project          *string               `mb2:"PROJECT" optional:"true" bson:"project,omitempty" json:"project"`
+	Comments         *[]SubtagProperty     `mb2:"COMMENT" optional:"true" json:"comments"`
+	Compound         CompoundProperties    `json:"compound"`
+	Species          SpeciesProperties     `json:"species"`
+	Acquisition      AcquisitionProperties `json:"acquisition"`
+	MassSpectrometry MassSpecProperties    `json:"mass_spectrometry"`
+	Peak             PeakProperties        `json:"peak"`
 }
 
 type RecordDeprecated struct {
