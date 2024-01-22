@@ -1,0 +1,12 @@
+type: object
+properties:
+  mz:
+    description: mz values
+    type: array
+    items:
+      type: number
+  intensity:
+    description: intensity values
+    type: array
+    items:
+      type: number
