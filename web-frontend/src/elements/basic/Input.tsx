@@ -23,7 +23,6 @@ type InputProps = {
   placeholder?: string;
   style?: CSSProperties;
   fontStyle?: CSSProperties;
-  ref?: RefObject<HTMLInputElement>;
 };
 
 function Input({
@@ -39,7 +38,6 @@ function Input({
   placeholder = '',
   style,
   fontStyle,
-  ref,
 }: InputProps) {
   const handleOnChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -68,7 +66,6 @@ function Input({
       <div className={className}>
         {label && <label style={fontStyle}>{`${label}`}</label>}
         <input
-          ref={ref}
           type={type}
           onChange={handleOnChange}
           onKeyDown={handleOnKeyDown}
@@ -97,7 +94,6 @@ function Input({
       max,
       min,
       placeholder,
-      ref,
       style,
       type,
     ],
