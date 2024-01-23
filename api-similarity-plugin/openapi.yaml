@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: MassBank3 spectral similarity API
-  description: An API to calculate the spectral similarity between a query spectrum and some reference spectra
-  version: 0.0.1
+  title: Title
+  description: Title
+  version: 1.0.0
 servers:
   - url: 'https'
 paths:
@@ -10,21 +10,31 @@ paths:
     get:
       summary: Get the version string of the implementation.
       responses:
-        "200":
+        '200':
           description: version string
           content:
             application/json:
               schema:
                 type: string
+
   /similarity:
-    summary: Calculates the spectral similarity between the query peaklist and the spectra in reflist.
+    summary: Calculates the spectral similarity between the query peak list and the reference spectra list.
     post:
-      summary: Create a new similarity calculation
+      summary: Create a new similarity calculation.
       requestBody:
         description: a similarity job
-        required: true
         content:
           application/json:
             schema:
-              $ref: "./schemas/peaklist.yaml"
-
+              $ref: './schemas/SimilarityJob.yaml'
+      responses:
+        "200":
+          description: similarity job successfully calculated
+          content:
+            application/json:
+              schema:
+                description: similarity score for each reference spectrum in the order of the reference spectra list
+                type: array
+                items:
+                  type: number
+  

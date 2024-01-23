@@ -1,7 +1,7 @@
 type: object
 properties:
   mz:
-    description: mz values
+    description: m/z value
     type: array
     items:
       type: number
