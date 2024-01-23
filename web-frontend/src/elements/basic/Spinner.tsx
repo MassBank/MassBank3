@@ -1,10 +1,11 @@
 import './Spinner.scss';
 import Button from './Button';
-import { CSSProperties, useEffect, useMemo, useState } from 'react';
+import { CSSProperties, MouseEvent, useEffect, useMemo, useState } from 'react';
 import { MagnifyingGlass } from 'react-loader-spinner';
 
 type InputProps = {
-  onClickCancel?: Function;
+  // eslint-disable-next-line no-unused-vars
+  onClickCancel?: (e: MouseEvent<HTMLButtonElement>) => void;
   className?: string;
   classNameButton?: string;
   buttonText?: string;

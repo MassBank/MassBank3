@@ -2,16 +2,12 @@ import './RecordView.scss';
 
 import Record from '../../types/Record';
 import useContainerDimensions from '../../utils/useContainerDimensions';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import StructureView from '../basic/StructureView';
-import Chart from '../basic/Chart';
-import PeakTable from './PeakTable';
 import { MF } from 'react-mf';
-import Peak from '../../types/peak/Peak';
 import AnnotationTable from './AnnotationTable';
-import getLinkedAnnotations from '../../utils/getLinkedAnnotations';
-import LinkedPeakAnnotation from '../../types/peak/LinkedPeakAnnotation';
 import SubTagTableRows from './SubTagTableRows';
+import Resizable from './Resizable';
 
 const borderStyle = '2px solid grey';
 
@@ -27,43 +23,14 @@ function RecordView({ record }: inputProps) {
   const containerRef = useRef(null);
   const { width: containerWidth, height: containerHeight } =
     useContainerDimensions(containerRef);
-  const chartContainerRef = useRef(null);
-  const { width: chartContainerWidth } =
-    useContainerDimensions(chartContainerRef);
-
-  const chartHeight = useMemo(() => containerHeight * 0.6, [containerHeight]);
-  const chartWidth = useMemo(
-    () => chartContainerWidth * 0.7,
-    [chartContainerWidth],
-  );
-  const peakTableWidth = useMemo(
-    () => chartContainerWidth * 0.3,
-    [chartContainerWidth],
+  const chartAndPeakTableContainerRef = useRef(null);
+  const { width: chartAndPeakTableContainerWidth } = useContainerDimensions(
+    chartAndPeakTableContainerRef,
   );
 
-  const [filteredPeakData, setFilteredPeakData] = useState<Peak[]>(
-    record.peak.peak.values,
-  );
-
-  const linkedAnnotations = useMemo(
-    () => getLinkedAnnotations(record.peak.peak.values, record.peak.annotation),
-    [record.peak],
-  );
-
-  const [filteredLinkedAnnotations, setFilteredLinkedAnnotations] =
-    useState<LinkedPeakAnnotation[]>(linkedAnnotations);
-
-  const handleOnZoom = useCallback(
-    (fpd: Peak[]) => {
-      setFilteredPeakData(fpd);
-
-      const _filteredLinkedAnnotations = getLinkedAnnotations(
-        fpd,
-        record.peak.annotation,
-      );
-      setFilteredLinkedAnnotations(_filteredLinkedAnnotations);
-    },
-    [record.peak.annotation],
+  const chartAndPeakTableHeight = useMemo(
+    () => containerHeight * 0.6,
+    [containerHeight],
   );
 
   const rowSpanAcquisition = useMemo(() => {
@@ -171,21 +138,13 @@ function RecordView({ record }: inputProps) {
               <td colSpan={2}>
                 <div
                   className="spectrum-peak-table-view"
-                  ref={chartContainerRef}
-                  style={{ width: '100%', height: chartHeight }}
+                  ref={chartAndPeakTableContainerRef}
+                  style={{ width: '100%', height: chartAndPeakTableHeight }}
                 >
-                  <Chart
-                    peakData={record.peak.peak.values}
-                    onZoom={handleOnZoom}
-                    width={chartWidth}
-                    height={chartHeight}
-                  />
-                  <PeakTable
-                    peaks={filteredPeakData}
-                    annotations={record.peak.annotation}
-                    linkedAnnotations={filteredLinkedAnnotations}
-                    width={peakTableWidth}
-                    height={chartHeight}
+                  <Resizable
+                    record={record}
+                    width={chartAndPeakTableContainerWidth}
+                    height={chartAndPeakTableHeight}
                   />
                 </div>
               </td>
@@ -356,34 +315,11 @@ function RecordView({ record }: inputProps) {
       </div>
     ),
     [
-      record.accession,
-      record.compound.smiles,
-      record.compound.names,
-      record.compound.classes,
-      record.compound.mass,
-      record.compound.formula,
-      record.compound.inchi,
-      record.compound.link,
-      record.title,
-      record.peak.peak.values,
-      record.peak.annotation,
-      record.peak.splash,
-      record.acquisition,
-      record.species,
-      record.authors,
-      record.publication,
-      record.copyright,
-      record.license,
-      record.date,
-      record.comments,
+      record,
       containerWidth,
       containerHeight,
-      chartHeight,
-      handleOnZoom,
-      chartWidth,
-      filteredPeakData,
-      filteredLinkedAnnotations,
-      peakTableWidth,
+      chartAndPeakTableHeight,
+      chartAndPeakTableContainerWidth,
       rowSpanAcquisition,
       rowSpanSpecies,
     ],

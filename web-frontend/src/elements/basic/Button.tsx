@@ -3,7 +3,8 @@ import './Button.scss';
 import { CSSProperties, MouseEvent, useCallback, useMemo } from 'react';
 
 type InputProps = {
-  onClick: Function;
+  // eslint-disable-next-line no-unused-vars
+  onClick: (e: MouseEvent<HTMLButtonElement>) => void;
   child: string | JSX.Element;
   className?: string;
   disabled?: boolean;
@@ -27,7 +28,7 @@ function Button({
     (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      onClick(e.target);
+      onClick(e);
     },
     [onClick],
   );
