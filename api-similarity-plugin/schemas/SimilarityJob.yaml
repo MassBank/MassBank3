@@ -1,0 +1,9 @@
+type: object
+properties:
+  peak_list:
+    $ref: 'PeakList.yaml'
+  reference_spectra_list:
+    description: the reference spectra list, list of ACCESSION strings
+    type: array
+    items:
+      type: string
