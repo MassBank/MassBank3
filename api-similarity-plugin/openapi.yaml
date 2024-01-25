@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Title
-  description: Title
-  version: 1.0.0
+  title: Similarity score api for MassBank3
+  description: This similarity score api for MassBank3 calculates the spectral similarity between the spectrum defined in the query peak list and the reference spectra list.
+  version: 0.0.1
 servers:
   - url: 'https'
 paths:
@@ -16,6 +16,7 @@ paths:
             application/json:
               schema:
                 type: string
+              example: cosine similarity 1.0.0
 
   /similarity:
     summary: Calculates the spectral similarity between the query peak list and the reference spectra list.
@@ -26,7 +27,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './schemas/SimilarityJob.yaml'
+              type: object
+              properties:
+                peak_list:
+                  type: object
+                  properties:
+                    mz:
+                      description: m/z value
+                      type: array
+                      items:
+                        type: number
+                      example: [147.063, 303.050, 449.108, 465.102, 611.161]
+                    intensity:
+                      description: intensity values
+                      type: array
+                      items:
+                        type: number
+                      example: [121.684, 10000.000, 657.368, 5884.210, 6700.000]
+                    reference_spectra_list:
+                      description: the reference spectra list, list of ACCESSION strings
+                      type: array
+                      items:
+                        type: string
+                      example: [ 'MSBNK-IPB_Halle-PB001341', 'MSBNK-IPB_Halle-PB006202',
+                                'MSBNK-IPB_Halle-PB006203', 'MSBNK-IPB_Halle-PB001342',
+                                'MSBNK-IPB_Halle-PB001343']
+
       responses:
         "200":
           description: similarity job successfully calculated
@@ -37,4 +63,3 @@ paths:
                 type: array
                 items:
                   type: number
-  
