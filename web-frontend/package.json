@@ -64,7 +64,7 @@
     "vite": "^5.0.6"
   },
   "volta": {
-    "node": "20.10.0"
+    "node": "20.11.0"
   },
   "peerDependencies": {
     "react": ">=18.2.0",

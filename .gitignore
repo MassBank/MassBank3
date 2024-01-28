@@ -17,3 +17,6 @@
 /.idea/
 /docker/debuglog/
 /scripts/bin/
+
+# misc
+.DS_Store
