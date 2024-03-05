@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: postgres-config
-  namespace: massbank3
-data:
-  POSTGRES_PASSWORD: massbank3password
-  POSTGRES_USER: massbank3
-  POSTGRES_DB: massbank3
