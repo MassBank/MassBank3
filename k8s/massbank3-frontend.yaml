@@ -22,7 +22,7 @@ spec:
             - name: VITE_MB3_API_URL
               value: "http://${MB3_API_HOST}:${MB3_API_PORT}"
             - name: VITE_MB3_BASE_URL
-              value: "/massbank3/"
+              value: "${MB3_FRONTEND_BASE_URL}"
 ---
 apiVersion: v1
 kind: Service
