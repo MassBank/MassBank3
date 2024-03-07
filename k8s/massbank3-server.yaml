@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: massbank3-server-deployment # Name des Deployments für uns Nutzer
+  namespace: massbank3
+  labels:
+    app: massbank3-server # Labels des Deployments
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: massbank3-server # Welche Container gehören zum Deployment? (*)
+  template:
+    metadata:
+      labels:
+        app: massbank3-server  # Label des Pods muss/ sollte mit (*) übereinstimmen
+    spec:
+      containers:
+        - name: massbank3-server
+          image: rmeier/massbank3-server:0.0.1  # Container Image
+          env:
+            - name: DB_TYPE
+              value: postgres
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_PASSWORD
+              value: massbank3password
+            - name: DB_HOST
+              value: massbank3-postgres-service
+            - name: DB_NAME
+              value: massbank3
+            - name: DB_CONN_STRING
+              value: ""
+            - name: MB3_SERVER_PORT
+              value: "8080"
+            - name: CDKDEPICT_URL
+              value: "http://massbank3-cdkdepict:8080"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: massbank3-server-service
+  namespace: massbank3
+spec:
+  type: NodePort
+  selector:
+    app: massbank3-server # Das gleiche Label wie im Deployment
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app: massbank3-server
+  name: massbank3-server-ingress
+  namespace: massbank3
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /test
+            pathType: Prefix
+            backend:
+              service:
+                name: massbank3-server-service
+                port:
+                  number: 8080
