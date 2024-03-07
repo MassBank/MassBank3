@@ -17,6 +17,7 @@
 /.idea/
 /docker/debuglog/
 /scripts/bin/
+/docker/deploy.sh
 
 # misc
 .DS_Store

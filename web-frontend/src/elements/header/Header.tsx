@@ -7,7 +7,10 @@ function Header() {
 
   const logoLink = (
     <li className="custom-li" key="logo-li">
-      <img src="/logos/logo.svg" alt="MassBank Europe" />
+      <img
+        src={import.meta.env.VITE_MB3_BASE_URL + '/logos/logo.svg'}
+        alt="MassBank Europe"
+      />
     </li>
   );
 
