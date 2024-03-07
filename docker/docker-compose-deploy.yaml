@@ -29,6 +29,7 @@ services:
       dockerfile: Dockerfile-frontend
       args:
         MB3_API_URL: "http://${MB3_API_HOST}:${MB3_API_PORT}"
+        MB3_FRONTEND_BASE_URL: "${MB3_FRONTEND_BASE_URL}"
     ports:
       - "${MB3_FRONTEND_PORT}:3000"
 

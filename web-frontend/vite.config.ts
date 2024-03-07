@@ -1,8 +1,11 @@
 import react from '@vitejs/plugin-react';
-import { defineConfig, splitVendorChunkPlugin } from 'vite';
+import { defineConfig, splitVendorChunkPlugin, loadEnv } from 'vite';
 
-export default () => {
+export default ({ mode }) => {
+  process.env = { ...process.env, ...loadEnv(mode, process.cwd(), '') };
+
   return defineConfig({
+    base: process.env.VITE_MB3_BASE_URL,
     css: {
       modules: { localsConvention: 'camelCase' },
       postcss: {

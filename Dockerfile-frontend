@@ -13,8 +13,11 @@ RUN npm install
 RUN npm run build
 
 ARG MB3_API_URL
+ARG MB3_FRONTEND_BASE_URL
+
 RUN touch .env
 RUN echo "VITE_MB3_API_URL=${MB3_API_URL}" > .env
+RUN echo "VITE_MB3_BASE_URL=${MB3_FRONTEND_BASE_URL}" >> .env
 
 EXPOSE 3000
 CMD npm run start
