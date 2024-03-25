@@ -9,10 +9,17 @@ type InputProps = {
   pd: Peak;
   xScale: ScaleLinear<number, number, never>;
   yScale: ScaleLinear<number, number, never>;
-  showLabel: boolean;
+  showLabel?: boolean;
+  strokeColour?: string;
 };
 
-function ChartElement({ pd, xScale, yScale, showLabel }: InputProps) {
+function ChartElement({
+  pd,
+  xScale,
+  yScale,
+  showLabel = false,
+  strokeColour = 'red',
+}: InputProps) {
   const highlight = useHighlight([pd.id]);
   const highlightData = useHighlightData();
 
@@ -60,7 +67,7 @@ function ChartElement({ pd, xScale, yScale, showLabel }: InputProps) {
         style={
           highlight.isActive
             ? { opacity: 1, stroke: 'black', strokeWidth: 2 }
-            : {}
+            : { stroke: strokeColour }
         }
       >
         <line
@@ -76,7 +83,7 @@ function ChartElement({ pd, xScale, yScale, showLabel }: InputProps) {
           <text
             className="hover-label"
             transform={`translate(${xScale(pd.mz)} ${
-              yScale(pd.rel || 0) - 10
+              pd.rel < 0 ? yScale(pd.rel || 0) + 20 : yScale(pd.rel || 0) - 10
             }) rotate(-30)`}
           >
             {pd.mz.toFixed(4)}
@@ -93,6 +100,7 @@ function ChartElement({ pd, xScale, yScale, showLabel }: InputProps) {
       pd.mz,
       pd.rel,
       showLabel,
+      strokeColour,
       xScale,
       xScaled,
       yScale,

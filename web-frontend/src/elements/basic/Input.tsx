@@ -4,7 +4,6 @@ import {
   ChangeEvent,
   CSSProperties,
   KeyboardEvent,
-  RefObject,
   useCallback,
   useMemo,
 } from 'react';

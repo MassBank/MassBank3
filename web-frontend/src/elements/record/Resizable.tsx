@@ -105,6 +105,7 @@ function Resizable({ record, width, height, style }: InputProps) {
     () => (
       <Chart
         peakData={record.peak.peak.values}
+        // peakData2={record.peak.peak.values}
         onZoom={handleOnZoom}
         width={chartWidth}
         height={height}
