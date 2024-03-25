@@ -11,23 +11,6 @@ data:
   POSTGRES_PASSWORD: "massbank3password"
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: massbank3-postgres-volume
-  namespace: massbank3
-  labels:
-    type: local
-    app: massbank3-postgres
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteMany
-  hostPath:
-    path: /data/postgresql
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: massbank3-postgres-volume-claim
@@ -35,9 +18,9 @@ metadata:
   labels:
     app: massbank3-postgres
 spec:
-  storageClassName: manual
+  storageClassName: nfs-unity
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 10Gi

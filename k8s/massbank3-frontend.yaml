@@ -46,13 +46,15 @@ metadata:
   name: massbank3-frontend-ingress
   namespace: massbank3
 spec:
+  ingressClassName: nginx
   rules:
-    - http:
+    - host: msbi.ipb-halle.de
+      http:
         paths:
-          - path: /frontent
-            pathType: Prefix
-            backend:
+          - backend:
               service:
                 name: massbank3-frontend-service
                 port:
-                  number: 8080
+                  number: 3000
+            path: /massbank3
+            pathType: Prefix
