@@ -1,3 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: massbank3-server-secret
+  namespace: massbank3
+  labels:
+    app: massbank3-server
+data:
+  DB_TYPE: "postgres"
+  DB_PORT: "5432"
+  DB_PASSWORD: "massbank3password"
+  DB_HOST: "massbank3-postgres-service"
+  DB_NAME: "massbank3"
+  DB_CONN_STRING: ""
+  MB3_SERVER_PORT: "8080"
+  CDKDEPICT_URL: "http://massbank3-cdkdepict:8080"
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,24 +34,18 @@ spec:
     spec:
       containers:
         - name: massbank3-server
-          image: rmeier/massbank3-server:0.0.1  # Container Image
-          env:
-            - name: DB_TYPE
-              value: postgres
-            - name: DB_PORT
-              value: "5432"
-            - name: DB_PASSWORD
-              value: massbank3password
-            - name: DB_HOST
-              value: massbank3-postgres-service
-            - name: DB_NAME
-              value: massbank3
-            - name: DB_CONN_STRING
-              value: ""
-            - name: MB3_SERVER_PORT
-              value: "8080"
-            - name: CDKDEPICT_URL
-              value: "http://massbank3-cdkdepict:8080"
+          image: ipbhalle/massbank3-server:dev  # Container Image
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: massbank3-server-secret
+      initContainers:
+        - name: massbank3-dbtool
+          image: ipbhalle/massbank3-dbtool:dev
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: massbank3-server-secret
 ---
 apiVersion: v1
 kind: Service
@@ -57,14 +68,19 @@ metadata:
     app: massbank3-server
   name: massbank3-server-ingress
   namespace: massbank3
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
+  ingressClassName: nginx
   rules:
-    - http:
+    - host: msbi.ipb-halle.de
+      http:
         paths:
-          - path: /test
-            pathType: Prefix
-            backend:
+          - backend:
               service:
                 name: massbank3-server-service
                 port:
                   number: 8080
+            path: /massbank3-api(/|$)(.*)
+            pathType: ImplementationSpecific
