@@ -8,13 +8,20 @@ const MARGIN = { top: 55, right: 30, bottom: 50, left: 70, button: 35 };
 
 type InputProps = {
   peakData: Peak[];
+  peakData2?: Peak[];
   // eslint-disable-next-line no-unused-vars
   onZoom: (fpd: Peak[]) => void;
   width?: number;
   height?: number;
 };
 
-function Chart({ peakData, onZoom, width = 400, height = 300 }: InputProps) {
+function Chart({
+  peakData,
+  peakData2,
+  onZoom,
+  width = 400,
+  height = 300,
+}: InputProps) {
   const wrapperRef = useRef(null);
   const svgRef = useRef(null);
 
@@ -27,18 +34,40 @@ function Chart({ peakData, onZoom, width = 400, height = 300 }: InputProps) {
     { min: number; max: number }[] | undefined
   >();
 
-  const filteredPeakData = useMemo(() => {
-    let _peakData = peakData;
-    if (brushXDomains) {
-      _peakData = peakData.filter(
-        (pd) =>
-          pd.mz >= brushXDomains[brushXDomains.length - 1].min &&
-          pd.mz <= brushXDomains[brushXDomains.length - 1].max,
-      );
-    }
+  const getFilteredPeakData = useCallback(
+    (peakDataTemp: Peak[]) => {
+      let _peakData = peakDataTemp;
+      if (brushXDomains) {
+        _peakData = peakDataTemp.filter(
+          (pd) =>
+            pd.mz >= brushXDomains[brushXDomains.length - 1].min &&
+            pd.mz <= brushXDomains[brushXDomains.length - 1].max,
+        );
+      }
 
-    return _peakData;
-  }, [brushXDomains, peakData]);
+      return _peakData;
+    },
+    [brushXDomains],
+  );
+
+  const filteredPeakData = useMemo(
+    () => getFilteredPeakData(peakData),
+    [getFilteredPeakData, peakData],
+  );
+
+  const filteredPeakData2 = useMemo(
+    () =>
+      peakData2
+        ? getFilteredPeakData(peakData2).map((p) => {
+            const _p: Peak = { ...p };
+            _p.intensity = -1 * _p.intensity;
+            _p.rel = -1 * _p.rel;
+
+            return _p;
+          })
+        : undefined,
+    [getFilteredPeakData, peakData2],
+  );
 
   useEffect(() => {
     onZoom(filteredPeakData);
@@ -66,7 +95,17 @@ function Chart({ peakData, onZoom, width = 400, height = 300 }: InputProps) {
   const yScale = useMemo(() => {
     const maxY = 1000;
 
-    return scaleLinear().domain([0, maxY]).range([boundsHeight, 0]);
+    return scaleLinear()
+      .domain([0, maxY])
+      .range([filteredPeakData2 ? boundsHeight / 2 : boundsHeight, 0]);
+  }, [boundsHeight, filteredPeakData2]);
+
+  const yScale2 = useMemo(() => {
+    const maxY = -1000;
+
+    return scaleLinear()
+      .domain([0, maxY])
+      .range([boundsHeight / 2, boundsHeight]);
   }, [boundsHeight]);
 
   function buildLabelValues(minX: number, maxX: number, stepSize: number) {
@@ -92,7 +131,7 @@ function Chart({ peakData, onZoom, width = 400, height = 300 }: InputProps) {
 
     const range = Math.abs(minX - maxX);
     let labelValues: number[] = [];
-    let precision;
+    let precision: number | undefined;
 
     if (range > 200) {
       const stepSize = 50;
@@ -133,7 +172,9 @@ function Chart({ peakData, onZoom, width = 400, height = 300 }: InputProps) {
       <g key={'x_axis_label' + x}>
         <text
           x={xScale(x)}
-          y={yScale.range()[0] + 20}
+          y={
+            filteredPeakData2 ? yScale2.range()[1] + 25 : yScale.range()[0] + 25
+          }
           textAnchor="middle"
           alignmentBaseline="central"
           fontSize={15}
@@ -143,13 +184,15 @@ function Chart({ peakData, onZoom, width = 400, height = 300 }: InputProps) {
         <line
           x1={xScale(x)}
           x2={xScale(x)}
-          y1={yScale.range()[0]}
-          y2={yScale.range()[0] + 10}
+          y1={filteredPeakData2 ? yScale2.range()[1] + 5 : yScale.range()[0]}
+          y2={
+            filteredPeakData2 ? yScale2.range()[1] + 15 : yScale.range()[0] + 10
+          }
           stroke="black"
         />
       </g>
     ));
-  }, [xScale, yScale]);
+  }, [filteredPeakData2, xScale, yScale, yScale2]);
 
   const xAxis = useMemo(() => {
     return (
@@ -157,19 +200,31 @@ function Chart({ peakData, onZoom, width = 400, height = 300 }: InputProps) {
         <line
           x1={xScale.range()[0]}
           x2={xScale.range()[1]}
-          y1={yScale.range()[0]}
-          y2={yScale.range()[0]}
+          y1={filteredPeakData2 ? yScale2.range()[0] : yScale.range()[0]}
+          y2={filteredPeakData2 ? yScale2.range()[0] : yScale.range()[0]}
           stroke="black"
         />
+        {filteredPeakData2 && (
+          <line
+            x1={xScale.range()[0]}
+            x2={xScale.range()[1]}
+            y1={yScale2.range()[1] + 5}
+            y2={yScale2.range()[1] + 5}
+            stroke="black"
+          />
+        )}
+
         <text
-          x={(xScale.range()[1] - xScale.range()[0]) / 2 - 30}
-          y={yScale.range()[0] + 50}
+          x={(xScale.range()[1] - xScale.range()[0]) / 2}
+          y={
+            filteredPeakData2 ? yScale2.range()[1] + 45 : yScale.range()[0] + 45
+          }
         >
           m/z
         </text>
       </g>
     );
-  }, [xScale, yScale]);
+  }, [filteredPeakData2, xScale, yScale, yScale2]);
 
   const yAxis = useMemo(() => {
     return (
@@ -177,28 +232,44 @@ function Chart({ peakData, onZoom, width = 400, height = 300 }: InputProps) {
         <line
           x1={xScale.range()[0]}
           x2={xScale.range()[0]}
-          y1={yScale.range()[0]}
-          y2={yScale.range()[1]}
+          y1={filteredPeakData2 ? yScale.range()[1] : yScale.range()[0]}
+          y2={filteredPeakData2 ? yScale2.range()[1] : yScale.range()[1]}
           stroke="black"
         />
         <text
           x={xScale.range()[0] - 60}
-          y={(yScale.range()[0] - yScale.range()[1]) / 2}
+          y={
+            filteredPeakData2
+              ? (yScale.range()[0] + yScale2.range()[0]) / 2
+              : (yScale.range()[0] - yScale.range()[1]) / 2
+          }
           textAnchor="middle"
           dominantBaseline="central"
           transform={`rotate(270, ${xScale.range()[0] - 60}, ${
-            (yScale.range()[0] - yScale.range()[1]) / 2
+            filteredPeakData2
+              ? (yScale.range()[0] + yScale2.range()[0]) / 2
+              : (yScale.range()[0] - yScale.range()[1]) / 2
           })`}
         >
           Relative Abundance
         </text>
       </g>
     );
-  }, [xScale, yScale]);
+  }, [filteredPeakData2, xScale, yScale, yScale2]);
 
   const yLabels = useMemo(() => {
-    const minY = Math.floor(Math.min(...yScale.domain()));
-    const maxY = Math.ceil(Math.max(...yScale.domain()));
+    const minY = Math.floor(
+      Math.min(
+        ...yScale.domain(),
+        ...(filteredPeakData2 ? yScale2.domain() : []),
+      ),
+    );
+    const maxY = Math.ceil(
+      Math.max(
+        ...yScale.domain(),
+        ...(filteredPeakData2 ? yScale2.domain() : []),
+      ),
+    );
     const range: number[] = [];
     for (let i = minY; i <= maxY; i++) {
       range.push(i);
@@ -210,37 +281,53 @@ function Chart({ peakData, onZoom, width = 400, height = 300 }: InputProps) {
           <g key={'x_axis_label' + y}>
             <text
               x={xScale.range()[0] - 30}
-              y={yScale(y)}
+              y={y < 0 ? yScale2(y) : yScale(y)}
               textAnchor="middle"
               alignmentBaseline="central"
               fontSize={15}
             >
-              {y}
+              {y < 0 ? -1 * y : y}
             </text>
             <line
               x1={xScale.range()[0]}
               x2={xScale.range()[0] - 10}
-              y1={yScale(y)}
-              y2={yScale(y)}
+              y1={y < 0 ? yScale2(y) : yScale(y)}
+              y2={y < 0 ? yScale2(y) : yScale(y)}
               stroke="black"
             />
           </g>
         ),
     );
-  }, [xScale, yScale]);
+  }, [filteredPeakData2, xScale, yScale, yScale2]);
 
   const chartElements = useMemo(
     () =>
-      filteredPeakData.map((d) => (
-        <ChartElement
-          key={'chart_element' + d.mz}
-          pd={d}
-          xScale={xScale}
-          yScale={yScale}
-          showLabel={isShowLabel}
-        />
-      )),
-    [filteredPeakData, isShowLabel, xScale, yScale],
+      filteredPeakData
+        .map((d) => (
+          <ChartElement
+            key={'chart_element' + d.mz + '_1'}
+            pd={d}
+            xScale={xScale}
+            yScale={yScale}
+            showLabel={isShowLabel}
+            strokeColour="red"
+          />
+        ))
+        .concat(
+          filteredPeakData2
+            ? filteredPeakData2.map((d) => (
+                <ChartElement
+                  key={'chart_element' + d.mz + '_2'}
+                  pd={d}
+                  xScale={xScale}
+                  yScale={yScale2}
+                  showLabel={isShowLabel}
+                  strokeColour="blue"
+                />
+              ))
+            : [],
+        ),
+    [filteredPeakData, filteredPeakData2, isShowLabel, xScale, yScale, yScale2],
   );
 
   const handleDoubleClick = useCallback(() => {
@@ -321,9 +408,16 @@ function Chart({ peakData, onZoom, width = 400, height = 300 }: InputProps) {
             padding: '3px',
           }}
         />
-        <p>
-          {filteredPeakData.length}/{peakData.length}
-        </p>
+        <div>
+          <p style={{ marginBottom: filteredPeakData2 ? 0 : undefined }}>
+            {filteredPeakData.length}/{peakData.length}
+          </p>
+          {peakData2 && filteredPeakData2 && (
+            <p style={{ marginTop: 0 }}>
+              {filteredPeakData2.length}/{peakData2.length}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
