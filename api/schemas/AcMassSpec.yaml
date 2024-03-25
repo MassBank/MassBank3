@@ -1,0 +1,75 @@
+type: object
+properties:
+  ms_type:
+    type: string
+    enum:
+      - "MS"
+      - "MS2"
+      - "MS3"
+      - "MS4"
+  ion_mode:
+    type: string
+    enum:
+      - "POSITIVE"
+      - "NEGATIVE"
+  subtags:
+    type: array
+    items:
+      type: object
+      properties:
+        subtag:
+          type: string
+          enum:
+            - "MS_TYPE"
+            - "ION_MODE"
+            - "COLLISION_ENERGY"
+            - "COLLISION_GAS"
+            - "DATE"
+            - "DESOLVATION_GAS_FLOW"
+            - "DESOLVATION_TEMPERATURE"
+            - "FRAGMENTATION_MODE"
+            - "IONIZATION"
+            - "IONIZATION_ENERGY"
+            - "LASER"
+            - "MATRIX"
+            - "MASS_ACCURACY"
+            - "MASS_RANGE_M/Z"
+            - "REAGENT_GAS"
+            - "RESOLUTION"
+            - "SCANNING_SETTING"
+            - "SOURCE_TEMPERATURE"
+            - "ACTIVATION_PARAMETER"
+            - "ACTIVATION_TIME"
+            - "ATOM_GUN_CURRENT"
+            - "AUTOMATIC_GAIN_CONTROL"
+            - "BOMBARDMENT"
+            - "CAPILLARY_TEMPERATURE"
+            - "CAPILLARY_VOLTAGE"
+            - "CDL_SIDE_OCTOPOLES_BIAS_VOLTAGE"
+            - "CDL_TEMPERATURE"
+            - "DATAFORMAT"
+            - "DRY_GAS_FLOW"
+            - "DRY_GAS_TEMP"
+            - "GAS_PRESSURE"
+            - "HELIUM_FLOW"
+            - "INTERFACE_VOLTAGE"
+            - "ION_GUIDE_PEAK_VOLTAGE"
+            - "ION_GUIDE_VOLTAGE"
+            - "ION_SPRAY_VOLTAGE"
+            - "IT_SIDE_OCTOPOLES_BIAS_VOLTAGE"
+            - "LENS_VOLTAGE"
+            - "NEBULIZER"
+            - "NEBULIZING_GAS"
+            - "NEEDLE_VOLTAGE"
+            - "OCTPOLE_VOLTAGE"
+            - "ORIFICE_TEMP"
+            - "ORIFICE_TEMPERATURE"
+            - "ORIFICE_VOLTAGE"
+            - "PROBE_TIP"
+            - "RING_VOLTAGE"
+            - "SAMPLE_DRIPPING"
+            - "SKIMMER_VOLTAGE"
+            - "SPRAY_VOLTAGE"
+            - "TUBE_LENS_VOLTAGE"
+        value:
+          type: string

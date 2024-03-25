@@ -1,0 +1,27 @@
+type: array
+items:
+  type: object
+  properties:
+    subtag:
+      type: string
+      enum:
+        - "CARRIER_GAS"
+        - "COLUMN_NAME"
+        - "COLUMN_TEMPERATURE"
+        - "COLUMN_TEMPERATURE_GRADIENT"
+        - "FLOW_GRADIENT"
+        - "FLOW_RATE"
+        - "INJECTION_TEMPERATURE"
+        - "INJECTION_TEMPERATURE_GRADIENT"
+        - "INLET_TYPE"
+        - "KOVATS_RTI"
+        - "LEE_RTI"
+        - "NAPS_RTI"
+        - "UOA_RTI"
+        - "UOA_PREDICTED_RTI"
+        - "RETENTION_TIME"
+        - "UOA_PREDICTED_RETENTION_TIME"
+        - "SOLVENT"
+        - "TRANSFERLINE_TEMPERATURE"
+    value:
+      type: string

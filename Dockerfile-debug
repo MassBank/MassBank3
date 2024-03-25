@@ -1,0 +1,21 @@
+FROM docker.io/golang:1.20 AS build
+WORKDIR /go/src
+COPY cmd/mb3server/src ./cmd/mb3server/src
+COPY cmd/mb3server/main.go ./cmd/mb3server
+COPY pkg ./pkg
+COPY go.mod .
+
+ENV CGO_ENABLED=0
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
+
+RUN go get -d -v ./...
+
+RUN go build -a -gcflags="all=-N -l"  -installsuffix cgo -o mb3server ./cmd/mb3server
+
+FROM docker.io/alpine AS runtime
+VOLUME /var/log
+COPY --from=build /go/src/mb3server ./
+COPY --from=build /go/bin/dlv /
+EXPOSE 8080/tcp 40000
+CMD ["/dlv", "--log", "--log-dest", "/var/log/delve.log", "--log-output", "debugger","--listen=:40000", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "./mb3server"]
+

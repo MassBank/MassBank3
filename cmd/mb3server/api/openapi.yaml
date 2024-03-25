@@ -1,0 +1,1720 @@
+openapi: 3.0.3
+info:
+  title: MassBank3 API
+  version: "3.0"
+servers:
+- url: https://api.server.test/v1
+paths:
+  /records:
+    get:
+      operationId: getRecords
+      parameters:
+      - description: "Filter by a list of instrument type, which will be associated\
+          \ by OR."
+        explode: true
+        in: query
+        name: instrument_type
+        required: false
+        schema:
+          $ref: '#/components/schemas/InstrumentType'
+        style: form
+      - description: Filter by SPLASH.
+        explode: true
+        in: query
+        name: splash
+        required: false
+        schema:
+          $ref: '#/components/schemas/Splash'
+        style: form
+      - description: "Filter by a List of MS types, which are associated by OR. If\
+          \ none is given, all is assumed."
+        explode: true
+        in: query
+        name: ms_type
+        required: false
+        schema:
+          $ref: '#/components/schemas/MSType'
+        style: form
+      - description: "Filter by ion mode. If none is given, both is assumed."
+        explode: true
+        in: query
+        name: ion-mode
+        required: false
+        schema:
+          $ref: '#/components/schemas/IonMode'
+        style: form
+      - description: Filter by compound name
+        explode: true
+        in: query
+        name: compound_name
+        required: false
+        schema:
+          $ref: '#/components/schemas/CompoundName'
+        style: form
+      - description: Filter by exact mass.
+        explode: true
+        in: query
+        name: exact_mass
+        required: false
+        schema:
+          $ref: '#/components/schemas/ExactMass'
+        style: form
+      - description: "Tolerance for mass filters. Default: 0.3"
+        explode: true
+        in: query
+        name: mass_tolerance
+        required: false
+        schema:
+          $ref: '#/components/schemas/MassTolerance'
+        style: form
+      - description: Filter by formula.
+        explode: true
+        in: query
+        name: formula
+        required: false
+        schema:
+          $ref: '#/components/schemas/Formula'
+        style: form
+      - description: Filter by peaks.
+        explode: true
+        in: query
+        name: peaks
+        required: false
+        schema:
+          $ref: '#/components/schemas/Peaks'
+        style: form
+      - description: "Intensity for peak search, defaults to 100."
+        explode: true
+        in: query
+        name: intensity
+        required: false
+        schema:
+          $ref: '#/components/schemas/Intensity'
+        style: form
+      - description: Filter by peak difference
+        explode: true
+        in: query
+        name: peak_differences
+        required: false
+        schema:
+          $ref: '#/components/schemas/Peaks'
+        style: form
+      - description: Filter by peak list.
+        explode: true
+        in: query
+        name: peak_list
+        required: false
+        schema:
+          $ref: '#/components/schemas/PeakList'
+        style: form
+      - description: "Maximum number of results. Default: 20"
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          $ref: '#/components/schemas/Limit'
+        style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          $ref: '#/components/schemas/Page'
+        style: form
+      - description: "The Instensity cutoff for Peaklist search. Default: 5"
+        explode: true
+        in: query
+        name: intensity_cutoff
+        required: false
+        schema:
+          $ref: '#/components/schemas/IntensityCutoff'
+        style: form
+      - description: Filter by InChIKey. Complete or Partial
+        explode: true
+        in: query
+        name: inchi_key
+        required: false
+        schema:
+          $ref: '#/components/schemas/InChIKey'
+        style: form
+      - description: a contributor (institution)
+        explode: true
+        in: query
+        name: contributor
+        required: false
+        schema:
+          $ref: '#/components/schemas/Contributor'
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResult'
+          description: A list of records
+      summary: Get a list of records
+  /records/{accession}:
+    get:
+      operationId: getRecord
+      parameters:
+      - description: The accession id of the record
+        explode: false
+        in: path
+        name: accession
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MBRecord'
+          description: A MassBank record
+      summary: Get a MassBank record
+  /records/{accession}/svg:
+    get:
+      operationId: getSVG
+      parameters:
+      - description: The accession id of the record
+        explode: false
+        in: path
+        name: accession
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+          description: A compound SVG
+      summary: The SVG image for an accession
+  /records/count:    
+    get:
+      summary: The number of all records
+      operationId: getCount
+      responses:
+        '200':
+          description: "The record count"
+          content:
+            application/json:
+              schema:
+                type: string
+  /filter/options:
+    get:
+      operationId: getFilterOptions
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilterOptions'
+          description: All Filter options
+      summary: get filter options
+  /filter/browse:
+    get:
+      operationId: getBrowseOptions
+      parameters:
+      - description: "Filter by a list of instrument type, which will be associated\
+          \ by OR."
+        explode: true
+        in: query
+        name: instrument_type
+        required: false
+        schema:
+          $ref: '#/components/schemas/InstrumentType'
+        style: form
+      - description: "Filter by a List of MS types, which are associated by OR. If\
+          \ none is given, all is assumed."
+        explode: true
+        in: query
+        name: ms_type
+        required: false
+        schema:
+          $ref: '#/components/schemas/MSType'
+        style: form
+      - description: "Filter by ion mode. If none is given, both is assumed."
+        explode: true
+        in: query
+        name: ion-mode
+        required: false
+        schema:
+          $ref: '#/components/schemas/IonMode'
+        style: form
+      - description: a contributor (institution)
+        explode: true
+        in: query
+        name: contributor
+        required: false
+        schema:
+          $ref: '#/components/schemas/Contributor'
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrowseOptions'
+          description: All browse options
+      summary: get browse options
+  /metadata:
+    get:
+      operationId: getMetadata
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+          description: Metadata for database and datasets
+      summary: get massbank metadata
+components:
+  schemas:
+    InstrumentType:
+      items:
+        type: string
+      type: array
+    Splash:
+      type: string
+    MSType:
+      items:
+        enum:
+        - MS
+        - MS2
+        - MS3
+        - MS4
+        type: string
+      type: array
+    IonMode:
+      type: string
+    CompoundName:
+      type: string
+    ExactMass:
+      description: "A mass prefixed with \"and\" or \"or\" before a colon, e.g. \"\
+        or:122.0\"."
+      pattern: "(and|or):[0-9]+(\\.[0-9]*)?"
+      type: string
+    MassTolerance:
+      default: 0.3
+      format: double
+      type: number
+    Formula:
+      description: "A chemical formula prefixed with \"and\" or \"or\" before a colon,\
+        \ e.g. \"or:C6H7N5\"."
+      pattern: "(and|or):(([A-Z][a-z]*[0-9]*)|\\*)*"
+      type: string
+    Peaks:
+      items:
+        description: "A m/z prefixed with \"and\" or \"or\" before a colon, e.g. \"\
+          or:143.0\"."
+        pattern: "(and|or):[0-9]+(\\.[0-9]*)?"
+        type: string
+      type: array
+    Intensity:
+      default: 100
+      description: Releative intensity for peak search
+      maximum: 100
+      minimum: 1
+      type: integer
+    PeakList:
+      items:
+        description: "A tuple of m/z and intensity, e.g. (193.4,57)"
+        pattern: "\\([0-9]+(\\.[0-9]*)?,[0-9]+\\)"
+        type: string
+      type: array
+    Limit:
+      default: 20
+      maximum: 500
+      minimum: 1
+      type: integer
+    Page:
+      default: 1
+      minimum: 1
+      type: integer
+    IntensityCutoff:
+      default: 5
+      maximum: 100
+      minimum: 1
+      type: integer
+    InChIKey:
+      type: string
+    Contributor:
+      items:
+        description: The short version of the contributor name
+        type: string
+      type: array
+    SearchResult:
+      example:
+        metadata:
+          isomer_count: 0
+          git_commit: git_commit
+          compound_count: 0
+          spectra_count: 0
+          limit: 1
+          page: 1
+          version: version
+          result_count: 0
+          timestamp: timestamp
+        data:
+        - spectra:
+          - id: id
+            title: title
+          - id: id
+            title: title
+          data: "{}"
+          svg: svg
+          synonyms:
+          - synonyms
+          - synonyms
+          mass: 7.061401241503109
+          name:
+          - name
+          - name
+          formula: formula
+        - spectra:
+          - id: id
+            title: title
+          - id: id
+            title: title
+          data: "{}"
+          svg: svg
+          synonyms:
+          - synonyms
+          - synonyms
+          mass: 7.061401241503109
+          name:
+          - name
+          - name
+          formula: formula
+      properties:
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        data:
+          description: A list of compounds with associated spectra.
+          items:
+            $ref: '#/components/schemas/SearchResult_data_inner'
+          type: array
+      type: object
+    MBRecord:
+      example:
+        date:
+          created: 2000-01-23
+          modified: 2000-01-23
+          updated: 2000-01-23
+        copyright: copyright
+        comments:
+        - null
+        - null
+        mass_spectrometry:
+          focused_ion:
+          - subtag: BASE_PEAK
+            value: value
+          - subtag: BASE_PEAK
+            value: value
+          data_processing:
+          - subtag: COMMENT
+            value: value
+          - subtag: COMMENT
+            value: value
+        deprecated:
+          date: 2000-01-23
+          reason: reason
+        project: project
+        accession: accession
+        peak:
+          annotation:
+            values:
+            - - values
+              - values
+            - - values
+              - values
+            header:
+            - header
+            - header
+          peak:
+            values:
+            - intensity: 5.962133916683182
+              rel: 563
+              mz: 1.4658129805029452
+            - intensity: 5.962133916683182
+              rel: 563
+              mz: 1.4658129805029452
+            header:
+            - header
+            - header
+          splash: splash
+          numPeak: 1
+        title: title
+        compound:
+          names:
+          - names
+          - names
+          inchi: inchi
+          smiles: smiles
+          classes:
+          - classes
+          - classes
+          mass: 0.8008281904610115
+          cdk_depict:
+          - cdk_depict
+          - cdk_depict
+          link:
+          - identifier: identifier
+            database: CAS
+          - identifier: identifier
+            database: CAS
+          formula: formula
+        license: CC0
+        species:
+          lineage:
+          - lineage
+          - lineage
+          name: name
+          link:
+          - identifier: identifier
+            database: CAS
+          - identifier: identifier
+            database: CAS
+          sample:
+          - sample
+          - sample
+        publication: publication
+        acquisition:
+          general:
+          - subtag: CONCENTRATION
+            value: value
+          - subtag: CONCENTRATION
+            value: value
+          ion_mobility:
+          - subtag: CCS
+            value: value
+          - subtag: CCS
+            value: value
+          mass_spectrometry:
+            ms_type: MS
+            subtags:
+            - subtag: MS_TYPE
+              value: value
+            - subtag: MS_TYPE
+              value: value
+            ion_mode: POSITIVE
+          chromatography:
+          - subtag: CARRIER_GAS
+            value: value
+          - subtag: CARRIER_GAS
+            value: value
+          instrument: instrument
+          instrument_type: instrument_type
+        authors:
+        - name: name
+          marc-relator: abr
+        - name: name
+          marc-relator: abr
+      properties:
+        accession:
+          description: Record identifier
+          pattern: "MSBNK-[A-Z0–9_]{1,32}-[A-Z0–9_]{1,64}"
+          type: string
+        deprecated:
+          $ref: '#/components/schemas/MBRecord_deprecated'
+        title:
+          description: "Short title of the record. It is composed as 'compound.names[0];\
+            \ acquisition.instrument_type; acquisition.mass_spectrometry.ms_type'"
+          type: string
+        date:
+          $ref: '#/components/schemas/MBRecord_date'
+        authors:
+          items:
+            $ref: '#/components/schemas/Authors_inner'
+          type: array
+        license:
+          description: Creative Commons License or its compatible terms
+          enum:
+          - CC0
+          - CC BY
+          - CC BY-NC
+          - CC BY-NC-SA
+          - CC BY-SA
+          type: string
+        copyright:
+          description: Copyright
+          type: string
+        publication:
+          description: Bibliographic information of reference
+          type: string
+        project:
+          description: Information on a related project
+          type: string
+        comments:
+          description: Comments
+          items:
+            $ref: '#/components/schemas/MBRecord_comments_inner'
+          type: array
+        compound:
+          $ref: '#/components/schemas/MBRecord_compound'
+        species:
+          $ref: '#/components/schemas/MBRecord_species'
+        acquisition:
+          $ref: '#/components/schemas/MBRecord_acquisition'
+        mass_spectrometry:
+          $ref: '#/components/schemas/MBRecord_mass_spectrometry'
+        peak:
+          $ref: '#/components/schemas/MBRecord_peak'
+      required:
+      - accession
+      - authors
+      - date
+      - license
+      - title
+      type: object
+    FilterOptions:
+      example:
+        intensity:
+          maximum: 5
+          minimum: 1
+        max_limit: 1
+        metadata:
+          isomer_count: 0
+          git_commit: git_commit
+          compound_count: 0
+          spectra_count: 0
+          limit: 1
+          page: 1
+          version: version
+          result_count: 0
+          timestamp: timestamp
+        ms_type:
+        - ms_type
+        - ms_type
+        mass:
+          maximum: 6.027456183070403
+          minimum: 0.8008281904610115
+        ion_mode:
+        - ion_mode
+        - ion_mode
+        instrument_type:
+        - instrument_type
+        - instrument_type
+      properties:
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        instrument_type:
+          items:
+            type: string
+          type: array
+        ms_type:
+          items:
+            type: string
+          type: array
+        ion_mode:
+          items:
+            type: string
+          type: array
+        mass:
+          $ref: '#/components/schemas/FilterOptions_mass'
+        intensity:
+          $ref: '#/components/schemas/FilterOptions_intensity'
+        max_limit:
+          minimum: 1
+          type: integer
+      type: object
+    Metadata:
+      example:
+        isomer_count: 0
+        git_commit: git_commit
+        compound_count: 0
+        spectra_count: 0
+        limit: 1
+        page: 1
+        version: version
+        result_count: 0
+        timestamp: timestamp
+      properties:
+        version:
+          type: string
+        timestamp:
+          type: string
+        git_commit:
+          type: string
+        spectra_count:
+          minimum: 0
+          type: integer
+        compound_count:
+          minimum: 0
+          type: integer
+        isomer_count:
+          minimum: 0
+          type: integer
+        result_count:
+          minimum: 0
+          type: integer
+        page:
+          minimum: 1
+          type: integer
+        limit:
+          minimum: 1
+          type: integer
+      type: object
+    BrowseOptions:
+      example:
+        metadata:
+          isomer_count: 0
+          git_commit: git_commit
+          compound_count: 0
+          spectra_count: 0
+          limit: 1
+          page: 1
+          version: version
+          result_count: 0
+          timestamp: timestamp
+        compound_start:
+        - count: 0
+          value: value
+        - count: 0
+          value: value
+        contributor:
+        - count: 0
+          value: value
+        - count: 0
+          value: value
+        ms_type:
+        - count: 0
+          value: value
+        - count: 0
+          value: value
+        ion_mode:
+        - count: 0
+          value: value
+        - count: 0
+          value: value
+        instrument_type:
+        - count: 0
+          value: value
+        - count: 0
+          value: value
+      properties:
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        contributor:
+          items:
+            $ref: '#/components/schemas/StringCount_inner'
+          type: array
+        instrument_type:
+          items:
+            $ref: '#/components/schemas/StringCount_inner'
+          type: array
+        ms_type:
+          items:
+            $ref: '#/components/schemas/StringCount_inner'
+          type: array
+        ion_mode:
+          items:
+            $ref: '#/components/schemas/StringCount_inner'
+          type: array
+        compound_start:
+          items:
+            $ref: '#/components/schemas/StringCount_inner'
+          type: array
+      type: object
+    StringCount:
+      items:
+        $ref: '#/components/schemas/StringCount_inner'
+      type: array
+    Authors:
+      items:
+        $ref: '#/components/schemas/Authors_inner'
+      type: array
+    DatabaseObject:
+      description: A database entry
+      example:
+        identifier: identifier
+        database: CAS
+      properties:
+        database:
+          description: Abbreviation for Database
+          enum:
+          - CAS
+          - CAYMAN
+          - CHEBI
+          - CHEMBL
+          - CHEMPDB
+          - CHEMSPIDER
+          - COMPTOX
+          - HMDB
+          - INCHIKEY
+          - KAPPAVIEW
+          - KEGG
+          - KNAPSACK
+          - LIPIDBANK
+          - LIPIDMAPS
+          - NIKKAJI
+          - PUBCHEM
+          - ZINC
+          type: string
+        identifier:
+          description: Identifier of the database record
+          type: string
+      type: object
+    AcMassSpec:
+      example:
+        ms_type: MS
+        subtags:
+        - subtag: MS_TYPE
+          value: value
+        - subtag: MS_TYPE
+          value: value
+        ion_mode: POSITIVE
+      properties:
+        ms_type:
+          enum:
+          - MS
+          - MS2
+          - MS3
+          - MS4
+          type: string
+        ion_mode:
+          enum:
+          - POSITIVE
+          - NEGATIVE
+          type: string
+        subtags:
+          items:
+            $ref: '#/components/schemas/AcMassSpec_subtags_inner'
+          type: array
+      type: object
+    AcChromatography:
+      items:
+        $ref: '#/components/schemas/AcChromatography_inner'
+      type: array
+    AcGeneral:
+      items:
+        $ref: '#/components/schemas/AcGeneral_inner'
+      type: array
+    AcIonMobility:
+      items:
+        $ref: '#/components/schemas/AcIonMobility_inner'
+      type: array
+    MsFocusedIon:
+      items:
+        $ref: '#/components/schemas/MsFocusedIon_inner'
+      type: array
+    MsDataProcessing:
+      items:
+        $ref: '#/components/schemas/MsDataProcessing_inner'
+      type: array
+    SearchResult_data_inner_spectra_inner:
+      description: Spectra for the given compound
+      example:
+        id: id
+        title: title
+      properties:
+        title:
+          description: Record title
+          type: string
+        id:
+          description: MassBank ID.
+          type: string
+      type: object
+    SearchResult_data_inner:
+      description: Data for a single compound.
+      example:
+        spectra:
+        - id: id
+          title: title
+        - id: id
+          title: title
+        data: "{}"
+        svg: svg
+        synonyms:
+        - synonyms
+        - synonyms
+        mass: 7.061401241503109
+        name:
+        - name
+        - name
+        formula: formula
+      properties:
+        data:
+          type: object
+        name:
+          description: Compound names.
+          items:
+            type: string
+          type: array
+        synonyms:
+          description: More compound names.
+          items:
+            type: string
+          type: array
+        formula:
+          description: Formula of the compound.
+          type: string
+        mass:
+          description: Exact Mass of the compound.
+          format: double
+          type: number
+        svg:
+          description: Smiles to generate structure.
+          type: string
+        spectra:
+          description: A list of spectra for the compound
+          items:
+            $ref: '#/components/schemas/SearchResult_data_inner_spectra_inner'
+          type: array
+      type: object
+    MBRecord_deprecated:
+      description: Mark the record as deprecated
+      example:
+        date: 2000-01-23
+        reason: reason
+      properties:
+        date:
+          description: Date of deprecation
+          format: date
+          type: string
+        reason:
+          description: reason for deprecation
+          type: string
+      type: object
+    MBRecord_date:
+      description: Date of creation or last modification of record
+      example:
+        created: 2000-01-23
+        modified: 2000-01-23
+        updated: 2000-01-23
+      properties:
+        updated:
+          description: Date of last update to record
+          format: date
+          type: string
+        created:
+          description: Date of record creation
+          format: date
+          type: string
+        modified:
+          description: Date of last (automatic) modification to record
+          format: date
+          type: string
+      type: object
+    MBRecord_comments_inner_oneOf:
+      description: A annotated comment
+      properties:
+        subtag:
+          description: The subtag to describe the comment
+          enum:
+          - "[MS2]"
+          - "[Merging]"
+          - "[Merged]"
+          - "[Mass spectrometry]"
+          - "[Chromatography]"
+          - "[Profile]"
+          - CONFIDENCE
+          - INTERNAL_ID
+          type: string
+        value:
+          description: The comment
+          type: string
+      type: object
+    MBRecord_comments_inner:
+      oneOf:
+      - description: A pure comment string
+        type: string
+      - $ref: '#/components/schemas/MBRecord_comments_inner_oneOf'
+    MBRecord_compound:
+      description: Information of Chemical Compound Analyzed
+      example:
+        names:
+        - names
+        - names
+        inchi: inchi
+        smiles: smiles
+        classes:
+        - classes
+        - classes
+        mass: 0.8008281904610115
+        cdk_depict:
+        - cdk_depict
+        - cdk_depict
+        link:
+        - identifier: identifier
+          database: CAS
+        - identifier: identifier
+          database: CAS
+        formula: formula
+      properties:
+        names:
+          description: Chemical names
+          items:
+            description: Chemical name
+            type: string
+          type: array
+        classes:
+          description: Chemical category
+          items:
+            description: Compound class
+            type: string
+          type: array
+        formula:
+          description: Chemical formula
+          type: string
+        cdk_depict:
+          description: Partially defined structures with CDK depict
+          items:
+            description: CDK depict structure
+            type: string
+          type: array
+        mass:
+          description: Exact mass
+          format: double
+          type: number
+        smiles:
+          description: SMILES code
+          type: string
+        inchi:
+          description: InChI code
+          type: string
+        link:
+          description: External database name with identifier
+          items:
+            $ref: '#/components/schemas/DatabaseObject'
+          type: array
+      required:
+      - classes
+      - formula
+      - inchi
+      - mass
+      - names
+      - smiles
+      type: object
+    MBRecord_species:
+      description: Information of Biological Sample
+      example:
+        lineage:
+        - lineage
+        - lineage
+        name: name
+        link:
+        - identifier: identifier
+          database: CAS
+        - identifier: identifier
+          database: CAS
+        sample:
+        - sample
+        - sample
+      properties:
+        name:
+          description: Scientific name of biological species
+          type: string
+        lineage:
+          description: Lineage of species
+          items:
+            description: A lineage class item
+            type: string
+          type: array
+        link:
+          description: External database name with identifier
+          items:
+            $ref: '#/components/schemas/DatabaseObject'
+          type: array
+        sample:
+          description: Information of sample preparation
+          items:
+            description: "Tissue or Cell, from which Sample was Prepared"
+            type: string
+          type: array
+      type: object
+    MBRecord_acquisition:
+      description: ""
+      example:
+        general:
+        - subtag: CONCENTRATION
+          value: value
+        - subtag: CONCENTRATION
+          value: value
+        ion_mobility:
+        - subtag: CCS
+          value: value
+        - subtag: CCS
+          value: value
+        mass_spectrometry:
+          ms_type: MS
+          subtags:
+          - subtag: MS_TYPE
+            value: value
+          - subtag: MS_TYPE
+            value: value
+          ion_mode: POSITIVE
+        chromatography:
+        - subtag: CARRIER_GAS
+          value: value
+        - subtag: CARRIER_GAS
+          value: value
+        instrument: instrument
+        instrument_type: instrument_type
+      properties:
+        instrument:
+          description: Commercial name and manufacturer of instrument
+          type: string
+        instrument_type:
+          description: Type of instrument
+          pattern: "((CE|GC|LC)-)?(APCI|APPI|EI|ESI|FAB|MALDI,FD|CI|FISIMS)-(B|E|FT|IT|Q|TOF)(B|E|FT|IT|Q|TOF)?"
+          type: string
+        mass_spectrometry:
+          $ref: '#/components/schemas/AcMassSpec'
+        chromatography:
+          items:
+            $ref: '#/components/schemas/AcChromatography_inner'
+          type: array
+        general:
+          items:
+            $ref: '#/components/schemas/AcGeneral_inner'
+          type: array
+        ion_mobility:
+          items:
+            $ref: '#/components/schemas/AcIonMobility_inner'
+          type: array
+      required:
+      - instrument
+      - instrument_type
+      - mass_spectrometry
+      type: object
+    MBRecord_mass_spectrometry:
+      example:
+        focused_ion:
+        - subtag: BASE_PEAK
+          value: value
+        - subtag: BASE_PEAK
+          value: value
+        data_processing:
+        - subtag: COMMENT
+          value: value
+        - subtag: COMMENT
+          value: value
+      properties:
+        focused_ion:
+          items:
+            $ref: '#/components/schemas/MsFocusedIon_inner'
+          type: array
+        data_processing:
+          items:
+            $ref: '#/components/schemas/MsDataProcessing_inner'
+          type: array
+      type: object
+    MBRecord_peak_annotation:
+      description: Chemical Annotation of Peaks with Molecular Formula
+      example:
+        values:
+        - - values
+          - values
+        - - values
+          - values
+        header:
+        - header
+        - header
+      properties:
+        header:
+          description: Record format of the annotation blocks
+          items:
+            type: string
+          type: array
+        values:
+          description: Annotation blocks
+          items:
+            description: Values corresponding to header
+            items:
+              type: string
+            type: array
+          type: array
+      type: object
+    MBRecord_peak_peak_values_inner:
+      description: Values for a single peak
+      example:
+        intensity: 5.962133916683182
+        rel: 563
+        mz: 1.4658129805029452
+      properties:
+        mz:
+          description: m/z of the peak
+          format: double
+          type: number
+        intensity:
+          description: intensity of the peak
+          format: double
+          type: number
+        rel:
+          description: Relative intensity of the peak
+          maximum: 999
+          minimum: 1
+          type: integer
+      type: object
+    MBRecord_peak_peak:
+      description: Peak Data
+      example:
+        values:
+        - intensity: 5.962133916683182
+          rel: 563
+          mz: 1.4658129805029452
+        - intensity: 5.962133916683182
+          rel: 563
+          mz: 1.4658129805029452
+        header:
+        - header
+        - header
+      properties:
+        header:
+          description: Fixed header
+          items:
+            type: string
+          type: array
+        values:
+          description: Peak values
+          items:
+            $ref: '#/components/schemas/MBRecord_peak_peak_values_inner'
+          type: array
+      type: object
+    MBRecord_peak:
+      example:
+        annotation:
+          values:
+          - - values
+            - values
+          - - values
+            - values
+          header:
+          - header
+          - header
+        peak:
+          values:
+          - intensity: 5.962133916683182
+            rel: 563
+            mz: 1.4658129805029452
+          - intensity: 5.962133916683182
+            rel: 563
+            mz: 1.4658129805029452
+          header:
+          - header
+          - header
+        splash: splash
+        numPeak: 1
+      properties:
+        splash:
+          description: Hashed Identifier of Mass Spectra
+          type: string
+        annotation:
+          $ref: '#/components/schemas/MBRecord_peak_annotation'
+        numPeak:
+          description: Total Number of Peaks
+          minimum: 1
+          type: integer
+        peak:
+          $ref: '#/components/schemas/MBRecord_peak_peak'
+      required:
+      - numPeak
+      - peak
+      - splash
+      type: object
+    FilterOptions_mass:
+      example:
+        maximum: 6.027456183070403
+        minimum: 0.8008281904610115
+      properties:
+        minimum:
+          default: 0
+          format: double
+          type: number
+        maximum:
+          default: 10000
+          format: double
+          type: number
+      type: object
+    FilterOptions_intensity:
+      example:
+        maximum: 5
+        minimum: 1
+      properties:
+        minimum:
+          default: 0
+          type: integer
+        maximum:
+          default: 100
+          type: integer
+      type: object
+    StringCount_inner:
+      example:
+        count: 0
+        value: value
+      properties:
+        value:
+          type: string
+        count:
+          minimum: 0
+          type: integer
+      type: object
+    Authors_inner:
+      description: Name of the author or affiliation
+      example:
+        name: name
+        marc-relator: abr
+      properties:
+        name:
+          type: string
+        marc-relator:
+          description: Marc relator to describe contribution of author or affiliation
+          enum:
+          - abr
+          - acp
+          - act
+          - adi
+          - adp
+          - aft
+          - anl
+          - anm
+          - ann
+          - ant
+          - ape
+          - apl
+          - app
+          - aqt
+          - arc
+          - ard
+          - arr
+          - art
+          - asg
+          - asn
+          - ato
+          - att
+          - auc
+          - aud
+          - aui
+          - aus
+          - aut
+          - bdd
+          - bjd
+          - bkd
+          - bkp
+          - blw
+          - bnd
+          - bpd
+          - brd
+          - brl
+          - bsl
+          - cas
+          - ccp
+          - chr
+          - clb
+          - cli
+          - cll
+          - clr
+          - clt
+          - cmm
+          - cmp
+          - cmt
+          - cnd
+          - cng
+          - cns
+          - coe
+          - col
+          - com
+          - con
+          - cor
+          - cos
+          - cot
+          - cou
+          - cov
+          - cpc
+          - cpe
+          - cph
+          - cpl
+          - cpt
+          - cre
+          - crp
+          - crr
+          - crt
+          - csl
+          - csp
+          - cst
+          - ctb
+          - cte
+          - ctg
+          - ctr
+          - cts
+          - ctt
+          - cur
+          - cwt
+          - dbp
+          - dfd
+          - dfe
+          - dft
+          - dgc
+          - dgg
+          - dgs
+          - dis
+          - dln
+          - dnc
+          - dnr
+          - dpc
+          - dpt
+          - drm
+          - drt
+          - dsr
+          - dst
+          - dtc
+          - dte
+          - dtm
+          - dto
+          - dub
+          - edc
+          - edm
+          - edt
+          - egr
+          - elg
+          - elt
+          - eng
+          - enj
+          - etr
+          - evp
+          - exp
+          - fac
+          - fds
+          - fld
+          - flm
+          - fmd
+          - fmk
+          - fmo
+          - fmp
+          - fnd
+          - fpy
+          - frg
+          - gis
+          - grt
+          - his
+          - hnr
+          - hst
+          - ill
+          - ilu
+          - ins
+          - inv
+          - isb
+          - itr
+          - ive
+          - ivr
+          - jud
+          - jug
+          - lbr
+          - lbt
+          - ldr
+          - led
+          - lee
+          - lel
+          - len
+          - let
+          - lgd
+          - lie
+          - lil
+          - lit
+          - lsa
+          - lse
+          - lso
+          - ltg
+          - lyr
+          - mcp
+          - mdc
+          - med
+          - mfp
+          - mfr
+          - mod
+          - mon
+          - mrb
+          - mrk
+          - msd
+          - mte
+          - mtk
+          - mus
+          - nrt
+          - opn
+          - org
+          - orm
+          - osp
+          - oth
+          - own
+          - pad
+          - pan
+          - pat
+          - pbd
+          - pbl
+          - pdr
+          - pfr
+          - pht
+          - plt
+          - pma
+          - pmn
+          - pop
+          - ppm
+          - ppt
+          - pra
+          - prc
+          - prd
+          - pre
+          - prf
+          - prg
+          - prm
+          - prn
+          - pro
+          - prp
+          - prs
+          - prt
+          - prv
+          - pta
+          - pte
+          - ptf
+          - pth
+          - ptt
+          - pup
+          - rbr
+          - rcd
+          - rce
+          - rcp
+          - rdd
+          - red
+          - ren
+          - res
+          - rev
+          - rpc
+          - rps
+          - rpt
+          - rpy
+          - rse
+          - rsg
+          - rsp
+          - rsr
+          - rst
+          - rth
+          - rtm
+          - sad
+          - sce
+          - scl
+          - scr
+          - sds
+          - sec
+          - sgd
+          - sgn
+          - sht
+          - sll
+          - sng
+          - spk
+          - spn
+          - spy
+          - srv
+          - std
+          - stg
+          - stl
+          - stm
+          - stn
+          - str
+          - tcd
+          - tch
+          - ths
+          - tld
+          - tlp
+          - trc
+          - trl
+          - tyd
+          - tyg
+          - uvp
+          - vac
+          - vdg
+          - voc
+          - wac
+          - wal
+          - wam
+          - wat
+          - wdc
+          - wde
+          - win
+          - wit
+          - wpr
+          - wst
+          type: string
+      required:
+      - name
+      type: object
+    AcMassSpec_subtags_inner:
+      example:
+        subtag: MS_TYPE
+        value: value
+      properties:
+        subtag:
+          enum:
+          - MS_TYPE
+          - ION_MODE
+          - COLLISION_ENERGY
+          - COLLISION_GAS
+          - DATE
+          - DESOLVATION_GAS_FLOW
+          - DESOLVATION_TEMPERATURE
+          - FRAGMENTATION_MODE
+          - IONIZATION
+          - IONIZATION_ENERGY
+          - LASER
+          - MATRIX
+          - MASS_ACCURACY
+          - MASS_RANGE_M/Z
+          - REAGENT_GAS
+          - RESOLUTION
+          - SCANNING_SETTING
+          - SOURCE_TEMPERATURE
+          - ACTIVATION_PARAMETER
+          - ACTIVATION_TIME
+          - ATOM_GUN_CURRENT
+          - AUTOMATIC_GAIN_CONTROL
+          - BOMBARDMENT
+          - CAPILLARY_TEMPERATURE
+          - CAPILLARY_VOLTAGE
+          - CDL_SIDE_OCTOPOLES_BIAS_VOLTAGE
+          - CDL_TEMPERATURE
+          - DATAFORMAT
+          - DRY_GAS_FLOW
+          - DRY_GAS_TEMP
+          - GAS_PRESSURE
+          - HELIUM_FLOW
+          - INTERFACE_VOLTAGE
+          - ION_GUIDE_PEAK_VOLTAGE
+          - ION_GUIDE_VOLTAGE
+          - ION_SPRAY_VOLTAGE
+          - IT_SIDE_OCTOPOLES_BIAS_VOLTAGE
+          - LENS_VOLTAGE
+          - NEBULIZER
+          - NEBULIZING_GAS
+          - NEEDLE_VOLTAGE
+          - OCTPOLE_VOLTAGE
+          - ORIFICE_TEMP
+          - ORIFICE_TEMPERATURE
+          - ORIFICE_VOLTAGE
+          - PROBE_TIP
+          - RING_VOLTAGE
+          - SAMPLE_DRIPPING
+          - SKIMMER_VOLTAGE
+          - SPRAY_VOLTAGE
+          - TUBE_LENS_VOLTAGE
+          type: string
+        value:
+          type: string
+      type: object
+    AcChromatography_inner:
+      example:
+        subtag: CARRIER_GAS
+        value: value
+      properties:
+        subtag:
+          enum:
+          - CARRIER_GAS
+          - COLUMN_NAME
+          - COLUMN_TEMPERATURE
+          - COLUMN_TEMPERATURE_GRADIENT
+          - FLOW_GRADIENT
+          - FLOW_RATE
+          - INJECTION_TEMPERATURE
+          - INJECTION_TEMPERATURE_GRADIENT
+          - INLET_TYPE
+          - KOVATS_RTI
+          - LEE_RTI
+          - NAPS_RTI
+          - UOA_RTI
+          - UOA_PREDICTED_RTI
+          - RETENTION_TIME
+          - UOA_PREDICTED_RETENTION_TIME
+          - SOLVENT
+          - TRANSFERLINE_TEMPERATURE
+          type: string
+        value:
+          type: string
+      type: object
+    AcGeneral_inner:
+      example:
+        subtag: CONCENTRATION
+        value: value
+      properties:
+        subtag:
+          enum:
+          - CONCENTRATION
+          - ANALYTICAL_TIME
+          - COLUMN_PRESSURE
+          - INTERNAL_STANDARD
+          - INTERNAL_STANDARD_MT
+          - MIGRATION_TIME
+          - PRECONDITIONING
+          - RUNNING_BUFFER
+          - RUNNING_VOLTAGE
+          - SAMPLE_INJECTION
+          - SAMPLING_CONE
+          - SHEATH_LIQUID
+          - TIME_PROGRAM
+          - WASHING_BUFFER
+          type: string
+        value:
+          type: string
+      type: object
+    AcIonMobility_inner:
+      example:
+        subtag: CCS
+        value: value
+      properties:
+        subtag:
+          enum:
+          - CCS
+          - DRIFT_GAS
+          - DRIFT_TIME
+          - INSTRUMENT_TYPE
+          - INVERSE_REDUCED_ION_MOBILITY
+          type: string
+        value:
+          type: string
+      type: object
+    MsFocusedIon_inner:
+      description: A list of subtag value pairs
+      example:
+        subtag: BASE_PEAK
+        value: value
+      properties:
+        subtag:
+          description: Subtag describing the value
+          enum:
+          - BASE_PEAK
+          - DERIVATIVE_FORM
+          - DERIVATIVE_MASS
+          - DERIVATIVE_TYPE
+          - ION_TYPE
+          - PRECURSOR_INT
+          - PRECURSOR_M/Z
+          - PRECURSOR_TYPE
+          - FULL_SCAN_FRAGMENT_ION_PEAK
+          type: string
+        value:
+          description: The value for the subtag
+          type: string
+      type: object
+    MsDataProcessing_inner:
+      description: A list of subtag value pairs
+      example:
+        subtag: COMMENT
+        value: value
+      properties:
+        subtag:
+          description: Subtag describing the value
+          enum:
+          - COMMENT
+          - DEPROFILE
+          - FIND_PEAK
+          - REANALYZE
+          - RECALIBRATE
+          - WHOLE
+          type: string
+        value:
+          description: The value for the subtag
+          type: string
+      type: object

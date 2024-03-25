@@ -1,0 +1,23 @@
+type: array
+items:
+  type: object
+  properties:
+    subtag:
+      type: string
+      enum:
+        - CONCENTRATION
+        - ANALYTICAL_TIME
+        - COLUMN_PRESSURE
+        - INTERNAL_STANDARD
+        - INTERNAL_STANDARD_MT
+        - MIGRATION_TIME
+        - PRECONDITIONING
+        - RUNNING_BUFFER
+        - RUNNING_VOLTAGE
+        - SAMPLE_INJECTION
+        - SAMPLING_CONE
+        - SHEATH_LIQUID
+        - TIME_PROGRAM
+        - WASHING_BUFFER
+    value:
+      type: string

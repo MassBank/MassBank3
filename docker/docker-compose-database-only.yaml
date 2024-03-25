@@ -1,0 +1,39 @@
+version: '3.1'
+
+services:
+  postgres:
+    image: docker.io/postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - '127.0.0.1:5432:5432'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "$$POSTGRES_DB","-U", "$$POSTGRES_USER"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 40s
+
+  mb3tool:
+    build:
+      context: ..
+      dockerfile: Dockerfile-dbtool
+    environment:
+      - DB_TYPE
+      - DB_PORT
+      - DB_USER
+      - DB_PASSWORD
+      - DB_HOST
+      - DB_NAME
+      - DB_CONN_STRING
+      - MB_GIT_REPO
+      - MB_GIT_BRANCH
+      - MB_DATA_DIRECTORY
+      - MB_DROP_ALL
+    depends_on:
+      postgres:
+        condition: service_healthy
+

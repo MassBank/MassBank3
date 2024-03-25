@@ -1,0 +1,18 @@
+type: array
+items:
+  description: "A list of subtag value pairs"
+  type: object
+  properties:
+    subtag:
+      description: "Subtag describing the value"
+      type: string
+      enum:
+        - COMMENT
+        - DEPROFILE
+        - FIND_PEAK
+        - REANALYZE
+        - RECALIBRATE
+        - WHOLE
+    value:
+      description: "The value for the subtag"
+      type: string

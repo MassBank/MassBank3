@@ -1,0 +1,97 @@
+components:
+  schemas:
+    StringCount:
+      type: array
+      items:
+        type: object
+        properties:
+          value:
+            type: string
+          count:
+            type: integer
+            minimum: 0
+    FilterOptions:
+      type: object
+      properties:
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+        instrument_type:
+          type: array
+          items:
+            type: string
+        ms_type:
+          type: array
+          items:
+            type: string
+        ion_mode:
+          type: array
+          items:
+            type: string
+        mass:
+          type: object
+          properties:
+            minimum:
+              type: number
+              format: double
+              default: 0
+            maximum:
+              type: number
+              format: double
+              default: 10000
+        intensity:
+          type: object
+          properties:
+            minimum:
+              type: integer
+              default: 0
+            maximum:
+              type: integer
+              default: 100
+        max_limit:
+          type: integer
+          minimum: 1
+    BrowseOptions:
+      type: object
+      properties:
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+        contributor:
+          $ref: "#/components/schemas/StringCount"
+        instrument_type:
+          $ref: "#/components/schemas/StringCount"
+        ms_type:
+          $ref: "#/components/schemas/StringCount"
+        ion_mode:
+          $ref: "#/components/schemas/StringCount"
+        compound_start:
+          $ref: "#/components/schemas/StringCount"
+    Metadata:
+      type: object
+      properties:
+        version:
+          type: string
+        timestamp:
+          type: string
+        git_commit:
+          type: string
+        spectra_count:
+          type: integer
+          minimum: 0
+        compound_count:
+          type: integer
+          minimum: 0
+        isomer_count:
+          type: integer
+          minimum: 0
+        result_count:
+          type: integer
+          minimum: 0
+        page:
+          type: integer
+          minimum: 1
+        limit:
+          type: integer
+          minimum: 1
+
+
+

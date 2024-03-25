@@ -13,3 +13,11 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+/docker/.env
+/.idea/
+/docker/debuglog/
+/scripts/bin/
+/docker/deploy.sh
+
+# misc
+.DS_Store

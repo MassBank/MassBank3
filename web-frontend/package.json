@@ -1,0 +1,73 @@
+{
+  "name": "web-frontend",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite --mode development --host localhost --port 3000 --strictPort --open",
+    "build": "rimraf dist && tsc && vite build --mode production",
+    "start": "vite --mode production --host 0.0.0.0 --port 3000 --strictPort",
+    "preview": "vite preview --host 0.0.0.0 --port 3000 -d --strictPort",
+    "compile": "tsc",
+    "clean-install": "rm package-lock.json && rm -rf node_modules && npm i",
+    "eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "eslint-fix": "npm run eslint --fix",
+    "prettier": "prettier --check src",
+    "prettier-write": "prettier --write src"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "@types/d3": "^7.4.3",
+    "d3": "^7.8.5",
+    "openchemlib": "^8.7.2",
+    "react": ">=18.2.0",
+    "react-dom": ">=18.2.0",
+    "react-loader-spinner": "^6.0.0",
+    "react-mf": "^2.0.2",
+    "react-ocl": "^6.1.0"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.23.3",
+    "@babel/preset-react": "^7.23.3",
+    "@babel/preset-typescript": "^7.23.3",
+    "@types/node": "^20.10.4",
+    "@types/react": "^18.2.42",
+    "@types/react-dom": "^18.2.17",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^3.1.0",
+    "react-router-dom": "^6.20.1",
+    "rimraf": "^5.0.5",
+    "sass": "^1.69.5",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.6"
+  },
+  "volta": {
+    "node": "20.11.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.2.0",
+    "react-dom": ">=18.2.0"
+  }
+}

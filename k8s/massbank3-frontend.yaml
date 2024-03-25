@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: massbank3-frontend-deployment # Name des Deployments für uns Nutzer
+  namespace: massbank3
+  labels:
+    app: massbank3-frontend # Labels des Deployments
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: massbank3-frontend # Welche Container gehören zum Deployment? (*)
+  template:
+    metadata:
+      labels:
+        app: massbank3-frontend # Label des Pods muss/ sollte mit (*) übereinstimmen
+    spec:
+      containers:
+        - name: massbank3-frontend
+          image: rmeier/massbank3-frontend:0.0.1 # Container Image
+          env:
+            - name: VITE_MB3_API_URL
+              value: "http://${MB3_API_HOST}:${MB3_API_PORT}"
+            - name: VITE_MB3_BASE_URL
+              value: "${MB3_FRONTEND_BASE_URL}"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: massbank3-frontend-service
+  namespace: massbank3
+spec:
+  type: NodePort
+  selector:
+    app: massbank3-frontend # Das gleiche Label wie im Deployment
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app: massbank3-frontend
+  name: massbank3-frontend-ingress
+  namespace: massbank3
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /frontent
+            pathType: Prefix
+            backend:
+              service:
+                name: massbank3-frontend-service
+                port:
+                  number: 8080

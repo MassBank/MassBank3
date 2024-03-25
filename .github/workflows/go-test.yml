@@ -1,0 +1,61 @@
+
+name: go-test
+
+on:
+  push:
+    branches: [ "*"]
+  pull_request:
+    branches: [ "*" ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        mongodb-version: ['6.0']
+        os: [ 'ubuntu-22.04', 'ubuntu-20.04']
+        postgres-images: [ 'postgres:latest']
+        go-version: ['1.20']
+    runs-on: ${{ matrix.os }}
+
+    services:
+      testpostgres:
+        image: ${{matrix.postgres-images}}
+        env:
+          POSTGRES_DB: mbtestdb
+          POSTGRES_PASSWORD: mbtestpwd
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: mbtestuser
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Start MongoDB
+      uses: supercharge/mongodb-github-action@1.8.0
+      with:
+        mongodb-version: ${{ matrix.mongodb-version }}
+        mongodb-username: mbtestuser
+        mongodb-password: mbtestpwd
+        mongodb-db: mbtestdb
+
+    - uses: actions/setup-go@v3
+      with:
+        go-version: ${{matrix.go-version}}
+
+    - name: Run all go tests
+      run: go test ./... -v -race -coverprofile=coverage.txt -covermode=atomic
+      env:
+        MONGODB_HOST: localhost
+        POSTGRES_HOST: localhost
+        TEST_DATA_DIR: /home/runner/work/MassBank3/MassBank3/
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3

@@ -1,0 +1,68 @@
+version: '3.1'
+
+services:
+
+  mongodb:
+    image: docker.io/mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test:  ["CMD","mongosh", "--eval", "\"db.adminCommand('ping')\""]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 40s
+
+  postgres:
+    image: docker.io/postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "$$POSTGRES_DB","-U", "$$POSTGRES_USER"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 40s
+
+  mb3server:
+    restart: always
+    ports:
+      - "${MB3_API_PORT}:${MB3_SERVER_PORT}"
+    environment:
+      - DB_TYPE
+      - DB_PORT
+      - DB_PASSWORD
+      - DB_HOST
+      - DB_NAME
+      - DB_CONN_STRING
+      - MB3_SERVER_PORT
+      - CDKDEPICT_URL
+
+  mb3frontend:
+    restart: always
+
+
+  cdkdepict:
+    image: docker.io/simolecule/cdkdepict:latest
+
+  mb3tool:
+    build:
+      context: ..
+      dockerfile: Dockerfile-dbtool
+    environment:
+      - DB_TYPE
+      - DB_PORT
+      - DB_USER
+      - DB_PASSWORD
+      - DB_HOST
+      - DB_NAME
+      - DB_CONN_STRING
+      - MB_GIT_REPO
+      - MB_GIT_BRANCH
+      - MB_DATA_DIRECTORY
+      - MB_DROP_ALL

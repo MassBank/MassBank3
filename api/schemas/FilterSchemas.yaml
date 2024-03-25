@@ -1,0 +1,69 @@
+components:
+  schemas:
+    InstrumentType:
+      type: array
+      items:
+        type: string
+    Splash:
+      type: string
+    MSType:
+      type: array
+      items:
+        type: string
+        enum: [ MS,MS2,MS3,MS4 ]
+    IonMode:
+      type: string
+      description: "enum: [ POSITIVE, NEGATIVE ]"
+    CompoundName:
+      type: string
+    ExactMass:
+      description: 'A mass prefixed with "and" or "or" before a colon, e.g. "or:122.0".'
+      type: string
+      pattern: "(and|or):[0-9]+(\\.[0-9]*)?"
+    MassTolerance:
+      type: number
+      format: double
+      default: 0.3
+    Formula:
+      description: 'A chemical formula prefixed with "and" or "or" before a colon, e.g. "or:C6H7N5".'
+      type: string
+      pattern: "(and|or):(([A-Z][a-z]*[0-9]*)|\\*)*"
+    Peaks:
+      type: array
+      items:
+        type: string
+        description: 'A m/z prefixed with "and" or "or" before a colon, e.g. "or:143.0".'
+        pattern: "(and|or):[0-9]+(\\.[0-9]*)?"
+    Intensity:
+      description: "Relative intensity for peak search"
+      type: integer
+      default: 100
+      minimum: 1
+      maximum: 100
+    PeakList:
+      type: array
+      items:
+        type: string
+        description: "A tuple of m/z and intensity, e.g. (193.4,57)"
+        pattern: "\\([0-9]+(\\.[0-9]*)?,[0-9]+\\)"
+    IntensityCutoff:
+      type: integer
+      default: 5
+      minimum: 1
+      maximum: 100
+    Limit:
+      type: integer
+      minimum: 1
+      maximum: 500
+      default: 20
+    InChIKey:
+      type: string
+    Page:
+      type: integer
+      minimum: 1
+      default: 1
+    Contributor:
+      type: array
+      items:
+        type: string
+        description: "The short version of the contributor name"

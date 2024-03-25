@@ -1,0 +1,21 @@
+type: array
+items:
+  description: "A list of subtag value pairs"
+  type: object
+  properties:
+    subtag:
+      description: "Subtag describing the value"
+      type: string
+      enum:
+        - BASE_PEAK
+        - DERIVATIVE_FORM
+        - DERIVATIVE_MASS
+        - DERIVATIVE_TYPE
+        - ION_TYPE
+        - PRECURSOR_INT
+        - PRECURSOR_M/Z
+        - PRECURSOR_TYPE
+        - FULL_SCAN_FRAGMENT_ION_PEAK
+    value:
+      description: "The value for the subtag"
+      type: string
