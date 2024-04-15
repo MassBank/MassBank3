@@ -20,14 +20,14 @@ import LinkedPeakAnnotation from '../../types/peak/LinkedPeakAnnotation';
 const sidebarWidth = 10;
 const defaultChartWidthRatio = 0.7;
 
-interface InputProps {
+type InputProps = {
   record: Record;
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
   style?: CSSProperties;
-}
+};
 
-function Resizable({ record, width, height, style }: InputProps) {
+function Resizable({ record, width = 500, height = 300, style }: InputProps) {
   const ref = useRef(null);
   const [isResizing, setIsResizing] = useState(false);
 

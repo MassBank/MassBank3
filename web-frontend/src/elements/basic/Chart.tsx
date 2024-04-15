@@ -74,7 +74,9 @@ function Chart({
   }, [filteredPeakData, onZoom]);
 
   const xScale = useMemo(() => {
-    const values = filteredPeakData.map((pd) => pd.mz);
+    const values = filteredPeakData
+      .map((pd) => pd.mz)
+      .concat(filteredPeakData2 ? filteredPeakData2.map((pd) => pd.mz) : []);
 
     const minX =
       brushXDomains && brushXDomains.length > 0
@@ -90,7 +92,7 @@ function Chart({
     return scaleLinear()
       .domain([minX - m, maxX + m])
       .range([0, boundsWidth]);
-  }, [boundsWidth, brushXDomains, filteredPeakData]);
+  }, [boundsWidth, brushXDomains, filteredPeakData, filteredPeakData2]);
 
   const yScale = useMemo(() => {
     const maxY = 1000;
@@ -373,7 +375,7 @@ function Chart({
       style={{
         width: width,
         height: height,
-        marginRight: 5,
+        padding: '5px',
       }}
     >
       <svg ref={svgRef} width={width} height={height - MARGIN.button}>
