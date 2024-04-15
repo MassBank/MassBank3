@@ -18,6 +18,7 @@
 /docker/debuglog/
 /scripts/bin/
 /docker/deploy.sh
+/docker/deploy_with_init.sh
 
 # misc
 .DS_Store
