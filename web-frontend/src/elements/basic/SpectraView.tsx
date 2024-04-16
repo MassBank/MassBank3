@@ -3,6 +3,7 @@ import Peak from '../../types/peak/Peak';
 import Chart from './Chart';
 import Carousel, { ResponsiveType } from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
+import './SpectraView.scss';
 
 type InputProps = {
   reference: Peak[];
@@ -17,24 +18,32 @@ function SpectraView({
   width = 500,
   height = 300,
 }: InputProps) {
-  const elements = useMemo(
-    () =>
-      hits.map((hit, i) => (
+  const elements = useMemo(() => {
+    const _width = width - 120;
+    const _height = height - 40;
+
+    return hits.map((hit, i) => (
+      <div
+        className="chart-views"
+        style={{
+          width: _width,
+          height: _height,
+        }}
+        key={'spectral_match_' + i}
+      >
         <Chart
           peakData={reference}
           peakData2={hit}
           onZoom={() => {}}
-          width={width - 20}
-          height={height - 20}
-          key={'spectral_match_' + i}
+          width={_width}
+          height={_height}
         />
-      )),
-    [height, hits, reference, width],
-  );
+      </div>
+    ));
+  }, [height, hits, reference, width]);
 
   const responsive = useMemo(() => {
     const items = 1;
-
     const breakpoint = { max: width, min: 100 };
     const responsive: ResponsiveType = {};
     elements.forEach((_element, i) => {
@@ -48,8 +57,9 @@ function SpectraView({
   }, [elements, width]);
 
   return (
-    <div style={{ width: width, height }}>
+    <div className="gd-carousel-wrapper" style={{ width, height }}>
       <Carousel
+        className="gd-carousel"
         responsive={responsive}
         swipeable={false}
         draggable={false}
