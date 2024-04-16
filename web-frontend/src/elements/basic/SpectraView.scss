@@ -1,0 +1,37 @@
+.spectra-view-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.spectra-view-carousel {
+  width: 100%;
+  height: 100%;
+
+  .react-multiple-carousel__arrow {
+    position: absolute;
+  }
+
+  .react-multiple-carousel__arrow--left {
+    width: 45px;
+    left: 5px;
+  }
+
+  .react-multiple-carousel__arrow--right {
+    width: 45px;
+    right: 5px;
+  }
+}
+
+.chart-view {
+  border: grey solid 1px;
+  padding: 5px;
+  margin-left: 55px;
+  margin-right: 55px;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
