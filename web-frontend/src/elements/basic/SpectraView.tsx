@@ -24,7 +24,7 @@ function SpectraView({
 
     return hits.map((hit, i) => (
       <div
-        className="chart-views"
+        className="chart-view"
         style={{
           width: _width,
           height: _height,
@@ -57,9 +57,9 @@ function SpectraView({
   }, [elements, width]);
 
   return (
-    <div className="gd-carousel-wrapper" style={{ width, height }}>
+    <div className="spectra-view-wrapper" style={{ width, height }}>
       <Carousel
-        className="gd-carousel"
+        className="spectra-view-carousel"
         responsive={responsive}
         swipeable={false}
         draggable={false}

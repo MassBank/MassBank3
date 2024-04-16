@@ -1,3 +1,5 @@
+import './Search.scss';
+
 import { useRef } from 'react';
 import Peak from '../../../../types/peak/Peak';
 import generateID from '../../../../utils/generateID';
@@ -52,13 +54,7 @@ function Search() {
   ]);
 
   return (
-    <div
-      ref={ref}
-      style={{
-        width: '100%',
-        height: '100%',
-      }}
-    >
+    <div ref={ref} className="search-view">
       <SpectraView
         reference={reference}
         hits={hits}
