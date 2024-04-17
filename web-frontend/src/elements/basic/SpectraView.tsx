@@ -4,10 +4,12 @@ import Chart from './Chart';
 import Carousel, { ResponsiveType } from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
 import './SpectraView.scss';
+import Hit from '../../types/Hit';
+import PeakTable from '../record/PeakTable';
 
 type InputProps = {
   reference: Peak[];
-  hits: Peak[][];
+  hits: Hit[];
   width?: number;
   height?: number;
 };
@@ -31,13 +33,27 @@ function SpectraView({
         }}
         key={'spectral_match_' + i}
       >
-        <Chart
-          peakData={reference}
-          peakData2={hit}
-          onZoom={() => {}}
-          width={_width}
-          height={_height}
-        />
+        <div className="chart-score-view">
+          <p className="score-text">Score: {hit.score}</p>
+          <Chart
+            peakData={reference}
+            peakData2={hit.peaks}
+            width={_width * 0.7 - 10}
+            height={_height - 50 - 10}
+          />
+        </div>
+        <div className="peak-tables-view">
+          <PeakTable
+            peaks={reference}
+            width={_width * 0.3}
+            height={_height * 0.5}
+          />
+          <PeakTable
+            peaks={hit.peaks}
+            width={_width * 0.3}
+            height={_height * 0.5}
+          />
+        </div>
       </div>
     ));
   }, [height, hits, reference, width]);

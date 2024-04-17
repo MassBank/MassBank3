@@ -9,18 +9,18 @@ import PeakAnnotation from '../../types/peak/PeakAnnotation';
 
 type InputProps = {
   peaks: Peak[];
-  annotations: PeakAnnotation | undefined;
-  linkedAnnotations: LinkedPeakAnnotation[];
   width: number;
   height: number;
+  annotations?: PeakAnnotation;
+  linkedAnnotations?: LinkedPeakAnnotation[];
 };
 
 function PeakTable({
   peaks,
-  annotations,
-  linkedAnnotations,
   width,
   height,
+  annotations,
+  linkedAnnotations,
 }: InputProps) {
   const rows = useMemo(
     () =>
@@ -29,6 +29,7 @@ function PeakTable({
           annotations &&
           annotations.header &&
           annotations.header.length > 0 &&
+          linkedAnnotations &&
           linkedAnnotations.length > 0
         ) {
           const annoRowIndex = linkedAnnotations[i].annotationIndex;
