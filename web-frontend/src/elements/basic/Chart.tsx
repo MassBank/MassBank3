@@ -10,7 +10,7 @@ type InputProps = {
   peakData: Peak[];
   peakData2?: Peak[];
   // eslint-disable-next-line no-unused-vars
-  onZoom: (fpd: Peak[]) => void;
+  onZoom?: (fpd: Peak[]) => void;
   width?: number;
   height?: number;
 };
@@ -18,7 +18,7 @@ type InputProps = {
 function Chart({
   peakData,
   peakData2,
-  onZoom,
+  onZoom = () => {},
   width = 400,
   height = 300,
 }: InputProps) {
