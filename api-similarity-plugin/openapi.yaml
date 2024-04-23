@@ -4,7 +4,8 @@ info:
   description: This similarity score api for MassBank3 calculates the spectral similarity between the spectrum defined in the query peak list and the reference spectra list.
   version: 0.0.1
 servers:
-  - url: 'https'
+  - url: 'http://localhost:8080'
+    description: 'Local server'
 paths:
   /version:
     get:
@@ -63,30 +64,39 @@ paths:
 
 components:
   schemas:
+    peak:
+      description: a peak with m/z and intensity
+      type: object
+      properties:
+        mz:
+          description: m/z value
+          type: number
+        intensity:
+          description: intensity value
+          type: number
+      example:
+        'mz': 147.063
+        'intensity': 121.684
+
     peak_list:
       description: the peak list of the query spectrum
-      type: array
-      items:
-        description: a peak with m/z and intensity
-        type: object
-        properties:
-          mz:
-            description: m/z value
-            type: number
-          intensity:
-            description: intensity value
-            type: number
-      example:
-        - 'mz': 147.063
-          'intensity': 121.684
-        - 'mz': 303.050
-          'intensity': 10000.000
-        - 'mz': 449.108
-          'intensity': 657.368
-        - 'mz': 465.102
-          'intensity': 5884.210
-        - 'mz': 611.161
-          'intensity': 6700.000
+      type: object
+      properties:
+        peak_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/peak'
+          example:
+            - 'mz': 147.063
+              'intensity': 121.684
+            - 'mz': 303.050
+              'intensity': 10000.000
+            - 'mz': 449.108
+              'intensity': 657.368
+            - 'mz': 465.102
+              'intensity': 5884.210
+            - 'mz': 611.161
+              'intensity': 6700.000
 
     reference_spectra_list:
       description: the reference spectra list, list of ACCESSION strings
