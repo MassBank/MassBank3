@@ -7,7 +7,7 @@ from openapi_server import encoder
 def main():
     app = connexion.App(__name__, specification_dir='..')
     app.app.json_encoder = encoder.JSONEncoder
-    app.add_api('openapi2.yaml',
+    app.add_api('openapi.yaml',
                 arguments={'title': 'Similarity score api for MassBank3'},
                 pythonic_params=True)
 

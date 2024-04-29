@@ -12,7 +12,7 @@ paths:
   /version:
     get:
       summary: Get the version string of the implementation.
-      x-openapi-router-controller: similarity_server_controller
+      x-openapi-router-controller: similarity-score-impl.similarity-score-controller
       operationId: version_get
       responses:
         "200":
@@ -25,7 +25,7 @@ paths:
   /similarity:
     post:
       summary: Create a new similarity calculation.
-      x-openapi-router-controller: similarity_server_controller
+      x-openapi-router-controller: similarity-score-impl.similarity-score-controller
       operationId: similarity_post
       requestBody:
         description: a similarity job
@@ -33,11 +33,7 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-                - $ref: '#/components/schemas/peak_list'
-                - $ref: '#/components/schemas/reference_spectra_list'
-                - required:
-                  - peak_list
+              $ref: '#/components/schemas/similarity_calculation'
 
       responses:
         "200":
@@ -112,7 +108,6 @@ components:
       type: object
       properties:
         reference_spectra_list:
-          title: reference_spectra_list
           type: array
           items:
             type: string
@@ -123,24 +118,43 @@ components:
             - MSBNK-IPB_Halle-PB001342
             - MSBNK-IPB_Halle-PB001343
 
+    similarity_calculation:
+      description: a similarity calculation
+      title: similarity_calculation
+      allOf:
+        - $ref: '#/components/schemas/peak_list'
+        - $ref: '#/components/schemas/reference_spectra_list'
+
+    similarity_score:
+      description: the similarity score to a reference spectrum
+      title: similarity_score
+      type: object
+      properties:
+        accession:
+          type: string
+        similarity_score:
+          type: number
+      example:
+        accession: MSBNK-IPB_Halle-PB001341
+        similarity_score: 0.3
+
     similarity_score_list:
-      description: the similarity score list, list of similarity scores
-      type: array
-      items:
-        type: object
-        properties:
-          accession:
-            type: string
-          similarity_score:
-            type: number
-        example:
-          - accession: MSBNK-IPB_Halle-PB001341
-            similarity_score: 0.3
-          - accession: MSBNK-IPB_Halle-PB006202
-            similarity_score: 0.5
-          - accession: MSBNK-IPB_Halle-PB006203
-            similarity_score: 0.5
-          - accession: MSBNK-IPB_Halle-PB001342
-            similarity_score: 0.9
-          - accession: MSBNK-IPB_Halle-PB001343
-            similarity_score: 0.8
+      description: the similarity score list, result of a similarity calculation
+      title: similarity_score_list
+      type: object
+      properties:
+        similarity_score_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/similarity_score'
+          example:
+            - accession: MSBNK-IPB_Halle-PB001341
+              similarity_score: 0.3
+            - accession: MSBNK-IPB_Halle-PB006202
+              similarity_score: 0.5
+            - accession: MSBNK-IPB_Halle-PB006203
+              similarity_score: 0.5
+            - accession: MSBNK-IPB_Halle-PB001342
+              similarity_score: 0.9
+            - accession: MSBNK-IPB_Halle-PB001343
+              similarity_score: 0.8
