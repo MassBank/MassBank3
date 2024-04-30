@@ -30,6 +30,7 @@ paths:
       requestBody:
         description: a similarity job
         required: true
+        x-body-name: similarity_calculation
         content:
           application/json:
             schema:
