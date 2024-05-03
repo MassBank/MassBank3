@@ -1,0 +1,5 @@
+connexion[swagger-ui] >= 2.6.0, <3.0.0
+
+matchms >= 0.24.0
+psycopg[binary] >= 3.0.0
+numpy~=1.24.4
