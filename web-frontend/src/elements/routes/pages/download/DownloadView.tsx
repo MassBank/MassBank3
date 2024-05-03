@@ -1,6 +1,6 @@
-import './Download.scss';
+import './DownloadView.scss';
 
-function Download() {
+function DownloadView() {
   return (
     <div className="download-panel">
       <p>
@@ -19,4 +19,4 @@ function Download() {
   );
 }
 
-export default Download;
+export default DownloadView;

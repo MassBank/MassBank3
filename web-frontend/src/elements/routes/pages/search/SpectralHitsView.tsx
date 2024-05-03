@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
-import Peak from '../../types/peak/Peak';
-import Chart from './Chart';
+import Peak from '../../../../types/peak/Peak';
+import Chart from '../../../basic/Chart';
 import Carousel, { ResponsiveType } from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
-import './SpectraView.scss';
-import Hit from '../../types/Hit';
-import PeakTable from '../record/PeakTable';
+import './SpectralHitsView.scss';
+import Hit from '../../../../types/Hit';
+import PeakTable from '../../../record/PeakTable';
 
 type InputProps = {
   reference: Peak[];
@@ -14,7 +14,7 @@ type InputProps = {
   height?: number;
 };
 
-function SpectraView({
+function SpectralHitsView({
   reference,
   hits,
   width = 500,
@@ -87,4 +87,4 @@ function SpectraView({
   );
 }
 
-export default SpectraView;
+export default SpectralHitsView;

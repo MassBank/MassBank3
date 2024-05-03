@@ -1,4 +1,4 @@
-import './Accession.scss';
+import './AccessionView.scss';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Input from '../../../basic/Input';
@@ -14,7 +14,7 @@ import {
 } from 'react-router-dom';
 import routes from '../../../../constants/routes';
 
-function Accession() {
+function AccessionView() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -32,12 +32,11 @@ function Accession() {
 
       if (typeof jsonData === 'string') {
         return undefined;
-      } else {
-        return jsonData;
       }
-    } else {
-      return undefined;
+      return jsonData;
     }
+
+    return undefined;
   }
 
   const handleOnSearch = useCallback(async (id: string) => {
@@ -109,7 +108,7 @@ function Accession() {
         <div className="result-panel">
           {isRequesting ? (
             <Spinner
-              buttonStyle={{ display: 'none' }}
+              buttonDisabled={true}
               spinnerWidth={200}
               spinnerHeight={200}
             />
@@ -126,4 +125,4 @@ function Accession() {
   return accessionView;
 }
 
-export default Accession;
+export default AccessionView;

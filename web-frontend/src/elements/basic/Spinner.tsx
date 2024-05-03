@@ -73,7 +73,11 @@ function Spinner({
             disabled={buttonDisabled}
             style={{
               ...(buttonDisabled
-                ? { border: 'none', backgroundColor: 'transparent' }
+                ? {
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    display: 'none',
+                  }
                 : undefined),
               ...buttonStyle,
             }}

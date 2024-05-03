@@ -1,4 +1,4 @@
-function NotFound() {
+function NotFoundView() {
   return (
     <div>
       <h2>404: Page Not Found</h2>
@@ -6,4 +6,4 @@ function NotFound() {
   );
 }
 
-export default NotFound;
+export default NotFoundView;
