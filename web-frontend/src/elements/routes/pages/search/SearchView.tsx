@@ -3,12 +3,14 @@ import './SearchView.scss';
 import { MouseEvent, useCallback, useRef, useState } from 'react';
 import Peak from '../../../../types/peak/Peak';
 import generateID from '../../../../utils/generateID';
+import axios from 'axios';
 
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import Hit from '../../../../types/Hit';
 import SpectralHitsView from './SpectralHitsView';
 import Button from '../../../basic/Button';
 import Spinner from '../../../basic/Spinner';
+import Content from '../../../../types/Content';
 
 function SearchView() {
   const ref = useRef(null);
@@ -23,17 +25,17 @@ function SearchView() {
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [hits, setHits] = useState<Hit[]>([]);
 
-  async function search() {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+  async function searchHits() {
+    return await new Promise((resolve) => setTimeout(resolve, 2000));
   }
 
-  const handleOnSearch = useCallback((e: MouseEvent<HTMLButtonElement>) => {
+  const handleOnSearchHits = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
 
     setIsRequesting(true);
 
-    search().then(() => {
+    searchHits().then(() => {
       const _hits: Hit[] = [];
       _hits.push({
         peaks: [
@@ -73,7 +75,7 @@ function SearchView() {
 
   return (
     <div ref={ref} className="search-view">
-      <Button onClick={handleOnSearch} child="Search" />
+      <Button onClick={handleOnSearchHits} child="Search Hits" />
       {isRequesting ? (
         <Spinner buttonDisabled={true} />
       ) : hits.length > 0 ? (

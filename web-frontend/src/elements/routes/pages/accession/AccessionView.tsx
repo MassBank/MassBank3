@@ -7,6 +7,7 @@ import Button from '../../../basic/Button';
 import RecordView from '../../../record/RecordView';
 import generateID from '../../../../utils/generateID';
 import Record from '../../../../types/Record';
+import axios from 'axios';
 import {
   createSearchParams,
   useNavigate,
@@ -26,14 +27,13 @@ function AccessionView() {
   async function getRecord(id: string) {
     const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/' + id;
 
-    const resp = await fetch(url);
-    if (resp.ok) {
-      const jsonData = await resp.json();
-
-      if (typeof jsonData === 'string') {
+    const resp = await axios.get(url);
+    if (resp.status === 200) {
+      const data = await resp.data;
+      if (typeof data === 'string') {
         return undefined;
       }
-      return jsonData;
+      return data;
     }
 
     return undefined;
