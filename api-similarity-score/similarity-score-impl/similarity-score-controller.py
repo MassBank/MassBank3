@@ -41,13 +41,10 @@ def similarity_post(similarity_calculation):  # noqa: E501
         else:
             scores = calculate_scores(spectra, [query], CosineGreedy())
         matches = scores.scores_by_query(query, 'CosineGreedy_score', sort=True)
-
-        match_list = []
+        match_list = SimilarityScoreList([])
 
         for match in matches:
-            match_list.append(SimilarityScoreList(SimilarityScore(match[0].metadata['id'], match[1][0])))
-            #match_list.append(SimilarityScoreListInner(match[0].metadata['id'], match[1][0]))
-
+            match_list.similarity_score_list.append(SimilarityScore(match[0].metadata['id'], match[1][0]))
 
         return match_list
 
@@ -61,3 +58,13 @@ def version_get():  # noqa: E501
     :rtype: Union[str, Tuple[str, int], Tuple[str, int, Dict[str, str]]
     """
     return 'cosine similarity 1.0.0'
+
+import db
+
+def main():
+    print("Loading spectra... ", end='', flush=True)
+    db.load_spectra()
+    print("Finished")
+
+if __name__ == '__main__':
+    main()
