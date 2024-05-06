@@ -5,5 +5,6 @@ export default interface Content {
   instrument_type: ValueCount[];
   ion_mode: ValueCount[];
   ms_type: ValueCount[];
-  // metadata: undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  metadata?: any;
 }

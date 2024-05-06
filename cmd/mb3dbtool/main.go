@@ -5,16 +5,17 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/MassBank/MassBank3/pkg/config"
-	"github.com/MassBank/MassBank3/pkg/database"
-	"github.com/MassBank/MassBank3/pkg/massbank"
-	"github.com/go-git/go-git/v5"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/MassBank/MassBank3/pkg/config"
+	"github.com/MassBank/MassBank3/pkg/database"
+	"github.com/MassBank/MassBank3/pkg/massbank"
+	"github.com/go-git/go-git/v5"
 )
 
 func main() {

@@ -5,12 +5,16 @@ import Spinner from '../../../basic/Spinner';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import Content from '../../../../types/Content';
 import ValueCount from '../../../../types/ValueCount';
+import axios from 'axios';
 import { Doughnut } from 'react-chartjs-2';
 import { ArcElement, Chart, Legend, Tooltip } from 'chart.js';
 import {
   splitStringAndCapitaliseFirstLetter,
   splitStringAndJoin,
 } from '../../../../utils/stringUtils';
+import SearchParams from '../../../../types/SearchParams';
+import CheckBox from '../../../basic/CheckBox';
+import calculateColour from '../../../../utils/calculateColour';
 
 function ContentView() {
   const ref = useRef(null);
@@ -20,28 +24,18 @@ function ContentView() {
   const [recordCount, setRecordCount] = useState<number | undefined>();
   const [content, setContent] = useState<Content | undefined>();
 
-  async function getRecordCount() {
-    const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/count';
-    const resp = await fetch(url);
-    if (resp.ok) {
-      return await resp.json();
-    } else {
-      return undefined;
+  async function fetchData(url: string, searchParams?: SearchParams) {
+    const params = new URLSearchParams();
+    if (searchParams) {
+      Object.keys(searchParams).forEach((key) => {
+        params.append(key, searchParams[key].join(','));
+      });
     }
-  }
-
-  async function getBrowseOptions() {
-    const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
-    const resp = await fetch(url);
-    if (resp.ok) {
-      const jsonData = await resp.json();
-
-      if (typeof jsonData === 'string') {
-        return undefined;
-      }
-
-      return jsonData;
+    const resp = await axios.get(url, { params });
+    if (resp.status === 200) {
+      return await resp.data;
     }
+    console.error(resp.statusText);
 
     return undefined;
   }
@@ -49,43 +43,137 @@ function ContentView() {
   const handleOnFetch = useCallback(async () => {
     setIsRequesting(true);
 
-    const count: number | undefined = await getRecordCount();
-    const _content = await getBrowseOptions();
-    console.log(_content);
+    const urlRecordCount =
+      import.meta.env.VITE_MB3_API_URL + '/v1/records/count';
+    const count: number | undefined = await fetchData(urlRecordCount);
 
     setRecordCount(count);
-    setContent(_content);
     setIsRequesting(false);
   }, []);
 
+  function buildSearchParams(cont: Content | undefined) {
+    const searchParams: SearchParams = {};
+    if (cont) {
+      Object.keys(cont)
+        .filter((k) => k !== 'metadata')
+        .forEach(
+          (k) =>
+            (searchParams[k] = (cont[k] as ValueCount[])
+              .filter((_vc) => _vc.flag === true)
+              .map((_vc) => _vc.value)),
+        );
+    }
+
+    return searchParams;
+  }
+
+  function initFlags(cont: Content) {
+    const keys = Object.keys(cont).filter((key) => key !== 'metadata');
+    for (let k = 0; k < keys.length; k++) {
+      const key = keys[k];
+      cont[key] = (cont[key] as ValueCount[]).map((vc) => {
+        return { ...vc, flag: true };
+      });
+    }
+
+    return cont;
+  }
+
+  const filterContent = useCallback(
+    async (prevContent: Content | undefined) => {
+      setIsRequesting(true);
+
+      const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
+      const newContent = (await fetchData(
+        url,
+        buildSearchParams(prevContent),
+      )) as Content;
+
+      if (!prevContent) {
+        initFlags(newContent);
+        setContent(newContent);
+      } else {
+        const _prevContent = { ...prevContent };
+        const keys = Object.keys(_prevContent).filter(
+          (key) => key !== 'metadata',
+        );
+        keys.forEach((key) => {
+          const valueCounts = [...(_prevContent[key] as ValueCount[])];
+          if (Object.keys(newContent).includes(key)) {
+            valueCounts.forEach((vc) => {
+              const _vc = (newContent[key] as ValueCount[]).find(
+                (vc2) => vc2.value === vc.value,
+              );
+              if (_vc) {
+                vc.count = _vc.count;
+              } else {
+                vc.count = 0;
+              }
+              if (vc.count === 0) {
+                vc.flag = false;
+              }
+            });
+
+            _prevContent[key] = valueCounts;
+          } else {
+            _prevContent[key] = valueCounts.map((vc) => {
+              return { ...vc, count: 0 };
+            });
+          }
+        });
+
+        setContent(_prevContent);
+      }
+
+      setIsRequesting(false);
+    },
+    [],
+  );
+
+  const handleOnSelect = useCallback(
+    (key: string, value: string, isChecked: boolean) => {
+      if (content) {
+        const _content = { ...content };
+        _content[key] = [...(_content[key] as ValueCount[])].map((vc) =>
+          vc.value === value ? { ...vc, flag: isChecked } : vc,
+        );
+
+        filterContent(_content);
+      }
+    },
+    [content, filterContent],
+  );
+
   useEffect(() => {
     handleOnFetch();
-  }, [handleOnFetch]);
+    filterContent(undefined);
+  }, [handleOnFetch, filterContent]);
 
   Chart.register(ArcElement, Tooltip, Legend);
-
-  function calcColor(min: number, max: number, val: number) {
-    const minHue = 240;
-    const maxHue = 0;
-    var curPercent = (val - min) / (max - min);
-    var colString =
-      'hsl(' + (curPercent * (maxHue - minHue) + minHue) + ',100%,50%)';
-    return colString;
-  }
 
   const charts = useMemo(() => {
     if (content) {
       const keys = Object.keys(content).filter((key) => key !== 'metadata');
       const _charts = keys.map((key) => {
-        const itemCount = (content[key] as ValueCount[]).length;
-        const totalCount = (content[key] as ValueCount[])
-          .map((vc) => vc.count)
-          .reduce((accu, count) => accu + count);
+        const filteredValueCounts = [...(content[key] as ValueCount[])].filter(
+          (vc) => vc.flag === true,
+        );
+        const itemCount = filteredValueCounts.length;
+        const totalCount =
+          filteredValueCounts.length > 0
+            ? filteredValueCounts
+                .map((vc) => vc.count)
+                .reduce((accu, count) => accu + count)
+            : undefined;
 
-        const contentValueCounts = (content[key] as ValueCount[])
+        const contentValueCounts = filteredValueCounts
           .sort((vc1, vc2) => -1 * (vc1.count - vc2.count))
           .map((vc) => {
-            return { ...vc, percentage: (vc.count / totalCount) * 100 };
+            return {
+              ...vc,
+              percentage:
+                totalCount !== undefined ? (vc.count / totalCount) * 100 : 0,
+            };
           });
 
         contentValueCounts.splice(10);
@@ -98,10 +186,7 @@ function ContentView() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const options: any = {
           plugins: {
-            responsive: true,
             legend: {
-              display: true,
-              responsive: true,
               position: 'top',
               labels: {
                 boxWidth: 10,
@@ -120,7 +205,7 @@ function ContentView() {
             {
               data: counts,
               backgroundColor: labels.map((l, i) =>
-                calcColor(0, labels.length, i),
+                calculateColour(0, labels.length, i),
               ),
               borderColor: 'black',
               borderWidth: 1,
@@ -167,6 +252,33 @@ function ContentView() {
     return undefined;
   }, [content, height, width]);
 
+  function buildRow(
+    key: string,
+    i: number,
+    k: number,
+    valueCounts: ValueCount[],
+    elements: JSX.Element[],
+  ) {
+    return (
+      <tr key={'content-table-row-' + key + '-' + i + '-' + k}>
+        {k < 4 ? (
+          <td
+            rowSpan={
+              Math.floor(valueCounts.length / 4) +
+              (valueCounts.length % 4 === 0 ? 0 : 1)
+            }
+          >
+            {splitStringAndCapitaliseFirstLetter(key, '_', ' ')}
+          </td>
+        ) : undefined}
+
+        {elements.map((elem, l) => (
+          <td key={'elem-' + i + '_' + k + '_' + l}>{elem}</td>
+        ))}
+      </tr>
+    );
+  }
+
   const contentTable = useMemo(() => {
     if (content) {
       const keys = Object.keys(content).filter((key) => key !== 'metadata');
@@ -174,9 +286,7 @@ function ContentView() {
       const header = (
         <tr key={'content-table-header'}>
           <th>Category</th>
-          <th>Value</th>
-          <th>Count</th>
-          <th>Share (%)</th>
+          <th colSpan={4}>Value</th>
         </tr>
       );
 
@@ -186,22 +296,32 @@ function ContentView() {
         const totalCount = (content[key] as ValueCount[])
           .map((vc) => vc.count)
           .reduce((accu, count) => accu + count);
-        const contentValueCounts = (content[key] as ValueCount[])
-          .sort((vc1, vc2) => -1 * (vc1.count - vc2.count))
-          .map((vc) => {
-            return { ...vc, percentage: (vc.count / totalCount) * 100 };
-          });
-
-        contentValueCounts.forEach((vc, k) => {
-          rows.push(
-            <tr key={'content-table-row-' + key + '-' + i + '-' + k}>
-              <td>{splitStringAndCapitaliseFirstLetter(key, '_', ' ')}</td>
-              <td>{splitStringAndJoin(vc.value, '_', ' ')}</td>
-              <td>{vc.count}</td>
-              <td>{vc.percentage.toPrecision(3)}</td>
-            </tr>,
-          );
+        const valueCounts = [...(content[key] as ValueCount[])].map((vc) => {
+          return { ...vc, percentage: (vc.count / totalCount) * 100 };
         });
+
+        let elements: JSX.Element[] = [];
+        for (let k = 0; k < valueCounts.length; k++) {
+          const vc = valueCounts[k];
+          elements.push(
+            <CheckBox
+              defaultValue={vc.flag || false}
+              onChange={(isChecked: boolean) =>
+                handleOnSelect(key, vc.value, isChecked)
+              }
+              label={
+                splitStringAndJoin(vc.value, '_', ' ') + ' (' + vc.count + ')'
+              }
+            />,
+          );
+
+          if ((k + 1) % 4 === 0) {
+            rows.push(buildRow(key, i, k, valueCounts, elements));
+            elements = [];
+          } else if (k === valueCounts.length - 1) {
+            rows.push(buildRow(key, i, k, valueCounts, elements));
+          }
+        }
       }
 
       return (
@@ -218,7 +338,7 @@ function ContentView() {
     }
 
     return undefined;
-  }, [content]);
+  }, [content, handleOnSelect]);
 
   return (
     <div ref={ref} className="content-view">
