@@ -33,7 +33,7 @@ def similarity_post(similarity_calculation):  # noqa: E501
 
         if len(request.reference_spectra_list) > 0:
             def filter_fn(spectrum):
-                return spectrum.metadata['id'] in request.reference_spectra_list
+                return spectrum.metadata['spectrum_id'] in request.reference_spectra_list
 
             references = list(filter(filter_fn, spectra))
 
@@ -44,7 +44,7 @@ def similarity_post(similarity_calculation):  # noqa: E501
         match_list = SimilarityScoreList([])
 
         for match in matches:
-            match_list.similarity_score_list.append(SimilarityScore(match[0].metadata['id'], match[1][0]))
+            match_list.similarity_score_list.append(SimilarityScore(match[0].metadata['spectrum_id'], match[1][0]))
 
         return match_list
 
@@ -58,13 +58,3 @@ def version_get():  # noqa: E501
     :rtype: Union[str, Tuple[str, int], Tuple[str, int, Dict[str, str]]
     """
     return 'cosine similarity 1.0.0'
-
-import db
-
-def main():
-    print("Loading spectra... ", end='', flush=True)
-    db.load_spectra()
-    print("Finished")
-
-if __name__ == '__main__':
-    main()
