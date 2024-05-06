@@ -1,4 +1,4 @@
-function News() {
+function NewsView() {
   return (
     <div>
       <h2>News View</h2>
@@ -6,4 +6,4 @@ function News() {
   );
 }
 
-export default News;
+export default NewsView;

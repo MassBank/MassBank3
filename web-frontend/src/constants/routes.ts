@@ -1,12 +1,12 @@
-import About from '../elements/routes/pages/about/About';
-import Accession from '../elements/routes/pages/accession/Accession';
-import Content from '../elements/routes/pages/content/Content';
-import Documentation from '../elements/routes/pages/documentation/Documentation';
-import Download from '../elements/routes/pages/download/Download';
-import Home from '../elements/routes/pages/home/Home';
-import News from '../elements/routes/pages/news/News';
-import NotFound from '../elements/routes/pages/notfound/NotFound';
-import Search from '../elements/routes/pages/search/Search';
+import AboutView from '../elements/routes/pages/about/AboutView';
+import AccessionView from '../elements/routes/pages/accession/AccessionView';
+import ContentView from '../elements/routes/pages/content/ContentView';
+import DocumentationView from '../elements/routes/pages/documentation/DocumentationView';
+import DownloadView from '../elements/routes/pages/download/DownloadView';
+import HomeView from '../elements/routes/pages/home/HomeView';
+import NewsView from '../elements/routes/pages/news/NewsView';
+import NotFoundView from '../elements/routes/pages/notfound/NotFoundView';
+import SearchView from '../elements/routes/pages/search/SearchView';
 
 const base_url = import.meta.env.VITE_MB3_BASE_URL;
 
@@ -22,27 +22,31 @@ interface ifc2 {
 }
 
 const routes: ifc2 = {
-  home: { path: base_url, label: 'Home', element: Home },
-  search: { path: base_url + 'search', label: 'Search', element: Search },
-  content: { path: base_url + 'content', label: 'Content', element: Content },
+  home: { path: base_url, label: 'Home', element: HomeView },
+  search: { path: base_url + 'search', label: 'Search', element: SearchView },
+  content: {
+    path: base_url + 'content',
+    label: 'Content',
+    element: ContentView,
+  },
   download: {
     path: base_url + 'download',
     label: 'Download',
-    element: Download,
+    element: DownloadView,
   },
   accession: {
     path: base_url + 'recordDisplay',
     label: 'Accession',
-    element: Accession,
+    element: AccessionView,
   },
   documentation: {
     path: base_url + 'documentation',
     label: 'Documentation',
-    element: Documentation,
+    element: DocumentationView,
   },
-  about: { path: base_url + 'about', label: 'About', element: About },
-  news: { path: base_url + 'news', label: 'News', element: News },
-  notFound: { path: base_url + '*', label: 'Not Found', element: NotFound },
+  about: { path: base_url + 'about', label: 'About', element: AboutView },
+  news: { path: base_url + 'news', label: 'News', element: NewsView },
+  notFound: { path: base_url + '*', label: 'Not Found', element: NotFoundView },
 };
 
 export default routes;

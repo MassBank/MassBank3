@@ -1,6 +1,6 @@
-import './Documentation.scss';
+import './DocumentationView.scss';
 
-function Documentation() {
+function DocumentationView() {
   return (
     <div className="documentation-panel">
       <p>
@@ -19,4 +19,4 @@ function Documentation() {
   );
 }
 
-export default Documentation;
+export default DocumentationView;
