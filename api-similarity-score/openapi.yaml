@@ -101,7 +101,7 @@ components:
             - mz: 465.102
               intensity: 5884.210
             - mz: 611.161
-              intensity': 6700.000
+              intensity: 6700.000
 
     reference_spectra_list:
       description: the reference spectra list, list of ACCESSION strings
