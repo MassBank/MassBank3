@@ -3,7 +3,7 @@ import numpy as np
 from matchms import Spectrum, calculate_scores
 from matchms.similarity import CosineGreedy
 
-from db import spectra
+from cosine_impl.db import spectra
 from openapi_server.models import SimilarityScore
 from openapi_server.models.similarity_calculation import SimilarityCalculation  # noqa: E501
 from openapi_server.models.similarity_score_list import SimilarityScoreList  # noqa: E501

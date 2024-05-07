@@ -3,7 +3,7 @@
 import connexion
 
 from openapi_server import encoder
-import db
+from cosine_impl import db
 
 
 def main():
