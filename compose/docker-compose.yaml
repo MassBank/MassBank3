@@ -1,4 +1,3 @@
-
 services:
 
   postgres:
@@ -23,7 +22,8 @@ services:
     ports:
       - "${MB3_API_PORT}:${MB3_SERVER_PORT}"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       - DB_TYPE
       - DB_PORT
@@ -40,7 +40,8 @@ services:
     ports:
       - "${SIMILARITY_SERVICE_COSINE_PORT}:8080"
     depends_on:
-      - postgres
+      mb3tool:
+        condition: service_completed_successfully
     environment:
       - DB_PORT
       - DB_USER
@@ -63,6 +64,9 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile-dbtool
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       - DB_TYPE
       - DB_PORT
