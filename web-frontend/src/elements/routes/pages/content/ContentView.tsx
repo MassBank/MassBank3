@@ -111,13 +111,15 @@ function ContentView() {
               }
               if (vc.count === 0) {
                 vc.flag = false;
+              } else {
+                vc.flag = true;
               }
             });
 
             _prevContent[key] = valueCounts;
           } else {
             _prevContent[key] = valueCounts.map((vc) => {
-              return { ...vc, count: 0 };
+              return { ...vc, count: 0, flag: false };
             });
           }
         });
