@@ -3,10 +3,11 @@ package config
 import (
 	"errors"
 	"flag"
-	"github.com/MassBank/MassBank3/pkg/database"
 	"log"
 	"os"
 	"strconv"
+
+	"github.com/MassBank/MassBank3/pkg/database"
 )
 
 type ToolConfig struct {
@@ -63,6 +64,10 @@ func GetToolConfig() ToolConfig {
 	flag.Parse()
 	if len(toolConfig.GitRepo) > 0 && len(toolConfig.DataDir) > 0 {
 		println("Git repo and data directory are set. Using data directory as default and git repo as fallback.")
+	} else if(len(toolConfig.GitRepo) > 0) {
+		println("Git repo is set. Using git repo as data source.")
+	} else if(len(toolConfig.DataDir) > 0) {
+		println("Data directory is set. Using data directory as data source.")
 	}
 	return *toolConfig
 }

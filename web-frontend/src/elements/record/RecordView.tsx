@@ -191,8 +191,12 @@ function RecordView({ record }: inputProps) {
             )}
             {/* ########### Links ########### */}
             {record.compound.link &&
-              record.compound.link.map((link) => (
-                <tr key={'link-' + link.database + '-' + link.identifier}>
+              record.compound.link.map((link, i) => (
+                <tr
+                  key={
+                    'link-' + link.database + '-' + link.identifier + '-' + i
+                  }
+                >
                   <td>{link.database}</td>
                   <td>{link.identifier}</td>
                 </tr>

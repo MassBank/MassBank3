@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/Code-Hex/dd"
 	"github.com/MassBank/MassBank3/pkg/massbank"
@@ -102,7 +104,7 @@ func (p *PostgresSQLDB) Disconnect() error {
 // Count see [MB3Database.Count]
 func (p *PostgresSQLDB) Count() (int64, error) {
 	var count int64
-	err := p.database.QueryRow("SELECT COUNT(*) FROM  massbank").Scan(&count)
+	err := p.database.QueryRow("SELECT COUNT(id) FROM  massbank;").Scan(&count)
 	if err != nil && err.(*pq.Error).Code == "42P01" {
 		return 0, nil
 	}
@@ -119,7 +121,7 @@ func (p *PostgresSQLDB) IsEmpty() (bool, error) {
 		return false, err
 	}
 	var count uint
-	res := p.database.QueryRow(`SELECT COUNT(*) FROM massbank;`)
+	res := p.database.QueryRow(`SELECT COUNT(id) FROM massbank;`)
 	err = res.Scan(&count)
 	if err != nil && err.(*pq.Error).Code == "42P01" {
 		return true, nil
@@ -136,12 +138,12 @@ func (p *PostgresSQLDB) DropAllRecords() error {
 	if err = p.checkDatabase(); err != nil {
 		return err
 	}
-	q := "DROP TABLE massbank;"
+	q := "DROP TABLE massbank CASCADE;"
 	_, err = p.database.Exec(q)
 	if err != nil {
 		return err
 	}
-	q = "DROP TABLE metadata;"
+	q = "DROP TABLE metadata CASCADE;"
 	_, err = p.database.Exec(q)
 	if err != nil {
 		return err
@@ -151,12 +153,313 @@ func (p *PostgresSQLDB) DropAllRecords() error {
 
 // GetRecord see [MB3Database.GetRecord]
 func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
-	var result massbank.MassBank2
-	var b []byte
-	if err := p.database.QueryRow("SELECT document FROM massbank WHERE document->>'accession' = $1", *s).Scan(&b); err != nil {
+	var result = massbank.MassBank2{}
+
+	var massbankId uint
+	var filename string
+	var accession string
+	var title string
+	var comments []string
+	var copyright string
+	var date time.Time
+	var metadataId uint
+	var query = "SELECT * FROM massbank WHERE accession = $1;"
+	err := p.database.QueryRow(query, *s).Scan(
+		&massbankId, 
+		&filename,
+		&accession,
+		&title,
+		(*pq.StringArray)(&comments),
+		&copyright,
+		&date,
+		&metadataId,
+	); 
+	if err != nil {
 		return nil, err
 	}
-	var err = json.Unmarshal(b, &result)
+
+	result.RecordTitle = &title
+	result.Date = &massbank.RecordDate{Created: date, Updated: date, Modified: date} 
+	result.Accession = &accession
+	result.Comments = &[]massbank.SubtagProperty{} 
+	for _, comment := range comments {
+		parts := strings.Split(comment, "---")
+		*result.Comments = append(*result.Comments, massbank.SubtagProperty{Subtag: parts[0], Value: parts[1]})
+	}	
+
+	// contributors
+	var contributor string
+	query = "SELECT name FROM contributor WHERE id IN (SELECT contributor_id FROM accession_contributor WHERE massbank_id = $1);"
+	err = p.database.QueryRow(query, massbankId).Scan(&contributor); 
+	if err == nil {
+		result.Contributor = &contributor
+	}
+	
+
+	// authors
+	query = "SELECT name FROM author WHERE id IN (SELECT author_id FROM accession_author WHERE massbank_id = $1);"
+	rows, err := p.database.Query(query, massbankId)
+    if err == nil {
+		defer rows.Close()
+
+		result.Authors = &[]massbank.RecordAuthorName{}
+		for rows.Next() {
+			var author string
+			if err := rows.Scan(&author); err != nil {
+				return nil, err
+			}
+			*result.Authors = append(*result.Authors, massbank.RecordAuthorName{Name: author})
+		}
+		if err = rows.Err(); err != nil {
+			return nil, err
+		}
+    }
+    
+	
+	// license
+	query = "SELECT name FROM license WHERE id IN (SELECT license_id FROM accession_license WHERE massbank_id = $1);"
+	var license string
+	err = p.database.QueryRow(query, massbankId).Scan(&license)
+    if err == nil {
+		result.License = &license
+    }
+
+	// publication (for now only one publication per record)
+	query = "SELECT name FROM publication WHERE id IN (SELECT publication_id FROM accession_publication WHERE massbank_id = $1);"
+	var publication string
+	err = p.database.QueryRow(query, massbankId).Scan(&publication)
+    if err == nil {		
+		result.Publication = &publication
+    }
+	
+	// compound
+	query = "SELECT inchi, formula, smiles, mass FROM compound WHERE id IN (SELECT compound_id FROM compound_name WHERE massbank_id = $1);"
+	var inchi string
+	var formula string
+	var smiles string
+	var mass float64
+	err = p.database.QueryRow(query, massbankId).Scan(&inchi, &formula, &smiles, &mass)
+	if err == nil {
+		result.Compound = massbank.CompoundProperties{
+			InChI:   &inchi,
+			Formula: &formula,
+			Smiles:  &smiles,
+			Mass:    &mass,
+		}
+		// compound names
+		result.Compound.Names = &[]string{}
+		query = "SELECT name FROM compound_name WHERE compound_id IN (SELECT compound_id FROM compound_name WHERE massbank_id = $1);"
+		rows, err = p.database.Query(query, massbankId)
+		if err == nil {
+			defer rows.Close()
+
+			for rows.Next() {
+				var name string
+				if err := rows.Scan(&name); err != nil {
+					return nil, err
+				}
+				*result.Compound.Names = append(*result.Compound.Names, name)
+			}
+			if err = rows.Err(); err != nil {
+				return nil, err
+			}
+		}
+		
+		// compound classes
+		result.Compound.Classes = &[]string{}
+		query = "SELECT class FROM compound_class WHERE compound_id IN (SELECT compound_id FROM compound_class WHERE massbank_id = $1);"
+		rows, err = p.database.Query(query, massbankId)
+		if err == nil {
+			defer rows.Close()
+
+			for rows.Next() {
+				var class string
+				if err := rows.Scan(&class); err != nil {
+					return nil, err
+				}
+				*result.Compound.Classes = append(*result.Compound.Classes, class)
+			}
+			if err = rows.Err(); err != nil {
+				return nil, err
+			}
+		}
+		
+		// compound link
+		result.Compound.Link = &[]massbank.DatabaseProperty{}
+		query = "SELECT database, identifier FROM compound_link WHERE compound_id IN (SELECT compound_id FROM compound_link WHERE massbank_id = $1);"
+		rows, err = p.database.Query(query, massbankId)
+		if err == nil {
+			defer rows.Close()
+
+			for rows.Next() {
+				var database string
+				var identifier string
+				if err := rows.Scan(&database, &identifier); err != nil {
+					return nil, err
+				}
+				*result.Compound.Link = append(*result.Compound.Link, massbank.DatabaseProperty{Database: database, Identifier: identifier})
+			}
+			if err = rows.Err(); err != nil {
+				return nil, err
+			}
+		}
+		
+		fmt.Println("compound: ", result.Compound)
+	}
+
+	// acquisition
+	query = "SELECT instrument, instrument_type FROM acquisition_instrument WHERE id IN (SELECT acquisition_instrument_id FROM accession_acquisition WHERE massbank_id = $1);"
+	var instrument string
+	var instrumentType string
+	err = p.database.QueryRow(query, massbankId).Scan(&instrument, &instrumentType)
+	if err == nil {
+		result.Acquisition = massbank.AcquisitionProperties{
+			Instrument:     &instrument,
+			InstrumentType: &instrumentType,
+		}
+		// acquisition mass spectrometry
+		result.Acquisition.MassSpectrometry = &[]massbank.SubtagProperty{}
+		query = "SELECT subtag, value FROM acquisition_mass_spectrometry WHERE massbank_id = $1;"
+		rows, err = p.database.Query(query, massbankId)
+		if err == nil {
+			defer rows.Close()
+
+			for rows.Next() {
+				var subtag string
+				var value string
+				if err := rows.Scan(&subtag, &value); err != nil {
+					return nil, err
+				}
+				*result.Acquisition.MassSpectrometry = append(*result.Acquisition.MassSpectrometry, massbank.SubtagProperty{Subtag: subtag, Value: value})
+			}
+			if err = rows.Err(); err != nil {
+				return nil, err
+			}			
+		}
+		// acquisition chromatography
+		result.Acquisition.Chromatography = &[]massbank.SubtagProperty{}
+		query = "SELECT subtag, value FROM acquisition_chromatography WHERE massbank_id = $1;"
+		rows, err = p.database.Query(query, massbankId)
+		if err == nil {
+			defer rows.Close()
+
+			for rows.Next() {
+				var subtag string
+				var value string
+				if err := rows.Scan(&subtag, &value); err != nil {
+					return nil, err
+				}
+				*result.Acquisition.Chromatography = append(*result.Acquisition.Chromatography, massbank.SubtagProperty{Subtag: subtag, Value: value})
+			}
+			if err = rows.Err(); err != nil {
+				return nil, err
+			}
+		}
+		
+		// acquisition general
+		result.Acquisition.General = &[]massbank.SubtagProperty{}
+		query = "SELECT subtag, value FROM acquisition_general WHERE massbank_id = $1;"
+		rows, err = p.database.Query(query, massbankId)
+		if err == nil {
+			defer rows.Close()
+
+			for rows.Next() {
+				var subtag string
+				var value string
+				if err := rows.Scan(&subtag, &value); err != nil {
+					return nil, err
+				}
+				*result.Acquisition.General = append(*result.Acquisition.General, massbank.SubtagProperty{Subtag: subtag, Value: value})
+			}
+			if err = rows.Err(); err != nil {
+				return nil, err
+			}
+		}
+	}
+	
+	
+	// mass spectrometry
+	query = "SELECT subtag, value FROM mass_spectrometry_focused_ion WHERE massbank_id = $1;"
+	result.MassSpectrometry = massbank.MassSpecProperties{}
+	rows, err = p.database.Query(query, massbankId)
+	if err == nil {
+		defer rows.Close()
+
+		result.MassSpectrometry.FocusedIon = &[]massbank.SubtagProperty{}
+		for rows.Next() {
+			var subtag string
+			var value string
+			if err := rows.Scan(&subtag, &value); err != nil {
+				return nil, err
+			}
+
+			*result.MassSpectrometry.FocusedIon = append(*result.MassSpectrometry.FocusedIon, massbank.SubtagProperty{Subtag: subtag, Value: value})
+		}
+		if err = rows.Err(); err != nil {
+			return nil, err
+		}
+	}
+	query = "SELECT subtag, value FROM mass_spectrometry_data_processing WHERE massbank_id = $1;"
+	rows, err = p.database.Query(query, massbankId)
+	if err == nil {
+		defer rows.Close()
+	
+		result.MassSpectrometry.DataProcessing = &[]massbank.SubtagProperty{}	
+		for rows.Next() {
+			var subtag string
+			var value string
+			if err := rows.Scan(&subtag, &value); err != nil {
+				return nil, err
+		}
+
+			*result.MassSpectrometry.DataProcessing = append(*result.MassSpectrometry.DataProcessing, massbank.SubtagProperty{Subtag: subtag, Value: value})
+		}
+		if err = rows.Err(); err != nil {
+			return nil, err
+		}
+	}	
+	
+	// peak
+	result.Peak = massbank.PeakProperties{}
+	var spectrumId uint
+	var splash string
+	var numPeak uint
+
+	query = "SELECT id, splash, num_peak FROM spectrum WHERE massbank_id = $1;"
+	err = p.database.QueryRow(query, massbankId).Scan(&spectrumId, &splash, &numPeak)
+	if err == nil {
+		result.Peak.Peak = &massbank.PkPeak{}
+			
+		result.Peak.Splash = &splash
+		result.Peak.NumPeak = &numPeak
+
+		query = "SELECT mz, intensity, relative_intensity FROM peak WHERE spectrum_id = $1;"
+		rows, err = p.database.Query(query, spectrumId)
+		if err == nil {
+			defer rows.Close()
+
+			result.Peak.Peak.Mz = []float64{}
+			result.Peak.Peak.Intensity = []float64{}
+			result.Peak.Peak.Rel = []uint{}
+			for rows.Next() {
+				var mz float64
+				var intensity float64
+				var rel uint
+				if err := rows.Scan(&mz, &intensity, &rel); err != nil {
+					return nil, err
+				}
+
+				result.Peak.Peak.Mz = append(result.Peak.Peak.Mz, mz)
+				result.Peak.Peak.Intensity = append(result.Peak.Peak.Intensity, intensity)
+				result.Peak.Peak.Rel = append(result.Peak.Peak.Rel, rel)
+			}
+			if err = rows.Err(); err != nil {
+				return nil, err
+			}
+		}		
+	}
+	
+
 	return &result, err
 }
 
@@ -173,9 +476,6 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 	}
 
 	where := bqb.Optional("WHERE")
-	if !filters.IncludeDeprecated {
-		where.And("document->>'deprecated' is null")
-	}
 	if filters.InstrumentType != nil {
 		where.And("document->'acquisition'->>'instrument_type' IN (?)", *filters.InstrumentType)
 	}
@@ -220,10 +520,10 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 			diff.Or("(t1.mz-t2.mz BETWEEN ? AND ?)", pd-*filters.MassEpsilon, pd+*filters.MassEpsilon)
 		}
 		innerwhere.And("?", diff)
-		peakdiffquery = bqb.New("JOIN (WITH t AS (SELECT mz,id FROM (SELECT jsonb_array_elements(document->'peak'->'peak'->'mz')::float AS mz,jsonb_array_elements(document->'peak'->'peak'->'rel')::int AS rel,id FROM massbank) as relmz WHERE relmz.rel>=?) SELECT DISTINCT t1.id FROM t as t1 LEFT JOIN t as t2 ON t1.id=t2.id ?) AS diff ON massbank.id = diff.id", *filters.IntensityCutoff, innerwhere)
+		peakdiffquery = bqb.New("JOIN (WITH t AS (SELECT mz,id FROM (SELECT jsonb_array_elements(document->'peak'->'peak'->'mz')::float AS mz,jsonb_array_elements(document->'peak'->'peak'->'rel')::int AS rel,id FROM massbank) AS relmz WHERE relmz.rel>=?) SELECT DISTINCT t1.id FROM t AS t1 LEFT JOIN t AS t2 ON t1.id=t2.id ?) AS diff ON massbank.id = diff.id", *filters.IntensityCutoff, innerwhere)
 
 	}
-	query := bqb.New("WITH mbdeprecated as (select count(*) OVER() spectraCount, json_build_object('id', document->>'accession','title', document->>'title')::json spectrum, document->'compound' compound FROM massbank ? ?) SELECT  count(*) OVER() resultCount, (array_agg(DISTINCT spectraCount))[1] spectraCount, compound->>'inchi' inchi, array_to_json(array_agg(spectrum ORDER BY spectrum->>'id')) spectra, array_to_json(array_agg(DISTINCT compound->>'formula')) formula, array_to_json(array_agg(DISTINCT compound->>'mass')) mass, array_to_json(array_agg(DISTINCT compound->'name')) names , array_to_json(array_agg(DISTINCT compound->>'smiles')) smiles FROM mbdeprecated GROUP BY inchi", peakdiffquery, where)
+	query := bqb.New("WITH mbdeprecated AS (select count(*) OVER() spectraCount, json_build_object('id', document->>'accession','title', document->>'title')::json spectrum, document->'compound' compound FROM massbank ? ?) SELECT  count(*) OVER() resultCount, (array_agg(DISTINCT spectraCount))[1] spectraCount, compound->>'inchi' inchi, array_to_json(array_agg(spectrum ORDER BY spectrum->>'id')) spectra, array_to_json(array_agg(DISTINCT compound->>'formula')) formula, array_to_json(array_agg(DISTINCT compound->>'mass')) mass, array_to_json(array_agg(DISTINCT compound->'name')) names , array_to_json(array_agg(DISTINCT compound->>'smiles')) smiles FROM mbdeprecated GROUP BY inchi", peakdiffquery, where)
 	query.Space("ORDER BY (array_agg(spectrum))[1]->>'title' ASC LIMIT ? OFFSET ?", filters.Limit, filters.Offset)
 	sql, params, err := query.ToPgsql()
 	rows, err := p.database.Query(sql, params...)
@@ -293,51 +593,53 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 
 // GetUniqueValues see [MB3Database.GetUniqueValues]
 func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
+
+	fmt.Println("GetUniqueValues -> start")
 	var query = `
-WITH mbdeprecated as (SELECT * FROM massbank WHERE document->>'deprecated' is null)
-SELECT to_json(co) as contributor,
-       to_json(it) as instrument_type,
-       to_json(mt) as ms_type,
-       to_json(im) as ion_mode,
-       mass.maxm   as max_mass,
-       mass.minm   as min_mass,
-       mz.maxmz    as max_mz,
-       mz.minmz    as min_mz,
-       i.maxi      as max_intensity,
-       i.mini      as min_intensity
+SELECT to_json(co) AS contributor,
+       to_json(it) AS instrument_type,
+       to_json(mt) AS ms_type,
+       to_json(im) AS ion_mode,
+       mass.maxm   AS max_mass,
+       mass.minm   AS min_mass,
+       mz.maxmz    AS max_mz,
+       mz.minmz    AS min_mz,
+       i.maxi      AS max_intensity,
+       i.mini      AS min_intensity
 FROM
     (SELECT ARRAY(SELECT t
-                   FROM (SELECT document ->> 'contributor' as val,
+                   FROM (SELECT document ->> 'contributor' AS val,
                                 count(id)
-                         from mbdeprecated
-                         GROUP BY document ->> 'contributor' ORDER BY document ->> 'contributor') t)) as co,
+                         FROM massbank
+                         GROUP BY document ->> 'contributor' ORDER BY document ->> 'contributor') t)) AS co,
      (SELECT ARRAY(SELECT t
-                   FROM (SELECT document -> 'acquisition' ->> 'instrument_type' as val,
+                   FROM (SELECT document -> 'acquisition' ->> 'instrument_type' AS val,
                                 count(id)
-                         from mbdeprecated
-                         GROUP BY document -> 'acquisition' ->> 'instrument_type' ORDER BY document -> 'acquisition' ->> 'instrument_type' ) t)) as it,
+                         FROM massbank
+                         GROUP BY document -> 'acquisition' ->> 'instrument_type' ORDER BY document -> 'acquisition' ->> 'instrument_type' ) t)) AS it,
      (SELECT ARRAY(SELECT t
-                   FROM (select t.ms ->> 'value' as val, count(t.ms)
-                         FROM (Select jsonb_array_elements(document -> 'acquisition' -> 'mass_spectrometry') as ms
-                               from mbdeprecated) t
-                         where ms ->> 'subtag' = 'MS_TYPE'
-                         GROUP BY t.ms ORDER BY t.ms) t)) as mt,
+                   FROM (SELECT t.ms ->> 'value' AS val, count(t.ms)
+                         FROM (SELECT jsonb_array_elements(document -> 'acquisition' -> 'mass_spectrometry') AS ms
+                               FROM massbank) t
+                         WHERE ms ->> 'subtag' = 'MS_TYPE'
+                         GROUP BY t.ms ORDER BY t.ms) t)) AS mt,
      (SELECT ARRAY(SELECT t
-                   FROM (select t.ms ->> 'value' as val, count(t.ms)
-                         FROM (Select jsonb_array_elements(document -> 'acquisition' -> 'mass_spectrometry') as ms
-                               from mbdeprecated) t
-                         where ms ->> 'subtag' = 'ION_MODE'
-                         GROUP BY t.ms ORDER BY t.ms) t)) as im,
-     (SELECT MIN((document -> 'compound' ->> 'mass' )::float8) as minm,
-             MAX((document -> 'compound' ->> 'mass' )::float8) as maxm
-      from mbdeprecated) as mass,
-     (SELECT MIN(t.mz) as minmz, MAX(t.mz) as maxmz
-      from (SELECT jsonb_array_elements(document -> 'peak' -> 'peak' -> 'mz')::float8 as mz FROM mbdeprecated) t) as mz,
-     (SELECT MIN(t.i) as mini, MAX(t.i) as maxi
-      FROM (SELECT jsonb_array_elements(document -> 'peak' -> 'peak' -> 'intensity')::float8 as i
-            FROM mbdeprecated) t) as i`
+                   FROM (SELECT t.ms ->> 'value' AS val, count(t.ms)
+                         FROM (SELECT jsonb_array_elements(document -> 'acquisition' -> 'mass_spectrometry') AS ms
+                               FROM massbank) t
+                         WHERE ms ->> 'subtag' = 'ION_MODE'
+                         GROUP BY t.ms ORDER BY t.ms) t)) AS im,
+     (SELECT MIN((document -> 'compound' ->> 'mass' )::float8) AS minm,
+             MAX((document -> 'compound' ->> 'mass' )::float8) AS maxm
+      FROM massbank) AS mass,
+     (SELECT MIN(t.mz) AS minmz, MAX(t.mz) AS maxmz
+      FROM (SELECT jsonb_array_elements(document -> 'peak' -> 'peak' -> 'mz')::float8 AS mz FROM massbank) t) AS mz,
+     (SELECT MIN(t.i) AS mini, MAX(t.i) AS maxi
+      FROM (SELECT jsonb_array_elements(document -> 'peak' -> 'peak' -> 'intensity')::float8 AS i
+            FROM massbank) t) AS i`
 	var val MB3Values
 	row := p.database.QueryRow(query)
+	fmt.Println("GetUniqueValues -> end")
 	cojs := make([]uint8, 0)
 	itjs := make([]uint8, 0)
 	mtjs := make([]uint8, 0)
@@ -353,6 +655,7 @@ FROM
 		&val.Peak.Min,
 		&val.Intensity.Max,
 		&val.Intensity.Min)
+	fmt.Println("GetUniqueValues -> end 2")
 	var rit = struct{ Array []MBCountValues }{}
 	json.Unmarshal(cojs, &rit)
 	val.Contributor = append(val.Contributor, rit.Array...)
@@ -362,6 +665,7 @@ FROM
 	val.MSType = append(val.MSType, rit.Array...)
 	json.Unmarshal(imjs, &rit)
 	val.IonMode = append(val.IonMode, rit.Array...)
+	fmt.Println("GetUniqueValues -> end 3")
 	return val, err
 }
 
@@ -395,47 +699,292 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId str
 	if err := p.checkDatabase(); err != nil {
 		return err
 	}
-	q := `INSERT INTO massbank(
-                     filename,
-                     document,
-                     metadataid) 
-			VALUES ($1,$2,$3);`
-	tx, err := p.database.Begin()
-	if err != nil {
-		return err
-	}
-	pStmt, err := tx.Prepare(q)
-	if err != nil {
-		if err2 := tx.Rollback(); err2 != nil {
-			return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
-
-		}
-		return err
-	}
+	
 	mid, err := strconv.ParseInt(metaDataId, 10, 64)
 	if err != nil {
-		if err2 := tx.Rollback(); err2 != nil {
-			return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
-		}
 		return err
 	}
 	for _, record := range records {
-		js, err := json.Marshal(record)
+		// insert into main table (massbank)
+		tx, err := p.database.Begin()
+		if err != nil {
+			return err
+		}
+		q := `INSERT INTO massbank (
+						filename,
+						accession,
+						title,
+						comments,
+						copyright,
+						date,
+						metadata_id) 
+				VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id;`
+		var comments = []string{}
+		if record.Comments != nil {
+			for _, comment := range *record.Comments {
+				comments = append(comments, "\"" + strings.ReplaceAll(comment.Subtag, "\"", "'") + "---" + strings.ReplaceAll(comment.Value, "\"", "'") + "\"")
+			} 
+		}
+		var massbankId int
+		err = tx.QueryRow(q,
+			record.Metadata.FileName, 
+			record.Accession, 
+			record.RecordTitle, 
+			"{" + strings.Join(comments, ",") + "}", 
+			record.Copyright, 
+			record.Date.Created,
+			mid).Scan(&massbankId)		
 		if err != nil {
 			if err2 := tx.Rollback(); err2 != nil {
 				return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
 			}
 			return err
 		}
-		_, err = pStmt.Exec(record.Metadata.FileName, js, mid)
+
+		// insert into contributor table
+		q = `INSERT INTO contributor (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id;`
+		var contributorId int
+		err = tx.QueryRow(q, *record.Contributor).Scan(&contributorId)
 		if err != nil {
 			if err2 := tx.Rollback(); err2 != nil {
 				return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
 			}
 			return err
 		}
+		// insert into accession_contributor table	
+		q = `INSERT INTO accession_contributor (massbank_id, contributor_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`					
+		_, err = tx.Exec(q, massbankId, contributorId)
+		if err != nil {
+			if err2 := tx.Rollback(); err2 != nil {
+				return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+			}
+			return err
+		}	
+
+		// insert into author table
+		if record.Authors != nil {			
+			for _, author := range *record.Authors {	
+				q = `INSERT INTO author (name) VALUES ($1) ON CONFLICT DO NOTHING RETURNING id;`
+				var authorId int
+				err := tx.QueryRow(q, author.Name).Scan(&authorId)
+				if err != nil {
+					if err2 := tx.Rollback(); err2 != nil {
+						return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+					}
+					return err
+				}
+				q = `INSERT INTO accession_author (massbank_id, author_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`								
+				_, err = tx.Exec(q, massbankId, authorId)
+				if err != nil {
+					if err2 := tx.Rollback(); err2 != nil {
+						return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+					}
+					return err
+				}
+			}					
+		}
+		// insert into license tables
+		if record.License != nil {
+			q = `INSERT INTO license (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id;`
+			var licenseId int
+			err = tx.QueryRow(q, *record.License).Scan(&licenseId)
+			if err != nil {
+				if err2 := tx.Rollback(); err2 != nil {
+					return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+				}
+				return err
+			}
+			q = `INSERT INTO accession_license (massbank_id, license_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`						
+			_, err = tx.Exec(q, massbankId, licenseId)
+			if err != nil {
+				if err2 := tx.Rollback(); err2 != nil {
+					return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+				}
+				return err
+			}	
+		}
+		// insert into publication table
+		if record.Publication != nil {
+			q = `INSERT INTO publication (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id;`			
+			var publicationId int
+			err = tx.QueryRow(q, *record.Publication).Scan(&publicationId)
+			if err != nil {
+				if err2 := tx.Rollback(); err2 != nil {
+					return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+				}
+				return err
+			}
+			q = `INSERT INTO accession_publication (massbank_id, publication_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`						
+			_, err = tx.Exec(q, massbankId, publicationId)
+			if err != nil {
+				if err2 := tx.Rollback(); err2 != nil {
+					return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+				}
+				return err
+			}	
+		}
+		// insert into compound table
+		q = `INSERT INTO compound (inchi, formula, smiles, mass) VALUES ($1, $2, $3, $4) ON CONFLICT (inchi, formula, smiles, mass) DO UPDATE SET inchi = EXCLUDED.inchi, formula = EXCLUDED.formula, smiles = EXCLUDED.smiles, mass = EXCLUDED.mass RETURNING id;`
+		var compoundId int
+		err = tx.QueryRow(q, *record.Compound.InChI, *record.Compound.Formula, *record.Compound.Smiles, *record.Compound.Mass).Scan(&compoundId)
+		if err != nil {
+			if err2 := tx.Rollback(); err2 != nil {
+				return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+			}
+			return err
+		}
+		if(record.Compound.Names != nil) {
+			q = `INSERT INTO compound_name (name, compound_id, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
+			for _, name := range *record.Compound.Names {							
+				_, err = tx.Exec(q, name, compoundId, massbankId)
+				if err != nil {
+					if err2 := tx.Rollback(); err2 != nil {
+						return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+					}
+					return err
+				}
+			}
+		}
+		if(record.Compound.Link != nil) {
+			q = `INSERT INTO compound_link (database, identifier, compound_id, massbank_id) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING;`
+			for _, link := range *record.Compound.Link {												
+				_, err = tx.Exec(q, link.Database, link.Identifier, compoundId, massbankId)
+				if err != nil {
+					if err2 := tx.Rollback(); err2 != nil {
+						return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+					}
+					return err
+				}
+			}
+		}
+		// insert into acquisition table
+		q = `INSERT INTO acquisition_instrument (instrument, instrument_type) VALUES ($1, $2) ON CONFLICT (instrument, instrument_type) DO UPDATE SET instrument = EXCLUDED.instrument, instrument_type = EXCLUDED.instrument_type RETURNING id;`
+		var acquisitionInstrumentId int
+		err = tx.QueryRow(q, *record.Acquisition.Instrument, *record.Acquisition.InstrumentType).Scan(&acquisitionInstrumentId)		
+		if err != nil {
+			if err2 := tx.Rollback(); err2 != nil {
+				return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+			}
+			return err
+		}
+		q = `INSERT INTO accession_acquisition (massbank_id, acquisition_instrument_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`			
+		_, err = tx.Exec(q, massbankId, acquisitionInstrumentId)
+		if err != nil {
+			if err2 := tx.Rollback(); err2 != nil {
+				return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+			}
+			return err
+		}
+
+		if(record.Acquisition.MassSpectrometry != nil) {
+			q = `INSERT INTO acquisition_mass_spectrometry (subtag, value, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
+			for _, subProp := range *record.Acquisition.MassSpectrometry {												
+				_, err = tx.Exec(q, subProp.Subtag, subProp.Value, massbankId)
+				if err != nil {
+					if err2 := tx.Rollback(); err2 != nil {
+						return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+					}
+					return err
+				}
+			}
+		}
+		if(record.Acquisition.Chromatography != nil) {
+			q = `INSERT INTO acquisition_chromatography (subtag, value, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
+			for _, subProp := range *record.Acquisition.Chromatography {												
+				_, err = tx.Exec(q, subProp.Subtag, subProp.Value, massbankId)
+				if err != nil {
+					if err2 := tx.Rollback(); err2 != nil {
+						return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+					}
+					return err
+				}
+			}
+		}
+		if(record.Acquisition.General != nil) {
+			q = `INSERT INTO acquisition_general (subtag, value, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
+			for _, subProp := range *record.Acquisition.General {												
+				_, err = tx.Exec(q, subProp.Subtag, subProp.Value, massbankId)
+				if err != nil {
+					if err2 := tx.Rollback(); err2 != nil {
+						return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+					}
+					return err
+				}
+			}
+		}
+
+		// insert into mass spectrometry table
+		if(record.MassSpectrometry.FocusedIon != nil) {
+			q = `INSERT INTO mass_spectrometry_focused_ion (subtag, value, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
+			for _, subProp := range *record.MassSpectrometry.FocusedIon {				
+				_, err = tx.Exec(q, subProp.Subtag, subProp.Value, massbankId)
+				if err != nil {
+					if err2 := tx.Rollback(); err2 != nil {
+						return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+					}
+					return err
+				}
+			}
+		}
+		if(record.MassSpectrometry.DataProcessing != nil) {
+			q = `INSERT INTO mass_spectrometry_data_processing(subtag, value, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
+			for _, subProp := range *record.MassSpectrometry.DataProcessing {				
+				_, err = tx.Exec(q, subProp.Subtag, subProp.Value, massbankId)
+				if err != nil {
+					if err2 := tx.Rollback(); err2 != nil {
+						return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+					}
+					return err
+				}
+			}
+		}
+
+		// insert into peak-related tables
+		q = `INSERT INTO spectrum (splash, num_peak, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING id;`		
+		var spectrumId int
+		err = tx.QueryRow(q, *record.Peak.Splash, *record.Peak.NumPeak, massbankId).Scan(&spectrumId)
+		if err != nil {
+			if err2 := tx.Rollback(); err2 != nil {
+				return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+			}
+			return err
+		}
+		
+		q = `INSERT INTO peak (mz, intensity, relative_intensity, spectrum_id) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING;`
+		for i, mz := range record.Peak.Peak.Mz {
+			_, err = tx.Exec(q, mz, record.Peak.Peak.Intensity[i], record.Peak.Peak.Rel[i], spectrumId)
+			if err != nil {
+				if err2 := tx.Rollback(); err2 != nil {
+					return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+				}
+				return err
+			}
+		}
+		if(record.Peak.Annotation != nil && record.Peak.Annotation.Values != nil) {
+			q = `INSERT INTO peak_annotation(subtag, value, spectrum_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
+			for _, header := range record.Peak.Annotation.Header {
+				values := record.Peak.Annotation.Values[header];
+				for _, value := range values {
+					_, err = tx.Exec(q, header, value, spectrumId)
+					if err != nil {
+						if err2 := tx.Rollback(); err2 != nil {
+							return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+						}
+						return err
+					}
+				}
+			}
+		}
+
+		err = tx.Commit()
+		if err != nil {
+			if err2 := tx.Rollback(); err2 != nil {
+				return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+			}
+			return err
+		}	
 	}
-	err = tx.Commit()
+
 	return err
 }
 
@@ -467,9 +1016,9 @@ func (p *PostgresSQLDB) UpdateRecords(records []*massbank.MassBank2, metaDataId 
 		INSERT INTO massbank(
                      filename,
                      document,
-                     metadataid)
+                     metadata_id)
 			VALUES ($1,$2,$3)
-			ON CONFLICT ((document->'accession'),metadataid) DO UPDATE 
+			ON CONFLICT (accession),metadata_id) DO UPDATE 
 				SET filename = $1,
 				    document = $2;
 		`
@@ -479,8 +1028,8 @@ func (p *PostgresSQLDB) UpdateRecords(records []*massbank.MassBank2, metaDataId 
 		UPDATE massbank 
 			SET filename = $1,
 			    document = $2
-			WHERE (document->'accession') = $4 
-			  AND  metadataid= $3 `
+			WHERE (accession) = $4 
+			  AND  metadata_id= $3 `
 	}
 	tx, err := p.database.Begin()
 	stmt, err := tx.Prepare(q)
@@ -516,7 +1065,7 @@ func (p *PostgresSQLDB) UpdateRecords(records []*massbank.MassBank2, metaDataId 
 				last = l
 				inserted += 1
 			}
-		}
+		}		
 
 	}
 	return uint64(modified), uint64(inserted), tx.Commit()
@@ -524,31 +1073,185 @@ func (p *PostgresSQLDB) UpdateRecords(records []*massbank.MassBank2, metaDataId 
 
 func (p *PostgresSQLDB) init() error {
 	var err error
-	var queries = []string{
+	var query = 
 		`
-		CREATE TABLE IF NOT EXISTS metadata
-			(id SERIAL,
+		DROP SCHEMA public CASCADE;
+		CREATE SCHEMA public;
+
+		CREATE TABLE IF NOT EXISTS metadata (
+			id SERIAL PRIMARY KEY,
 			commit char(40),
 			timestamp timestamp NOT NULL,
 			version varchar(10) NOT NULL,
-		    PRIMARY KEY (id),
-		    UNIQUE (commit,timestamp,version))
-		`,
-		`
-		CREATE TABLE IF NOT EXISTS massbank 
-			(id SERIAL, 
-			 filename VARCHAR, 
-			 document jsonb,
-			 metadataId INT,
-			 FOREIGN KEY  (metadataId) REFERENCES metadata(id))
- 		`,
-		`CREATE INDEX IF NOT EXISTS mb_accession_idx ON massbank((document->'accession'))`,
-		`CREATE UNIQUE INDEX IF NOT EXISTS mb_accession_metadata_idx ON massbank((document->'accession'),metadataid)`,
-	}
-	for _, q := range queries {
-		if _, err = p.database.Exec(q); err != nil {
-			return err
-		}
+			UNIQUE (commit, timestamp, version)
+		);
+
+		CREATE TABLE IF NOT EXISTS massbank (
+			id SERIAL PRIMARY KEY,
+			filename TEXT NOT NULL,
+			accession VARCHAR(40) NOT NULL UNIQUE,	
+			title TEXT,
+			comments TEXT[],
+			copyright TEXT,
+			date timestamp NOT NULL,
+			metadata_id INT NOT NULL REFERENCES metadata(id) ON UPDATE CASCADE ON DELETE CASCADE
+		);
+
+		-- contributor
+		CREATE TABLE IF NOT EXISTS contributor (
+			id SERIAL PRIMARY KEY,
+			name TEXT NOT NULL,
+			UNIQUE (name)
+		);
+		CREATE TABLE IF NOT EXISTS accession_contributor (
+			massbank_id INT REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			contributor_id INT NOT NULL REFERENCES contributor(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			UNIQUE (massbank_id, contributor_id)
+		);
+
+		-- author
+		CREATE TABLE IF NOT EXISTS author (
+			id SERIAL PRIMARY KEY,
+			name TEXT NOT NULL
+		);
+		CREATE TABLE IF NOT EXISTS accession_author (
+			massbank_id INT REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			author_id INT NOT NULL REFERENCES author(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			UNIQUE (massbank_id, author_id)
+		);
+
+		-- license
+		CREATE TABLE IF NOT EXISTS license (
+			id SERIAL PRIMARY KEY,
+			name TEXT NOT NULL,
+			UNIQUE (name)
+		);
+		CREATE TABLE IF NOT EXISTS accession_license (
+			massbank_id INT REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			license_id INT NOT NULL REFERENCES license(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			UNIQUE (massbank_id, license_id)
+		);
+
+		-- publication
+		CREATE TABLE IF NOT EXISTS publication (
+			id SERIAL PRIMARY KEY,
+			name TEXT NOT NULL,
+			UNIQUE (name)
+		);
+		CREATE TABLE IF NOT EXISTS accession_publication (
+			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			publication_id INT NOT NULL REFERENCES publication(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			UNIQUE (massbank_id, publication_id)
+		);
+
+		-- compound
+		CREATE TABLE IF NOT EXISTS compound (
+			id SERIAL PRIMARY KEY,
+			inchi TEXT NOT NULL,
+			formula TEXT NOT NULL,
+			smiles TEXT NOT NULL,
+			mass FLOAT NOT NULL,
+			UNIQUE (inchi, formula, smiles, mass)
+		);
+		CREATE TABLE IF NOT EXISTS compound_name (
+			name TEXT NOT NULL,
+			compound_id INT NOT NULL REFERENCES compound(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			UNIQUE (name, compound_id, massbank_id)		
+		);
+		CREATE TABLE IF NOT EXISTS compound_class (
+			class TEXT NOT NULL,
+			compound_id INT NOT NULL REFERENCES compound(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			UNIQUE (class, compound_id, massbank_id)
+		);
+		CREATE TABLE IF NOT EXISTS compound_link (
+			database TEXT NOT NULL,
+			identifier TEXT NOT NULL,
+			compound_id INT NOT NULL REFERENCES compound(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			UNIQUE (database, identifier, compound_id, massbank_id)
+		);
+
+		-- acquisition
+		CREATE TABLE IF NOT EXISTS acquisition_instrument (
+			id SERIAL PRIMARY KEY,
+			instrument TEXT NOT NULL,
+			instrument_type TEXT NOT NULL,
+			UNIQUE (instrument, instrument_type)
+		);
+		CREATE TABLE IF NOT EXISTS accession_acquisition (
+			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			acquisition_instrument_id INT NOT NULL REFERENCES acquisition_instrument(id) ON UPDATE CASCADE ON DELETE CASCADE
+		);
+		CREATE TABLE IF NOT EXISTS acquisition_mass_spectrometry (
+			subtag TEXT NOT NULL,
+			value TEXT NOT NULL,
+			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
+		);
+		CREATE TABLE IF NOT EXISTS acquisition_chromatography (
+			subtag TEXT NOT NULL,
+			value TEXT NOT NULL,
+			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
+		);
+		CREATE TABLE IF NOT EXISTS acquisition_general (
+			subtag TEXT NOT NULL,
+			value TEXT NOT NULL,
+			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
+		);
+
+		-- mass spectrometry
+		CREATE TABLE IF NOT EXISTS mass_spectrometry_focused_ion (
+			subtag TEXT NOT NULL,
+			value TEXT NOT NULL,
+			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			UNIQUE (subtag, value, massbank_id)
+		);
+		CREATE TABLE IF NOT EXISTS mass_spectrometry_data_processing (
+			subtag TEXT NOT NULL,
+			value TEXT NOT NULL,
+			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			UNIQUE (subtag, value, massbank_id)
+		);
+
+		-- spectrum (peak)
+		CREATE TABLE IF NOT EXISTS spectrum (
+			id SERIAL PRIMARY KEY,
+			splash TEXT NOT NULL,
+			num_peak INT NOT NULL,			
+			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
+		);
+		CREATE TABLE IF NOT EXISTS peak (
+			mz FLOAT NOT NULL,
+			intensity FLOAT NOT NULL,
+			relative_intensity FLOAT NOT NULL,	
+			spectrum_id INT NOT NULL REFERENCES spectrum(id) ON UPDATE CASCADE ON DELETE CASCADE
+		);
+		CREATE TABLE IF NOT EXISTS peak_annotation (
+			subtag TEXT NOT NULL,
+			value TEXT NOT NULL,
+			spectrum_id INT NOT NULL REFERENCES spectrum(id) ON UPDATE CASCADE ON DELETE CASCADE
+		);
+
+		
+
+		-- project
+		-- CREATE TABLE IF NOT EXISTS project (
+		-- 	id SERIAL PRIMARY KEY,
+		-- 	name TEXT NOT NULL UNIQUE
+		-- );
+		-- CREATE TABLE IF NOT EXISTS accession_project (
+		-- 	massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
+		-- 	project_id INT NOT NULL REFERENCES project(id) ON UPDATE CASCADE ON DELETE CASCADE,
+		-- 	UNIQUE (massbank_id, project_id)
+		-- );
+		
+		-- species (sample)
+
+		`;
+	
+	if _, err = p.database.Exec(query); err != nil {
+		return err
 	}
 	return nil
 }

@@ -83,7 +83,7 @@ func main() {
 	}
 	count, err = db.Count()
 
-	println("Database update was succesful. ", count, " records in database.")
+	println("Database update was successful. ", count, " records in database.")
 }
 
 func readDirectoryData(dir string) ([]*massbank.MassBank2, *massbank.MbMetaData, error) {
