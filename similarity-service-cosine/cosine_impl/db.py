@@ -10,6 +10,22 @@ DB_HOST = os.environ.get('DB_HOST', "localhost")
 DB_NAME = os.environ.get('DB_NAME', "massbank3")
 spectra = []
 
+class ReferenceSpectra:
+    """This class loads all reference spectra from the database"""
+    def __init__(self, connection):
+        """initialize the class with a database connection"""
+        self.connection = connection
+        self.spectra = []
+
+    def get_spectra(self):
+        with self.connection.cursor() as cur:
+            cur.execute("select * from metadata;")
+            timestamp = cur.fetchone()[2]
+        print(timestamp)
+
+if __name__ == '__main__':
+    myspec=ReferenceSpectra(psycopg.connect(f"postgresql://{DB_NAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"))
+    myspec.get_spectra()
 
 # Load all (non-deprecated) spectra from the database for faster lookup
 def load_spectra():

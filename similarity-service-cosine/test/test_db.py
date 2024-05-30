@@ -1,7 +1,6 @@
 from pytest_postgresql import factories
 from pathlib import Path
 
-
 new_postgresql = factories.postgresql_proc()
 database = factories.postgresql("new_postgresql", dbname="massbank3", load=[Path("test_dump.sql")])
 
