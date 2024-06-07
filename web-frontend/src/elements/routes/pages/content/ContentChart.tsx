@@ -7,6 +7,23 @@ import calculateColour from '../../../../utils/calculateColour';
 import ValueCount from '../../../../types/ValueCount';
 import Content from '../../../../types/Content';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const options: any = {
+  plugins: {
+    legend: {
+      position: 'right',
+      labels: {
+        boxWidth: 10,
+        padding: 5,
+        font: {
+          size: 10,
+        },
+      },
+      align: 'center',
+    },
+  },
+};
+
 type InputProps = {
   content: Content;
   identifier: string;
@@ -43,22 +60,6 @@ function ContentChart({ content, identifier, width }: InputProps) {
     );
     const counts = contentValueCounts.map((vc) => vc.count);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const options: any = {
-      plugins: {
-        legend: {
-          position: 'top',
-          labels: {
-            boxWidth: 10,
-            padding: 5,
-            font: {
-              size: 10,
-            },
-          },
-          align: 'center',
-        },
-      },
-    };
     const finalData = {
       labels: labels,
       datasets: [
@@ -76,13 +77,12 @@ function ContentChart({ content, identifier, width }: InputProps) {
 
     return (
       <div
-        className="content-chart"
+        className="content-chart-container"
         style={{
-          width: width / 4,
-          border: 'solid 1px black',
+          width,
         }}
       >
-        <p>
+        <p className="content-chart-label">
           {(itemCount > 10 ? 'Top 10 of ' : '') +
             splitStringAndCapitaliseFirstLetter(identifier, '_', ' ')}
         </p>
@@ -90,6 +90,7 @@ function ContentChart({ content, identifier, width }: InputProps) {
           data={finalData}
           options={options}
           fallbackContent={<p>{`No content for ${identifier}`}</p>}
+          style={{ padding: '5px' }}
         />
       </div>
     );

@@ -1,5 +1,6 @@
 import { useState, useEffect, MutableRefObject } from 'react';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function useContainerDimensions(ref: MutableRefObject<any>) {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 

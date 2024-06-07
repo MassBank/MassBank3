@@ -1,6 +1,7 @@
+/* eslint-disable no-unused-vars */
 import './ContentTable.scss';
 
-import { useMemo } from 'react';
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import ValueCount from '../../../../types/ValueCount';
 import {
   splitStringAndCapitaliseFirstLetter,
@@ -8,6 +9,8 @@ import {
 } from '../../../../utils/stringUtils';
 import CheckBox from '../../../basic/CheckBox';
 import Content from '../../../../types/Content';
+import Button from '../../../basic/Button';
+import { on } from 'events';
 
 function buildRow(
   key: string,
@@ -15,6 +18,8 @@ function buildRow(
   k: number,
   valueCounts: ValueCount[],
   elements: JSX.Element[],
+  // eslint-disable-next-line no-unused-vars
+  onSelectAll: (key: string) => void,
 ) {
   return (
     <tr key={'content-table-row-' + key + '-' + i + '-' + k}>
@@ -25,7 +30,27 @@ function buildRow(
             (valueCounts.length % 4 === 0 ? 0 : 1)
           }
         >
-          {splitStringAndCapitaliseFirstLetter(key, '_', ' ')}
+          {
+            <div>
+              <label>
+                {splitStringAndCapitaliseFirstLetter(key, '_', ' ')}
+              </label>
+              <Button
+                child={
+                  valueCounts.filter((vc) => vc.flag === true).length ===
+                  valueCounts.length
+                    ? 'Unselect'
+                    : 'Select'
+                }
+                onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+
+                  onSelectAll(key);
+                }}
+              />
+            </div>
+          }
         </td>
       ) : undefined}
 
@@ -37,24 +62,26 @@ function buildRow(
 }
 
 type InputProps = {
-  content: Content;
-  // eslint-disable-next-line no-unused-vars
-  onSelect: (key: string, value: string, isChecked: boolean) => void;
+  content: Content | undefined;
+  onSelect: (
+    key: string,
+    value: string | undefined,
+    isChecked: boolean | undefined,
+  ) => void;
 };
 
 function ContentTable({ content, onSelect }: InputProps) {
-  const contentTable = useMemo(() => {
+  const header = (
+    <tr key={'content-table-header'}>
+      <th>Category</th>
+      <th colSpan={4}>Value</th>
+    </tr>
+  );
+
+  const rows = useMemo(() => {
     if (content) {
       const keys = Object.keys(content).filter((key) => key !== 'metadata');
-
-      const header = (
-        <tr key={'content-table-header'}>
-          <th>Category</th>
-          <th colSpan={4}>Value</th>
-        </tr>
-      );
-
-      const rows: JSX.Element[] = [];
+      const _rows: JSX.Element[] = [];
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
         const totalCount = (content[key] as ValueCount[])
@@ -76,35 +103,41 @@ function ContentTable({ content, onSelect }: InputProps) {
               label={
                 splitStringAndJoin(vc.value, '_', ' ') + ' (' + vc.count + ')'
               }
+              isCheckedOutside={vc.flag}
             />,
           );
 
           if ((k + 1) % 4 === 0) {
-            rows.push(buildRow(key, i, k, valueCounts, elements));
+            _rows.push(
+              buildRow(key, i, k, valueCounts, elements, () =>
+                onSelect(key, undefined, undefined),
+              ),
+            );
             elements = [];
           } else if (k === valueCounts.length - 1) {
-            rows.push(buildRow(key, i, k, valueCounts, elements));
+            _rows.push(
+              buildRow(key, i, k, valueCounts, elements, () =>
+                onSelect(key, undefined, undefined),
+              ),
+            );
           }
         }
       }
-
-      return (
-        <div className="content-table-container">
-          <table className="content-table">
-            <thead>{header}</thead>
-            <tbody>
-              {rows}
-              <tr className="auto-height" />
-            </tbody>
-          </table>
-        </div>
-      );
+      return _rows;
     }
-
-    return undefined;
   }, [content, onSelect]);
 
-  return contentTable;
+  return (
+    <div className="content-table-container">
+      <table className="content-table">
+        <thead>{header}</thead>
+        <tbody>
+          {rows}
+          <tr className="auto-height" />
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
 export default ContentTable;

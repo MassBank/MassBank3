@@ -14,7 +14,7 @@ import ContentChart from './ContentChart';
 
 function ContentView() {
   const ref = useRef(null);
-  const { width, height } = useContainerDimensions(ref);
+  const { width } = useContainerDimensions(ref);
 
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [recordCount, setRecordCount] = useState<number | undefined>();
@@ -106,12 +106,26 @@ function ContentView() {
   );
 
   const handleOnSelect = useCallback(
-    (key: string, value: string, isChecked: boolean) => {
+    (
+      key: string,
+      value: string | undefined,
+      isChecked: boolean | undefined,
+    ) => {
       if (content2) {
         const _content = { ...content2 };
-        _content[key] = [...(_content[key] as ValueCount[])].map((vc) =>
-          vc.value === value ? { ...vc, flag: isChecked } : vc,
-        );
+        const valueCounts = [...(_content[key] as ValueCount[])];
+        if (value === undefined || isChecked === undefined) {
+          const allSet =
+            valueCounts.filter((vc) => vc.flag === true).length ===
+            valueCounts.length;
+          _content[key] = valueCounts.map((vc) => {
+            return { ...vc, flag: !allSet };
+          });
+        } else {
+          _content[key] = valueCounts.map((vc) =>
+            vc.value === value ? { ...vc, flag: isChecked } : vc,
+          );
+        }
 
         setContent2(_content);
       }
@@ -134,29 +148,28 @@ function ContentView() {
           key={'chart_' + key}
           content={content}
           identifier={key}
-          width={width}
+          width={width / 4}
         />
       ));
 
-      return (
-        <div
-          className="content-charts"
-          style={{
-            width,
-            height,
-          }}
-        >
-          {_charts}
-        </div>
-      );
+      return <div className="content-charts">{_charts}</div>;
     }
 
     return undefined;
-  }, [content, height, width]);
+  }, [content, width]);
+
+  const contentTable = useMemo(
+    () => <ContentTable content={content2} onSelect={handleOnSelect} />,
+    [content2, handleOnSelect],
+  );
 
   const searchButton = useMemo(
     () => (
-      <Button child={'Search'} onClick={() => handleOnFetchContent(content2)} />
+      <Button
+        child={'Search'}
+        onClick={() => handleOnFetchContent(content2)}
+        style={{ width: '100%', height: '50px' }}
+      />
     ),
     [content2, handleOnFetchContent],
   );
@@ -174,9 +187,7 @@ function ContentView() {
           </h2>
 
           {charts}
-          {content2 ? (
-            <ContentTable content={content2} onSelect={handleOnSelect} />
-          ) : undefined}
+          {contentTable}
           {searchButton}
         </>
       )}
