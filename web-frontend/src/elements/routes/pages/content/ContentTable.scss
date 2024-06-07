@@ -1,0 +1,39 @@
+.content-table-container {
+  width: 100%;
+  height: 100%;
+
+  overflow: scroll;
+
+  .content-table {
+    width: 100%;
+    height: 100%;
+
+    text-align: center;
+    border-spacing: 0;
+    border: 1px solid #dedede;
+
+    th,
+    td {
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      padding: 0.3rem;
+      border: 1px solid #dedede;
+    }
+
+    thead th {
+      position: sticky;
+      position: -webkit-sticky;
+      top: 0;
+      background: lightgrey;
+    }
+
+    tr:hover {
+      background-color: lightcyan;
+    }
+
+    .auto-height {
+      height: 100%;
+    }
+  }
+}

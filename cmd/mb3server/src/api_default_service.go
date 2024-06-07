@@ -74,8 +74,6 @@ func (s *DefaultApiService) GetRecord(ctx context.Context, accession string) (Im
 
 	record, err := GetRecord(accession)
 	return Response(200, record), err
-
-	return Response(http.StatusNotImplemented, nil), errors.New("GetRecord method not implemented")
 }
 
 // GetRecords - Get a list of records
