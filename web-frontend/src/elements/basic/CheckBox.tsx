@@ -3,6 +3,7 @@ import {
   CSSProperties,
   ChangeEvent,
   useCallback,
+  useEffect,
   useMemo,
   useState,
 } from 'react';
@@ -11,6 +12,8 @@ type InputProps = {
   defaultValue: boolean;
   // eslint-disable-next-line no-unused-vars
   onChange: (isChecked: boolean) => void;
+  // eslint-disable-next-line no-unused-vars
+  isCheckedOutside?: boolean;
   label?: string;
   className?: string;
   style?: CSSProperties;
@@ -19,11 +22,18 @@ type InputProps = {
 function CheckBox({
   defaultValue,
   onChange,
+  isCheckedOutside,
   label,
   className = 'CheckBox',
   style,
 }: InputProps) {
   const [isChecked, setIsChecked] = useState<boolean>(defaultValue);
+
+  useEffect(() => {
+    if (isCheckedOutside !== undefined) {
+      setIsChecked(isCheckedOutside);
+    }
+  }, [isCheckedOutside]);
 
   const handleOnChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {

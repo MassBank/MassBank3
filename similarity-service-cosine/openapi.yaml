@@ -12,7 +12,7 @@ paths:
   /version:
     get:
       summary: Get the version string of the implementation.
-      x-openapi-router-controller: similarity-score-impl.similarity-score-controller
+      x-openapi-router-controller: cosine_impl.cosine_impl_controller
       operationId: version_get
       responses:
         "200":
@@ -25,7 +25,7 @@ paths:
   /similarity:
     post:
       summary: Create a new similarity calculation.
-      x-openapi-router-controller: similarity-score-impl.similarity-score-controller
+      x-openapi-router-controller: cosine_impl.cosine_impl_controller
       operationId: similarity_post
       requestBody:
         description: a similarity job

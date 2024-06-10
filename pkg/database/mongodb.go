@@ -3,16 +3,17 @@ package database
 import (
 	"context"
 	"errors"
+	"log"
+	"reflect"
+	"strconv"
+	"time"
+
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	bson2 "gopkg.in/mgo.v2/bson"
-	"log"
-	"reflect"
-	"strconv"
-	"time"
 )
 
 // Mb3MongoDB represents a mongodb connection and should implement [MB3Database]

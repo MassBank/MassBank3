@@ -1,10 +1,11 @@
 package database
 
 import (
-	"github.com/Code-Hex/dd"
-	"github.com/MassBank/MassBank3/pkg/massbank"
 	"log"
 	"math"
+
+	"github.com/Code-Hex/dd"
+	"github.com/MassBank/MassBank3/pkg/massbank"
 )
 
 // Filters is the abstract description of filters used to find MassBank records

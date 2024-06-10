@@ -1,0 +1,17 @@
+.content-chart-container {
+  height: 100%;
+
+  border: solid 1px black;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .content-chart-label {
+    padding-top: 10px;
+    margin-bottom: 0px;
+  }
+
+  margin: 0px;
+}
