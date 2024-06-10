@@ -108,7 +108,7 @@ func getDBConfig() database.DBConfig {
 		log.Panicln(errors.New("Could not read port variable: DB_PORT=" + dbPortEnv))
 	}
 	c.DbPort = uint(dbPort)
-	flag.StringVar(&databaseType, "db_type", databaseType, "Database type must be postgres or mongodb. Overwrites environment variable DB_TYPE")
+	flag.StringVar(&databaseType, "db_type", databaseType, "Database type must be postgres (currently). Overwrites environment variable DB_TYPE")
 	flag.StringVar(&c.DbUser, "db_user", c.DbUser, "database user name. Overwrites environment variable DB_USER")
 	flag.StringVar(&c.DbPwd, "db_pwd", c.DbPwd, "database user password. Overwrites environment variable DB_PASSWORD")
 	flag.StringVar(&c.DbHost, "db_host", c.DbHost, "database host. Overwrites environment variable DB_HOST")
@@ -118,10 +118,8 @@ func getDBConfig() database.DBConfig {
 	flag.Parse()
 	if databaseType == "postgres" {
 		c.Database = database.Postgres
-	} else if databaseType == "mongodb" {
-		c.Database = database.MongoDB
 	} else {
-		panic("Database must be postgres or mongodb")
+		panic("Database must be postgres (currently).")
 	}
 	if c.DbPort == 0 {
 		if c.Database == database.Postgres {

@@ -35,12 +35,6 @@ func TestNewPostgresSQLDb(t *testing.T) {
 			false,
 		},
 		{
-			"MongoDb valid config",
-			args{TestDbConfigs["mg valid"]},
-			nil,
-			true,
-		},
-		{
 			"Postgres empty config",
 			args{TestDbConfigs["pg empty"]},
 			nil,

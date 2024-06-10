@@ -34,8 +34,7 @@ type DatabaseType int
 
 // The list of supported databases
 const (
-	MongoDB  DatabaseType = 0
-	Postgres              = 1
+	Postgres = 0
 )
 
 // DBConfig is the abstract database configuration which should be used when working
@@ -223,12 +222,7 @@ var db MB3Database
 func InitDb(dbConfig DBConfig) (MB3Database, error) {
 	if db == nil {
 		var err error
-		if dbConfig.Database == MongoDB {
-			db, err = NewMongoDB(dbConfig)
-			if err != nil {
-				panic(err)
-			}
-		} else if dbConfig.Database == Postgres {
+		if dbConfig.Database == Postgres {
 			db, err = NewPostgresSQLDb(dbConfig)
 			log.Println(dd.Dump(db))
 			if err != nil {

@@ -1,11 +1,6 @@
 version: "3.1"
 
 services:
-  mongodb:
-    extends:
-      file: docker-compose-common.yaml
-      service: mongodb
-
   postgres:
     extends:
       file: docker-compose-common.yaml
@@ -17,7 +12,6 @@ services:
       service: mb3server
     build: ../
     depends_on:
-      - mongodb
       - postgres
 
   mb3frontend:
@@ -46,6 +40,4 @@ services:
       - dbinit
     depends_on:
       postgres:
-        condition: service_healthy
-      mongodb:
         condition: service_healthy

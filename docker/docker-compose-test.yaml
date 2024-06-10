@@ -1,23 +1,14 @@
-version: '3.1'
+version: "3.1"
 
 services:
-
-  testmongo:
-    extends:
-      file: docker-compose-common.yaml
-      service: mongodb
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: "mbtestuser"
-      MONGO_INITDB_ROOT_PASSWORD: "mbtestpwd"
-  
   testpostgres:
     extends:
       file: docker-compose-common.yaml
       service: postgres
     environment:
       POSTGRES_PASSWORD: "mbtestpwd"
-      POSTGRES_USER:     "mbtestuser"
-      POSTGRES_DB:       "mbtestdb"
+      POSTGRES_USER: "mbtestuser"
+      POSTGRES_DB: "mbtestdb"
 
   mb3server:
     extends:
@@ -27,9 +18,7 @@ services:
     depends_on:
       testpostgres:
         condition: service_healthy
-      testmongo:
-        condition: service_healthy
-  
+
   mb3test:
     build:
       context: ..
@@ -38,6 +27,4 @@ services:
       - ./testout:/go/src/out
     depends_on:
       testpostgres:
-        condition: service_healthy
-      testmongo:
         condition: service_healthy

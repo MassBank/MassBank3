@@ -3,10 +3,11 @@ package database
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/MassBank/MassBank3/pkg/massbank"
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/MassBank/MassBank3/pkg/massbank"
 )
 
 func TestMain(m *testing.M) {
@@ -86,7 +87,6 @@ type testDB struct {
 
 func initDBs(set DbInitSet) ([]testDB, error) {
 	var testDBs = []testDBinit{
-		{"mongodb", initMongoTestDB},
 		{"postgres", initPostgresTestDB},
 	}
 	var result = []testDB{}
@@ -125,18 +125,6 @@ func TestMB3Database_Connect(t *testing.T) {
 			TestDatabases["pg wrong host"],
 			true,
 		},
-		{"MongoDB valid",
-			TestDatabases["mg valid"],
-			false,
-		},
-		{"MongoDB valid with connection string",
-			TestDatabases["mg valid conn string"],
-			false,
-		},
-		{"MongoDB with wrong host",
-			TestDatabases["mg wrong host"],
-			true,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -172,26 +160,6 @@ func TestMB3Database_Disconnect(t *testing.T) {
 		{
 			"Postgres with wrong host",
 			TestDatabases["pg wrong host"],
-			true,
-		},
-		{"MongoDB valid",
-			TestDatabases["mg valid"],
-			false,
-		},
-		{"MongoDB valid second time",
-			TestDatabases["mg valid"],
-			true,
-		},
-		{"MongoDB with wrong host",
-			TestDatabases["mg wrong host"],
-			true,
-		},
-		{"MongoDB with connection string",
-			TestDatabases["mg valid conn string"],
-			false,
-		},
-		{"MongoDB with connection string second time",
-			TestDatabases["mg valid conn string"],
 			true,
 		},
 	}
@@ -716,13 +684,8 @@ func TestMB3Database_AddRecord(t *testing.T) {
 	for _, db := range DBs {
 		db.checkCount(t, 0)
 		var tests = []testData{}
-		for key, record := range mbTestRecords {
-			var versionId string
-			if db.name == "mongodb" {
-				versionId = "63fcbaf4b9e0e5714f9d623b"
-			} else {
-				versionId = "1"
-			}
+		for key, record := range mbTestRecords {			
+			versionId := "1" // default version id for postgres
 			data := testData{
 				name:    db.name + "-" + key,
 				args:    args{record, versionId},
@@ -757,12 +720,7 @@ func TestMB3Database_AddRecords(t *testing.T) {
 		wantCount uint64
 	}
 	for _, db := range DBs {
-		var versionId string
-		if db.name == "mongodb" {
-			versionId = "63fcbaf4b9e0e5714f9d623b"
-		} else {
-			versionId = "1"
-		}
+		versionId := "1" // default version id for postgres
 		var tests = []testData{
 			{
 				db.name + "-" + "Insert first 5",
@@ -831,13 +789,8 @@ func TestMB3Database_UpdateMetadata(t *testing.T) {
 				false,
 				false,
 			},
-		}
-		var versionId string
-		if db.name == "mongodb" {
-			versionId = "63f746d01247aa361673cb67"
-		} else {
-			versionId = "1"
-		}
+		}		
+		versionId := "1" // default version id for postgres
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				gotId, err := db.db.UpdateMetadata(&tt.args.metaData)
@@ -873,12 +826,7 @@ func TestMB3Database_UpdateRecord(t *testing.T) {
 	}
 	for _, db := range DBs {
 		db.checkCount(t, 8)
-		var versionId string
-		if db.name == "mongodb" {
-			versionId = "63fcbaf4b9e0e5714f9d623b"
-		} else {
-			versionId = "1"
-		}
+		versionId := "1" // default version id for postgres		
 		var tests = []testData{
 			{
 				"Update first",
@@ -935,12 +883,7 @@ func TestMB3Database_UpdateRecords(t *testing.T) {
 		wantCount uint64
 	}
 	for _, db := range DBs {
-		var versionId string
-		if db.name == "mongodb" {
-			versionId = "63fcbaf4b9e0e5714f9d623b"
-		} else {
-			versionId = "1"
-		}
+		versionId := "1" // default version id for postgres
 		var tests = []testData{
 			{
 				db.name + "-" + "Update first 5",

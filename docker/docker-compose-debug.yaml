@@ -1,13 +1,6 @@
 version: "3.1"
 
 services:
-  mongodb:
-    extends:
-      file: docker-compose-common.yaml
-      service: mongodb
-    ports:
-      - "27017:27017"
-
   postgres:
     extends:
       file: docker-compose-common.yaml
@@ -31,7 +24,6 @@ services:
     volumes:
       - ./debuglog:/var/log
     depends_on:
-      - mongodb
       - postgres
 
   mb3frontend:
@@ -52,8 +44,6 @@ services:
       service: mb3tool
     depends_on:
       postgres:
-        condition: service_healthy
-      mongodb:
         condition: service_healthy
 
   cdkdepict:
