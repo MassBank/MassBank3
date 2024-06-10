@@ -22,12 +22,7 @@ func main() {
 	var userConfig = config.GetToolConfig()
 	var db database.MB3Database
 	var err error
-	if userConfig.Database == database.MongoDB {
-		db, err = database.NewMongoDB(userConfig.DBConfig)
-		if err != nil {
-			panic(err)
-		}
-	} else if userConfig.Database == database.Postgres {
+	if userConfig.Database == database.Postgres {
 		db, err = database.NewPostgresSQLDb(userConfig.DBConfig)
 		if err != nil {
 			panic(err)
@@ -83,7 +78,7 @@ func main() {
 	}
 	count, err = db.Count()
 
-	println("Database update was succesful. ", count, " records in database.")
+	println("Database update was successful. ", count, " records in database.")
 }
 
 func readDirectoryData(dir string) ([]*massbank.MassBank2, *massbank.MbMetaData, error) {

@@ -3,10 +3,11 @@ package config
 import (
 	"errors"
 	"flag"
-	"github.com/MassBank/MassBank3/pkg/database"
 	"log"
 	"os"
 	"strconv"
+
+	"github.com/MassBank/MassBank3/pkg/database"
 )
 
 type ToolConfig struct {
@@ -63,6 +64,10 @@ func GetToolConfig() ToolConfig {
 	flag.Parse()
 	if len(toolConfig.GitRepo) > 0 && len(toolConfig.DataDir) > 0 {
 		println("Git repo and data directory are set. Using data directory as default and git repo as fallback.")
+	} else if(len(toolConfig.GitRepo) > 0) {
+		println("Git repo is set. Using git repo as data source.")
+	} else if(len(toolConfig.DataDir) > 0) {
+		println("Data directory is set. Using data directory as data source.")
 	}
 	return *toolConfig
 }
@@ -103,7 +108,7 @@ func getDBConfig() database.DBConfig {
 		log.Panicln(errors.New("Could not read port variable: DB_PORT=" + dbPortEnv))
 	}
 	c.DbPort = uint(dbPort)
-	flag.StringVar(&databaseType, "db_type", databaseType, "Database type must be postgres or mongodb. Overwrites environment variable DB_TYPE")
+	flag.StringVar(&databaseType, "db_type", databaseType, "Database type must be postgres (currently). Overwrites environment variable DB_TYPE")
 	flag.StringVar(&c.DbUser, "db_user", c.DbUser, "database user name. Overwrites environment variable DB_USER")
 	flag.StringVar(&c.DbPwd, "db_pwd", c.DbPwd, "database user password. Overwrites environment variable DB_PASSWORD")
 	flag.StringVar(&c.DbHost, "db_host", c.DbHost, "database host. Overwrites environment variable DB_HOST")
@@ -113,10 +118,8 @@ func getDBConfig() database.DBConfig {
 	flag.Parse()
 	if databaseType == "postgres" {
 		c.Database = database.Postgres
-	} else if databaseType == "mongodb" {
-		c.Database = database.MongoDB
 	} else {
-		panic("Database must be postgres or mongodb")
+		panic("Database must be postgres (currently).")
 	}
 	if c.DbPort == 0 {
 		if c.Database == database.Postgres {

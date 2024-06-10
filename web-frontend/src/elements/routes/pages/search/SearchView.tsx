@@ -3,14 +3,12 @@ import './SearchView.scss';
 import { MouseEvent, useCallback, useRef, useState } from 'react';
 import Peak from '../../../../types/peak/Peak';
 import generateID from '../../../../utils/generateID';
-import axios from 'axios';
 
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import Hit from '../../../../types/Hit';
 import SpectralHitsView from './SpectralHitsView';
 import Button from '../../../basic/Button';
 import Spinner from '../../../basic/Spinner';
-import Content from '../../../../types/Content';
 
 function SearchView() {
   const ref = useRef(null);
