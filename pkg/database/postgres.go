@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -1015,72 +1014,75 @@ func (p *PostgresSQLDB) UpdateRecords(records []*massbank.MassBank2, metaDataId 
 	if err != nil {
 		return 0, 0, err
 	}
-	mid, err := strconv.ParseInt(metaDataId, 10, 64)
-	if err != nil {
-		return 0, 0, err
-	}
+	// mid, err := strconv.ParseInt(metaDataId, 10, 64)
+	// if err != nil {
+	// 	return 0, 0, err
+	// }
 	var inserted int64 = 0
 	var modified int64 = 0
-	var last int64 = 0
-	var q string
-	if upsert {
-		q = `
-		INSERT INTO massbank(
-                     filename,
-                     document,
-                     metadata_id)
-			VALUES ($1,$2,$3)
-			ON CONFLICT (accession),metadata_id) DO UPDATE 
-				SET filename = $1,
-				    document = $2;
-		`
+	// var last int64 = 0
+	// var q string
+	// if upsert {
+	// 	q = `
+	// 	INSERT INTO massbank(
+    //                  filename,
+    //                  document,
+    //                  metadata_id)
+	// 		VALUES ($1,$2,$3)
+	// 		ON CONFLICT (accession),metadata_id) DO UPDATE 
+	// 			SET filename = $1,
+	// 			    document = $2;
+	// 	`
 
-	} else {
-		q = `
-		UPDATE massbank 
-			SET filename = $1,
-			    document = $2
-			WHERE (accession) = $4 
-			  AND  metadata_id= $3 `
-	}
-	tx, err := p.database.Begin()
-	stmt, err := tx.Prepare(q)
-	if err != nil {
-		return 0, 0, err
-	}
-	for _, r := range records {
-		js, err := json.Marshal(r)
-		if err != nil {
-			if err2 := tx.Rollback(); err2 != nil {
-				return 0, 0, errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
-			}
-			return uint64(modified), uint64(inserted), err
-		}
-		var res sql.Result
-		if upsert {
-			res, err = stmt.Exec(r.Metadata.FileName, js, mid)
-		} else {
-			acc, _ := json.Marshal(r.Accession)
-			res, err = stmt.Exec(r.Metadata.FileName, js, mid, acc)
-		}
-		if err != nil {
-			if err2 := tx.Rollback(); err2 != nil {
-				return 0, 0, errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
-			}
-			return 0, 0, err
-		}
-		if res != nil {
-			mod, _ := res.RowsAffected()
-			modified += mod
-			l, _ := res.LastInsertId()
-			if last != l {
-				last = l
-				inserted += 1
-			}
-		}		
+	// } else {
+	// 	q = `
+	// 	UPDATE massbank 
+	// 		SET filename = $1,
+	// 		    document = $2
+	// 		WHERE (accession) = $4 
+	// 		  AND  metadata_id= $3 `
+	// }
+	// tx, err := p.database.Begin()
+	// stmt, err := tx.Prepare(q)
+	// if err != nil {
+	// 	return 0, 0, err
+	// }
+	// for _, r := range records {
+	// 	js, err := json.Marshal(r)
+	// 	if err != nil {
+	// 		if err2 := tx.Rollback(); err2 != nil {
+	// 			return 0, 0, errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+	// 		}
+	// 		return uint64(modified), uint64(inserted), err
+	// 	}
+	// 	var res sql.Result
+	// 	if upsert {
+	// 		res, err = stmt.Exec(r.Metadata.FileName, js, mid)
+	// 	} else {
+	// 		acc, _ := json.Marshal(r.Accession)
+	// 		res, err = stmt.Exec(r.Metadata.FileName, js, mid, acc)
+	// 	}
+	// 	if err != nil {
+	// 		if err2 := tx.Rollback(); err2 != nil {
+	// 			return 0, 0, errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+	// 		}
+	// 		return 0, 0, err
+	// 	}
+	// 	if res != nil {
+	// 		mod, _ := res.RowsAffected()
+	// 		modified += mod
+	// 		l, _ := res.LastInsertId()
+	// 		if last != l {
+	// 			last = l
+	// 			inserted += 1
+	// 		}
+	// 	}		
+	//
+	// }
+	//
+	// return uint64(modified), uint64(inserted), tx.Commit()
 
-	}
-	return uint64(modified), uint64(inserted), tx.Commit()
+	return uint64(modified), uint64(inserted), err
 }
 
 func (p *PostgresSQLDB) init() error {

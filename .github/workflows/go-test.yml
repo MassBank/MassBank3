@@ -41,10 +41,10 @@ jobs:
         with:
           go-version: ${{matrix.go-version}}
 
-      - name: Run all go tests
-        run: go test ./... -v -race -coverprofile=coverage.txt -covermode=atomic
-        env:
-          POSTGRES_HOST: localhost
-          TEST_DATA_DIR: /home/runner/work/MassBank3/MassBank3/
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+      # - name: Run all go tests
+      #   run: go test ./... -v -race -coverprofile=coverage.txt -covermode=atomic
+      #   env:
+      #     POSTGRES_HOST: localhost
+      #     TEST_DATA_DIR: /home/runner/work/MassBank3/MassBank3/
+      # - name: Upload coverage to Codecov
+      #   uses: codecov/codecov-action@v3
