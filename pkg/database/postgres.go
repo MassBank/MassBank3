@@ -501,8 +501,6 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 // GetUniqueValues see [MB3Database.GetUniqueValues]
 func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 
-	fmt.Println("GetUniqueValues -> start")
-
 	var val MB3Values = MB3Values{}
 	var rows *sql.Rows
 	var err error
@@ -586,7 +584,6 @@ func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	if(filters.MsType != nil) {
 		var msTypes []string
 		for _, ms := range *filters.MsType {
-			fmt.Println("ms.String(): ", ms.String())
 			msTypes = append(msTypes, ms.String())
 		}
 		subQuery := "ms_type IN (" + "'" + strings.Join(msTypes, "','") + "'" + ")"
@@ -611,7 +608,6 @@ func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	}
 
 	query = query + " GROUP BY contributor, instrument_type, ms_type, ion_mode;"
-	fmt.Println("query: ", query)
 	rows, err = p.database.Query(query)
 	if err != nil {
 		return MB3Values{}, err
@@ -654,17 +650,10 @@ func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 		}
 	}
 
-
 	val.Contributor = contributors
-	fmt.Println("contributors: ", val.Contributor)
 	val.InstrumentType = instrumentTypes
-	fmt.Println("instrumentTypes: ", val.InstrumentType)
 	val.MSType = msTypes
-	fmt.Println("msTypes: ", val.MSType)
 	val.IonMode = ionModes
-	fmt.Println("ionModes: ", val.IonMode)
-	
-	fmt.Println("GetUniqueValues -> end")
 	
 	return val, err
 }
