@@ -168,7 +168,13 @@ function ContentView() {
       <Button
         child={'Search'}
         onClick={() => handleOnFetchContent(content2)}
-        style={{ width: '100%', height: '50px' }}
+        style={{
+          width: '100%',
+          height: '50px',
+          fontSize: '18px',
+          fontWeight: 'bold',
+          color: 'blue',
+        }}
       />
     ),
     [content2, handleOnFetchContent],
