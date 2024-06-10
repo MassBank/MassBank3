@@ -10,7 +10,6 @@ import {
 import CheckBox from '../../../basic/CheckBox';
 import Content from '../../../../types/Content';
 import Button from '../../../basic/Button';
-import { on } from 'events';
 
 function buildRow(
   key: string,
