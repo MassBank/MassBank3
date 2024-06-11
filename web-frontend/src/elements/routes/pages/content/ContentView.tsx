@@ -64,9 +64,6 @@ function ContentView() {
         });
     }
 
-    console.log(cont);
-    console.log(searchParams);
-
     return searchParams;
   }
 

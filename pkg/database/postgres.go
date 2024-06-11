@@ -1011,9 +1011,6 @@ func (p *PostgresSQLDB) UpdateRecords(records []*massbank.MassBank2, metaDataId 
 	if err = p.checkDatabase(); err != nil {
 		return 0, 0, err
 	}
-	if err != nil {
-		return 0, 0, err
-	}
 	// mid, err := strconv.ParseInt(metaDataId, 10, 64)
 	// if err != nil {
 	// 	return 0, 0, err
