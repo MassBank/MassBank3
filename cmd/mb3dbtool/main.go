@@ -77,6 +77,9 @@ func main() {
 		panic("No files found")
 	}
 	count, err = db.Count()
+	if err != nil {
+		panic(err)
+	}
 
 	println("Database update was successful. ", count, " records in database.")
 }
