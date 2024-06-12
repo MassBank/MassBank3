@@ -1086,8 +1086,8 @@ func (p *PostgresSQLDB) init() error {
 	var err error
 	var query = 
 		`
-		DROP SCHEMA public CASCADE;
-		CREATE SCHEMA public;
+		-- DROP SCHEMA public CASCADE;
+		-- CREATE SCHEMA public;
 
 		CREATE TABLE IF NOT EXISTS metadata (
 			id SERIAL PRIMARY KEY,
