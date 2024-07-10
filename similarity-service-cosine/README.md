@@ -26,7 +26,7 @@ To run the server, please execute the following from the root directory:
 
 ```
 pip3 install -r requirements.txt
-PYTHONPATH=gen python3 -m similarity-score-impl
+PYTHONPATH=gen python3 -m cosine_impl
 ```
 
 and open your browser to here:

@@ -3,10 +3,19 @@ import numpy as np
 from matchms import Spectrum, calculate_scores
 from matchms.similarity import CosineGreedy
 
-from cosine_impl.db import spectra
+from cosine_impl.db import ReferenceSpectra
 from openapi_server.models import SimilarityScore
 from openapi_server.models.similarity_calculation import SimilarityCalculation  # noqa: E501
 from openapi_server.models.similarity_score_list import SimilarityScoreList  # noqa: E501
+
+import os
+import psycopg
+
+DB_PORT = os.environ.get('DB_PORT', 5432)
+DB_USER = os.environ.get('DB_USER', "massbank3")
+DB_PASSWORD = os.environ.get('DB_PASSWORD', "massbank3password")
+DB_HOST = os.environ.get('DB_HOST', "localhost")
+DB_NAME = os.environ.get('DB_NAME', "massbank3")
 
 
 def similarity_post(similarity_calculation):  # noqa: E501
@@ -22,6 +31,9 @@ def similarity_post(similarity_calculation):  # noqa: E501
     if connexion.request.is_json:
         request = SimilarityCalculation.from_dict(similarity_calculation)
 
+        reference_spectra = ReferenceSpectra(psycopg.connect(f"postgresql://{DB_NAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"))
+        reference_spectra.load_spectra()
+
         mz = []
         intensities = []
 
@@ -35,11 +47,11 @@ def similarity_post(similarity_calculation):  # noqa: E501
             def filter_fn(spectrum):
                 return spectrum.metadata['spectrum_id'] in request.reference_spectra_list
 
-            references = list(filter(filter_fn, spectra))
+            references = list(filter(filter_fn, ReferenceSpectra.spectra))
 
             scores = calculate_scores(references, [query], CosineGreedy())
         else:
-            scores = calculate_scores(spectra, [query], CosineGreedy())
+            scores = calculate_scores(ReferenceSpectra.spectra, [query], CosineGreedy())
         matches = scores.scores_by_query(query, 'CosineGreedy_score', sort=True)
         match_list = SimilarityScoreList([])
 

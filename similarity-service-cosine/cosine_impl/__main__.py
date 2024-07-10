@@ -3,14 +3,8 @@
 import connexion
 
 from openapi_server import encoder
-from cosine_impl import db
-
 
 def main():
-    print("Loading spectra... ", end='', flush=True)
-    db.load_spectra()
-    print("Finished")
-
     app = connexion.App(__name__, specification_dir='..')
     app.app.json_encoder = encoder.JSONEncoder
     app.add_api('openapi.yaml',
