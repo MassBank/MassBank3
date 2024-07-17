@@ -1,12 +1,18 @@
 package mb3server
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
+	"sort"
 	"strconv"
+	"strings"
 
 	"github.com/MassBank/MassBank3/pkg/config"
 	"github.com/MassBank/MassBank3/pkg/database"
@@ -248,14 +254,7 @@ func GetCount() (*int64, error) {
 	return &count, nil
 }
 
-func GetRecord(accession string) (*MbRecord, error) {
-	if err := initDB(); err != nil {
-		return nil, err
-	}
-	record, err := db.GetRecord(&accession)
-	if err != nil {
-		return nil, err
-	}
+func buildMbRecord(record *massbank.MassBank2) (*MbRecord){
 	result := MbRecord{
 		Accession:  *record.Accession,
 		Deprecated: MbRecordDeprecated{},
@@ -330,8 +329,10 @@ func GetRecord(accession string) (*MbRecord, error) {
 	}
 
 	// insert authors
-	for _, author := range *record.Authors {
-		result.Authors = append(result.Authors, AuthorsInner(author))
+	if record.Authors != nil {
+		for _, author := range *record.Authors {
+			result.Authors = append(result.Authors, AuthorsInner(author))
+		}
 	}
 
 	// insert peak data
@@ -462,6 +463,139 @@ func GetRecord(accession string) (*MbRecord, error) {
 		result.MassSpectrometry.FocusedIon = ions
 	}
 
-	return &result, nil
+	return &result
+}
 
+func GetRecord(accession string) (*MbRecord, error) {
+	if err := initDB(); err != nil {
+		return nil, err
+	}
+	record, err := db.GetRecord(&accession)
+	if err != nil {
+		return nil, err
+	}
+	result := *buildMbRecord(record)
+
+	return &result, nil
+}
+
+func getEnv(name string, fallback string) string {
+	if value, ok := os.LookupEnv(name); ok {
+		return value
+	}
+	return fallback
+}
+
+func GetSimilarity(peakList []string, referenceSpectraList []string, instrumentType []string, msType []string, ionMode string, exactMass string, massTolerance float64, formula string, limit int32, intensityCutoff int32, contributor []string) (*SimilaritySearchResult, error) {
+	sort.Slice(peakList, func(i, j int) bool {
+		split1 := strings.Split(peakList[i], ";")
+		split2 := strings.Split(peakList[j], ";")
+		mz1, err := strconv.ParseFloat(split1[0], 64)
+		if err != nil {
+			return false
+		}
+		mz2, err := strconv.ParseFloat(split2[0], 64)
+		if err != nil {
+			return false
+		}
+		return mz1 < mz2
+	})
+	fmt.Println("peakList: ", peakList)
+	fmt.Println("referenceSpectraList: ", referenceSpectraList)
+	fmt.Println("instrumentType: ", instrumentType)
+	fmt.Println("msType: ", msType)
+	fmt.Println("ionMode: ", ionMode)
+	fmt.Println("exactMass: ", exactMass)
+	fmt.Println("massTolerance: ", massTolerance)
+	fmt.Println("formula: ", formula)
+	fmt.Println("limit: ", limit)
+	fmt.Println("intensityCutoff: ", intensityCutoff)
+	fmt.Println("contributor: ", contributor)	
+
+	if err := initDB(); err != nil {
+		return nil, err
+	}
+
+	type datatype1 struct {
+		Mz float64 `json:"mz"`
+		Intensity float64 `json:"intensity"`
+	}
+	peakListParam := []datatype1{}
+	for _, pl := range peakList {
+		split := strings.Split(pl, ";")
+		mzStr := split[0]
+		relStr := split[1]
+		mz, err := strconv.ParseFloat(mzStr, 64)
+		if err != nil {
+			return nil, err
+		}
+		rel, err := strconv.ParseFloat(relStr, 64)
+		if err != nil {
+			return nil, err
+		}
+		peakListParam = append(peakListParam, datatype1{Mz: mz, Intensity: rel})
+	}
+
+	hostname := getEnv("SIMILARITY_SERVICE_COSINE_HOST", "similarity-service-cosine")
+	port := getEnv("SIMILARITY_SERVICE_COSINE_PORT_INTERNAL", "8080")
+	requestURL := "http://" + hostname + ":" + port + "/similarity"
+
+	type datatype2 struct {
+		PeakList []datatype1 `json:"peak_list"`
+		ReferenceSpectraList []string `json:"reference_spectra_list"`
+	}
+
+	data := datatype2{}
+	data.PeakList = peakListParam
+	if len(referenceSpectraList) == 1 && referenceSpectraList[0] == ""{		
+		data.ReferenceSpectraList = []string{}
+	} else {
+		data.ReferenceSpectraList = referenceSpectraList
+	}
+
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(data)   
+	req, err := http.NewRequest(http.MethodPost, requestURL, b)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	type SimilarityScoreListInner struct {
+		Accession string `json:"accession"`
+		SimilarityScore float64 `json:"similarity_score"`
+	}
+	type SimilarityScoreList struct {
+		SimilarityScoreList []SimilarityScoreListInner `json:"similarity_score_list"`
+	}
+
+	var result SimilarityScoreList
+	err = json.NewDecoder(res.Body).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+
+	records := SimilaritySearchResult{}
+	records.Data = []SimilaritySearchResultDataInner{}
+	for i, res := range result.SimilarityScoreList {		
+		records.Data = append(records.Data, SimilaritySearchResultDataInner{
+			Accession: res.Accession,
+			Score: float32(res.SimilarityScore),			
+		})
+
+		if limit > 0 {
+			if int32(i) >= limit - 1 {
+				break
+			}
+		}
+	}
+
+	return &records, nil
 }

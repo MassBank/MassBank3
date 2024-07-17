@@ -1,7 +1,8 @@
 openapi: 3.0.3
 info:
   title: Similarity score api for MassBank3
-  description: This similarity score api for MassBank3 calculates the spectral similarity
+  description:
+    This similarity score api for MassBank3 calculates the spectral similarity
     between the spectrum defined in the query peak list and the reference spectra
     list.
   version: 0.0.1
@@ -34,7 +35,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/similarity_calculation'
+              $ref: "#/components/schemas/similarity_calculation"
 
       responses:
         "200":
@@ -42,7 +43,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/similarity_score_list'
+                $ref: "#/components/schemas/similarity_score_list"
         "400":
           description: The server can not process the input.
           content:
@@ -79,8 +80,8 @@ components:
           description: intensity value
           type: number
       example:
-        'mz': 147.063
-        'intensity': 121.684
+        "mz": 147.063
+        "intensity": 121.684
 
     peak_list:
       description: the peak list of the query spectrum
@@ -90,7 +91,7 @@ components:
         peak_list:
           type: array
           items:
-            $ref: '#/components/schemas/peak'
+            $ref: "#/components/schemas/peak"
           example:
             - mz: 147.063
               intensity: 121.684
@@ -123,8 +124,8 @@ components:
       description: a similarity calculation
       title: similarity_calculation
       allOf:
-        - $ref: '#/components/schemas/peak_list'
-        - $ref: '#/components/schemas/reference_spectra_list'
+        - $ref: "#/components/schemas/peak_list"
+        - $ref: "#/components/schemas/reference_spectra_list"
 
     similarity_score:
       description: the similarity score to a reference spectrum
@@ -147,7 +148,7 @@ components:
         similarity_score_list:
           type: array
           items:
-            $ref: '#/components/schemas/similarity_score'
+            $ref: "#/components/schemas/similarity_score"
           example:
             - accession: MSBNK-IPB_Halle-PB001341
               similarity_score: 0.3

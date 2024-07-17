@@ -1,0 +1,15 @@
+type: object
+properties:
+  data:
+    type: array
+    description: A ranked list of records with similarity scores.
+    items:
+      description: A record with similarity score.
+      type: object
+      properties:
+        accession:
+          description: MassBank accession id.
+          type: string
+        score:
+          description: Similarity score to the query spectrum.
+          type: number

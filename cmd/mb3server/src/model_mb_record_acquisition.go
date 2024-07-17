@@ -16,7 +16,7 @@ type MbRecordAcquisition struct {
 	Instrument string `json:"instrument"`
 
 	// Type of instrument
-	InstrumentType string `json:"instrument_type"`
+	InstrumentType string `json:"instrument_type" validate:"regexp=((CE|GC|LC)-)?(APCI|APPI|EI|ESI|FAB|MALDI,FD|CI|FISIMS)-(B|E|FT|IT|Q|TOF)(B|E|FT|IT|Q|TOF)?"`
 
 	MassSpectrometry AcMassSpec `json:"mass_spectrometry"`
 

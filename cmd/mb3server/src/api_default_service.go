@@ -15,19 +15,19 @@ import (
 	"net/http"
 )
 
-// DefaultApiService is a service that implements the logic for the DefaultApiServicer
+// DefaultAPIService is a service that implements the logic for the DefaultApiServicer
 // This service should implement the business logic for every endpoint for the DefaultApi API.
 // Include any external packages or services that will be required by this service.
-type DefaultApiService struct {
+type DefaultAPIService struct {
 }
 
 // NewDefaultApiService creates a default api service
-func NewDefaultApiService() DefaultApiServicer {
-	return &DefaultApiService{}
+func NewDefaultApiService() *DefaultAPIService {
+	return &DefaultAPIService{}
 }
 
 // GetBrowseOptions - get browse options
-func (s *DefaultApiService) GetBrowseOptions(ctx context.Context, instrumentType []string, msType []string, ionMode string, contributor []string) (ImplResponse, error) {
+func (s *DefaultAPIService) GetBrowseOptions(ctx context.Context, instrumentType []string, msType []string, ionMode string, contributor []string) (ImplResponse, error) {
 	opt, err := GetBrowseOptions(instrumentType, msType, ionMode, contributor)
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), errors.New("Could not get results")
@@ -36,7 +36,7 @@ func (s *DefaultApiService) GetBrowseOptions(ctx context.Context, instrumentType
 }
 
 // GetCount - get record count
-func (s *DefaultApiService) GetCount(ctx context.Context) (ImplResponse, error) {
+func (s *DefaultAPIService) GetCount(ctx context.Context) (ImplResponse, error) {
 	count, err := GetCount()
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), errors.New("Could not get result count")
@@ -46,7 +46,7 @@ func (s *DefaultApiService) GetCount(ctx context.Context) (ImplResponse, error) 
 }
 
 // GetFilterOptions - get filter options
-func (s *DefaultApiService) GetFilterOptions(ctx context.Context) (ImplResponse, error) {
+func (s *DefaultAPIService) GetFilterOptions(ctx context.Context) (ImplResponse, error) {
 
 	opt, err := GetBrowseOptions([]string{}, []string{}, "", []string{})
 	if err != nil {
@@ -57,7 +57,7 @@ func (s *DefaultApiService) GetFilterOptions(ctx context.Context) (ImplResponse,
 }
 
 // GetMetadata - get massbank metadata
-func (s *DefaultApiService) GetMetadata(ctx context.Context) (ImplResponse, error) {
+func (s *DefaultAPIService) GetMetadata(ctx context.Context) (ImplResponse, error) {
 	// TODO - update GetMetadata with the required logic for this service method.
 	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
@@ -68,7 +68,7 @@ func (s *DefaultApiService) GetMetadata(ctx context.Context) (ImplResponse, erro
 }
 
 // GetRecord - Get a MassBank record
-func (s *DefaultApiService) GetRecord(ctx context.Context, accession string) (ImplResponse, error) {
+func (s *DefaultAPIService) GetRecord(ctx context.Context, accession string) (ImplResponse, error) {
 	// TODO - update GetRecord with the required logic for this service method.
 	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
@@ -77,7 +77,7 @@ func (s *DefaultApiService) GetRecord(ctx context.Context, accession string) (Im
 }
 
 // GetRecords - Get a list of records
-func (s *DefaultApiService) GetRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, limit int32, page int32, intensityCutoff int32, inchiKey string, contributor []string) (ImplResponse, error) {
+func (s *DefaultAPIService) GetRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, limit int32, page int32, intensityCutoff int32, inchiKey string, contributor []string) (ImplResponse, error) {
 	result, err := GetRecords(limit, page, contributor, instrumentType, msType, ionMode)
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), errors.New("Could not get results")
@@ -86,8 +86,22 @@ func (s *DefaultApiService) GetRecords(ctx context.Context, instrumentType []str
 
 }
 
-func (s *DefaultApiService) GetSVG(ctx context.Context, s2 string) (ImplResponse, error) {
+func (s *DefaultAPIService) GetSVG(ctx context.Context, s2 string) (ImplResponse, error) {
 	svg, err := GetSvg(s2)
 
 	return Response(http.StatusOK, *svg), err
+}
+
+// GetSimilarity implements DefaultAPIServicer.
+func (s *DefaultAPIService) GetSimilarity(ctx context.Context, peakList []string, referenceSpectraList []string, instrumentType []string, msType []string, ionMode string, exactMass string, massTolerance float64, formula string, limit int32, intensityCutoff int32, contributor []string) (ImplResponse, error) {
+	// TODO - update GetSimilarity with the required logic for this service method.
+	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	result, err := GetSimilarity(peakList, referenceSpectraList, instrumentType, msType, ionMode, exactMass, massTolerance, formula, limit, intensityCutoff, contributor)
+
+	if err != nil {
+		return Response(http.StatusInternalServerError, nil), err
+	}
+
+	return Response(http.StatusOK, result), err
 }

@@ -1,11 +1,10 @@
 import { useMemo } from 'react';
 import Peak from '../../../../types/peak/Peak';
-import Chart from '../../../basic/Chart';
 import Carousel, { ResponsiveType } from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
 import './SpectralHitsView.scss';
 import Hit from '../../../../types/Hit';
-import PeakTable from '../../../record/PeakTable';
+import SpectralHitsViewComponent from './SpectralHitsViewComponent';
 
 type InputProps = {
   reference: Peak[];
@@ -24,37 +23,16 @@ function SpectralHitsView({
     const _width = width - 120;
     const _height = height - 40;
 
-    return hits.map((hit, i) => (
-      <div
-        className="chart-view"
-        style={{
-          width: _width,
-          height: _height,
-        }}
-        key={'spectral_match_' + i}
-      >
-        <div className="chart-score-view">
-          <p className="score-text">Score: {hit.score}</p>
-          <Chart
-            peakData={reference}
-            peakData2={hit.peaks}
-            width={_width * 0.7 - 10}
-            height={_height - 50 - 10}
-          />
-        </div>
-        <div className="peak-tables-view">
-          <PeakTable
-            peaks={reference}
-            width={_width * 0.3}
-            height={_height * 0.5}
-          />
-          <PeakTable
-            peaks={hit.peaks}
-            width={_width * 0.3}
-            height={_height * 0.5}
-          />
-        </div>
-      </div>
+    return hits.map((hit) => (
+      <SpectralHitsViewComponent
+        key={hit.accession}
+        referencePeaks={reference}
+        hitPeaks={hit.record.peak.peak.values as Peak[]}
+        accession={hit.accession}
+        score={hit.score}
+        width={_width}
+        height={_height}
+      />
     ));
   }, [height, hits, reference, width]);
 

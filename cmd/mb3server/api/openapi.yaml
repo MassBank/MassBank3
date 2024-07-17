@@ -38,7 +38,7 @@ paths:
       - description: "Filter by ion mode. If none is given, both is assumed."
         explode: true
         in: query
-        name: ion-mode
+        name: ion_mode
         required: false
         schema:
           $ref: '#/components/schemas/IonMode'
@@ -194,17 +194,17 @@ paths:
                 type: string
           description: A compound SVG
       summary: The SVG image for an accession
-  /records/count:    
+  /records/count:
     get:
-      summary: The number of all records
       operationId: getCount
       responses:
-        '200':
-          description: "The record count"
+        "200":
           content:
             application/json:
               schema:
                 type: string
+          description: The record count
+      summary: The number of all records
   /filter/options:
     get:
       operationId: getFilterOptions
@@ -241,7 +241,7 @@ paths:
       - description: "Filter by ion mode. If none is given, both is assumed."
         explode: true
         in: query
-        name: ion-mode
+        name: ion_mode
         required: false
         schema:
           $ref: '#/components/schemas/IonMode'
@@ -273,6 +273,116 @@ paths:
                 $ref: '#/components/schemas/Metadata'
           description: Metadata for database and datasets
       summary: get massbank metadata
+  /similarity:
+    get:
+      operationId: getSimilarity
+      parameters:
+      - description: Filter by peak list.
+        explode: true
+        in: query
+        name: peak_list
+        required: true
+        schema:
+          $ref: '#/components/schemas/PeakList'
+        style: form
+      - description: Filter by reference spectra list.
+        explode: true
+        in: query
+        name: reference_spectra_list
+        required: false
+        schema:
+          example:
+          - MSBNK-IPB_Halle-PB001341
+          - MSBNK-IPB_Halle-PB006202
+          - MSBNK-IPB_Halle-PB006203
+          - MSBNK-IPB_Halle-PB001342
+          - MSBNK-IPB_Halle-PB001343
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Filter by a list of instrument type, which will be associated\
+          \ by OR."
+        explode: true
+        in: query
+        name: instrument_type
+        required: false
+        schema:
+          $ref: '#/components/schemas/InstrumentType'
+        style: form
+      - description: "Filter by a List of MS types, which are associated by OR. If\
+          \ none is given, all is assumed."
+        explode: true
+        in: query
+        name: ms_type
+        required: false
+        schema:
+          $ref: '#/components/schemas/MSType'
+        style: form
+      - description: "Filter by ion mode. If none is given, both is assumed."
+        explode: true
+        in: query
+        name: ion_mode
+        required: false
+        schema:
+          $ref: '#/components/schemas/IonMode'
+        style: form
+      - description: Filter by exact mass.
+        explode: true
+        in: query
+        name: exact_mass
+        required: false
+        schema:
+          $ref: '#/components/schemas/ExactMass'
+        style: form
+      - description: "Tolerance for mass filters. Default: 0.3"
+        explode: true
+        in: query
+        name: mass_tolerance
+        required: false
+        schema:
+          $ref: '#/components/schemas/MassTolerance'
+        style: form
+      - description: Filter by formula.
+        explode: true
+        in: query
+        name: formula
+        required: false
+        schema:
+          $ref: '#/components/schemas/Formula'
+        style: form
+      - description: "Maximum number of results. Default: 20"
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          $ref: '#/components/schemas/Limit'
+        style: form
+      - description: "The Instensity cutoff for Peaklist search. Default: 5"
+        explode: true
+        in: query
+        name: intensity_cutoff
+        required: false
+        schema:
+          $ref: '#/components/schemas/IntensityCutoff'
+        style: form
+      - description: a contributor (institution)
+        explode: true
+        in: query
+        name: contributor
+        required: false
+        schema:
+          $ref: '#/components/schemas/Contributor'
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimilaritySearchResult'
+          description: A list of similar records
+      summary: Get a list of records with similarity scores
 components:
   schemas:
     InstrumentType:
@@ -291,6 +401,7 @@ components:
         type: string
       type: array
     IonMode:
+      description: "enum: [ POSITIVE, NEGATIVE ]"
       type: string
     CompoundName:
       type: string
@@ -317,14 +428,14 @@ components:
       type: array
     Intensity:
       default: 100
-      description: Releative intensity for peak search
+      description: Relative intensity for peak search
       maximum: 100
       minimum: 1
       type: integer
     PeakList:
       items:
-        description: "A tuple of m/z and intensity, e.g. (193.4,57)"
-        pattern: "\\([0-9]+(\\.[0-9]*)?,[0-9]+\\)"
+        description: "A tuple of m/z and intensity, e.g. (193.4;57)"
+        pattern: "\\([0-9]+(\\.[0-9]*)?;[0-9]+\\)"
         type: string
       type: array
     Limit:
@@ -408,8 +519,8 @@ components:
           updated: 2000-01-23
         copyright: copyright
         comments:
-        - null
-        - null
+        - MBRecord_comments_inner
+        - MBRecord_comments_inner
         mass_spectrometry:
           focused_ion:
           - subtag: BASE_PEAK
@@ -725,6 +836,20 @@ components:
       items:
         $ref: '#/components/schemas/StringCount_inner'
       type: array
+    SimilaritySearchResult:
+      example:
+        data:
+        - score: 0.8008281904610115
+          accession: accession
+        - score: 0.8008281904610115
+          accession: accession
+      properties:
+        data:
+          description: A ranked list of records with similarity scores.
+          items:
+            $ref: '#/components/schemas/SimilaritySearchResult_data_inner'
+          type: array
+      type: object
     Authors:
       items:
         $ref: '#/components/schemas/Authors_inner'
@@ -1254,6 +1379,19 @@ components:
         count:
           minimum: 0
           type: integer
+      type: object
+    SimilaritySearchResult_data_inner:
+      description: A record with similarity score.
+      example:
+        score: 0.8008281904610115
+        accession: accession
+      properties:
+        accession:
+          description: MassBank accession id.
+          type: string
+        score:
+          description: Similarity score to the query spectrum.
+          type: number
       type: object
     Authors_inner:
       description: Name of the author or affiliation

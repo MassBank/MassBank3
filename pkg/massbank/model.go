@@ -108,7 +108,7 @@ type PkPeak struct {
 	Header    []string  `json:"header"`
 	Mz        []float64 `json:"mz"`
 	Intensity []float64 `json:"intensity"`
-	Rel       []uint    `json:"rel"`
+	Rel       []int32    `json:"rel"`
 }
 
 type PkAnnotation struct {

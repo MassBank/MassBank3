@@ -365,7 +365,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					2536772.25,
 					204606.65625,
 				},
-				Rel: []uint{
+				Rel: []int32{
 					422,
 					36,
 					999,
@@ -619,7 +619,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					289484,
 					16528,
 				},
-				Rel: []uint{
+				Rel: []int32{
 					999,
 					125,
 					7,
@@ -887,7 +887,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					10982,
 					805229.1,
 				},
-				Rel: []uint{
+				Rel: []int32{
 					3,
 					5,
 					13,
@@ -1175,7 +1175,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					13043.94434,
 					75456.7,
 				},
-				Rel: []uint{
+				Rel: []int32{
 					180,
 					16,
 					10,
@@ -1337,7 +1337,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 				Intensity: []float64{
 					5.68, 1.26, 3.11, 1.85, 4.41, 19.29, 28.64, 7.9, 5.09, 1.39, 18.14, 34.82, 3.18, 2.3, 2.04, 1.25, 6.11, 6.12, 22.52, 1.38, 14.67, 1.15, 1.48, 1.16, 6.23, 2.84, 1.81, 12.7, 42.96, 6.05, 2.1, 5.12, 1.61, 31.68, 2.02, 5.64, 46.38, 3.12, 1.97, 8.22, 99.99, 8.31, 4.82,
 				},
-				Rel: []uint{
+				Rel: []int32{
 					57,
 					13,
 					31,
@@ -1611,7 +1611,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					54.97,
 					2.20,
 				},
-				Rel: []uint{
+				Rel: []int32{
 					15,
 					16,
 					133,
@@ -1824,7 +1824,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					0.04392,
 					0.03962,
 				},
-				Rel: []uint{
+				Rel: []int32{
 					97,
 					80,
 					999,
@@ -2048,7 +2048,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					2215,
 					237.5,
 				},
-				Rel: []uint{
+				Rel: []int32{
 					79,
 					57,
 					84,
@@ -2245,7 +2245,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					272.0,
 					1553.0,
 				},
-				Rel: []uint{
+				Rel: []int32{
 					12,
 					13,
 					15,
@@ -2417,7 +2417,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 				Intensity: []float64{
 					310073.000000,
 				},
-				Rel: []uint{
+				Rel: []int32{
 					999,
 				},
 			},
@@ -2523,7 +2523,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					235010720.0,
 					52446636.0,
 				},
-				Rel: []uint{
+				Rel: []int32{
 					312,
 					999,
 					222,
@@ -2878,7 +2878,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 					206.000000,
 					162.000000,
 				},
-				Rel: []uint{
+				Rel: []int32{
 					156,
 					135,
 					142,
@@ -3144,7 +3144,7 @@ var mbTestRecords = map[string]massbank.MassBank2{
 				Intensity: []float64{
 					47825.663583333335, 123675.15916666668, 2119825.3000000003, 538442.9091666666, 717615.9775, 348560.26666666666, 577177.7541666667, 162688.84041666667, 246360.69083333333, 1749842.5083333335,
 				},
-				Rel: []uint{
+				Rel: []int32{
 					22,
 					58,
 					999,

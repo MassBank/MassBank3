@@ -14,10 +14,10 @@ import (
 	"net/http"
 )
 
-// DefaultApiRouter defines the required methods for binding the api requests to a responses for the DefaultApi
-// The DefaultApiRouter implementation should parse necessary information from the http request,
-// pass the data to a DefaultApiServicer to perform the required actions, then write the service results to the http response.
-type DefaultApiRouter interface {
+// DefaultAPIRouter defines the required methods for binding the api requests to a responses for the DefaultAPI
+// The DefaultAPIRouter implementation should parse necessary information from the http request,
+// pass the data to a DefaultAPIServicer to perform the required actions, then write the service results to the http response.
+type DefaultAPIRouter interface {
 	GetBrowseOptions(http.ResponseWriter, *http.Request)
 	GetCount(http.ResponseWriter, *http.Request)
 	GetFilterOptions(http.ResponseWriter, *http.Request)
@@ -25,13 +25,14 @@ type DefaultApiRouter interface {
 	GetRecord(http.ResponseWriter, *http.Request)
 	GetRecords(http.ResponseWriter, *http.Request)
 	GetSVG(http.ResponseWriter, *http.Request)
+	GetSimilarity(http.ResponseWriter, *http.Request)
 }
 
-// DefaultApiServicer defines the api actions for the DefaultApi service
+// DefaultAPIServicer defines the api actions for the DefaultAPI service
 // This interface intended to stay up to date with the openapi yaml used to generate it,
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
-type DefaultApiServicer interface {
+type DefaultAPIServicer interface {
 	GetBrowseOptions(context.Context, []string, []string, string, []string) (ImplResponse, error)
 	GetCount(context.Context) (ImplResponse, error)
 	GetFilterOptions(context.Context) (ImplResponse, error)
@@ -39,4 +40,5 @@ type DefaultApiServicer interface {
 	GetRecord(context.Context, string) (ImplResponse, error)
 	GetRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, int32, int32, string, []string) (ImplResponse, error)
 	GetSVG(context.Context, string) (ImplResponse, error)
+	GetSimilarity(context.Context, []string, []string, []string, []string, string, string, float64, string, int32, int32, []string) (ImplResponse, error)
 }

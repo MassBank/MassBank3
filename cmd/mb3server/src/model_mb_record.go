@@ -12,7 +12,7 @@ package mb3server
 type MbRecord struct {
 
 	// Record identifier
-	Accession string `json:"accession"`
+	Accession string `json:"accession" validate:"regexp=MSBNK-[A-Z0–9_]{1,32}-[A-Z0–9_]{1,64}"`
 
 	Deprecated MbRecordDeprecated `json:"deprecated,omitempty"`
 
