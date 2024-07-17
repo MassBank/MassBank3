@@ -47,24 +47,21 @@ paths:
         "400":
           description: The server can not process the input.
           content:
-            application/json:
+            application/problem+json:
               schema:
-                type: string
-              example: Can not read peak list.
+                $ref: "#/components/schemas/error"
         "503":
           description: The server is not ready to handle the request.
           content:
-            application/json:
+            application/problem+json:
               schema:
-                type: string
-              example: Server is busy with preprocessing.
+                $ref: "#/components/schemas/error"
         "500":
           description: The server encountered an unexpected condition.
           content:
-            application/json:
+            application/problem+json:
               schema:
-                type: string
-              example: some error
+                $ref: "#/components/schemas/error"
 
 components:
   schemas:
@@ -79,6 +76,9 @@ components:
         intensity:
           description: intensity value
           type: number
+      required:
+        - mz
+        - intensity
       example:
         "mz": 147.063
         "intensity": 121.684
@@ -160,3 +160,22 @@ components:
               similarity_score: 0.9
             - accession: MSBNK-IPB_Halle-PB001343
               similarity_score: 0.8
+
+    error:
+      description: an error response
+      title: error
+      type: object
+      properties:
+        status:
+          type: number
+        title:
+          type: string
+        detail:
+          type: string
+        type:
+          type: string
+      example:
+        status: 500
+        title: "Database Error"
+        detail: "connection failed: connection to server at \"127.0.0.1\", port 5432 failed: Connection refused\n\tIs the server running on that host and accepting TCP/IP connections?"
+        type: "about:blank"

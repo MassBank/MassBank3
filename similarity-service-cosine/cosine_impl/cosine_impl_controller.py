@@ -1,8 +1,8 @@
 import connexion
 import numpy as np
-from connexion import problem
-from flask import jsonify, Flask
+from flask import jsonify
 from matchms import Spectrum, calculate_scores
+from matchms.filtering import normalize_intensities
 from matchms.similarity import CosineGreedy
 
 from cosine_impl.db import ReferenceSpectra
@@ -19,7 +19,7 @@ DB_PASSWORD = os.environ.get('DB_PASSWORD', "massbank3password")
 DB_HOST = os.environ.get('DB_HOST', "localhost")
 DB_NAME = os.environ.get('DB_NAME', "massbank3")
 
-app = Flask(__name__)
+
 
 def similarity_post(similarity_calculation):  # noqa: E501
     """Create a new similarity calculation.
@@ -39,35 +39,31 @@ def similarity_post(similarity_calculation):  # noqa: E501
                 psycopg.connect(f"postgresql://{DB_NAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"))
             reference_spectra.load_spectra()
         except psycopg.DatabaseError as e:
-            return problem(
+            return connexion.problem(
                 title="Database Error",
                 detail=str(e),
                 status=500,
             )
 
-        mz = []
-        intensities = []
+        mz, intensities = zip(*[(peak.mz, peak.intensity) for peak in request.peak_list])
 
-        for peak in request.peak_list:
-            mz.append(peak.mz)
-            intensities.append(peak.intensity)
+        try:
+            query = normalize_intensities(Spectrum(mz=np.array(mz), intensities=np.array(intensities)))
+        except AssertionError as e:
+            return connexion.problem(
+                title="AssertionError",
+                detail=str(e),
+                status=400,
+            )
 
-        query = Spectrum(mz=np.array(mz), intensities=np.array(intensities))
+        references = ReferenceSpectra.spectra
+        if request.reference_spectra_list:
+            references = [s for s in references if s.metadata['spectrum_id'] in request.reference_spectra_list]
 
-        if len(request.reference_spectra_list) > 0:
-            def filter_fn(spectrum):
-                return spectrum.metadata['spectrum_id'] in request.reference_spectra_list
-
-            references = list(filter(filter_fn, ReferenceSpectra.spectra))
-
-            scores = calculate_scores(references, [query], CosineGreedy())
-        else:
-            scores = calculate_scores(ReferenceSpectra.spectra, [query], CosineGreedy())
+        scores = calculate_scores(references, [query], CosineGreedy())
         matches = scores.scores_by_query(query, 'CosineGreedy_score', sort=True)
-        match_list = SimilarityScoreList([])
-
-        for match in matches:
-            match_list.similarity_score_list.append(SimilarityScore(match[0].metadata['spectrum_id'], match[1][0]))
+        match_list = SimilarityScoreList(
+            [SimilarityScore(match[0].metadata['spectrum_id'], match[1][0]) for match in matches])
 
         return match_list
 
