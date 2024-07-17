@@ -13,7 +13,6 @@ class ReferenceSpectra:
         """initialize the class with a database connection"""
         self.connection = connection
 
-    @property
     def load_spectra(self):
         """load all spectra from the database if the metadata indicates newer data and stores them"""
         with self.connection.cursor() as cur:

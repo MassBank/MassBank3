@@ -1,5 +1,7 @@
 import connexion
 import numpy as np
+from connexion import problem
+from flask import jsonify, Flask
 from matchms import Spectrum, calculate_scores
 from matchms.similarity import CosineGreedy
 
@@ -17,6 +19,7 @@ DB_PASSWORD = os.environ.get('DB_PASSWORD', "massbank3password")
 DB_HOST = os.environ.get('DB_HOST', "localhost")
 DB_NAME = os.environ.get('DB_NAME', "massbank3")
 
+app = Flask(__name__)
 
 def similarity_post(similarity_calculation):  # noqa: E501
     """Create a new similarity calculation.
@@ -31,8 +34,16 @@ def similarity_post(similarity_calculation):  # noqa: E501
     if connexion.request.is_json:
         request = SimilarityCalculation.from_dict(similarity_calculation)
 
-        reference_spectra = ReferenceSpectra(psycopg.connect(f"postgresql://{DB_NAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"))
-        reference_spectra.load_spectra()
+        try:
+            reference_spectra = ReferenceSpectra(
+                psycopg.connect(f"postgresql://{DB_NAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"))
+            reference_spectra.load_spectra()
+        except psycopg.DatabaseError as e:
+            return problem(
+                title="Database Error",
+                detail=str(e),
+                status=500,
+            )
 
         mz = []
         intensities = []
@@ -70,3 +81,9 @@ def version_get():  # noqa: E501
     :rtype: Union[str, Tuple[str, int], Tuple[str, int, Dict[str, str]]
     """
     return 'cosine similarity 1.0.0'
+
+
+def handle_psycopg_database_error(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
