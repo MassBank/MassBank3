@@ -124,8 +124,6 @@ func getDBConfig() database.DBConfig {
 	if c.DbPort == 0 {
 		if c.Database == database.Postgres {
 			c.DbPort = 5432
-		} else {
-			c.DbPort = 27017
 		}
 	}
 	return c

@@ -10,7 +10,7 @@ components:
       type: array
       items:
         type: string
-        enum: [ MS,MS2,MS3,MS4 ]
+        enum: [MS, MS2, MS3, MS4]
     IonMode:
       type: string
       description: "enum: [ POSITIVE, NEGATIVE ]"
@@ -44,8 +44,8 @@ components:
       type: array
       items:
         type: string
-        description: "A tuple of m/z and intensity, e.g. (193.4,57)"
-        pattern: "\\([0-9]+(\\.[0-9]*)?,[0-9]+\\)"
+        description: "A tuple of m/z and intensity, e.g. (193.4;57)"
+        pattern: "\\([0-9]+(\\.[0-9]*)?;[0-9]+\\)"
     IntensityCutoff:
       type: integer
       default: 5

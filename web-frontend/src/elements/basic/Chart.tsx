@@ -10,7 +10,7 @@ type InputProps = {
   peakData: Peak[];
   peakData2?: Peak[];
   // eslint-disable-next-line no-unused-vars
-  onZoom?: (fpd: Peak[]) => void;
+  onZoom?: (fpd1: Peak[], fpd2?: Peak[]) => void;
   width?: number;
   height?: number;
 };
@@ -69,9 +69,24 @@ function Chart({
     [getFilteredPeakData, peakData2],
   );
 
-  useEffect(() => {
-    onZoom(filteredPeakData);
-  }, [filteredPeakData, onZoom]);
+  const handleOnZoom = useCallback(
+    (_filteredPeakData: Peak[], _filteredPeakData2?: Peak[]) => {
+      const _filteredPeakData2_temp = (_filteredPeakData2 || []).map((p) => {
+        return {
+          ...p,
+          intensity: -1 * p.intensity,
+          rel: -1 * p.rel,
+        } as Peak;
+      });
+      onZoom(_filteredPeakData, _filteredPeakData2_temp);
+    },
+    [onZoom],
+  );
+
+  useEffect(
+    () => handleOnZoom(filteredPeakData, filteredPeakData2),
+    [filteredPeakData, filteredPeakData2, handleOnZoom],
+  );
 
   const xScale = useMemo(() => {
     const values = filteredPeakData

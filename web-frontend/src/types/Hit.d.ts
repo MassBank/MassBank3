@@ -1,4 +1,5 @@
 export default interface Hit {
-  peaks: Peak[];
+  accession: string;
   score: number;
+  record?: Record;
 }

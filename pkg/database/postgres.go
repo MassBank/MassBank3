@@ -431,11 +431,11 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 
 			result.Peak.Peak.Mz = []float64{}
 			result.Peak.Peak.Intensity = []float64{}
-			result.Peak.Peak.Rel = []uint{}
+			result.Peak.Peak.Rel = []int32{}
 			for rows.Next() {
 				var mz float64
 				var intensity float64
-				var rel uint
+				var rel int32
 				if err := rows.Scan(&mz, &intensity, &rel); err != nil {
 					return nil, err
 				}

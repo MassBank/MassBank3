@@ -1,90 +1,139 @@
 import './SearchView.scss';
 
-import { MouseEvent, useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import Peak from '../../../../types/peak/Peak';
 import generateID from '../../../../utils/generateID';
 
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import Hit from '../../../../types/Hit';
 import SpectralHitsView from './SpectralHitsView';
-import Button from '../../../basic/Button';
 import Spinner from '../../../basic/Spinner';
+import axios from 'axios';
+import Record from '../../../../types/Record';
+import SearchPanel from './SearchPanel';
+import Placeholder from '../../../basic/Placeholder';
 
 function SearchView() {
   const ref = useRef(null);
   const { width, height } = useContainerDimensions(ref);
-
-  const reference: Peak[] = [];
-
-  reference.push({ mz: 1, intensity: 100, rel: 100, id: generateID() });
-  reference.push({ mz: 5, intensity: 1000, rel: 1000, id: generateID() });
-  reference.push({ mz: 10, intensity: 500, rel: 500, id: generateID() });
-
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
+
+  const [referencePeakList, setReferencePeakList] = useState<Peak[]>([]);
   const [hits, setHits] = useState<Hit[]>([]);
 
-  async function searchHits() {
-    return await new Promise((resolve) => setTimeout(resolve, 2000));
-  }
+  const searchPanelWidth = width;
+  const searchPanelHeight = 400;
 
-  const handleOnSearchHits = useCallback((e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const searchHits = useCallback(
+    async (peakList: Peak[], referenceSpectraList: string[]) => {
+      const url = import.meta.env.VITE_MB3_API_URL + '/v1/similarity';
+      const params = new URLSearchParams();
+      params.append(
+        'peak_list',
+        peakList.map((p) => `${p.mz};${p.intensity}`).join(','),
+      );
+      params.append('reference_spectra_list', referenceSpectraList.join(','));
+      params.append('limit', '10');
 
-    setIsRequesting(true);
+      const resp = await axios.get(url, { params });
+      if (resp.status === 200) {
+        const data = await resp.data;
+        if (typeof data === 'string') {
+          return undefined;
+        }
+        const _hits = data.data;
+        const res2 = await fetchRecords(_hits.map((h: Hit) => h.accession));
+        for (let i = 0; i < _hits.length; i++) {
+          _hits[i].record = res2[i];
+        }
 
-    searchHits().then(() => {
-      const _hits: Hit[] = [];
-      _hits.push({
-        peaks: [
-          { mz: 1, intensity: 100, rel: 100, id: generateID() },
-          { mz: 4, intensity: 900, rel: 900, id: generateID() },
-          { mz: 9, intensity: 400, rel: 400, id: generateID() },
-        ],
-        score: 0.5,
-      });
-      _hits.push({
-        peaks: [
-          { mz: 1.5, intensity: 10, rel: 10, id: generateID() },
-          { mz: 7, intensity: 800, rel: 800, id: generateID() },
-        ],
-        score: 0.7,
-      });
-      _hits.push({
-        peaks: [
-          { mz: 3, intensity: 1000, rel: 1000, id: generateID() },
-          { mz: 11, intensity: 100, rel: 100, id: generateID() },
-        ],
-        score: 0.9,
-      });
-      _hits.push({
-        peaks: [
-          { mz: 8, intensity: 300, rel: 300, id: generateID() },
-          { mz: 10, intensity: 1000, rel: 1000, id: generateID() },
-          { mz: 50, intensity: 800, rel: 800, id: generateID() },
-        ],
-        score: 0.2,
-      });
+        return _hits;
+      }
 
+      return undefined;
+    },
+    [],
+  );
+
+  const handleOnSearchHits = useCallback(
+    async (peakList: Peak[], referenceSpectraList: string[]) => {
+      setIsRequesting(true);
+      const _hits = await searchHits(peakList, referenceSpectraList);
+      setReferencePeakList(peakList);
       setHits(_hits);
       setIsRequesting(false);
-    });
-  }, []);
+    },
+    [searchHits],
+  );
+
+  const searchPanel = useMemo(
+    () => (
+      <SearchPanel
+        width={searchPanelWidth}
+        height={searchPanelHeight}
+        onSubmit={(data) => {
+          console.log(data);
+          const peakList: Peak[] = data.peakListInputField
+            .split('\n')
+            .map((line: string) => {
+              const [mz, rel] = line.split(' ');
+              return {
+                mz: parseFloat(mz),
+                intensity: parseFloat(rel),
+                rel: parseFloat(rel),
+                id: generateID(),
+              } as Peak;
+            });
+          const referenceSpectraList = data.referenceSpectraInputField
+            .split('\n')
+            .filter((s: string) => s !== '');
+
+          handleOnSearchHits(peakList, referenceSpectraList);
+        }}
+      />
+    ),
+    [handleOnSearchHits, searchPanelWidth],
+  );
+
+  async function fetchRecords(accessions: string[]) {
+    const records: (Record | undefined)[] = [];
+
+    for (const accession of accessions) {
+      const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/' + accession;
+      const resp = await axios.get(url);
+      if (resp.status === 200) {
+        const record = await resp.data;
+        record.peak.peak.values = record.peak.peak.values.map((p) => ({
+          ...p,
+          id: generateID(),
+        }));
+        records.push(record);
+      } else {
+        records.push(undefined);
+      }
+    }
+
+    return records;
+  }
 
   return (
     <div ref={ref} className="search-view">
-      <Button onClick={handleOnSearchHits} child="Search Hits" />
+      {searchPanel}
       {isRequesting ? (
         <Spinner buttonDisabled={true} />
       ) : hits.length > 0 ? (
         <SpectralHitsView
-          reference={reference}
+          reference={referencePeakList}
           hits={hits}
           width={width}
-          height={height}
+          height={height - searchPanelHeight}
         />
       ) : (
-        <p>No hits!</p>
+        <Placeholder
+          child={''}
+          width={width}
+          height={height - searchPanelHeight}
+        />
       )}
     </div>
   );
