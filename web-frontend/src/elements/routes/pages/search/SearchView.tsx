@@ -72,7 +72,6 @@ function SearchView() {
         width={searchPanelWidth}
         height={searchPanelHeight}
         onSubmit={(data) => {
-          console.log(data);
           const peakList: Peak[] = data.peakListInputField
             .split('\n')
             .map((line: string) => {
