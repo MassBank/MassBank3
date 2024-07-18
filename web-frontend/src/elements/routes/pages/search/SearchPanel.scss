@@ -1,3 +1,5 @@
+$button-container-height: 40px;
+
 .search-panel-container {
   display: flex;
   flex-direction: column;
@@ -6,7 +8,7 @@
 
   .search-panel-container-inner {
     width: 100%;
-    height: calc(100% - 50px);
+    height: calc(100% - $button-container-height);
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -14,7 +16,7 @@
 
     .peak-list-input-container {
       width: 100%;
-      height: calc(100% - 50px);
+      height: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -23,22 +25,39 @@
 
     .reference-spectra-list-input-container {
       width: 100%;
-      height: calc(100% - 50px);
+      height: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
     }
+  }
+  .search-panel-button-container {
+    width: 100%;
+    height: $button-container-height;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
 
-    .search-panel-submit-button-container {
-      width: 100%;
-      height: 50px;
-    }
-
-    .error-label {
-      color: red;
+    .submit-input {
       text-align: center;
-      font-weight: bold;
+      background-color: transparent;
+      color: inherit;
+      border: 1px solid lightgrey;
+      border-radius: 5px;
+      padding-left: 2px;
+      padding-right: 2px;
+      padding-bottom: 2px;
+      font: inherit;
+      cursor: pointer;
+      outline: inherit;
     }
+  }
+
+  .error-label {
+    color: red;
+    text-align: center;
+    font-weight: bold;
   }
 }

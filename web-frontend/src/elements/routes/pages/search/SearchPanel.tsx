@@ -2,6 +2,16 @@ import './SearchPanel.scss';
 
 import { useCallback } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
+import Button from '../../../basic/Button';
+import {
+  referencePeakList,
+  referenceSpectraList,
+} from './utils/peakListExample';
+
+const peakListPattern =
+  /^(\d+(\.\d+)* \d+(\.\d+)*)(\n\d+(\.\d+)* \d+(\.\d+)*)*$/;
+const msbnkPattern =
+  /^(MSBNK-[a-zA-Z0-9_]+-[a-zA-Z0-9_]+)(\nMSBNK-[a-zA-Z0-9_]+-[a-zA-Z0-9_]+)*$/;
 
 type InputProps = {
   width: number;
@@ -14,6 +24,7 @@ function SearchPanel({ width, height, onSubmit }: InputProps) {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm();
 
@@ -25,9 +36,6 @@ function SearchPanel({ width, height, onSubmit }: InputProps) {
   );
 
   const errorLabelHeight = 30;
-  const peakListPattern = /^(\d+\.\d+ \d+)(\n\d+\.\d+ \d+)*$/;
-  const msbnkPattern =
-    /^(MSBNK-[a-zA-Z0-9_]+-[a-zA-Z0-9_]+)(\nMSBNK-[a-zA-Z0-9_]+-[a-zA-Z0-9_]+)*$/;
 
   return (
     <form onSubmit={handleSubmit((data) => handleOnSubmit(data))}>
@@ -35,7 +43,7 @@ function SearchPanel({ width, height, onSubmit }: InputProps) {
         <div className="search-panel-container-inner">
           <div className="peak-list-input-container">
             <textarea
-              placeholder="Enter a peak list: m/z and relative intensities(0-999), delimited by a space. For example:&#10;147.063 11&#10;303.05 999&#10;449.108 64&#10;465.102 588&#10;611.161 670"
+              placeholder="Enter a peak list: m/z and intensity, delimited by a space. For example:&#10;&#10;147.063 11&#10;303.05 999&#10;449.108 64&#10;465.102 588&#10;611.161 670"
               {...register('peakListInputField', {
                 required: true,
                 pattern: peakListPattern,
@@ -61,7 +69,7 @@ function SearchPanel({ width, height, onSubmit }: InputProps) {
           </div>
           <div className="reference-spectra-list-input-container">
             <textarea
-              placeholder="Enter reference spectra:&#10;MSBNK-IPB_Halle-PB001341&#10;MSBNK-IPB_Halle-PB006202&#10;MSBNK-IPB_Halle-PB006203&#10;MSBNK-IPB_Halle-PB001342&#10;MSBNK-IPB_Halle-PB001343"
+              placeholder="Enter reference spectra. For example:&#10;&#10;MSBNK-IPB_Halle-PB001341&#10;MSBNK-IPB_Halle-PB006202&#10;MSBNK-IPB_Halle-PB006203&#10;MSBNK-IPB_Halle-PB001342&#10;MSBNK-IPB_Halle-PB001343"
               {...register('referenceSpectraInputField', {
                 required: false,
                 pattern: msbnkPattern,
@@ -85,8 +93,23 @@ function SearchPanel({ width, height, onSubmit }: InputProps) {
             )}
           </div>
         </div>
-        <div className="search-panel-submit-button-container">
-          <input type="submit" value="Search" />
+        <div className="search-panel-button-container">
+          <Button
+            child={'Load Example'}
+            onClick={() => {
+              setValue('peakListInputField', referencePeakList.join('\n'), {
+                shouldValidate: true,
+              });
+              setValue(
+                'referenceSpectraInputField',
+                referenceSpectraList.join('\n'),
+                {
+                  shouldValidate: true,
+                },
+              );
+            }}
+          />
+          <input type="submit" value="Search" className="submit-input" />
         </div>
       </div>
     </form>
