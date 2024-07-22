@@ -1093,7 +1093,7 @@ func (p *PostgresSQLDB) init() error {
 			id SERIAL PRIMARY KEY,
 			commit char(40),
 			timestamp timestamp NOT NULL,
-			version varchar(10) NOT NULL,
+			version varchar(20) NOT NULL,
 			UNIQUE (commit, timestamp, version)
 		);
 
