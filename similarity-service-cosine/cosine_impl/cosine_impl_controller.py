@@ -48,7 +48,6 @@ def load_spectra():  # noqa: E501
             set_matchms_logger_level("ERROR")
 
             with conn.cursor() as cur:
-                cur = conn.cursor()
                 cur.execute(
                     "SELECT massbank.accession, peak.mz, peak.intensity "
                     "FROM massbank "

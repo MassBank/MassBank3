@@ -1,19 +1,7 @@
 #!/usr/bin/env python3
 
-import connexion
-
-from openapi_server import encoder
-
-
-def main():
-    app = connexion.App(__name__, specification_dir='..')
-    app.app.json_encoder = encoder.JSONEncoder
-    app.add_api('openapi.yaml',
-                arguments={'title': 'Similarity score api for MassBank3'},
-                pythonic_params=True)
-
-    app.run(port=8080)
+import cosine_impl.app
 
 
 if __name__ == '__main__':
-    main()
+    cosine_impl.app.serve_app()
