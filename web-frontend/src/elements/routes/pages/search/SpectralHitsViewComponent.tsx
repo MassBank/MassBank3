@@ -1,28 +1,30 @@
+import './SpectralHitsViewComponent.scss';
+
 import { useCallback, useState } from 'react';
 import Peak from '../../../../types/peak/Peak';
 import PeakTable from '../../../record/PeakTable';
 import Chart from '../../../basic/Chart';
+import Hit from '../../../../types/Hit';
+import ResultInfo from './result/ResultInfo';
 
 type InputProps = {
-  referencePeaks: Peak[];
-  hitPeaks: Peak[];
-  accession: string;
-  score: number;
+  reference: Peak[];
+  hit: Hit;
   width: number;
   height: number;
 };
 
 function SpectralHitsViewComponent({
-  referencePeaks,
-  hitPeaks,
-  accession,
-  score,
+  reference,
+  hit,
   width,
   height,
 }: InputProps) {
   const [filteredReferencePeaks, setFilteredReferencePeaks] =
-    useState<Peak[]>(referencePeaks);
-  const [filteredHitPeaks, setFilteredHitPeaks] = useState<Peak[]>(hitPeaks);
+    useState<Peak[]>(reference);
+  const [filteredHitPeaks, setFilteredHitPeaks] = useState<Peak[]>(
+    hit.record.peak.peak.values as Peak[],
+  );
 
   const handleOnZoom = useCallback(
     (_filteredReferencePeaks: Peak[], _filteredHitPeaks?: Peak[]) => {
@@ -34,33 +36,35 @@ function SpectralHitsViewComponent({
 
   return (
     <div
-      className="chart-view"
+      className="component-container"
       style={{
-        width: width,
-        height: height,
+        width,
+        height,
       }}
-      key={'spectral_match_' + accession + '_' + score}
     >
-      <div className="chart-score-view">
-        <p className="score-text">Score: {score}</p>
+      <ResultInfo
+        hit={hit}
+        imageWidth={width * 0.3}
+        imageHeight={height}
+        style={{ width: width * 0.3, height, backgroundColor: 'lightyellow' }}
+      />
+      <div className="chart-view">
         <Chart
-          peakData={referencePeaks}
-          peakData2={hitPeaks}
-          width={width * 0.7 - 10}
-          height={height - 50 - 10}
+          peakData={reference}
+          peakData2={hit.record.peak.peak.values as Peak[]}
+          width={width * 0.5}
+          height={height}
           onZoom={handleOnZoom}
         />
       </div>
       <div className="peak-tables-view">
         <PeakTable
           peaks={filteredReferencePeaks}
-          width={width * 0.3}
-          height={height * 0.5}
+          style={{ width: width * 0.2, height: height * 0.5 }}
         />
         <PeakTable
           peaks={filteredHitPeaks}
-          width={width * 0.3}
-          height={height * 0.5}
+          style={{ width: width * 0.2, height: height * 0.5 }}
         />
       </div>
     </div>

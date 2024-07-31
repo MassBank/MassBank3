@@ -13,6 +13,9 @@ type InputProps = {
   onZoom?: (fpd1: Peak[], fpd2?: Peak[]) => void;
   width?: number;
   height?: number;
+  disableLabels?: boolean;
+  disableZoom?: boolean;
+  disableOnHover?: boolean;
 };
 
 function Chart({
@@ -21,6 +24,9 @@ function Chart({
   onZoom = () => {},
   width = 400,
   height = 300,
+  disableLabels = false,
+  disableZoom = false,
+  disableOnHover = false,
 }: InputProps) {
   const wrapperRef = useRef(null);
   const svgRef = useRef(null);
@@ -221,7 +227,7 @@ function Chart({
           y2={filteredPeakData2 ? yScale2.range()[0] : yScale.range()[0]}
           stroke="black"
         />
-        {filteredPeakData2 && (
+        {filteredPeakData2 && !disableLabels && (
           <line
             x1={xScale.range()[0]}
             x2={xScale.range()[1]}
@@ -231,17 +237,21 @@ function Chart({
           />
         )}
 
-        <text
-          x={(xScale.range()[1] - xScale.range()[0]) / 2}
-          y={
-            filteredPeakData2 ? yScale2.range()[1] + 45 : yScale.range()[0] + 45
-          }
-        >
-          m/z
-        </text>
+        {disableLabels ? undefined : (
+          <text
+            x={(xScale.range()[1] - xScale.range()[0]) / 2}
+            y={
+              filteredPeakData2
+                ? yScale2.range()[1] + 45
+                : yScale.range()[0] + 45
+            }
+          >
+            m/z
+          </text>
+        )}
       </g>
     );
-  }, [filteredPeakData2, xScale, yScale, yScale2]);
+  }, [disableLabels, filteredPeakData2, xScale, yScale, yScale2]);
 
   const yAxis = useMemo(() => {
     return (
@@ -253,26 +263,28 @@ function Chart({
           y2={filteredPeakData2 ? yScale2.range()[1] : yScale.range()[1]}
           stroke="black"
         />
-        <text
-          x={xScale.range()[0] - 60}
-          y={
-            filteredPeakData2
-              ? (yScale.range()[0] + yScale2.range()[0]) / 2
-              : (yScale.range()[0] - yScale.range()[1]) / 2
-          }
-          textAnchor="middle"
-          dominantBaseline="central"
-          transform={`rotate(270, ${xScale.range()[0] - 60}, ${
-            filteredPeakData2
-              ? (yScale.range()[0] + yScale2.range()[0]) / 2
-              : (yScale.range()[0] - yScale.range()[1]) / 2
-          })`}
-        >
-          Relative Abundance
-        </text>
+        {disableLabels ? undefined : (
+          <text
+            x={xScale.range()[0] - 60}
+            y={
+              filteredPeakData2
+                ? (yScale.range()[0] + yScale2.range()[0]) / 2
+                : (yScale.range()[0] - yScale.range()[1]) / 2
+            }
+            textAnchor="middle"
+            dominantBaseline="central"
+            transform={`rotate(270, ${xScale.range()[0] - 60}, ${
+              filteredPeakData2
+                ? (yScale.range()[0] + yScale2.range()[0]) / 2
+                : (yScale.range()[0] - yScale.range()[1]) / 2
+            })`}
+          >
+            Relative Abundance
+          </text>
+        )}
       </g>
     );
-  }, [filteredPeakData2, xScale, yScale, yScale2]);
+  }, [disableLabels, filteredPeakData2, xScale, yScale, yScale2]);
 
   const yLabels = useMemo(() => {
     const minY = Math.floor(
@@ -328,6 +340,7 @@ function Chart({
             yScale={yScale}
             showLabel={isShowLabel}
             strokeColour="red"
+            disableOnHover={disableOnHover}
           />
         ))
         .concat(
@@ -344,7 +357,15 @@ function Chart({
               ))
             : [],
         ),
-    [filteredPeakData, filteredPeakData2, isShowLabel, xScale, yScale, yScale2],
+    [
+      disableOnHover,
+      filteredPeakData,
+      filteredPeakData2,
+      isShowLabel,
+      xScale,
+      yScale,
+      yScale2,
+    ],
   );
 
   const handleDoubleClick = useCallback(() => {
@@ -362,27 +383,32 @@ function Chart({
   }, [brushXDomains]);
 
   useEffect(() => {
-    const svg = select(svgRef.current);
-    const brush = brushX()
-      .extent([
-        [0, 0],
-        [width, height],
-      ])
-      .on('end', (e) => {
-        if (e.selection) {
-          const inverted: number[] = e.selection.map((x) => xScale.invert(x));
-          const newBrushXDomains = brushXDomains
-            ? [...brushXDomains].concat({ min: inverted[0], max: inverted[1] })
-            : [{ min: inverted[0], max: inverted[1] }];
+    if (!disableZoom) {
+      const svg = select(svgRef.current);
+      const brush = brushX()
+        .extent([
+          [0, 0],
+          [width, height],
+        ])
+        .on('end', (e) => {
+          if (e.selection) {
+            const inverted: number[] = e.selection.map((x) => xScale.invert(x));
+            const newBrushXDomains = brushXDomains
+              ? [...brushXDomains].concat({
+                  min: inverted[0],
+                  max: inverted[1],
+                })
+              : [{ min: inverted[0], max: inverted[1] }];
 
-          setBrushXDomains(newBrushXDomains);
-        }
-      });
+            setBrushXDomains(newBrushXDomains);
+          }
+        });
 
-    // @ts-ignore
-    svg.select('.brush').call(brush).call(brush.move, undefined);
-    svg.on('dblclick', handleDoubleClick);
-  }, [brushXDomains, handleDoubleClick, height, width, xScale]);
+      // @ts-ignore
+      svg.select('.brush').call(brush).call(brush.move, undefined);
+      svg.on('dblclick', handleDoubleClick);
+    }
+  }, [brushXDomains, disableZoom, handleDoubleClick, height, width, xScale]);
 
   return (
     <div
@@ -391,6 +417,10 @@ function Chart({
         width: width,
         height: height,
         padding: '5px',
+        userSelect: 'none',
+        msUserSelect: 'none',
+        MozUserSelect: 'none',
+        WebkitUserSelect: 'none',
       }}
     >
       <svg ref={svgRef} width={width} height={height - MARGIN.button}>
@@ -402,40 +432,42 @@ function Chart({
           {<g className="brush" />}
           {chartElements}
           {xAxis}
-          {xLabels}
+          {disableLabels ? undefined : xLabels}
           {yAxis}
-          {yLabels}
+          {disableLabels ? undefined : yLabels}
         </g>
       </svg>
-      <div
-        style={{
-          width: '100%',
-          height: MARGIN.button,
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <Button
-          child={isShowLabel ? 'Hide Labels' : 'Show Labels'}
-          onClick={() => setIsShowLabel(!isShowLabel)}
-          buttonStyle={{
-            border: 'black solid 1px',
-            padding: '3px',
+      {disableLabels ? undefined : (
+        <div
+          style={{
+            width: '100%',
+            height: MARGIN.button,
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
-        />
-        <div>
-          <p style={{ marginBottom: filteredPeakData2 ? 0 : undefined }}>
-            {filteredPeakData.length}/{peakData.length}
-          </p>
-          {peakData2 && filteredPeakData2 && (
-            <p style={{ marginTop: 0 }}>
-              {filteredPeakData2.length}/{peakData2.length}
+        >
+          <Button
+            child={isShowLabel ? 'Hide Labels' : 'Show Labels'}
+            onClick={() => setIsShowLabel(!isShowLabel)}
+            buttonStyle={{
+              border: 'black solid 1px',
+              padding: '3px',
+            }}
+          />
+          <div>
+            <p style={{ marginBottom: filteredPeakData2 ? 0 : undefined }}>
+              {filteredPeakData.length}/{peakData.length}
             </p>
-          )}
+            {peakData2 && filteredPeakData2 && (
+              <p style={{ marginTop: 0 }}>
+                {filteredPeakData2.length}/{peakData2.length}
+              </p>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

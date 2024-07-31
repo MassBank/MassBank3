@@ -1,0 +1,67 @@
+$cardTextHeight: 40px;
+
+.result-card-container {
+  user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+
+  border-radius: 1rem;
+  border: 1px solid grey;
+  padding: 2px;
+
+  box-shadow:
+    0 6px 10px rgba(0, 0, 0, 0.08),
+    0 0 6px rgba(0, 0, 0, 0.05);
+  transition:
+    0.3s transform cubic-bezier(0.155, 1.105, 0.295, 1.12),
+    0.3s box-shadow,
+    0.3s -webkit-transform cubic-bezier(0.155, 1.105, 0.295, 1.12);
+
+  &:hover {
+    transform: scale(1.015);
+    box-shadow:
+      0 10px 20px rgba(0, 0, 0, 0.12),
+      0 4px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .card-header {
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+
+    padding-left: 5px;
+
+    border-top-right-radius: 1rem;
+    background-color: lightcyan;
+  }
+
+  .card-body {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    // .chart-and-structure-preview-container {
+    //   width: 100%;
+    //   height: calc(100% - $cardTextHeight);
+    //   display: flex;
+    //   flex-direction: row;
+    //   justify-content: center;
+    //   align-items: center;
+    // }
+
+    // .result-card-text-container {
+    //   width: 100%;
+    //   height: $cardTextHeight;
+    //   display: flex;
+    //   flex-direction: row;
+    //   justify-content: center;
+    //   align-items: center;
+    // }
+  }
+}

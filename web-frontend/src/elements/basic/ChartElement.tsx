@@ -11,6 +11,7 @@ type InputProps = {
   yScale: ScaleLinear<number, number, never>;
   showLabel?: boolean;
   strokeColour?: string;
+  disableOnHover?: boolean;
 };
 
 function ChartElement({
@@ -19,6 +20,7 @@ function ChartElement({
   yScale,
   showLabel = false,
   strokeColour = 'red',
+  disableOnHover = false,
 }: InputProps) {
   const highlight = useHighlight([pd.id]);
   const highlightData = useHighlightData();
@@ -42,9 +44,11 @@ function ChartElement({
       e.preventDefault();
       e.stopPropagation();
 
-      highlight.show();
+      if (!disableOnHover) {
+        highlight.show();
+      }
     },
-    [highlight],
+    [disableOnHover, highlight],
   );
 
   const handleOnMouseLeave = useCallback(
@@ -52,9 +56,11 @@ function ChartElement({
       e.preventDefault();
       e.stopPropagation();
 
-      highlight.hide();
+      if (!disableOnHover) {
+        highlight.hide();
+      }
     },
-    [highlight],
+    [disableOnHover, highlight],
   );
 
   const chartElement = useMemo(
