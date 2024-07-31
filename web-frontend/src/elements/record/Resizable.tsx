@@ -105,7 +105,6 @@ function Resizable({ record, width = 500, height = 300, style }: InputProps) {
     () => (
       <Chart
         peakData={record.peak.peak.values}
-        // peakData2={record.peak.peak.values}
         onZoom={handleOnZoom}
         width={chartWidth}
         height={height}
@@ -134,8 +133,7 @@ function Resizable({ record, width = 500, height = 300, style }: InputProps) {
         peaks={filteredPeakData}
         annotations={record.peak.annotation}
         linkedAnnotations={filteredLinkedAnnotations}
-        width={peakTableWidth}
-        height={height}
+        style={{ width: peakTableWidth, height }}
       />
     ),
     [

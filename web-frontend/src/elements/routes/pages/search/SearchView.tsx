@@ -6,23 +6,22 @@ import generateID from '../../../../utils/generateID';
 
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import Hit from '../../../../types/Hit';
-import SpectralHitsView from './SpectralHitsView';
 import Spinner from '../../../basic/Spinner';
 import axios from 'axios';
-import Record from '../../../../types/Record';
 import SearchPanel from './SearchPanel';
 import Placeholder from '../../../basic/Placeholder';
+import ResultPanel from './result/ResultPanel';
 
 function SearchView() {
   const ref = useRef(null);
   const { width, height } = useContainerDimensions(ref);
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
 
-  const [referencePeakList, setReferencePeakList] = useState<Peak[]>([]);
+  const [reference, setReference] = useState<Peak[]>([]);
   const [hits, setHits] = useState<Hit[]>([]);
 
   const searchPanelWidth = width;
-  const searchPanelHeight = 350;
+  const searchPanelHeight = 200;
 
   const searchHits = useCallback(
     async (peakList: Peak[], referenceSpectraList: string[]) => {
@@ -33,7 +32,6 @@ function SearchView() {
         peakList.map((p) => `${p.mz};${p.intensity}`).join(','),
       );
       params.append('reference_spectra_list', referenceSpectraList.join(','));
-      params.append('limit', '10');
 
       const resp = await axios.get(url, { params });
       if (resp.status === 200) {
@@ -41,13 +39,8 @@ function SearchView() {
         if (typeof data === 'string') {
           return undefined;
         }
-        const _hits = data.data;
-        const res2 = await fetchRecords(_hits.map((h: Hit) => h.accession));
-        for (let i = 0; i < _hits.length; i++) {
-          _hits[i].record = res2[i];
-        }
 
-        return _hits;
+        return data.data as Hit[];
       }
 
       return undefined;
@@ -59,8 +52,8 @@ function SearchView() {
     async (peakList: Peak[], referenceSpectraList: string[]) => {
       setIsRequesting(true);
       const _hits = await searchHits(peakList, referenceSpectraList);
-      setReferencePeakList(peakList);
-      setHits(_hits);
+      setReference(peakList);
+      setHits(_hits || []);
       setIsRequesting(false);
     },
     [searchHits],
@@ -100,26 +93,30 @@ function SearchView() {
     [handleOnSearchHits, searchPanelWidth],
   );
 
-  async function fetchRecords(accessions: string[]) {
-    const records: (Record | undefined)[] = [];
+  const resultPanel = useMemo(
+    () => (
+      <ResultPanel
+        hits={hits}
+        reference={reference}
+        width={width}
+        height={height - searchPanelHeight}
+        widthOverview={width}
+        heightOverview={height - 100}
+      />
+    ),
+    [height, hits, reference, width],
+  );
 
-    for (const accession of accessions) {
-      const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/' + accession;
-      const resp = await axios.get(url);
-      if (resp.status === 200) {
-        const record = await resp.data;
-        record.peak.peak.values = record.peak.peak.values.map((p) => ({
-          ...p,
-          id: generateID(),
-        }));
-        records.push(record);
-      } else {
-        records.push(undefined);
-      }
-    }
-
-    return records;
-  }
+  const placeholder = useMemo(
+    () => (
+      <Placeholder
+        child={''}
+        width={width}
+        height={height - searchPanelHeight}
+      />
+    ),
+    [height, width],
+  );
 
   return (
     <div ref={ref} className="search-view">
@@ -127,18 +124,9 @@ function SearchView() {
       {isRequesting ? (
         <Spinner buttonDisabled={true} />
       ) : hits.length > 0 ? (
-        <SpectralHitsView
-          reference={referencePeakList}
-          hits={hits}
-          width={width}
-          height={height - searchPanelHeight}
-        />
+        resultPanel
       ) : (
-        <Placeholder
-          child={''}
-          width={width}
-          height={height - searchPanelHeight}
-        />
+        placeholder
       )}
     </div>
   );

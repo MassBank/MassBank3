@@ -1,6 +1,6 @@
 import './PeakTable.scss';
 
-import { useMemo } from 'react';
+import { CSSProperties, useMemo } from 'react';
 import PeakTableRow from './PeakTableRow';
 import Peak from '../../types/peak/Peak';
 import { splitStringAndCapitaliseFirstLetter } from '../../utils/stringUtils';
@@ -9,18 +9,18 @@ import PeakAnnotation from '../../types/peak/PeakAnnotation';
 
 type InputProps = {
   peaks: Peak[];
-  width: number;
-  height: number;
   annotations?: PeakAnnotation;
   linkedAnnotations?: LinkedPeakAnnotation[];
+  style?: CSSProperties;
+  tableStyle?: CSSProperties;
 };
 
 function PeakTable({
   peaks,
-  width,
-  height,
   annotations,
   linkedAnnotations,
+  style,
+  tableStyle,
 }: InputProps) {
   const rows = useMemo(
     () =>
@@ -47,8 +47,8 @@ function PeakTable({
   );
 
   return (
-    <div className="PeakTable" style={{ width, height }}>
-      <table>
+    <div className="peak-table" style={style}>
+      <table style={tableStyle}>
         <thead>
           <tr>
             <th>m/z</th>

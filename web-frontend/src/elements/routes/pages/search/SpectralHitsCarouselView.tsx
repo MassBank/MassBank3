@@ -1,8 +1,9 @@
+import 'react-multi-carousel/lib/styles.css';
+import './SpectralHitsCarouselView.scss';
+
 import { useMemo } from 'react';
 import Peak from '../../../../types/peak/Peak';
 import Carousel, { ResponsiveType } from 'react-multi-carousel';
-import 'react-multi-carousel/lib/styles.css';
-import './SpectralHitsView.scss';
 import Hit from '../../../../types/Hit';
 import SpectralHitsViewComponent from './SpectralHitsViewComponent';
 
@@ -13,7 +14,7 @@ type InputProps = {
   height?: number;
 };
 
-function SpectralHitsView({
+function SpectralHitsCarouselView({
   reference,
   hits,
   width = 500,
@@ -23,17 +24,19 @@ function SpectralHitsView({
     const _width = width - 120;
     const _height = height - 40;
 
-    return hits.map((hit) => (
-      <SpectralHitsViewComponent
-        key={hit.accession}
-        referencePeaks={reference}
-        hitPeaks={hit.record.peak.peak.values as Peak[]}
-        accession={hit.accession}
-        score={hit.score}
-        width={_width}
-        height={_height}
-      />
-    ));
+    return hits
+      .filter((hit) => hit.record)
+      .map((hit) => (
+        <SpectralHitsViewComponent
+          key={
+            'spectral-hits-view-component_' + hit.accession + '_' + hit.score
+          }
+          reference={reference}
+          hit={hit}
+          width={_width}
+          height={_height}
+        />
+      ));
   }, [height, hits, reference, width]);
 
   const responsive = useMemo(() => {
@@ -59,10 +62,10 @@ function SpectralHitsView({
         draggable={false}
         showDots={true}
       >
-        {elements.map((element) => element)}
+        {elements}
       </Carousel>
     </div>
   );
 }
 
-export default SpectralHitsView;
+export default SpectralHitsCarouselView;
