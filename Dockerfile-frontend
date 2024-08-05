@@ -6,8 +6,7 @@ WORKDIR /app
 COPY ./web-frontend/ .
 
 # install dependencies
-# RUN npm install --legacy-peer-deps
-RUN npm install
+RUN npm run clean-install
 
 # for production mode
 RUN npm run build
