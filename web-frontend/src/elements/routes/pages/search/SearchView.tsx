@@ -111,8 +111,10 @@ function SearchView() {
     () => (
       <Placeholder
         child={''}
-        width={width}
-        height={height - searchPanelHeight}
+        style={{
+          width: width,
+          height: height - searchPanelHeight,
+        }}
       />
     ),
     [height, width],

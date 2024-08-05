@@ -1,20 +1,15 @@
+import './Placeholder.scss';
+
+import { CSSProperties } from 'react';
+
 type InputProps = {
   child: string | JSX.Element;
-  width: number;
-  height: number;
+  style?: CSSProperties;
 };
 
-function Placeholder({ child, width, height }: InputProps) {
+function Placeholder({ child, style }: InputProps) {
   return (
-    <div
-      style={{
-        width,
-        height,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
+    <div className="placeholder" style={style}>
       {child}
     </div>
   );
