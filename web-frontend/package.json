@@ -45,7 +45,8 @@
     "react-mf": "^2.0.3",
     "react-modal": "^3.16.1",
     "react-multi-carousel": "^2.8.5",
-    "react-ocl": "^6.1.0"
+    "react-ocl": "^6.1.0",
+    "react-responsive-pagination": "^2.7.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.24.8",
