@@ -2,7 +2,7 @@ import './RecordView.scss';
 
 import Record from '../../types/Record';
 import useContainerDimensions from '../../utils/useContainerDimensions';
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import StructureView from '../basic/StructureView';
 import { MF } from 'react-mf';
 import AnnotationTable from './AnnotationTable';
