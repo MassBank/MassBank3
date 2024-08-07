@@ -161,6 +161,11 @@ type MB3Database interface {
 	// database.
 	GetRecord(*string) (*massbank.MassBank2, error)
 
+	// GetRecord gets a single simple MassBank record by the Accession string.
+	// It should return nil and a [NotFoundError] if the record is not in the
+	// database.
+	GetSimpleRecord(*string) (*massbank.MassBank2, error)
+
 	// GetRecords Get an array of MassBank records by filtering
 	//
 	// Will return an empty list if the filter does not match any records.

@@ -97,6 +97,12 @@ func (c *DefaultAPIController) Routes() Routes {
 			"/v1/similarity",
 			c.GetSimilarity,
 		},
+		{
+			"GetSimpleRecord",
+			strings.ToUpper("Get"),
+			"/v1/records/{accession}/simple",
+			c.GetSimpleRecord,
+		},
 	}
 }
 
@@ -265,6 +271,21 @@ func (c *DefaultAPIController) GetSimilarity(w http.ResponseWriter, r *http.Requ
 	}
 	contributorParam := strings.Split(query.Get("contributor"), ",")
 	result, err := c.service.GetSimilarity(r.Context(), peakListParam, referenceSpectraListParam, instrumentTypeParam, msTypeParam, ionModeParam, exactMassParam, massToleranceParam, formulaParam, limitParam, intensityCutoffParam, contributorParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+
+}
+
+// GetSimpleRecord - Get a MassBank record in simple format
+func (c *DefaultAPIController) GetSimpleRecord(w http.ResponseWriter, r *http.Request) {
+	accessionParam := chi.URLParam(r, "accession")
+
+	result, err := c.service.GetSimpleRecord(r.Context(), accessionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

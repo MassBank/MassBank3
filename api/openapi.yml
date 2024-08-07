@@ -134,6 +134,24 @@ paths:
             application/json:
               schema:
                 $ref: "./schemas/MBRecord.yaml"
+  /records/{accession}/simple:
+    parameters:
+      - name: accession
+        in: path
+        description: The accession id of the record
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a MassBank record in simple format (accession, title, peaks, smiles)
+      operationId: getSimpleRecord
+      responses:
+        "200":
+          description: "A simple MassBank record (accession, title, peaks, smiles)"
+          content:
+            application/json:
+              schema:
+                $ref: "./schemas/MBRecord.yaml"
   /records/{accession}/svg:
     parameters:
       - name: accession

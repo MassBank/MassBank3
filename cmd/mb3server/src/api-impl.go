@@ -466,6 +466,35 @@ func buildMbRecord(record *massbank.MassBank2) (*MbRecord){
 	return &result
 }
 
+func buildSimpleMbRecord(record *massbank.MassBank2) (*MbRecord){
+	result := MbRecord{
+		Accession:  *record.Accession,
+		Title:      *record.RecordTitle,
+		Compound: MbRecordCompound{
+			Smiles:    *record.Compound.Smiles,
+		},
+		Peak: MbRecordPeak{
+			Peak: MbRecordPeakPeak{
+				Header: record.Peak.Peak.Header,
+				Values: nil,
+			},
+		},
+	}
+	// insert peak data
+	var mzs = record.Peak.Peak.Mz
+	var ints = record.Peak.Peak.Intensity
+	var rels = record.Peak.Peak.Rel
+	for i := 0; i < len(mzs); i++ {
+		result.Peak.Peak.Values = append(result.Peak.Peak.Values, MbRecordPeakPeakValuesInner{
+			Mz:        mzs[i],
+			Intensity: ints[i],
+			Rel:       rels[i],
+		})
+	}
+
+	return &result
+}
+
 func GetRecord(accession string) (*MbRecord, error) {
 	if err := initDB(); err != nil {
 		return nil, err
@@ -475,6 +504,19 @@ func GetRecord(accession string) (*MbRecord, error) {
 		return nil, err
 	}
 	result := *buildMbRecord(record)
+
+	return &result, nil
+}
+
+func GetSimpleRecord(accession string) (*MbRecord, error) {
+	if err := initDB(); err != nil {
+		return nil, err
+	}
+	record, err := db.GetSimpleRecord(&accession)
+	if err != nil {
+		return nil, err
+	}
+	result := *buildSimpleMbRecord(record)
 
 	return &result, nil
 }

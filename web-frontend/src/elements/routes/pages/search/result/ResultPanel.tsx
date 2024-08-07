@@ -39,7 +39,7 @@ function ResultPanel({
     JSX.Element | undefined
   >();
 
-  const pageLimit = 10;
+  const pageLimit = 20;
 
   const resultTableData = useMemo(() => {
     const _resultTableData: Hit[][] = [];
@@ -49,7 +49,6 @@ function ResultPanel({
     for (let i = 0; i < hits.length; i++) {
       if (counter < pageLimit) {
         resultHits.push(hits[i]);
-
         counter++;
       } else {
         _resultTableData.push(resultHits);
@@ -66,8 +65,8 @@ function ResultPanel({
 
   const fetchRecords = useCallback(async (_hits: Hit[]) => {
     if (_hits.length > 0) {
-      const from = 0; //resultPageIndex * pageLimit;
-      let to = 10; //from + pageLimit;
+      const from = 0;
+      let to = pageLimit;
       if (to > _hits.length) {
         to = _hits.length;
       }
@@ -80,7 +79,10 @@ function ResultPanel({
       const records: (Record | undefined)[] = [];
       for (const accession of accessions) {
         const url =
-          import.meta.env.VITE_MB3_API_URL + '/v1/records/' + accession;
+          import.meta.env.VITE_MB3_API_URL +
+          '/v1/records/' +
+          accession +
+          '/simple';
         const resp = await axios.get(url);
         if (resp.status === 200) {
           const record = await resp.data;

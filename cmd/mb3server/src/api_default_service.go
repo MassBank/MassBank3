@@ -105,3 +105,12 @@ func (s *DefaultAPIService) GetSimilarity(ctx context.Context, peakList []string
 
 	return Response(http.StatusOK, result), err
 }
+
+// GetSimpleRecord - Get a simple MassBank record
+func (s *DefaultAPIService) GetSimpleRecord(ctx context.Context, accession string) (ImplResponse, error) {
+	// TODO - update GetRecord with the required logic for this service method.
+	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	record, err := GetSimpleRecord(accession)
+	return Response(200, record), err
+}

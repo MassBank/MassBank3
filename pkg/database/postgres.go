@@ -454,6 +454,73 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	return &result, err
 }
 
+// GetSimpleRecord see [MB3Database.GetRecord]
+func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) {
+	var result = massbank.MassBank2{}
+
+	var massbankId uint
+	var accession string
+	var title string
+	var query = "SELECT id, accession, title FROM massbank WHERE accession = $1;"
+	err := p.database.QueryRow(query, *s).Scan(
+		&massbankId,
+		&accession,
+		&title,
+	); 
+	if err != nil {
+		return nil, err
+	}
+
+	result.RecordTitle = &title
+	result.Accession = &accession
+	
+	// compound
+	query = "SELECT smiles FROM compound WHERE id IN (SELECT compound_id FROM compound_name WHERE massbank_id = $1);"
+	var smiles string	
+	err = p.database.QueryRow(query, massbankId).Scan(&smiles)
+	if err == nil {
+		result.Compound = massbank.CompoundProperties{		
+			Smiles:  &smiles,
+		}	
+	}	
+	
+	// peak
+	result.Peak = massbank.PeakProperties{}
+	var spectrumId uint
+
+	query = "SELECT id FROM spectrum WHERE massbank_id = $1;"
+	err = p.database.QueryRow(query, massbankId).Scan(&spectrumId)
+	if err == nil {
+		result.Peak.Peak = &massbank.PkPeak{}
+		query = "SELECT mz, intensity, relative_intensity FROM peak WHERE spectrum_id = $1;"
+		rows, err := p.database.Query(query, spectrumId)
+		if err == nil {
+			defer rows.Close()
+
+			result.Peak.Peak.Mz = []float64{}
+			result.Peak.Peak.Intensity = []float64{}
+			result.Peak.Peak.Rel = []int32{}
+			for rows.Next() {
+				var mz float64
+				var intensity float64
+				var rel int32
+				if err := rows.Scan(&mz, &intensity, &rel); err != nil {
+					return nil, err
+				}
+
+				result.Peak.Peak.Mz = append(result.Peak.Peak.Mz, mz)
+				result.Peak.Peak.Intensity = append(result.Peak.Peak.Intensity, intensity)
+				result.Peak.Peak.Rel = append(result.Peak.Peak.Rel, rel)
+			}
+			if err = rows.Err(); err != nil {
+				return nil, err
+			}
+		}		
+	}
+	
+	return &result, err
+}
+
 // GetRecords see [MB3Database.GetRecords]
 func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 	if filters.Limit <= 0 {
@@ -1267,6 +1334,83 @@ func (p *PostgresSQLDB) init() error {
 			ms_type TEXT NOT NULL,
 			ion_mode TEXT NOT NULL
 		);
+
+		CREATE INDEX IF NOT EXISTS metadata_id ON metadata(id);
+		CREATE INDEX IF NOT EXISTS metadata_commit ON metadata(commit);
+		CREATE INDEX IF NOT EXISTS metadata_timestamp ON metadata(timestamp);
+		CREATE INDEX IF NOT EXISTS metadata_version ON metadata(version);
+					
+		CREATE INDEX IF NOT EXISTS massbank_id_index ON massbank(id);
+		CREATE INDEX IF NOT EXISTS massbank_accession_index ON massbank(accession);
+
+		CREATE INDEX IF NOT EXISTS contributor_id_index ON contributor(id);
+		CREATE INDEX IF NOT EXISTS contributor_name_index ON contributor(name);
+
+		CREATE INDEX IF NOT EXISTS author_id_index ON author(id);
+		CREATE INDEX IF NOT EXISTS author_name_index ON author(name);
+		CREATE INDEX IF NOT EXISTS accession_author_massbank_id_index ON accession_author(massbank_id);
+		CREATE INDEX IF NOT EXISTS accession_author_author_id_index ON accession_author(author_id);
+
+		CREATE INDEX IF NOT EXISTS license_id_index ON license(id);
+		CREATE INDEX IF NOT EXISTS license_name_index ON license(name);
+
+		CREATE INDEX IF NOT EXISTS publication_id_index ON publication(id);
+		CREATE INDEX IF NOT EXISTS publication_name_index ON publication(name);
+		CREATE INDEX IF NOT EXISTS accession_publication_massbank_id_index ON accession_publication(massbank_id);
+		CREATE INDEX IF NOT EXISTS accession_publication_publication_id_index ON accession_publication(publication_id);
+
+		CREATE INDEX IF NOT EXISTS compound_id_index ON compound(id);
+		CREATE INDEX IF NOT EXISTS compound_inchi_index ON compound(inchi);
+		CREATE INDEX IF NOT EXISTS compound_formula_index ON compound(formula);
+		CREATE INDEX IF NOT EXISTS compound_smiles_index ON compound(smiles);
+		CREATE INDEX IF NOT EXISTS compound_mass_index ON compound(mass);
+
+		CREATE INDEX IF NOT EXISTS compound_name_name ON compound_name(name);
+		CREATE INDEX IF NOT EXISTS compound_name_compound_id ON compound_name(compound_id);
+		CREATE INDEX IF NOT EXISTS compound_name_massbank_id ON compound_name(massbank_id);
+
+		CREATE INDEX IF NOT EXISTS compound_class_class ON compound_class(class);
+		CREATE INDEX IF NOT EXISTS compound_class_compound_id ON compound_class(compound_id);
+		CREATE INDEX IF NOT EXISTS compound_class_massbank_id ON compound_class(massbank_id);
+
+		CREATE INDEX IF NOT EXISTS compound_link_database ON compound_link(database);
+		CREATE INDEX IF NOT EXISTS compound_link_identifier ON compound_link(identifier);
+		CREATE INDEX IF NOT EXISTS compound_link_compound_id ON compound_link(compound_id);
+		CREATE INDEX IF NOT EXISTS compound_link_massbank_id ON compound_link(massbank_id);
+
+		CREATE INDEX IF NOT EXISTS acquisition_instrument_id ON acquisition_instrument(id);
+		CREATE INDEX IF NOT EXISTS acquisition_instrument_instrument ON acquisition_instrument(instrument);
+		CREATE INDEX IF NOT EXISTS acquisition_instrument_instrument_type ON acquisition_instrument(instrument_type);
+
+		CREATE INDEX IF NOT EXISTS accession_acquisition_massbank_id ON accession_acquisition(massbank_id);
+		CREATE INDEX IF NOT EXISTS accession_acquisition_acquisition_instrument_id ON accession_acquisition(acquisition_instrument_id);
+
+		CREATE INDEX IF NOT EXISTS acquisition_mass_spectrometry_massbank_id ON acquisition_mass_spectrometry(massbank_id);
+		CREATE INDEX IF NOT EXISTS acquisition_chromatography_massbank_id ON acquisition_chromatography(massbank_id);
+		CREATE INDEX IF NOT EXISTS acquisition_general_massbank_id ON acquisition_general(massbank_id);
+
+		CREATE INDEX IF NOT EXISTS mass_spectrometry_focused_ion_massbank_id ON mass_spectrometry_focused_ion(massbank_id);
+		CREATE INDEX IF NOT EXISTS mass_spectrometry_data_processing_massbank_id ON mass_spectrometry_data_processing(massbank_id);
+
+		CREATE INDEX IF NOT EXISTS spectrum_id ON spectrum(id);
+		CREATE INDEX IF NOT EXISTS spectrum_splash ON spectrum(splash);
+		CREATE INDEX IF NOT EXISTS spectrum_num_peak ON spectrum(num_peak);
+		CREATE INDEX IF NOT EXISTS spectrum_massbank_id ON spectrum(massbank_id);
+
+		CREATE INDEX IF NOT EXISTS peak_mz ON peak(mz);
+		CREATE INDEX IF NOT EXISTS peak_intensity ON peak(intensity);
+		CREATE INDEX IF NOT EXISTS peak_relative_intensity ON peak(relative_intensity);
+		CREATE INDEX IF NOT EXISTS peak_spectrum_id ON peak(spectrum_id);
+
+		CREATE INDEX IF NOT EXISTS peak_annotation_spectrum_id ON peak_annotation(spectrum_id);
+
+		CREATE INDEX IF NOT EXISTS browse_options_massbank_id ON browse_options(massbank_id);
+		CREATE INDEX IF NOT EXISTS browse_options_accession ON browse_options(accession);
+		CREATE INDEX IF NOT EXISTS browse_options_contributor ON browse_options(contributor);
+		CREATE INDEX IF NOT EXISTS browse_options_instrument_type ON browse_options(instrument_type);
+		CREATE INDEX IF NOT EXISTS browse_options_ms_type ON browse_options(ms_type);
+		CREATE INDEX IF NOT EXISTS browse_options_ion_mode ON browse_options(ion_mode);
+
 		`;
 	
 	if _, err = p.database.Exec(query); err != nil {
