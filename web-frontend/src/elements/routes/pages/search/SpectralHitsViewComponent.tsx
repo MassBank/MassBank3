@@ -1,11 +1,11 @@
 import './SpectralHitsViewComponent.scss';
 
-import { useCallback, useState } from 'react';
 import Peak from '../../../../types/peak/Peak';
-import PeakTable from '../../../record/PeakTable';
-import Chart from '../../../basic/Chart';
 import Hit from '../../../../types/Hit';
 import ResultInfo from './result/ResultInfo';
+import Resizable from '../../../record/Resizable';
+import Record from '../../../../types/Record';
+import { useMemo } from 'react';
 
 type InputProps = {
   reference: Peak[];
@@ -20,55 +20,33 @@ function SpectralHitsViewComponent({
   width,
   height,
 }: InputProps) {
-  const [filteredReferencePeaks, setFilteredReferencePeaks] =
-    useState<Peak[]>(reference);
-  const [filteredHitPeaks, setFilteredHitPeaks] = useState<Peak[]>(
-    hit.record.peak.peak.values as Peak[],
-  );
-
-  const handleOnZoom = useCallback(
-    (_filteredReferencePeaks: Peak[], _filteredHitPeaks?: Peak[]) => {
-      setFilteredReferencePeaks(_filteredReferencePeaks);
-      setFilteredHitPeaks(_filteredHitPeaks || []);
-    },
-    [],
-  );
-
-  return (
-    <div
-      className="component-container"
-      style={{
-        width,
-        height,
-      }}
-    >
-      <ResultInfo
-        hit={hit}
-        imageWidth={width * 0.3}
-        imageHeight={height}
-        style={{ width: width * 0.3, height, backgroundColor: 'lightyellow' }}
-      />
-      <div className="chart-view">
-        <Chart
-          peakData={reference}
-          peakData2={hit.record.peak.peak.values as Peak[]}
-          width={width * 0.5}
+  const spectralHitsViewComponent = useMemo(
+    () => (
+      <div
+        className="component-container"
+        style={{
+          width,
+          height,
+        }}
+      >
+        <ResultInfo
+          hit={hit}
+          imageWidth={width * 0.3}
+          imageHeight={height}
+          style={{ width: width * 0.3, height, backgroundColor: 'lightyellow' }}
+        />
+        <Resizable
+          record={{ peak: { peak: { values: reference } } } as Record}
+          record2={hit.record}
+          width={width * 0.7}
           height={height}
-          onZoom={handleOnZoom}
         />
       </div>
-      <div className="peak-tables-view">
-        <PeakTable
-          peaks={filteredReferencePeaks}
-          style={{ width: width * 0.2, height: height * 0.5 }}
-        />
-        <PeakTable
-          peaks={filteredHitPeaks}
-          style={{ width: width * 0.2, height: height * 0.5 }}
-        />
-      </div>
-    </div>
+    ),
+    [height, hit, reference, width],
   );
+
+  return spectralHitsViewComponent;
 }
 
 export default SpectralHitsViewComponent;

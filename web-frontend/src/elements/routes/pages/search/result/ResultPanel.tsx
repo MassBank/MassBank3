@@ -5,12 +5,15 @@ import Hit from '../../../../../types/Hit';
 import Record from '../../../../../types/Record';
 import generateID from '../../../../../utils/generateID';
 import axios from 'axios';
-import ResultCard from './ResultCard';
 import Peak from '../../../../../types/peak/Peak';
 import CustomModal from '../../../../basic/CustomModal';
 import SpectralHitsCarouselView from '../SpectralHitsCarouselView';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import Pagination from '../../../../basic/Pagination';
+import ResultTable from './ResultTable';
+import Spinner from '../../../../basic/Spinner';
+import Placeholder from '../../../../basic/Placeholder';
 
 type InputProps = {
   hits: Hit[];
@@ -29,46 +32,50 @@ function ResultPanel({
   widthOverview = width,
   heightOverview = height,
 }: InputProps) {
+  const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [hitsWithRecords, setHitsWithRecords] = useState<Hit[]>([]);
-  const [selectedCardDeckIndex, setSelectedCardDeckIndex] = useState<number>(0);
-  const [cardDecks, setCardDecks] = useState<JSX.Element[]>([]);
-  // const handleOnSelectCardIndex = useCallback((index: number) => {
-  //   setSelectedCardDeckIndex(index);
-  // }, []);
+  const [resultPageIndex, setResultPageIndex] = useState<number>(0);
+  const [spectralHitsCarouselView, setSpectralHitsCarouselView] = useState<
+    JSX.Element | undefined
+  >();
 
-  const selectedPageLimit = 10;
+  const pageLimit = 10;
 
-  const cardSize = useMemo(() => {
-    return { width: width / 3 - 15, height: height * 0.6 };
-  }, [height, width]);
-  // const chartSize = useMemo(() => {
-  //   return {
-  //     width: (cardSize.width / 3) * 2 - 20,
-  //     height: cardSize.height / 2,
-  //   };
-  // }, [cardSize.height, cardSize.width]);
-  const imageSize = useMemo(() => {
-    return {
-      width: cardSize.width,
-      height: cardSize.height / 2,
-    };
-  }, [cardSize.height, cardSize.width]);
+  const resultTableData = useMemo(() => {
+    const _resultTableData: Hit[][] = [];
+    let counter = 0;
+    let resultHits: Hit[] = [];
 
-  const fetchRecords = useCallback(async () => {
-    if (hits.length > 0) {
-      // const selectedPageLimit = 10;
-      const from = 0;
-      const to = 10;
+    for (let i = 0; i < hits.length; i++) {
+      if (counter < pageLimit) {
+        resultHits.push(hits[i]);
+
+        counter++;
+      } else {
+        _resultTableData.push(resultHits);
+        resultHits = [hits[i]];
+        counter = 1;
+      }
+    }
+    if (resultHits.length > 0) {
+      _resultTableData.push(resultHits);
+    }
+
+    return _resultTableData;
+  }, [hits]);
+
+  const fetchRecords = useCallback(async (_hits: Hit[]) => {
+    if (_hits.length > 0) {
+      const from = 0; //resultPageIndex * pageLimit;
+      let to = 10; //from + pageLimit;
+      if (to > _hits.length) {
+        to = _hits.length;
+      }
+
       const range = to - from;
-      console.log('getHitsWithRecords', from, to, range);
-
-      const limit = range > hits.length ? hits.length : range;
-      console.log('limit', limit);
-
-      console.log('slice from', from, 'to', from + limit);
-
-      const accessions = hits.slice(from, from + limit).map((h) => h.accession);
+      const accessions = _hits
+        .slice(from, from + range)
+        .map((h) => h.accession);
 
       const records: (Record | undefined)[] = [];
       for (const accession of accessions) {
@@ -87,94 +94,54 @@ function ResultPanel({
         }
       }
 
-      const _hitsWithRecords = hits.slice(from, from + limit).map((h, i) => {
+      const _hitsWithRecords = _hits.slice(from, from + range).map((h, i) => {
         h.record = records[i];
         return h;
       });
 
-      setHitsWithRecords(_hitsWithRecords);
+      return _hitsWithRecords;
     }
-  }, [hits]);
+  }, []);
 
-  useEffect(() => {
-    fetchRecords();
-  }, [fetchRecords]);
+  const [resultTable, setResultTable] = useState<JSX.Element | undefined>();
 
-  useEffect(() => {
-    const cardDeckData: Hit[][] = [];
-    let counter = 0;
-    let resultHits: Hit[] = [];
+  const buildResultTable = useCallback(() => {
+    setIsRequesting(true);
+    const _hits =
+      resultTableData.length > 0 ? resultTableData[resultPageIndex] : [];
 
-    for (let i = 0; i < hitsWithRecords.length; i++) {
-      if (counter < selectedPageLimit) {
-        counter++;
-        resultHits.push(hitsWithRecords[i]);
-      } else {
-        cardDeckData.push(resultHits);
-        resultHits = [hitsWithRecords[i]];
-        counter = 1;
-      }
-    }
-    if (resultHits.length > 0) {
-      cardDeckData.push(resultHits);
-    }
-
-    let cardDeckIndex = selectedCardDeckIndex;
-    if (cardDeckIndex >= cardDeckData.length) {
-      cardDeckIndex = 0;
-      setSelectedCardDeckIndex(cardDeckIndex);
-    }
-
-    const _cardDecks =
-      cardDeckData.length > 0
-        ? cardDeckData[cardDeckIndex].map((hit, i) => (
-            <ResultCard
-              key={`resultCard_${i}`}
-              label={cardDeckIndex * selectedPageLimit + i + 1}
-              // reference={reference}
-              hit={hit}
-              // chartWidth={chartSize.width}
-              // chartHeight={chartSize.height}
-              imageWidth={imageSize.width}
-              imageHeight={imageSize.height}
-              style={{
-                minWidth: cardSize.width,
-                maxWidth: cardSize.width,
-                minHeight: cardSize.height,
-                maxHeight: cardSize.height,
-                marginLeft: '4px',
-                marginBottom: '4px',
-                border: 'solid 1px lightgrey',
-              }}
-              onDoubleClick={() => {
-                setShowModal(true);
-              }}
-            />
-          ))
-        : [];
-
-    setCardDecks(_cardDecks);
+    fetchRecords(_hits).then((_hitsWithRecords) => {
+      setResultTable(
+        <ResultTable
+          reference={reference}
+          hits={_hitsWithRecords || []}
+          offset={resultPageIndex * pageLimit}
+          onDoubleClick={() => setShowModal(true)}
+          rowHeight={200}
+        />,
+      );
+      setSpectralHitsCarouselView(
+        <SpectralHitsCarouselView
+          reference={reference}
+          hits={_hitsWithRecords || []}
+          width={widthOverview}
+          height={heightOverview - 50}
+        />,
+      );
+      setIsRequesting(false);
+    });
   }, [
-    selectedCardDeckIndex,
-    hitsWithRecords,
+    fetchRecords,
+    heightOverview,
     reference,
-    imageSize.width,
-    imageSize.height,
-    cardSize.width,
-    cardSize.height,
+    resultPageIndex,
+    resultTableData,
+    widthOverview,
   ]);
 
-  const spectralHitsCarouselView = useMemo(
-    () => (
-      <SpectralHitsCarouselView
-        reference={reference}
-        hits={hitsWithRecords}
-        width={widthOverview}
-        height={heightOverview - 50}
-      />
-    ),
-    [heightOverview, hitsWithRecords, reference, widthOverview],
-  );
+  useEffect(() => {
+    buildResultTable();
+  }, [buildResultTable]);
 
   const customModal = useMemo(
     () => (
@@ -205,11 +172,36 @@ function ResultPanel({
     [heightOverview, showModal, spectralHitsCarouselView, widthOverview],
   );
 
-  return (
+  const handleOnPageChange = useCallback(
+    (pageIndex: number) => setResultPageIndex(pageIndex - 1),
+    [],
+  );
+
+  const pagination = useMemo(
+    () => (
+      <Pagination
+        total={Math.ceil(hits.length / pageLimit)}
+        onPageChange={handleOnPageChange}
+        style={{ height: '50px' }}
+      />
+    ),
+    [handleOnPageChange, hits.length],
+  );
+
+  return resultTableData.length > 0 ? (
     <div className="result-container" style={{ width, height }}>
-      {customModal}
-      <div className="card-deck-container">{cardDecks}</div>
+      {pagination}
+      {isRequesting ? (
+        <Spinner buttonDisabled={true} />
+      ) : (
+        <div className="result-table-modal-container">
+          {resultTable}
+          {customModal}
+        </div>
+      )}
     </div>
+  ) : (
+    <Placeholder child="No hits found" style={{ width, height }} />
   );
 }
 

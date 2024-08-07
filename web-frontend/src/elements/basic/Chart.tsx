@@ -4,8 +4,6 @@ import ChartElement from './ChartElement';
 import Button from './Button';
 import Peak from '../../types/peak/Peak';
 
-const MARGIN = { top: 55, right: 30, bottom: 50, left: 70, button: 35 };
-
 type InputProps = {
   peakData: Peak[];
   peakData2?: Peak[];
@@ -33,8 +31,25 @@ function Chart({
 
   const [isShowLabel, setIsShowLabel] = useState<boolean>(false);
 
-  const boundsWidth = width - MARGIN.right - MARGIN.left;
-  const boundsHeight = height - MARGIN.top - MARGIN.bottom - MARGIN.button;
+  const MARGIN = useMemo(() => {
+    const defaultMargin = 5;
+    return {
+      top: disableLabels ? defaultMargin : 55,
+      right: defaultMargin,
+      bottom: disableLabels ? defaultMargin : 50,
+      left: disableLabels ? defaultMargin : 70,
+      button: disableLabels ? defaultMargin : 35,
+    };
+  }, [disableLabels]);
+
+  const boundsWidth = useMemo(
+    () => width - MARGIN.right - MARGIN.left,
+    [MARGIN.left, MARGIN.right, width],
+  );
+  const boundsHeight = useMemo(
+    () => height - MARGIN.top - MARGIN.bottom - MARGIN.button,
+    [MARGIN.bottom, MARGIN.button, MARGIN.top, height],
+  );
 
   const [brushXDomains, setBrushXDomains] = useState<
     { min: number; max: number }[] | undefined
@@ -353,6 +368,7 @@ function Chart({
                   yScale={yScale2}
                   showLabel={isShowLabel}
                   strokeColour="blue"
+                  disableOnHover={disableOnHover}
                 />
               ))
             : [],
@@ -416,20 +432,23 @@ function Chart({
       style={{
         width: width,
         height: height,
-        padding: '5px',
         userSelect: 'none',
         msUserSelect: 'none',
         MozUserSelect: 'none',
         WebkitUserSelect: 'none',
       }}
     >
-      <svg ref={svgRef} width={width} height={height - MARGIN.button}>
+      <svg
+        ref={svgRef}
+        width={width}
+        height={disableLabels ? height : height - MARGIN.button}
+      >
         <g
           width={boundsWidth}
           height={boundsHeight}
           transform={`translate(${[MARGIN.left, MARGIN.top].join(',')})`}
         >
-          {<g className="brush" />}
+          {disableZoom ? undefined : <g className="brush" />}
           {chartElements}
           {xAxis}
           {disableLabels ? undefined : xLabels}
@@ -440,23 +459,31 @@ function Chart({
       {disableLabels ? undefined : (
         <div
           style={{
-            width: '100%',
             height: MARGIN.button,
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
+            marginRight: MARGIN.right,
           }}
         >
           <Button
             child={isShowLabel ? 'Hide Labels' : 'Show Labels'}
             onClick={() => setIsShowLabel(!isShowLabel)}
             buttonStyle={{
-              border: 'black solid 1px',
+              border: '1px solid black',
               padding: '3px',
             }}
           />
-          <div>
+          <div
+            style={{
+              height: MARGIN.button,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              justifyItems: 'center',
+            }}
+          >
             <p style={{ marginBottom: filteredPeakData2 ? 0 : undefined }}>
               {filteredPeakData.length}/{peakData.length}
             </p>

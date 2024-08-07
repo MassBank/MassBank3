@@ -18,7 +18,6 @@ function ResultLink({ hit }: InputProps) {
   return (
     hit.record && (
       <div className="link-container">
-        <label>{hit.record.title}</label>
         <a
           className="link"
           href={hit.accession && hit.accession !== '' ? url : '?'}
