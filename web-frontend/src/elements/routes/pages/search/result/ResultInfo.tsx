@@ -28,6 +28,7 @@ function ResultInfo({ hit, imageWidth, imageHeight, style }: InputProps) {
           />
         ) : undefined}
       </div>
+      <label>{hit.record.title}</label>
       <ResultLink hit={hit} />
     </div>
   );

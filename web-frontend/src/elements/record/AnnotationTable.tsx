@@ -49,7 +49,7 @@ function AnnotationTable({
   }, [annotation]);
 
   return (
-    <div className="AnnotationTable" style={{ width, height }}>
+    <div className="annotation-table" style={{ width, height }}>
       {annotationTable}
     </div>
   );

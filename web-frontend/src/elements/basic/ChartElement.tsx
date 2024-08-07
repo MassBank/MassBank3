@@ -35,7 +35,7 @@ function ChartElement({
     } else {
       setDisableShowLabel(false);
     }
-  }, [disableShowLabel, highlightData.highlight.highlighted, pd.id]);
+  }, [highlightData.highlight.highlighted, pd.id]);
 
   const xScaled = xScale(pd.mz);
 

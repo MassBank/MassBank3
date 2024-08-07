@@ -1,30 +1,16 @@
 $link-symbol-width: 30px;
+$link-symbol-height: 30px;
 
 .link-container {
-  width: 100%;
-  height: 100%;
+  width: $link-symbol-width;
+  height: $link-symbol-height;
   display: flex;
-  flex-direction: row;
   justify-content: center;
   align-items: center;
 
-  label {
-    width: calc(100% - $link-symbol-width);
-    height: 100%;
-    padding-left: 10px;
-    padding-right: 10px;
-    text-wrap: wrap;
-    text-align: center;
-
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-  }
-
   a {
     width: $link-symbol-width;
-    height: 100%;
+    height: $link-symbol-height;
     text-align: center;
 
     display: flex;
