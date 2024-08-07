@@ -16,10 +16,6 @@ type inputProps = {
 };
 
 function RecordView({ record }: inputProps) {
-  useEffect(() => {
-    console.log(record);
-  }, [record]);
-
   const containerRef = useRef(null);
   const { width: containerWidth, height: containerHeight } =
     useContainerDimensions(containerRef);
