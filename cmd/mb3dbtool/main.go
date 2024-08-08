@@ -55,10 +55,20 @@ func main() {
 		println(err.Error())
 	}
 	println("Start updating database.")
-	metaId, err := db.UpdateMetadata(versionData)
+
+	println("Removing indexes...")
+	err = db.RemoveIndexes()
 	if err != nil {
+		println("Could not remove indexes: " + err.Error())
 		panic(err)
 	}
+	println("Updating metadata...")
+	metaId, err := db.UpdateMetadata(versionData)
+	if err != nil {
+		println("Could not update metadata: " + err.Error())
+		panic(err)
+	}
+	println("Updating records...")
 	if count < 1 {
 		err = db.AddRecords(mbfiles, metaId)
 		if err != nil {
@@ -81,7 +91,16 @@ func main() {
 		panic(err)
 	}
 
-	println("Database update was successful. ", count, " records in database.")
+	println("Database filling was successful. ", count, " records in database.")
+
+	println("Adding indexes...")
+	err = db.AddIndexes()
+	if err != nil {
+		println("Could not add indexes: " + err.Error())
+		panic(err)
+	}
+
+	println("Finished database update.")
 }
 
 func readDirectoryData(dir string) ([]*massbank.MassBank2, *massbank.MbMetaData, error) {

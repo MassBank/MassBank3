@@ -183,6 +183,12 @@ type MB3Database interface {
 	// Returns the id of the database entry as string.
 	UpdateMetadata(meta *massbank.MbMetaData) (string, error)
 
+	// RemoveIndexes removes all indexes from the database.
+	RemoveIndexes() error
+
+	//AddIndexes adds indexes to the database.
+	AddIndexes() error
+
 	// AddRecord adds a new MassBank record to the database. If the Accession
 	// id already exists it will return an error.
 	//
