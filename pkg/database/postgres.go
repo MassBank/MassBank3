@@ -15,6 +15,94 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type Index struct {
+	IndexName string
+	TableName string
+	Columns   []string
+}
+
+func (db *PostgresSQLDB) GetIndexes() []Index {
+	var indexes = []Index{}
+	indexes = append(indexes, Index{IndexName: "metadata_id_index", TableName: "metadata", Columns: []string{"id"}})
+	indexes = append(indexes, Index{IndexName: "metadata_commit_index", TableName: "metadata", Columns: []string{"commit"}})
+	indexes = append(indexes, Index{IndexName: "metadata_timestamp_index", TableName: "metadata", Columns: []string{"timestamp"}})
+	indexes = append(indexes, Index{IndexName: "metadata_version_index", TableName: "metadata", Columns: []string{"version"}})
+
+	indexes = append(indexes, Index{IndexName: "massbank_id_index", TableName: "massbank", Columns: []string{"id"}})
+	indexes = append(indexes, Index{IndexName: "massbank_accession_index", TableName: "massbank", Columns: []string{"accession"}})
+	indexes = append(indexes, Index{IndexName: "massbank_title_index", TableName: "massbank", Columns: []string{"title"}})
+		
+	indexes = append(indexes, Index{IndexName: "contributor_id_index", TableName: "contributor", Columns: []string{"id"}})
+	indexes = append(indexes, Index{IndexName: "contributor_name_index", TableName: "contributor", Columns: []string{"name"}})
+
+	indexes = append(indexes, Index{IndexName: "author_id_index", TableName: "author", Columns: []string{"id"}})
+	indexes = append(indexes, Index{IndexName: "author_name_index", TableName: "author", Columns: []string{"name"}})
+	indexes = append(indexes, Index{IndexName: "accession_author_massbank_id_index", TableName: "accession_author", Columns: []string{"massbank_id"}})
+	indexes = append(indexes, Index{IndexName: "accession_author_author_id_index", TableName: "accession_author", Columns: []string{"author_id"}})
+
+	indexes = append(indexes, Index{IndexName: "license_id_index", TableName: "license", Columns: []string{"id"}})
+	indexes = append(indexes, Index{IndexName: "license_name_index", TableName: "license", Columns: []string{"name"}})
+
+	indexes = append(indexes, Index{IndexName: "publication_id_index", TableName: "publication", Columns: []string{"id"}})
+	indexes = append(indexes, Index{IndexName: "publication_name_index", TableName: "publication", Columns: []string{"name"}})
+	indexes = append(indexes, Index{IndexName: "accession_publication_massbank_id_index", TableName: "accession_publication", Columns: []string{"massbank_id"}})
+	indexes = append(indexes, Index{IndexName: "accession_publication_publication_id_index", TableName: "accession_publication", Columns: []string{"publication_id"}})
+
+	indexes = append(indexes, Index{IndexName: "compound_id_index", TableName: "compound", Columns: []string{"id"}})
+	indexes = append(indexes, Index{IndexName: "compound_inchi_index", TableName: "compound", Columns: []string{"inchi"}})
+	indexes = append(indexes, Index{IndexName: "compound_formula_index", TableName: "compound", Columns: []string{"formula"}})
+	indexes = append(indexes, Index{IndexName: "compound_smiles_index", TableName: "compound", Columns: []string{"smiles"}})
+	indexes = append(indexes, Index{IndexName: "compound_mass_index", TableName: "compound", Columns: []string{"mass"}})
+
+	indexes = append(indexes, Index{IndexName: "compound_name_id_index", TableName: "compound_name", Columns: []string{"id"}})
+	indexes = append(indexes, Index{IndexName: "compound_name_name_index", TableName: "compound_name", Columns: []string{"name"}})
+	indexes = append(indexes, Index{IndexName: "compound_name_massbank_id_index", TableName: "compound_name", Columns: []string{"massbank_id"}})
+
+	indexes = append(indexes, Index{IndexName: "compound_class_class_index", TableName: "compound_class", Columns: []string{"class"}})
+	indexes = append(indexes, Index{IndexName: "compound_class_compound_id_index", TableName: "compound_class", Columns: []string{"compound_id"}})
+	indexes = append(indexes, Index{IndexName: "compound_class_massbank_id_index", TableName: "compound_class", Columns: []string{"massbank_id"}})
+
+	indexes = append(indexes, Index{IndexName: "compound_link_database_index", TableName: "compound_link", Columns: []string{"database"}})
+	indexes = append(indexes, Index{IndexName: "compound_link_identifier_index", TableName: "compound_link", Columns: []string{"identifier"}})
+	indexes = append(indexes, Index{IndexName: "compound_link_compound_id_index", TableName: "compound_link", Columns: []string{"compound_id"}})
+	indexes = append(indexes, Index{IndexName: "compound_link_massbank_id_index", TableName: "compound_link", Columns: []string{"massbank_id"}})
+
+	indexes = append(indexes, Index{IndexName: "acquisition_instrument_id_index", TableName: "acquisition_instrument", Columns: []string{"id"}})
+	indexes = append(indexes, Index{IndexName: "acquisition_instrument_instrument_index", TableName: "acquisition_instrument", Columns: []string{"instrument"}})
+	indexes = append(indexes, Index{IndexName: "acquisition_instrument_instrument_type_index", TableName: "acquisition_instrument", Columns: []string{"instrument_type"}})
+
+	indexes	= append(indexes, Index{IndexName: "accession_acquisition_massbank_id_index", TableName: "accession_acquisition", Columns: []string{"massbank_id"}})
+	indexes	= append(indexes, Index{IndexName: "accession_acquisition_acquisition_instrument_id_index", TableName: "accession_acquisition", Columns: []string{"acquisition_instrument_id"}})
+
+	indexes = append(indexes, Index{IndexName: "acquisition_mass_spectrometry_massbank_id_index", TableName: "acquisition_mass_spectrometry", Columns: []string{"massbank_id"}})
+	indexes = append(indexes, Index{IndexName: "acquisition_chromatography_massbank_id_index", TableName: "acquisition_chromatography", Columns: []string{"massbank_id"}})
+	indexes = append(indexes, Index{IndexName: "acquisition_general_massbank_id_index", TableName: "acquisition_general", Columns: []string{"massbank_id"}})
+
+	indexes = append(indexes, Index{IndexName: "mass_spectrometry_focused_ion_massbank_id_index", TableName: "mass_spectrometry_focused_ion", Columns: []string{"massbank_id"}})
+	indexes = append(indexes, Index{IndexName: "mass_spectrometry_data_processing_massbank_id_index", TableName: "mass_spectrometry_data_processing", Columns: []string{"massbank_id"}})
+
+	indexes = append(indexes, Index{IndexName: "spectrum_id_index", TableName: "spectrum", Columns: []string{"id"}})
+	indexes = append(indexes, Index{IndexName: "spectrum_splash_index", TableName: "spectrum", Columns: []string{"splash"}})
+	indexes = append(indexes, Index{IndexName: "spectrum_num_peak_index", TableName: "spectrum", Columns: []string{"num_peak"}})
+	indexes = append(indexes, Index{IndexName: "spectrum_massbank_id_index", TableName: "spectrum", Columns: []string{"massbank_id"}})
+
+	indexes = append(indexes, Index{IndexName: "peak_mz_index", TableName: "peak", Columns: []string{"mz"}})
+	indexes = append(indexes, Index{IndexName: "peak_intensity_index", TableName: "peak", Columns: []string{"intensity"}})
+	indexes = append(indexes, Index{IndexName: "peak_relative_intensity_index", TableName: "peak", Columns: []string{"relative_intensity"}})
+	indexes = append(indexes, Index{IndexName: "peak_spectrum_id_index", TableName: "peak", Columns: []string{"spectrum_id"}})
+
+	indexes = append(indexes, Index{IndexName: "peak_annotation_spectrum_id_index", TableName: "peak_annotation", Columns: []string{"spectrum_id"}})
+
+	indexes = append(indexes, Index{IndexName: "browse_options_massbank_id_index", TableName: "browse_options", Columns: []string{"massbank_id"}})
+	indexes = append(indexes, Index{IndexName: "browse_options_accession_index", TableName: "browse_options", Columns: []string{"accession"}})
+	indexes = append(indexes, Index{IndexName: "browse_options_contributor_index", TableName: "browse_options", Columns: []string{"contributor"}})
+	indexes = append(indexes, Index{IndexName: "browse_options_instrument_type_index", TableName: "browse_options", Columns: []string{"instrument_type"}})
+	indexes = append(indexes, Index{IndexName: "browse_options_ms_type_index", TableName: "browse_options", Columns: []string{"ms_type"}})
+	indexes = append(indexes, Index{IndexName: "browse_options_ion_mode_index", TableName: "browse_options", Columns: []string{"ion_mode"}})
+
+	return indexes
+}
+
 // PostgresSQLDB is a struct representing a postgres connection. This should implement
 // the [MB3Database] interface.
 type PostgresSQLDB struct {
@@ -743,6 +831,46 @@ func (p *PostgresSQLDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error
 
 }
 
+func (p *PostgresSQLDB) DropIndex(i *Index) (string) {
+	return "DROP INDEX IF EXISTS " + i.IndexName + ";"
+}
+
+func (p *PostgresSQLDB) CreateIndex(i *Index) (string) {
+	return "CREATE INDEX IF NOT EXISTS " + i.IndexName + " ON " + i.TableName + " (" + strings.Join(i.Columns, ",") + ");"
+}
+
+// RemoveIndexes see [MB3Database.RemoveIndexes]
+func (p *PostgresSQLDB) RemoveIndexes() error {
+	if err := p.checkDatabase(); err != nil {
+		return err
+	}
+	indexes := p.GetIndexes()
+	for i := 0; i < len(indexes); i++ {
+		query := p.DropIndex(&indexes[i])
+		if _, err := p.database.Exec(query); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// AddIndexes see [MB3Database.AddIndexes]
+func (p *PostgresSQLDB) AddIndexes() error {
+	if err := p.checkDatabase(); err != nil {
+		return err
+	}
+	indexes := p.GetIndexes()
+	for i := 0; i < len(indexes); i++ {
+		query := p.CreateIndex(&indexes[i])
+		if _, err := p.database.Exec(query); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // AddRecord see [MB3Database.AddRecord]
 func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string) error {
 	records := []*massbank.MassBank2{record}
@@ -1334,82 +1462,6 @@ func (p *PostgresSQLDB) init() error {
 			ms_type TEXT NOT NULL,
 			ion_mode TEXT NOT NULL
 		);
-
-		CREATE INDEX IF NOT EXISTS metadata_id ON metadata(id);
-		CREATE INDEX IF NOT EXISTS metadata_commit ON metadata(commit);
-		CREATE INDEX IF NOT EXISTS metadata_timestamp ON metadata(timestamp);
-		CREATE INDEX IF NOT EXISTS metadata_version ON metadata(version);
-					
-		CREATE INDEX IF NOT EXISTS massbank_id_index ON massbank(id);
-		CREATE INDEX IF NOT EXISTS massbank_accession_index ON massbank(accession);
-
-		CREATE INDEX IF NOT EXISTS contributor_id_index ON contributor(id);
-		CREATE INDEX IF NOT EXISTS contributor_name_index ON contributor(name);
-
-		CREATE INDEX IF NOT EXISTS author_id_index ON author(id);
-		CREATE INDEX IF NOT EXISTS author_name_index ON author(name);
-		CREATE INDEX IF NOT EXISTS accession_author_massbank_id_index ON accession_author(massbank_id);
-		CREATE INDEX IF NOT EXISTS accession_author_author_id_index ON accession_author(author_id);
-
-		CREATE INDEX IF NOT EXISTS license_id_index ON license(id);
-		CREATE INDEX IF NOT EXISTS license_name_index ON license(name);
-
-		CREATE INDEX IF NOT EXISTS publication_id_index ON publication(id);
-		CREATE INDEX IF NOT EXISTS publication_name_index ON publication(name);
-		CREATE INDEX IF NOT EXISTS accession_publication_massbank_id_index ON accession_publication(massbank_id);
-		CREATE INDEX IF NOT EXISTS accession_publication_publication_id_index ON accession_publication(publication_id);
-
-		CREATE INDEX IF NOT EXISTS compound_id_index ON compound(id);
-		CREATE INDEX IF NOT EXISTS compound_inchi_index ON compound(inchi);
-		CREATE INDEX IF NOT EXISTS compound_formula_index ON compound(formula);
-		CREATE INDEX IF NOT EXISTS compound_smiles_index ON compound(smiles);
-		CREATE INDEX IF NOT EXISTS compound_mass_index ON compound(mass);
-
-		CREATE INDEX IF NOT EXISTS compound_name_name ON compound_name(name);
-		CREATE INDEX IF NOT EXISTS compound_name_compound_id ON compound_name(compound_id);
-		CREATE INDEX IF NOT EXISTS compound_name_massbank_id ON compound_name(massbank_id);
-
-		CREATE INDEX IF NOT EXISTS compound_class_class ON compound_class(class);
-		CREATE INDEX IF NOT EXISTS compound_class_compound_id ON compound_class(compound_id);
-		CREATE INDEX IF NOT EXISTS compound_class_massbank_id ON compound_class(massbank_id);
-
-		CREATE INDEX IF NOT EXISTS compound_link_database ON compound_link(database);
-		CREATE INDEX IF NOT EXISTS compound_link_identifier ON compound_link(identifier);
-		CREATE INDEX IF NOT EXISTS compound_link_compound_id ON compound_link(compound_id);
-		CREATE INDEX IF NOT EXISTS compound_link_massbank_id ON compound_link(massbank_id);
-
-		CREATE INDEX IF NOT EXISTS acquisition_instrument_id ON acquisition_instrument(id);
-		CREATE INDEX IF NOT EXISTS acquisition_instrument_instrument ON acquisition_instrument(instrument);
-		CREATE INDEX IF NOT EXISTS acquisition_instrument_instrument_type ON acquisition_instrument(instrument_type);
-
-		CREATE INDEX IF NOT EXISTS accession_acquisition_massbank_id ON accession_acquisition(massbank_id);
-		CREATE INDEX IF NOT EXISTS accession_acquisition_acquisition_instrument_id ON accession_acquisition(acquisition_instrument_id);
-
-		CREATE INDEX IF NOT EXISTS acquisition_mass_spectrometry_massbank_id ON acquisition_mass_spectrometry(massbank_id);
-		CREATE INDEX IF NOT EXISTS acquisition_chromatography_massbank_id ON acquisition_chromatography(massbank_id);
-		CREATE INDEX IF NOT EXISTS acquisition_general_massbank_id ON acquisition_general(massbank_id);
-
-		CREATE INDEX IF NOT EXISTS mass_spectrometry_focused_ion_massbank_id ON mass_spectrometry_focused_ion(massbank_id);
-		CREATE INDEX IF NOT EXISTS mass_spectrometry_data_processing_massbank_id ON mass_spectrometry_data_processing(massbank_id);
-
-		CREATE INDEX IF NOT EXISTS spectrum_id ON spectrum(id);
-		CREATE INDEX IF NOT EXISTS spectrum_splash ON spectrum(splash);
-		CREATE INDEX IF NOT EXISTS spectrum_num_peak ON spectrum(num_peak);
-		CREATE INDEX IF NOT EXISTS spectrum_massbank_id ON spectrum(massbank_id);
-
-		CREATE INDEX IF NOT EXISTS peak_mz ON peak(mz);
-		CREATE INDEX IF NOT EXISTS peak_intensity ON peak(intensity);
-		CREATE INDEX IF NOT EXISTS peak_relative_intensity ON peak(relative_intensity);
-		CREATE INDEX IF NOT EXISTS peak_spectrum_id ON peak(spectrum_id);
-
-		CREATE INDEX IF NOT EXISTS peak_annotation_spectrum_id ON peak_annotation(spectrum_id);
-
-		CREATE INDEX IF NOT EXISTS browse_options_massbank_id ON browse_options(massbank_id);
-		CREATE INDEX IF NOT EXISTS browse_options_accession ON browse_options(accession);
-		CREATE INDEX IF NOT EXISTS browse_options_contributor ON browse_options(contributor);
-		CREATE INDEX IF NOT EXISTS browse_options_instrument_type ON browse_options(instrument_type);
-		CREATE INDEX IF NOT EXISTS browse_options_ms_type ON browse_options(ms_type);
-		CREATE INDEX IF NOT EXISTS browse_options_ion_mode ON browse_options(ion_mode);
 
 		`;
 	
