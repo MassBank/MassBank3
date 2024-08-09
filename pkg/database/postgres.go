@@ -37,6 +37,7 @@ func (db *PostgresSQLDB) GetIndexes() []Index {
 
 	indexes = append(indexes, Index{IndexName: "author_id_index", TableName: "author", Columns: []string{"id"}})
 	indexes = append(indexes, Index{IndexName: "author_name_index", TableName: "author", Columns: []string{"name"}})
+
 	indexes = append(indexes, Index{IndexName: "accession_author_massbank_id_index", TableName: "accession_author", Columns: []string{"massbank_id"}})
 	indexes = append(indexes, Index{IndexName: "accession_author_author_id_index", TableName: "accession_author", Columns: []string{"author_id"}})
 
@@ -45,6 +46,7 @@ func (db *PostgresSQLDB) GetIndexes() []Index {
 
 	indexes = append(indexes, Index{IndexName: "publication_id_index", TableName: "publication", Columns: []string{"id"}})
 	indexes = append(indexes, Index{IndexName: "publication_name_index", TableName: "publication", Columns: []string{"name"}})
+
 	indexes = append(indexes, Index{IndexName: "accession_publication_massbank_id_index", TableName: "accession_publication", Columns: []string{"massbank_id"}})
 	indexes = append(indexes, Index{IndexName: "accession_publication_publication_id_index", TableName: "accession_publication", Columns: []string{"publication_id"}})
 
@@ -54,8 +56,8 @@ func (db *PostgresSQLDB) GetIndexes() []Index {
 	indexes = append(indexes, Index{IndexName: "compound_smiles_index", TableName: "compound", Columns: []string{"smiles"}})
 	indexes = append(indexes, Index{IndexName: "compound_mass_index", TableName: "compound", Columns: []string{"mass"}})
 
-	indexes = append(indexes, Index{IndexName: "compound_name_id_index", TableName: "compound_name", Columns: []string{"id"}})
 	indexes = append(indexes, Index{IndexName: "compound_name_name_index", TableName: "compound_name", Columns: []string{"name"}})
+	indexes = append(indexes, Index{IndexName: "compound_name_compound_id_index", TableName: "compound_name", Columns: []string{"compound_id"}})
 	indexes = append(indexes, Index{IndexName: "compound_name_massbank_id_index", TableName: "compound_name", Columns: []string{"massbank_id"}})
 
 	indexes = append(indexes, Index{IndexName: "compound_class_class_index", TableName: "compound_class", Columns: []string{"class"}})
