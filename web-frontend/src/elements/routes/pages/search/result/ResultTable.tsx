@@ -9,7 +9,8 @@ type InputProps = {
   reference: Peak[];
   hits: Hit[];
   offset: number;
-  onDoubleClick: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onDoubleClick: (slideIndex: number) => void;
   rowHeight?: number;
 };
 
@@ -44,7 +45,7 @@ function ResultTable({
           height={rowHeight}
           chartWidth={500}
           imageWidth={rowHeight}
-          onDoubleClick={onDoubleClick}
+          onDoubleClick={() => onDoubleClick(i)}
         />,
       );
     });

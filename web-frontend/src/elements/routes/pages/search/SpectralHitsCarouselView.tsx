@@ -1,7 +1,7 @@
 import 'react-multi-carousel/lib/styles.css';
 import './SpectralHitsCarouselView.scss';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Peak from '../../../../types/peak/Peak';
 import Carousel, { ResponsiveType } from 'react-multi-carousel';
 import Hit from '../../../../types/Hit';
@@ -10,6 +10,7 @@ import SpectralHitsViewComponent from './SpectralHitsViewComponent';
 type InputProps = {
   reference: Peak[];
   hits: Hit[];
+  slideIndex?: number;
   width?: number;
   height?: number;
 };
@@ -17,6 +18,7 @@ type InputProps = {
 function SpectralHitsCarouselView({
   reference,
   hits,
+  slideIndex = 0,
   width = 500,
   height = 300,
 }: InputProps) {
@@ -53,6 +55,12 @@ function SpectralHitsCarouselView({
     return responsive;
   }, [elements, width]);
 
+  const [carousel, setCarousel] = useState<Carousel | null>(null);
+
+  useEffect(() => {
+    carousel?.setState({ currentSlide: slideIndex });
+  }, [carousel, slideIndex]);
+
   return (
     <div className="spectra-view-wrapper" style={{ width, height }}>
       <Carousel
@@ -61,6 +69,7 @@ function SpectralHitsCarouselView({
         swipeable={false}
         draggable={false}
         showDots={true}
+        ref={(el) => setCarousel(el)}
       >
         {elements}
       </Carousel>

@@ -34,6 +34,7 @@ function ResultPanel({
 }: InputProps) {
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [slideIndex, setSlideIndex] = useState<number>(0);
   const [resultPageIndex, setResultPageIndex] = useState<number>(0);
   const [spectralHitsCarouselView, setSpectralHitsCarouselView] = useState<
     JSX.Element | undefined
@@ -118,7 +119,10 @@ function ResultPanel({
           reference={reference}
           hits={_hitsWithRecords || []}
           offset={resultPageIndex * pageLimit}
-          onDoubleClick={() => setShowModal(true)}
+          onDoubleClick={(_slideIndex: number) => {
+            setSlideIndex(_slideIndex);
+            setShowModal(true);
+          }}
           rowHeight={200}
         />,
       );
@@ -126,6 +130,7 @@ function ResultPanel({
         <SpectralHitsCarouselView
           reference={reference}
           hits={_hitsWithRecords || []}
+          slideIndex={slideIndex}
           width={widthOverview}
           height={heightOverview - 50}
         />,
@@ -138,6 +143,7 @@ function ResultPanel({
     reference,
     resultPageIndex,
     resultTableData,
+    slideIndex,
     widthOverview,
   ]);
 
