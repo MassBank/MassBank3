@@ -20,7 +20,7 @@ function Pagination({ total, onPageChange, style }: InputProps) {
   };
 
   return (
-    <div className="custom-pagination" style={style}>
+    <div className="pagination-container" style={style}>
       <ResponsivePaginationComponent
         current={current}
         total={total}
