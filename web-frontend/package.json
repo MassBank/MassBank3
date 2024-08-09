@@ -1,6 +1,7 @@
 {
   "name": "web-frontend",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite --mode development --host localhost --port 3000 --strictPort --open",
     "build": "rimraf dist && tsc && vite build --mode production",
