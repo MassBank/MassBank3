@@ -20,8 +20,11 @@ function SpectralHitsViewComponent({
   width,
   height,
 }: InputProps) {
-  const spectralHitsViewComponent = useMemo(
-    () => (
+  const spectralHitsViewComponent = useMemo(() => {
+    const widthResultInfo = width * 0.25;
+    const widthResizable = width - widthResultInfo;
+
+    return (
       <div
         className="component-container"
         style={{
@@ -31,20 +34,23 @@ function SpectralHitsViewComponent({
       >
         <ResultInfo
           hit={hit}
-          imageWidth={width * 0.3}
+          imageWidth={widthResultInfo}
           imageHeight={height}
-          style={{ width: width * 0.3, height, backgroundColor: 'lightyellow' }}
+          style={{
+            width: widthResultInfo,
+            height,
+            backgroundColor: 'lightyellow',
+          }}
         />
         <Resizable
           record={{ peak: { peak: { values: reference } } } as Record}
           record2={hit.record}
-          width={width * 0.7}
+          width={widthResizable}
           height={height}
         />
       </div>
-    ),
-    [height, hit, reference, width],
-  );
+    );
+  }, [height, hit, reference, width]);
 
   return spectralHitsViewComponent;
 }

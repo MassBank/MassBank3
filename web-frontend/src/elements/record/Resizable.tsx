@@ -17,7 +17,7 @@ import getLinkedAnnotations from '../../utils/getLinkedAnnotations';
 import LinkedPeakAnnotation from '../../types/peak/LinkedPeakAnnotation';
 
 const sidebarWidth = 10;
-const defaultChartWidthRatio = 0.7;
+const defaultChartWidthRatio = 0.75;
 
 type InputProps = {
   record: Record;

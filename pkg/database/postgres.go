@@ -12,7 +12,6 @@ import (
 	"github.com/Code-Hex/dd"
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"github.com/lib/pq"
-	_ "github.com/lib/pq"
 )
 
 type Index struct {
