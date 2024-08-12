@@ -579,7 +579,7 @@ func GetSimilarity(peakList []string, referenceSpectraList []string, instrumentT
 	}
 
 	hostname := getEnv("SIMILARITY_SERVICE_COSINE_HOST", "similarity-service-cosine")
-	port := getEnv("SIMILARITY_SERVICE_COSINE_PORT_INTERNAL", "8080")
+	port := getEnv("SIMILARITY_SERVICE_COSINE_PORT", "8080")
 	requestURL := "http://" + hostname + ":" + port + "/similarity"
 
 	type datatype2 struct {
