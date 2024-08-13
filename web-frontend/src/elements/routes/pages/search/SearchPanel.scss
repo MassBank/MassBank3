@@ -1,24 +1,30 @@
-$button-container-height: 40px;
-
 .search-panel-container {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 
-  .search-panel-container-inner {
+  .collapse-button-container {
     width: 100%;
-    height: calc(100% - $button-container-height);
+    height: 100%;
     display: flex;
-    flex-direction: row;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
 
+    background-color: lightgrey;
+
+    .Button {
+      margin-left: 10px;
+    }
+  }
+
+  .sidebar {
     .peak-list-input-container {
       width: 100%;
       height: 100%;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
     }
@@ -27,37 +33,37 @@ $button-container-height: 40px;
       width: 100%;
       height: 100%;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
     }
+
+    .error-label {
+      color: red;
+      text-align: center;
+      font-weight: bold;
+    }
   }
-  .search-panel-button-container {
+
+  .search-button-container {
     width: 100%;
-    height: $button-container-height;
+    height: 100%;
     display: flex;
-    flex-direction: row;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
 
+    background-color: lightgrey;
+
     .submit-input {
+      width: 100%;
+      height: 100%;
       text-align: center;
       background-color: transparent;
       color: inherit;
-      border: 1px solid lightgrey;
-      border-radius: 5px;
-      padding-left: 2px;
-      padding-right: 2px;
-      padding-bottom: 2px;
+
+      border: none;
       font: inherit;
       cursor: pointer;
       outline: inherit;
     }
-  }
-
-  .error-label {
-    color: red;
-    text-align: center;
-    font-weight: bold;
   }
 }

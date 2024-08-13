@@ -180,24 +180,20 @@ function ResultPanel({
     [heightOverview, showModal, spectralHitsCarouselView, widthOverview],
   );
 
-  const handleOnPageChange = useCallback(
-    (pageIndex: number) => setResultPageIndex(pageIndex - 1),
-    [],
-  );
-
   const pagination = useMemo(
     () => (
       <Pagination
         total={Math.ceil(hits.length / pageLimit)}
-        onPageChange={handleOnPageChange}
+        onPageChange={(pageIndex: number) => setResultPageIndex(pageIndex - 1)}
         style={{ height: '50px' }}
       />
     ),
-    [handleOnPageChange, hits.length],
+    [hits.length],
   );
 
   return resultTableData.length > 0 ? (
     <div className="result-container" style={{ width, height }}>
+      <p className="hit-count-paragraph">{`${hits.length} hits were found!`}</p>
       {pagination}
       {isRequesting ? (
         <Spinner buttonDisabled={true} />
