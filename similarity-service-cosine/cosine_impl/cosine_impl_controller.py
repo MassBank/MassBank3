@@ -29,6 +29,8 @@ spectra = []
 # Initialize the connection pool globally
 pool = ConnectionPool(conninfo=f"postgresql://{DB_NAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}", open=False)
 
+# Global setting
+logging.basicConfig(level="INFO")
 
 def load_spectra():  # noqa: E501
     """load all spectra from the database if the metadata indicates newer data and stores them"""

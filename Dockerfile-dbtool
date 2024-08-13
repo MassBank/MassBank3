@@ -11,5 +11,12 @@ RUN go build -a -installsuffix cgo -o mb3dbtool ./cmd/mb3dbtool
 
 FROM docker.io/alpine AS runtime
 COPY --from=build /go/src/mb3dbtool ./
+RUN printf 'case $MB_DB_INIT in\n\
+  true) echo Initialize database...\n\
+        ./mb3dbtool;;\n\
+  *) echo Skip database initialization...;;\n\
+esac' > ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+
 EXPOSE 8080/tcp
-ENTRYPOINT ["./mb3dbtool"]
+CMD ["/bin/sh","./entrypoint.sh"]
