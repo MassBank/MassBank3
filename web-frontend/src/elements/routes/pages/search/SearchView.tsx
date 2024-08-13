@@ -11,17 +11,21 @@ import axios from 'axios';
 import SearchPanel from './SearchPanel';
 import Placeholder from '../../../basic/Placeholder';
 import ResultPanel from './result/ResultPanel';
+import { FieldValues } from 'react-hook-form';
 
 function SearchView() {
   const ref = useRef(null);
   const { width, height } = useContainerDimensions(ref);
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
-
   const [reference, setReference] = useState<Peak[]>([]);
   const [hits, setHits] = useState<Hit[]>([]);
+  const [collapsed, setCollapsed] = useState<boolean>(false);
 
-  const searchPanelWidth = width;
-  const searchPanelHeight = 200;
+  const searchPanelWidth = useMemo(
+    () => (collapsed ? 50 : width * 0.25),
+    [collapsed, width],
+  );
+  const searchPanelHeight = height;
 
   const searchHits = useCallback(
     async (peakList: Peak[], referenceSpectraList: string[]) => {
@@ -59,38 +63,46 @@ function SearchView() {
     [searchHits],
   );
 
+  const handleOnSubmit = useCallback(
+    (data: FieldValues) => {
+      setCollapsed(true);
+      const peakListValues: number[][] = data.peakListInputField
+        .split('\n')
+        .map((line: string) => {
+          const [mz, intensity] = line.split(' ');
+          return [parseFloat(mz), parseFloat(intensity)];
+        });
+      const max = Math.max(...peakListValues.map((p) => p[1]));
+      const peakList: Peak[] = peakListValues.map((values: number[]) => {
+        const [mz, intensity] = values;
+        const rel = Math.floor((intensity / max) * 1000) - 1;
+        return {
+          mz,
+          intensity,
+          rel: rel < 0 ? 0 : rel,
+          id: generateID(),
+        } as Peak;
+      });
+      const referenceSpectraList = data.referenceSpectraInputField
+        .split('\n')
+        .filter((s: string) => s !== '');
+
+      handleOnSearchHits(peakList, referenceSpectraList);
+    },
+    [handleOnSearchHits],
+  );
+
   const searchPanel = useMemo(
     () => (
       <SearchPanel
         width={searchPanelWidth}
         height={searchPanelHeight}
-        onSubmit={(data) => {
-          const peakListValues: number[][] = data.peakListInputField
-            .split('\n')
-            .map((line: string) => {
-              const [mz, intensity] = line.split(' ');
-              return [parseFloat(mz), parseFloat(intensity)];
-            });
-          const max = Math.max(...peakListValues.map((p) => p[1]));
-          const peakList: Peak[] = peakListValues.map((values: number[]) => {
-            const [mz, intensity] = values;
-            const rel = Math.floor((intensity / max) * 1000) - 1;
-            return {
-              mz,
-              intensity,
-              rel: rel < 0 ? 0 : rel,
-              id: generateID(),
-            } as Peak;
-          });
-          const referenceSpectraList = data.referenceSpectraInputField
-            .split('\n')
-            .filter((s: string) => s !== '');
-
-          handleOnSearchHits(peakList, referenceSpectraList);
-        }}
+        collapsed={collapsed}
+        onCollapse={(collapsed: boolean) => setCollapsed(collapsed)}
+        onSubmit={handleOnSubmit}
       />
     ),
-    [handleOnSearchHits, searchPanelWidth],
+    [searchPanelWidth, searchPanelHeight, collapsed, handleOnSubmit],
   );
 
   const resultPanel = useMemo(
@@ -98,13 +110,13 @@ function SearchView() {
       <ResultPanel
         hits={hits}
         reference={reference}
-        width={width}
-        height={height - searchPanelHeight}
+        width={width - searchPanelWidth}
+        height={height}
         widthOverview={width}
         heightOverview={height - 100}
       />
     ),
-    [height, hits, reference, width],
+    [height, hits, reference, searchPanelWidth, width],
   );
 
   const placeholder = useMemo(
@@ -112,12 +124,12 @@ function SearchView() {
       <Placeholder
         child={''}
         style={{
-          width: width,
-          height: height - searchPanelHeight,
+          width: width - searchPanelWidth,
+          height: height,
         }}
       />
     ),
-    [height, width],
+    [height, searchPanelWidth, width],
   );
 
   return (
