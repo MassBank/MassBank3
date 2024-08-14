@@ -20,7 +20,6 @@ import (
 type DefaultAPIRouter interface {
 	GetBrowseOptions(http.ResponseWriter, *http.Request)
 	GetCount(http.ResponseWriter, *http.Request)
-	GetFilterOptions(http.ResponseWriter, *http.Request)
 	GetMetadata(http.ResponseWriter, *http.Request)
 	GetRecord(http.ResponseWriter, *http.Request)
 	GetRecords(http.ResponseWriter, *http.Request)
@@ -36,10 +35,9 @@ type DefaultAPIRouter interface {
 type DefaultAPIServicer interface {
 	GetBrowseOptions(context.Context, []string, []string, string, []string) (ImplResponse, error)
 	GetCount(context.Context) (ImplResponse, error)
-	GetFilterOptions(context.Context) (ImplResponse, error)
 	GetMetadata(context.Context) (ImplResponse, error)
 	GetRecord(context.Context, string) (ImplResponse, error)
-	GetRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, int32, int32, string, []string) (ImplResponse, error)
+	GetRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, string, []string) (ImplResponse, error)
 	GetSVG(context.Context, string) (ImplResponse, error)
 	GetSimilarity(context.Context, []string, []string, []string, []string, string, string, float64, string, int32, int32, []string) (ImplResponse, error)
 	GetSimpleRecord(context.Context, string) (ImplResponse, error)

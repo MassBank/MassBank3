@@ -612,9 +612,10 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 
 // GetRecords see [MB3Database.GetRecords]
 func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
-	if filters.Limit <= 0 {
-		filters.Limit = DefaultValues.Limit
-	}
+
+
+	fmt.Println("GetRecords -> start")
+
 	if filters.MassEpsilon == nil {
 		filters.MassEpsilon = &DefaultValues.MassEpsilon
 	}
@@ -622,27 +623,28 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 		filters.IntensityCutoff = &DefaultValues.IntensityCutoff
 	}
 
-	var accessions = []string{}
-	if filters.InstrumentType != nil {
-		rows, err := p.database.Query("SELECT accession FROM massbank WHERE id IN (SELECT massbank_id FROM accession_acquisition WHERE acquisition_instrument_id IN (SELECT id FROM acquisition_instrument WHERE instrument_type IN (?)));", filters.InstrumentType)
 
-		if err != nil {
+	var accessions = []string{}
+	query := "SELECT accession FROM browse_options"
+	query = query + p.buildBrowseOptionsWhere(filters) + ";"
+	fmt.Println("GetRecords -> query: ", query)
+	rows, err := p.database.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var accession string
+		if err := rows.Scan(&accession); err != nil {
 			return nil, err
 		}
-		defer rows.Close()
-
-		for rows.Next() {
-			var accession string
-			if err := rows.Scan(&accession); err != nil {
-				return nil, err
-			}
-			accessions = append(accessions, accession)
-		}
+		accessions = append(accessions, accession)
 	}
+	
+	fmt.Println("#accessions: ", len(accessions))
+	fmt.Println("accessions:  ", accessions)
 
-	fmt.Println("GetRecords -> start")
-	fmt.Println("filters: ", filters)
-	fmt.Println("accessions: ", accessions)
 
 	var searchResult = SearchResult{
 		SpectraCount: 0,
@@ -651,6 +653,80 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 	}
 
 	return &searchResult, nil
+}
+
+// BuildSearchOptionsWhere to build the where clause within the browse_options table
+func (p *PostgresSQLDB) buildBrowseOptionsWhere(filters Filters) string {
+	var query = ""
+	addedWhere := false
+	addedAnd := false
+
+	if(filters.Contributor != nil) {
+		query = query + " WHERE contributor IN (" + "'" + strings.Join(*filters.Contributor, "','") + "'" + ")"
+		addedWhere = true
+	}
+	if (filters.InstrumentType != nil) {
+		subQuery := "instrument_type IN (" + "'" + strings.Join(*filters.InstrumentType, "','") + "'" + ")"
+		if(addedWhere) {
+			query = query + " AND " + subQuery
+			addedAnd = true
+		} else {
+			query = query + " WHERE " + subQuery
+			addedWhere = true
+		}
+	}
+
+	if(filters.MsType != nil) {
+		var msTypes []string
+		for _, ms := range *filters.MsType {
+			msTypes = append(msTypes, ms.String())
+		}
+		subQuery := "ms_type IN (" + "'" + strings.Join(msTypes, "','") + "'" + ")"
+		if(addedWhere || addedAnd) {
+			query = query + " AND " + subQuery
+			addedAnd = true
+		} else {
+			query = query + " WHERE " + subQuery
+			addedWhere = true
+		}
+	}
+
+	if(filters.IonMode != massbank.ANY) {
+		subQuery := "ion_mode = '" + string(filters.IonMode) + "'"
+		if(addedWhere || addedAnd) {
+			query = query + " AND " + subQuery
+			addedAnd = true
+		} else {
+			query = query + " WHERE " + subQuery
+			addedWhere = true
+		}	
+	}
+
+	return query
+}
+
+// GetAccessionsByFilterOptions see [MB3Database.GetAccessions]
+func (p *PostgresSQLDB) GetAccessionsByFilterOptions(filters Filters) ([]string, error) {
+	var accessions = []string{}
+	query := "SELECT accession FROM browse_options"
+	query = query + p.buildBrowseOptionsWhere(filters) + ";"
+
+	fmt.Println("GetAccessionsByFilterOptions -> query: ", query)
+
+	rows, err := p.database.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var accession string
+		if err := rows.Scan(&accession); err != nil {
+			return nil, err
+		}
+		accessions = append(accessions, accession)
+	}
+	return accessions, nil
 }
 
 // GetUniqueValues see [MB3Database.GetUniqueValues]
@@ -718,50 +794,9 @@ func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 		}
 	}
 
-	addedWhere := false
-	addedAnd := false
+	
 	query = "SELECT contributor, instrument_type, ms_type, ion_mode, COUNT(contributor) FROM browse_options"
-	if(filters.Contributor != nil) {
-		query = query + " WHERE contributor IN (" + "'" + strings.Join(*filters.Contributor, "','") + "'" + ")"
-		addedWhere = true
-	}
-	if (filters.InstrumentType != nil) {
-		subQuery := "instrument_type IN (" + "'" + strings.Join(*filters.InstrumentType, "','") + "'" + ")"
-		if(addedWhere) {
-			query = query + " AND " + subQuery
-			addedAnd = true
-		} else {
-			query = query + " WHERE " + subQuery
-			addedWhere = true
-		}
-	}
-
-	if(filters.MsType != nil) {
-		var msTypes []string
-		for _, ms := range *filters.MsType {
-			msTypes = append(msTypes, ms.String())
-		}
-		subQuery := "ms_type IN (" + "'" + strings.Join(msTypes, "','") + "'" + ")"
-		if(addedWhere || addedAnd) {
-			query = query + " AND " + subQuery
-			addedAnd = true
-		} else {
-			query = query + " WHERE " + subQuery
-			addedWhere = true
-		}
-	}
-
-	if(filters.IonMode != massbank.ANY) {
-		subQuery := "ion_mode = '" + string(filters.IonMode) + "'"
-		if(addedWhere || addedAnd) {
-			query = query + " AND " + subQuery
-			addedAnd = true
-		} else {
-			query = query + " WHERE " + subQuery
-			addedWhere = true
-		}	
-	}
-
+	query = query + p.buildBrowseOptionsWhere(filters)
 	query = query + " GROUP BY contributor, instrument_type, ms_type, ion_mode;"
 	rows, err = p.database.Query(query)
 	if err != nil {
@@ -812,6 +847,8 @@ func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	
 	return val, err
 }
+
+
 
 // UpdateMetadata see [MB3Database.UpdateMetadata]
 func (p *PostgresSQLDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error) {

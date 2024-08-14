@@ -15,9 +15,6 @@ src/model_ac_mass_spec_subtags_inner.go
 src/model_authors_inner.go
 src/model_browse_options.go
 src/model_database_object.go
-src/model_filter_options.go
-src/model_filter_options_intensity.go
-src/model_filter_options_mass.go
 src/model_mb_record.go
 src/model_mb_record_acquisition.go
 src/model_mb_record_comments_inner.go

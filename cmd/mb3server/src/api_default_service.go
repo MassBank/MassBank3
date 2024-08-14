@@ -45,17 +45,6 @@ func (s *DefaultAPIService) GetCount(ctx context.Context) (ImplResponse, error) 
 	return Response(200, count), nil
 }
 
-// GetFilterOptions - get filter options
-func (s *DefaultAPIService) GetFilterOptions(ctx context.Context) (ImplResponse, error) {
-
-	opt, err := GetBrowseOptions([]string{}, []string{}, "", []string{})
-	if err != nil {
-		return Response(http.StatusInternalServerError, nil), errors.New("Could not get results")
-	}
-	return Response(http.StatusOK, opt), nil
-
-}
-
 // GetMetadata - get massbank metadata
 func (s *DefaultAPIService) GetMetadata(ctx context.Context) (ImplResponse, error) {
 	// TODO - update GetMetadata with the required logic for this service method.
@@ -77,10 +66,10 @@ func (s *DefaultAPIService) GetRecord(ctx context.Context, accession string) (Im
 }
 
 // GetRecords - Get a list of records
-func (s *DefaultAPIService) GetRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, limit int32, page int32, intensityCutoff int32, inchiKey string, contributor []string) (ImplResponse, error) {
-	result, err := GetRecords(limit, page, contributor, instrumentType, msType, ionMode)
+func (s *DefaultAPIService) GetRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchiKey string, contributor []string) (ImplResponse, error) {
+	result, err := GetRecords(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, intensityCutoff, inchiKey, contributor)
 	if err != nil {
-		return Response(http.StatusInternalServerError, nil), errors.New("Could not get results")
+		return Response(http.StatusInternalServerError, nil), err
 	}
 	return Response(200, result), nil
 

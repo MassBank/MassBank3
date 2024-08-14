@@ -62,12 +62,6 @@ func (c *DefaultAPIController) Routes() Routes {
 			c.GetCount,
 		},
 		{
-			"GetFilterOptions",
-			strings.ToUpper("Get"),
-			"/v1/filter/options",
-			c.GetFilterOptions,
-		},
-		{
 			"GetMetadata",
 			strings.ToUpper("Get"),
 			"/v1/metadata",
@@ -137,19 +131,6 @@ func (c *DefaultAPIController) GetCount(w http.ResponseWriter, r *http.Request) 
 
 }
 
-// GetFilterOptions - get filter options
-func (c *DefaultAPIController) GetFilterOptions(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetFilterOptions(r.Context())
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
-
-}
-
 // GetMetadata - get massbank metadata
 func (c *DefaultAPIController) GetMetadata(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.GetMetadata(r.Context())
@@ -201,16 +182,6 @@ func (c *DefaultAPIController) GetRecords(w http.ResponseWriter, r *http.Request
 	}
 	peakDifferencesParam := strings.Split(query.Get("peak_differences"), ",")
 	peakListParam := strings.Split(query.Get("peak_list"), ",")
-	limitParam, err := parseInt32Parameter(query.Get("limit"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	pageParam, err := parseInt32Parameter(query.Get("page"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
 	intensityCutoffParam, err := parseInt32Parameter(query.Get("intensity_cutoff"), false)
 	if err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
@@ -218,7 +189,7 @@ func (c *DefaultAPIController) GetRecords(w http.ResponseWriter, r *http.Request
 	}
 	inchiKeyParam := query.Get("inchi_key")
 	contributorParam := strings.Split(query.Get("contributor"), ",")
-	result, err := c.service.GetRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, limitParam, pageParam, intensityCutoffParam, inchiKeyParam, contributorParam)
+	result, err := c.service.GetRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, intensityCutoffParam, inchiKeyParam, contributorParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -281,7 +252,7 @@ func (c *DefaultAPIController) GetSimilarity(w http.ResponseWriter, r *http.Requ
 
 }
 
-// GetSimpleRecord - Get a MassBank record in simple format
+// GetSimpleRecord - Get a MassBank record in simple format (accession, title, peaks, smiles)
 func (c *DefaultAPIController) GetSimpleRecord(w http.ResponseWriter, r *http.Request) {
 	accessionParam := chi.URLParam(r, "accession")
 

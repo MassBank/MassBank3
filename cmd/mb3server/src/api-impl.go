@@ -5,11 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -57,9 +55,6 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 		InchiKey:          "",
 		Contributor:       co,
 		IntensityCutoff:   nil,
-		Limit:             0,
-		Offset:            0,
-		IncludeDeprecated: false,
 	}
 	vals, err := db.GetUniqueValues(filters)
 	if err != nil {
@@ -104,15 +99,9 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 	return &result, nil
 }
 
-func GetRecords(limit int32, page int32, contributor []string, instrumentType []string, msType []string, ionMode string) (*SearchResult, error) {
+func GetRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchiKey string, contributor []string) (*SearchResult, error) {
 	if err := initDB(); err != nil {
 		return nil, err
-	}
-	if limit <= 0 {
-		limit = 20
-	}
-	if page <= 0 {
-		page = 1
 	}
 
 	it := &instrumentType
@@ -124,28 +113,38 @@ func GetRecords(limit int32, page int32, contributor []string, instrumentType []
 		co = nil
 	}
 
-	var offset = (page - 1) * limit
 	if err := initDB(); err != nil {
 		return nil, err
 	}
 
+	var _exactMass *float64
+	if(exactMass != "") {
+		_exactMass2, err := strconv.ParseFloat(exactMass, 64)
+		if err != nil {
+			return nil, err
+		}
+		_exactMass = &_exactMass2
+	} else {
+		_exactMass = nil
+	}
+
+
+	// _intensityCutoff := int64(intensityCutoff)
+
 	var filters = database.Filters{
 		InstrumentType:    it,
-		Splash:            "",
+		Splash:            splash,
 		MsType:            getMsTypes(msType),
 		IonMode:           getIonMode(ionMode),
-		CompoundName:      "",
-		Mass:              nil,
+		CompoundName:      compoundName,
+		Mass:              _exactMass,
 		MassEpsilon:       nil,
-		Formula:           "",
+		Formula:           formula,
 		Peaks:             nil,
 		PeakDifferences:   nil,
-		InchiKey:          "",
+		InchiKey:          inchiKey,
 		Contributor:       co,
-		IntensityCutoff:   nil,
-		Limit:             int64(limit),
-		Offset:            int64(offset),
-		IncludeDeprecated: false,
+		IntensityCutoff:   nil, //&_intensityCutoff,
 	}
 	searchResult, err := db.GetRecords(filters)
 	if err != nil {
@@ -153,23 +152,23 @@ func GetRecords(limit int32, page int32, contributor []string, instrumentType []
 	}
 	var result = SearchResult{}
 	for _, value := range searchResult.Data {
-		smiles := (value.Smiles)
-		svg, err := getSvgFromSmiles(&smiles)
-		var svgS string = ""
-		if err != nil {
-			log.Println(err)
-		} else {
-			re := regexp.MustCompile("<\\?xml[^>]*>\\n<!DOCTYPE[^>]*>\\n")
-			svgS = string(re.ReplaceAll([]byte(*svg), []byte("")))
-			re = regexp.MustCompile("\\n")
-			svgS = string(re.ReplaceAll([]byte(svgS), []byte(" ")))
-		}
+		// smiles := (value.Smiles)
+		// svg, err := getSvgFromSmiles(&smiles)
+		// var svgS string = ""
+		// if err != nil {
+		// 	log.Println(err)
+		// } else {
+		// 	re := regexp.MustCompile("<\\?xml[^>]*>\\n<!DOCTYPE[^>]*>\\n")
+		// 	svgS = string(re.ReplaceAll([]byte(*svg), []byte("")))
+		// 	re = regexp.MustCompile("\\n")
+		// 	svgS = string(re.ReplaceAll([]byte(svgS), []byte(" ")))
+		// }
 		var val = SearchResultDataInner{
 			Data:    map[string]interface{}{},
 			Name:    value.Names,
 			Formula: value.Formula,
 			Mass:    value.Mass,
-			Svg:     svgS,
+			// Svg:     svgS,
 			Spectra: []SearchResultDataInnerSpectraInner{},
 		}
 		for _, sp := range value.Spectra {

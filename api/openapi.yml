@@ -78,16 +78,6 @@ paths:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/PeakList"
         required: false
       - in: query
-        name: limit
-        description: "Maximum number of results. Default: 20"
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Limit"
-        required: false
-      - in: query
-        name: page
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Page"
-      - in: query
         name: intensity_cutoff
         description: "The Instensity cutoff for Peaklist search. Default: 5"
         schema:
@@ -181,17 +171,6 @@ paths:
             application/json:
               schema:
                 type: string
-  /filter/options:
-    get:
-      summary: get filter options
-      operationId: getFilterOptions
-      responses:
-        "200":
-          description: "All Filter options"
-          content:
-            application/json:
-              schema:
-                $ref: "./schemas/FilterOptions.yaml#/components/schemas/FilterOptions"
   /filter/browse:
     get:
       summary: get browse options

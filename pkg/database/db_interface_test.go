@@ -343,34 +343,6 @@ func TestMB3Database_GetRecords(t *testing.T) {
 			},
 			{
 				db,
-				db.name + " " + "Get all records with deprecated",
-				Filters{IncludeDeprecated: true},
-				testSearchResults([]uint64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}, 13, 13),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get first 3 records",
-				Filters{Limit: 3, Offset: 0},
-				testSearchResults([]uint64{1, 5, 11}, 12, 12),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get second page with 3 records",
-				Filters{Limit: 3, Offset: 3},
-				testSearchResults([]uint64{3, 8, 10}, 12, 12),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all but first  3 records",
-				Filters{Limit: 0, Offset: 3},
-				testSearchResults([]uint64{0, 2, 3, 4, 6, 7, 8, 9, 10}, 12, 12),
-				false,
-			},
-			{
-				db,
 				db.name + " " + "Get all records with InstrumentType LC-ESI-ITFT",
 				Filters{InstrumentType: &[]string{"LC-ESI-ITFT"}},
 				testSearchResults([]uint64{0, 2, 10}, 3, 3),
@@ -564,16 +536,6 @@ func TestMB3Database_GetRecords(t *testing.T) {
 				}
 				if got.SpectraCount != tt.want.SpectraCount {
 					t.Errorf("Got wrong spectra count expected %v, got %v", tt.want.SpectraCount, got.SpectraCount)
-				}
-				if (tt.args.Limit != 0 && len(got.Data) > int(tt.args.Limit)) ||
-					len(got.Data) != len(tt.want.Data) {
-					gotNames := []string{}
-					for _, g := range got.Data {
-						for _, sp := range g.Spectra {
-							gotNames = append(gotNames, sp.Id)
-						}
-					}
-					t.Errorf("Limit was %d, expected %d records, but got %d records: %v", tt.args.Limit, len(tt.want.Data), len(got.Data), gotNames)
 				}
 				compareDbResults(t, tt.want, *got)
 			})

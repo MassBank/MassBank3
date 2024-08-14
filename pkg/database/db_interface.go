@@ -24,9 +24,6 @@ type Filters struct {
 	InchiKey          string
 	Contributor       *[]string
 	IntensityCutoff   *int64
-	Limit             int64
-	Offset            int64
-	IncludeDeprecated bool
 }
 
 // DatabaseType is an enum containing the database type
@@ -53,8 +50,7 @@ var DefaultValues = struct {
 	MassEpsilon     float64
 	IntensityCutoff int64
 	Limit           int64
-	Offset          int64
-}{0.3, 100, math.MaxInt64, 0}
+}{0.3, 100, math.MaxInt64}
 
 // MBErrorType is an enum for the error types during database operations
 type MBErrorType int
