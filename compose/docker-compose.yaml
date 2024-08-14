@@ -38,7 +38,7 @@ services:
       - DB_NAME
       - DB_USER
       - MB3_SERVER_PORT
-      - SIMILARITY_SERVICE_COSINE_HOST="similarity-service-cosine"
+      - SIMILARITY_SERVICE_COSINE_HOST=similarity-service-cosine
       - SIMILARITY_SERVICE_COSINE_PORT=8080
 
   similarity-service-cosine:
