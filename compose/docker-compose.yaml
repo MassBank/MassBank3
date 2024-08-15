@@ -3,7 +3,7 @@ services:
     image: docker.io/postgres:latest
     restart: always
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - "${DB_PORT}:5432"
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USER}
@@ -32,14 +32,14 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      - DB_TYPE
       - DB_PORT
       - DB_PASSWORD
       - DB_HOST
       - DB_NAME
-      - DB_CONN_STRING
+      - DB_USER
       - MB3_SERVER_PORT
-      - CDKDEPICT_URL
+      - SIMILARITY_SERVICE_COSINE_HOST=similarity-service-cosine
+      - SIMILARITY_SERVICE_COSINE_PORT=8080
 
   similarity-service-cosine:
     build: ../similarity-service-cosine
@@ -47,14 +47,14 @@ services:
     ports:
       - "${SIMILARITY_SERVICE_COSINE_PORT}:8080"
     depends_on:
-      mb3tool:
-        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
     environment:
       - DB_PORT
-      - DB_USER
       - DB_PASSWORD
       - DB_HOST
       - DB_NAME
+      - DB_USER
 
   mb3frontend:
     build:
@@ -76,13 +76,12 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      - DB_TYPE
       - DB_PORT
-      - DB_USER
       - DB_PASSWORD
       - DB_HOST
       - DB_NAME
-      - DB_CONN_STRING
+      - DB_USER
+      - MB_DB_INIT
       - MB_GIT_REPO
       - MB_GIT_BRANCH
       - MB_DATA_DIRECTORY
