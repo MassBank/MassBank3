@@ -114,25 +114,6 @@ type MB3MetaData struct {
 	IsomerCount    int
 }
 
-type SearchResult struct {
-	SpectraCount int
-	ResultCount  int
-	Data         map[string]SearchResultData
-}
-
-type SpectrumMetaData struct {
-	Id    string
-	Title string
-}
-
-type SearchResultData struct {
-	Names   []string
-	Formula string
-	Mass    float64
-	Smiles  string
-	Spectra []SpectrumMetaData
-}
-
 // MB3Database This is the Interface which has to be implemented for databases using MassBank3
 //
 // Any database can be used as in the backend as long as it defines the interface.
@@ -165,7 +146,7 @@ type MB3Database interface {
 	// GetRecords Get an array of MassBank records by filtering
 	//
 	// Will return an empty list if the filter does not match any records.
-	GetRecords(filters Filters) (*SearchResult, error)
+	GetRecords(filters Filters) (*[]massbank.MassBank2, error)
 
 	// GetUniqueValues is used to get the values for filter frontend
 	GetUniqueValues(filters Filters) (MB3Values, error)

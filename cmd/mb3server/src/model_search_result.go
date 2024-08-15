@@ -10,19 +10,15 @@
 package mb3server
 
 type SearchResult struct {
-	Metadata Metadata `json:"metadata,omitempty"`
 
-	// A list of compounds with associated spectra.
-	Data []SearchResultDataInner `json:"data,omitempty"`
+	// A list of records.
+	Data []MbRecord `json:"data,omitempty"`
 }
 
 // AssertSearchResultRequired checks if the required fields are not zero-ed
 func AssertSearchResultRequired(obj SearchResult) error {
-	if err := AssertMetadataRequired(obj.Metadata); err != nil {
-		return err
-	}
 	for _, el := range obj.Data {
-		if err := AssertSearchResultDataInnerRequired(el); err != nil {
+		if err := AssertMbRecordRequired(el); err != nil {
 			return err
 		}
 	}

@@ -611,11 +611,7 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 }
 
 // GetRecords see [MB3Database.GetRecords]
-func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
-
-
-	fmt.Println("GetRecords -> start")
-
+func (p *PostgresSQLDB) GetRecords(filters Filters) (*[]massbank.MassBank2, error) {
 	if filters.MassEpsilon == nil {
 		filters.MassEpsilon = &DefaultValues.MassEpsilon
 	}
@@ -623,40 +619,25 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*SearchResult, error) {
 		filters.IntensityCutoff = &DefaultValues.IntensityCutoff
 	}
 
-
-	var accessions = []string{}
-	query := "SELECT accession FROM browse_options"
-	query = query + p.buildBrowseOptionsWhere(filters) + ";"
-	fmt.Println("GetRecords -> query: ", query)
-	rows, err := p.database.Query(query)
+	accessions, err := p.GetAccessionsByFilterOptions(filters)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
-	for rows.Next() {
-		var accession string
-		if err := rows.Scan(&accession); err != nil {
+	records := []massbank.MassBank2{}
+	for _, accession := range accessions {
+		record, err := p.GetRecord(&accession)
+		if err != nil {
 			return nil, err
 		}
-		accessions = append(accessions, accession)
-	}
-	
-	fmt.Println("#accessions: ", len(accessions))
-	fmt.Println("accessions:  ", accessions)
-
-
-	var searchResult = SearchResult{
-		SpectraCount: 0,
-		ResultCount:  0,
-		Data:         map[string]SearchResultData{},
+		records = append(records, *record)
 	}
 
-	return &searchResult, nil
+	return &records, nil
 }
 
 // BuildSearchOptionsWhere to build the where clause within the browse_options table
-func (p *PostgresSQLDB) buildBrowseOptionsWhere(filters Filters) string {
+func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) string {
 	var query = ""
 	addedWhere := false
 	addedAnd := false
@@ -705,13 +686,10 @@ func (p *PostgresSQLDB) buildBrowseOptionsWhere(filters Filters) string {
 	return query
 }
 
-// GetAccessionsByFilterOptions see [MB3Database.GetAccessions]
 func (p *PostgresSQLDB) GetAccessionsByFilterOptions(filters Filters) ([]string, error) {
 	var accessions = []string{}
 	query := "SELECT accession FROM browse_options"
-	query = query + p.buildBrowseOptionsWhere(filters) + ";"
-
-	fmt.Println("GetAccessionsByFilterOptions -> query: ", query)
+	query = query + p.BuildBrowseOptionsWhere(filters) + ";"
 
 	rows, err := p.database.Query(query)
 	if err != nil {
@@ -726,6 +704,7 @@ func (p *PostgresSQLDB) GetAccessionsByFilterOptions(filters Filters) ([]string,
 		}
 		accessions = append(accessions, accession)
 	}
+
 	return accessions, nil
 }
 
@@ -796,7 +775,7 @@ func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 
 	
 	query = "SELECT contributor, instrument_type, ms_type, ion_mode, COUNT(contributor) FROM browse_options"
-	query = query + p.buildBrowseOptionsWhere(filters)
+	query = query + p.BuildBrowseOptionsWhere(filters)
 	query = query + " GROUP BY contributor, instrument_type, ms_type, ion_mode;"
 	rows, err = p.database.Query(query)
 	if err != nil {

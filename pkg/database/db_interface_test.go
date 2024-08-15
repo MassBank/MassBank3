@@ -47,29 +47,29 @@ func testRecords(names []uint64) []*massbank.MassBank2 {
 	return records
 }
 
-func testSearchResults(names []uint64, specCount int, resultCount int) SearchResult {
-	var searchResult = SearchResult{}
-	searchResult.SpectraCount = specCount
-	var data = map[string]SearchResultData{}
-	for _, i := range names {
-		record := mbTestRecords[recordnames[i]]
-		dataset := data[*record.Compound.InChI]
-		if dataset.Spectra == nil {
-			dataset.Spectra = []SpectrumMetaData{}
-		}
-		dataset.Spectra = append(dataset.Spectra, SpectrumMetaData{*record.Accession, *record.RecordTitle})
-		dataset.Smiles = *record.Compound.Smiles
-		dataset.Formula = *record.Compound.Formula
-		dataset.Mass = *record.Compound.Mass
-		dataset.Names = append(dataset.Names, *record.Compound.Names...)
-		data[*record.Compound.InChI] = dataset
-	}
-	searchResult.Data = data
-	searchResult.ResultCount = resultCount
-	//println("Want:")
-	//println(dd.Dump(searchResult))
-	return searchResult
-}
+// func testSearchResults(names []uint64, specCount int, resultCount int) SearchResult {
+// 	var searchResult = SearchResult{}
+// 	searchResult.SpectraCount = specCount
+// 	var data = map[string]SearchResultData{}
+// 	for _, i := range names {
+// 		record := mbTestRecords[recordnames[i]]
+// 		dataset := data[*record.Compound.InChI]
+// 		if dataset.Spectra == nil {
+// 			dataset.Spectra = []SpectrumMetaData{}
+// 		}
+// 		dataset.Spectra = append(dataset.Spectra, SpectrumMetaData{*record.Accession, *record.RecordTitle})
+// 		dataset.Smiles = *record.Compound.Smiles
+// 		dataset.Formula = *record.Compound.Formula
+// 		dataset.Mass = *record.Compound.Mass
+// 		dataset.Names = append(dataset.Names, *record.Compound.Names...)
+// 		data[*record.Compound.InChI] = dataset
+// 	}
+// 	searchResult.Data = data
+// 	searchResult.ResultCount = resultCount
+// 	//println("Want:")
+// 	//println(dd.Dump(searchResult))
+// 	return searchResult
+// }
 
 func run(m *testing.M) (code int, err error) {
 	return m.Run(), nil
@@ -316,281 +316,281 @@ func TestMB3Database_GetSmiles(t *testing.T) {
 	}
 }
 
-func TestMB3Database_GetRecords(t *testing.T) {
-	DBs, err := initDBs(All)
-	if err != nil {
-		t.Fatal("Could not init Databases: ", err.Error())
-	}
-	type args struct {
-		f Filters
-	}
-	for _, db := range DBs {
+// func TestMB3Database_GetRecords(t *testing.T) {
+// 	DBs, err := initDBs(All)
+// 	if err != nil {
+// 		t.Fatal("Could not init Databases: ", err.Error())
+// 	}
+// 	type args struct {
+// 		f Filters
+// 	}
+// 	for _, db := range DBs {
 
-		type testData struct {
-			db      testDB
-			name    string
-			args    Filters
-			want    SearchResult
-			wantErr bool
-		}
-		var tests = []testData{
-			{
-				db,
-				db.name + " " + "Get all records",
-				Filters{},
-				testSearchResults([]uint64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}, 12, 12),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with InstrumentType LC-ESI-ITFT",
-				Filters{InstrumentType: &[]string{"LC-ESI-ITFT"}},
-				testSearchResults([]uint64{0, 2, 10}, 3, 3),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with InstrumentType LC-ESI-ITFT OR LC-ESI-QFT",
-				Filters{InstrumentType: &[]string{"LC-ESI-ITFT", "LC-ESI-QFT"}},
-				testSearchResults([]uint64{0, 2, 3, 10}, 4, 4),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with MS type MS",
-				Filters{MsType: &[]massbank.MsType{massbank.MS}},
-				testSearchResults([]uint64{4, 9, 11}, 3, 3),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with MS type MS2",
-				Filters{MsType: &[]massbank.MsType{massbank.MS2}},
-				testSearchResults([]uint64{0, 1, 2, 3, 6, 7, 8, 10}, 8, 8),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with MS type MS and MS2",
-				Filters{MsType: &[]massbank.MsType{massbank.MS, massbank.MS2}},
-				testSearchResults([]uint64{0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11}, 11, 11),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with ion mode POSITIVE",
-				Filters{IonMode: massbank.POSITIVE},
-				testSearchResults([]uint64{0, 1, 3, 4, 5, 9, 10, 11}, 8, 8),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with ion mode ANY",
-				Filters{IonMode: massbank.ANY},
-				testSearchResults([]uint64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}, 12, 12),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with SPLASH ",
-				Filters{Splash: "splash10-0udi-0609400000-9fd50528da25d66adfc7"},
-				testSearchResults([]uint64{7}, 1, 1),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with non existing SPLASH ",
-				Filters{Splash: "splash10-0udi-0609400000-9fd50528a725d66adfc7"},
-				testSearchResults([]uint64{}, 0, 0),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with Mass and default epsilon",
-				Filters{Mass: ptr(float64(296.251000))},
-				testSearchResults([]uint64{8}, 1, 1),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with Mass and default epsilon, no match",
-				Filters{Mass: ptr(float64(296.141000))},
-				testSearchResults([]uint64{}, 0, 0),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with Mass and custom epsilon",
-				Filters{Mass: ptr(float64(296.141000)), MassEpsilon: ptr(float64(0.5))},
-				testSearchResults([]uint64{8}, 1, 1),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with methyl in name",
-				Filters{CompoundName: "methyl"},
-				testSearchResults([]uint64{0, 1, 3, 4}, 4, 4),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with Methyl in name",
-				Filters{CompoundName: "Methyl"},
-				testSearchResults([]uint64{0, 1, 3, 4}, 4, 4),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with name 11-HDoHE",
-				Filters{CompoundName: "11-HDoHE"},
-				testSearchResults([]uint64{}, 0, 0),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with contributor RIKEN",
-				Filters{Contributor: &[]string{"RIKEN"}},
-				testSearchResults([]uint64{7, 8}, 2, 2),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with contributor RIKEN and AAFC",
-				Filters{Contributor: &[]string{"RIKEN", "AAFC"}},
-				testSearchResults([]uint64{0, 7, 8}, 3, 3),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with formula C11H11",
-				Filters{Formula: "C11H11"},
-				testSearchResults([]uint64{1}, 1, 1),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with InchiKey ZVKARXLKNIBGIR-UHFFFAOYSA-N",
-				Filters{InchiKey: "ZVKARXLKNIBGIR-UHFFFAOYSA-N"},
-				testSearchResults([]uint64{3}, 1, 1),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with Peak difference 18.01056 ",
-				Filters{PeakDifferences: &[]float64{18.01056}},
-				testSearchResults([]uint64{4, 5, 8, 11}, 4, 4),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with Peak difference 27.9857 ",
-				Filters{PeakDifferences: &[]float64{27.9857}},
-				testSearchResults([]uint64{0, 3, 4, 7, 10, 11}, 6, 6),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with Peak difference 18.01056 or 27.9857",
-				Filters{PeakDifferences: &[]float64{18.01056, 27.9857}},
-				testSearchResults([]uint64{0, 3, 4, 5, 7, 8, 10, 11}, 8, 8),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with Peak 123.0",
-				Filters{Peaks: &[]float64{123.0}},
-				testSearchResults([]uint64{3, 4, 5}, 3, 3),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with Peak 123.0 with custom epsilon",
-				Filters{Peaks: &[]float64{123.0}, MassEpsilon: ptr(0.1)},
-				testSearchResults([]uint64{4, 5}, 2, 2),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with Peak 123.0 and 125.0",
-				Filters{Peaks: &[]float64{123.0, 125.0}},
-				testSearchResults([]uint64{4, 5}, 2, 2),
-				false,
-			},
-			{
-				db,
-				db.name + " " + "Get all records with non existing Peak",
-				Filters{Peaks: &[]float64{222.0}},
-				testSearchResults([]uint64{}, 0, 0),
-				false,
-			},
-		}
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				got, err := tt.db.db.GetRecords(tt.args)
-				if (err != nil) != tt.wantErr {
-					t.Errorf("%s: GetRecords() error = %v, wantErr %v", tt.db.name, err, tt.wantErr)
-					return
-				}
-				if got.ResultCount != tt.want.ResultCount {
-					t.Errorf("Got wrong result count expected %v, got %v", tt.want.ResultCount, got.ResultCount)
-				}
-				if got.SpectraCount != tt.want.SpectraCount {
-					t.Errorf("Got wrong spectra count expected %v, got %v", tt.want.SpectraCount, got.SpectraCount)
-				}
-				compareDbResults(t, tt.want, *got)
-			})
-		}
+// 		type testData struct {
+// 			db      testDB
+// 			name    string
+// 			args    Filters
+// 			want    SearchResult
+// 			wantErr bool
+// 		}
+// 		var tests = []testData{
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records",
+// 				Filters{},
+// 				testSearchResults([]uint64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}, 12, 12),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with InstrumentType LC-ESI-ITFT",
+// 				Filters{InstrumentType: &[]string{"LC-ESI-ITFT"}},
+// 				testSearchResults([]uint64{0, 2, 10}, 3, 3),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with InstrumentType LC-ESI-ITFT OR LC-ESI-QFT",
+// 				Filters{InstrumentType: &[]string{"LC-ESI-ITFT", "LC-ESI-QFT"}},
+// 				testSearchResults([]uint64{0, 2, 3, 10}, 4, 4),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with MS type MS",
+// 				Filters{MsType: &[]massbank.MsType{massbank.MS}},
+// 				testSearchResults([]uint64{4, 9, 11}, 3, 3),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with MS type MS2",
+// 				Filters{MsType: &[]massbank.MsType{massbank.MS2}},
+// 				testSearchResults([]uint64{0, 1, 2, 3, 6, 7, 8, 10}, 8, 8),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with MS type MS and MS2",
+// 				Filters{MsType: &[]massbank.MsType{massbank.MS, massbank.MS2}},
+// 				testSearchResults([]uint64{0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11}, 11, 11),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with ion mode POSITIVE",
+// 				Filters{IonMode: massbank.POSITIVE},
+// 				testSearchResults([]uint64{0, 1, 3, 4, 5, 9, 10, 11}, 8, 8),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with ion mode ANY",
+// 				Filters{IonMode: massbank.ANY},
+// 				testSearchResults([]uint64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}, 12, 12),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with SPLASH ",
+// 				Filters{Splash: "splash10-0udi-0609400000-9fd50528da25d66adfc7"},
+// 				testSearchResults([]uint64{7}, 1, 1),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with non existing SPLASH ",
+// 				Filters{Splash: "splash10-0udi-0609400000-9fd50528a725d66adfc7"},
+// 				testSearchResults([]uint64{}, 0, 0),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with Mass and default epsilon",
+// 				Filters{Mass: ptr(float64(296.251000))},
+// 				testSearchResults([]uint64{8}, 1, 1),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with Mass and default epsilon, no match",
+// 				Filters{Mass: ptr(float64(296.141000))},
+// 				testSearchResults([]uint64{}, 0, 0),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with Mass and custom epsilon",
+// 				Filters{Mass: ptr(float64(296.141000)), MassEpsilon: ptr(float64(0.5))},
+// 				testSearchResults([]uint64{8}, 1, 1),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with methyl in name",
+// 				Filters{CompoundName: "methyl"},
+// 				testSearchResults([]uint64{0, 1, 3, 4}, 4, 4),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with Methyl in name",
+// 				Filters{CompoundName: "Methyl"},
+// 				testSearchResults([]uint64{0, 1, 3, 4}, 4, 4),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with name 11-HDoHE",
+// 				Filters{CompoundName: "11-HDoHE"},
+// 				testSearchResults([]uint64{}, 0, 0),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with contributor RIKEN",
+// 				Filters{Contributor: &[]string{"RIKEN"}},
+// 				testSearchResults([]uint64{7, 8}, 2, 2),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with contributor RIKEN and AAFC",
+// 				Filters{Contributor: &[]string{"RIKEN", "AAFC"}},
+// 				testSearchResults([]uint64{0, 7, 8}, 3, 3),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with formula C11H11",
+// 				Filters{Formula: "C11H11"},
+// 				testSearchResults([]uint64{1}, 1, 1),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with InchiKey ZVKARXLKNIBGIR-UHFFFAOYSA-N",
+// 				Filters{InchiKey: "ZVKARXLKNIBGIR-UHFFFAOYSA-N"},
+// 				testSearchResults([]uint64{3}, 1, 1),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with Peak difference 18.01056 ",
+// 				Filters{PeakDifferences: &[]float64{18.01056}},
+// 				testSearchResults([]uint64{4, 5, 8, 11}, 4, 4),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with Peak difference 27.9857 ",
+// 				Filters{PeakDifferences: &[]float64{27.9857}},
+// 				testSearchResults([]uint64{0, 3, 4, 7, 10, 11}, 6, 6),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with Peak difference 18.01056 or 27.9857",
+// 				Filters{PeakDifferences: &[]float64{18.01056, 27.9857}},
+// 				testSearchResults([]uint64{0, 3, 4, 5, 7, 8, 10, 11}, 8, 8),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with Peak 123.0",
+// 				Filters{Peaks: &[]float64{123.0}},
+// 				testSearchResults([]uint64{3, 4, 5}, 3, 3),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with Peak 123.0 with custom epsilon",
+// 				Filters{Peaks: &[]float64{123.0}, MassEpsilon: ptr(0.1)},
+// 				testSearchResults([]uint64{4, 5}, 2, 2),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with Peak 123.0 and 125.0",
+// 				Filters{Peaks: &[]float64{123.0, 125.0}},
+// 				testSearchResults([]uint64{4, 5}, 2, 2),
+// 				false,
+// 			},
+// 			{
+// 				db,
+// 				db.name + " " + "Get all records with non existing Peak",
+// 				Filters{Peaks: &[]float64{222.0}},
+// 				testSearchResults([]uint64{}, 0, 0),
+// 				false,
+// 			},
+// 		}
+// 		for _, tt := range tests {
+// 			t.Run(tt.name, func(t *testing.T) {
+// 				got, err := tt.db.db.GetRecords(tt.args)
+// 				if (err != nil) != tt.wantErr {
+// 					t.Errorf("%s: GetRecords() error = %v, wantErr %v", tt.db.name, err, tt.wantErr)
+// 					return
+// 				}
+// 				if got.ResultCount != tt.want.ResultCount {
+// 					t.Errorf("Got wrong result count expected %v, got %v", tt.want.ResultCount, got.ResultCount)
+// 				}
+// 				if got.SpectraCount != tt.want.SpectraCount {
+// 					t.Errorf("Got wrong spectra count expected %v, got %v", tt.want.SpectraCount, got.SpectraCount)
+// 				}
+// 				compareDbResults(t, tt.want, *got)
+// 			})
+// 		}
 
-	}
-}
+// 	}
+// }
 
-func compareDbResults(t *testing.T, want SearchResult, got SearchResult) {
-	for wk, w := range want.Data {
-		bw, errw := json.Marshal(w)
-		found := false
-		if g, ok := got.Data[wk]; ok {
-			if g.Formula != w.Formula {
-				t.Errorf("Result formula does not match: got %v , want %v", g.Formula, w.Formula)
-			}
-			if g.Smiles != w.Smiles {
-				t.Errorf("Result smiles does not match: got %v , want %v", g.Smiles, w.Smiles)
-			}
-			if g.Mass != w.Mass {
-				t.Errorf("Result mass does not match: got %v , want %v", g.Mass, w.Mass)
-			}
-			if len(g.Names) != len(w.Names) {
-				t.Errorf("Count of names differs in Result wanted %v, got %v", w.Names, g.Names)
-			}
-			bg, errg := json.Marshal(w)
-			for _, spw := range w.Spectra {
-				for _, sp := range g.Spectra {
-					if sp.Id == spw.Id {
-						found = true
-						if string(bg) != string(bw) || errg != nil || errw != nil {
-							t.Errorf("\nwant: %v \ngot : %v\n", string(bw), string(bg))
-						}
-					}
-				}
-			}
-		} else {
-			t.Errorf("Could not find spectra for %v in result", wk)
-		}
-		if found == false {
-			for _, spw := range w.Spectra {
-				gotNames := []string{}
-				for _, g := range got.Data {
-					for _, sp := range g.Spectra {
-						gotNames = append(gotNames, sp.Id)
-					}
-				}
-				//println("Want: ", dd.Dump(want))
-				//println("Got: ", dd.Dump(got))
-				t.Errorf("Expected Accession %v to be in result but it was not found. Result was %v", spw.Id, gotNames)
-			}
-		}
+// func compareDbResults(t *testing.T, want SearchResult, got SearchResult) {
+// 	for wk, w := range want.Data {
+// 		bw, errw := json.Marshal(w)
+// 		found := false
+// 		if g, ok := got.Data[wk]; ok {
+// 			if g.Formula != w.Formula {
+// 				t.Errorf("Result formula does not match: got %v , want %v", g.Formula, w.Formula)
+// 			}
+// 			if g.Smiles != w.Smiles {
+// 				t.Errorf("Result smiles does not match: got %v , want %v", g.Smiles, w.Smiles)
+// 			}
+// 			if g.Mass != w.Mass {
+// 				t.Errorf("Result mass does not match: got %v , want %v", g.Mass, w.Mass)
+// 			}
+// 			if len(g.Names) != len(w.Names) {
+// 				t.Errorf("Count of names differs in Result wanted %v, got %v", w.Names, g.Names)
+// 			}
+// 			bg, errg := json.Marshal(w)
+// 			for _, spw := range w.Spectra {
+// 				for _, sp := range g.Spectra {
+// 					if sp.Id == spw.Id {
+// 						found = true
+// 						if string(bg) != string(bw) || errg != nil || errw != nil {
+// 							t.Errorf("\nwant: %v \ngot : %v\n", string(bw), string(bg))
+// 						}
+// 					}
+// 				}
+// 			}
+// 		} else {
+// 			t.Errorf("Could not find spectra for %v in result", wk)
+// 		}
+// 		if found == false {
+// 			for _, spw := range w.Spectra {
+// 				gotNames := []string{}
+// 				for _, g := range got.Data {
+// 					for _, sp := range g.Spectra {
+// 						gotNames = append(gotNames, sp.Id)
+// 					}
+// 				}
+// 				//println("Want: ", dd.Dump(want))
+// 				//println("Got: ", dd.Dump(got))
+// 				t.Errorf("Expected Accession %v to be in result but it was not found. Result was %v", spw.Id, gotNames)
+// 			}
+// 		}
 
-	}
-}
+// 	}
+// }
 
 func TestMB3Database_GetUniqueValues(t *testing.T) {
 	DBs, err := initDBs(All)

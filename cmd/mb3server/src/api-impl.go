@@ -99,7 +99,7 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 	return &result, nil
 }
 
-func GetRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchiKey string, contributor []string) (*SearchResult, error) {
+func GetRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchiKey string, contributor []string) (*[]massbank.MassBank2, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
@@ -146,39 +146,12 @@ func GetRecords(instrumentType []string, splash string, msType []string, ionMode
 		Contributor:       co,
 		IntensityCutoff:   nil, //&_intensityCutoff,
 	}
-	searchResult, err := db.GetRecords(filters)
+	records, err := db.GetRecords(filters)
 	if err != nil {
 		return nil, err
 	}
-	var result = SearchResult{}
-	for _, value := range searchResult.Data {
-		// smiles := (value.Smiles)
-		// svg, err := getSvgFromSmiles(&smiles)
-		// var svgS string = ""
-		// if err != nil {
-		// 	log.Println(err)
-		// } else {
-		// 	re := regexp.MustCompile("<\\?xml[^>]*>\\n<!DOCTYPE[^>]*>\\n")
-		// 	svgS = string(re.ReplaceAll([]byte(*svg), []byte("")))
-		// 	re = regexp.MustCompile("\\n")
-		// 	svgS = string(re.ReplaceAll([]byte(svgS), []byte(" ")))
-		// }
-		var val = SearchResultDataInner{
-			Data:    map[string]interface{}{},
-			Name:    value.Names,
-			Formula: value.Formula,
-			Mass:    value.Mass,
-			// Svg:     svgS,
-			Spectra: []SearchResultDataInnerSpectraInner{},
-		}
-		for _, sp := range value.Spectra {
-			val.Spectra = append(val.Spectra, SearchResultDataInnerSpectraInner{sp.Title, sp.Id})
-		}
-		result.Data = append(result.Data, val)
-	}
-	result.Metadata.ResultCount = int32(searchResult.ResultCount)
-	result.Metadata.SpectraCount = int32(searchResult.SpectraCount)
-	return &result, nil
+	
+	return records, nil
 }
 
 func getIonMode(ionMode string) massbank.IonMode {

@@ -24,8 +24,6 @@ type Metadata struct {
 
 	ResultCount int32 `json:"result_count,omitempty"`
 
-	Page int32 `json:"page,omitempty"`
-
 	Limit int32 `json:"limit,omitempty"`
 }
 

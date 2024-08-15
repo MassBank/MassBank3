@@ -446,54 +446,238 @@ components:
       type: array
     SearchResult:
       example:
-        metadata:
-          isomer_count: 0
-          git_commit: git_commit
-          compound_count: 0
-          spectra_count: 0
-          limit: 1
-          page: 1
-          version: version
-          result_count: 0
-          timestamp: timestamp
         data:
-        - spectra:
-          - id: id
-            title: title
-          - id: id
-            title: title
-          data: "{}"
-          svg: svg
-          synonyms:
-          - synonyms
-          - synonyms
-          mass: 7.061401241503109
-          name:
-          - name
-          - name
-          formula: formula
-        - spectra:
-          - id: id
-            title: title
-          - id: id
-            title: title
-          data: "{}"
-          svg: svg
-          synonyms:
-          - synonyms
-          - synonyms
-          mass: 7.061401241503109
-          name:
-          - name
-          - name
-          formula: formula
+        - date:
+            created: 2000-01-23
+            modified: 2000-01-23
+            updated: 2000-01-23
+          copyright: copyright
+          comments:
+          - MBRecord_comments_inner
+          - MBRecord_comments_inner
+          mass_spectrometry:
+            focused_ion:
+            - subtag: BASE_PEAK
+              value: value
+            - subtag: BASE_PEAK
+              value: value
+            data_processing:
+            - subtag: COMMENT
+              value: value
+            - subtag: COMMENT
+              value: value
+          deprecated:
+            date: 2000-01-23
+            reason: reason
+          project: project
+          accession: accession
+          peak:
+            annotation:
+              values:
+              - - values
+                - values
+              - - values
+                - values
+              header:
+              - header
+              - header
+            peak:
+              values:
+              - intensity: 5.962133916683182
+                rel: 563
+                mz: 1.4658129805029452
+              - intensity: 5.962133916683182
+                rel: 563
+                mz: 1.4658129805029452
+              header:
+              - header
+              - header
+            splash: splash
+            numPeak: 1
+          title: title
+          compound:
+            names:
+            - names
+            - names
+            inchi: inchi
+            smiles: smiles
+            classes:
+            - classes
+            - classes
+            mass: 0.8008281904610115
+            cdk_depict:
+            - cdk_depict
+            - cdk_depict
+            link:
+            - identifier: identifier
+              database: CAS
+            - identifier: identifier
+              database: CAS
+            formula: formula
+          license: CC0
+          species:
+            lineage:
+            - lineage
+            - lineage
+            name: name
+            link:
+            - identifier: identifier
+              database: CAS
+            - identifier: identifier
+              database: CAS
+            sample:
+            - sample
+            - sample
+          publication: publication
+          acquisition:
+            general:
+            - subtag: CONCENTRATION
+              value: value
+            - subtag: CONCENTRATION
+              value: value
+            ion_mobility:
+            - subtag: CCS
+              value: value
+            - subtag: CCS
+              value: value
+            mass_spectrometry:
+              ms_type: MS
+              subtags:
+              - subtag: MS_TYPE
+                value: value
+              - subtag: MS_TYPE
+                value: value
+              ion_mode: POSITIVE
+            chromatography:
+            - subtag: CARRIER_GAS
+              value: value
+            - subtag: CARRIER_GAS
+              value: value
+            instrument: instrument
+            instrument_type: instrument_type
+          authors:
+          - name: name
+            marc-relator: abr
+          - name: name
+            marc-relator: abr
+        - date:
+            created: 2000-01-23
+            modified: 2000-01-23
+            updated: 2000-01-23
+          copyright: copyright
+          comments:
+          - MBRecord_comments_inner
+          - MBRecord_comments_inner
+          mass_spectrometry:
+            focused_ion:
+            - subtag: BASE_PEAK
+              value: value
+            - subtag: BASE_PEAK
+              value: value
+            data_processing:
+            - subtag: COMMENT
+              value: value
+            - subtag: COMMENT
+              value: value
+          deprecated:
+            date: 2000-01-23
+            reason: reason
+          project: project
+          accession: accession
+          peak:
+            annotation:
+              values:
+              - - values
+                - values
+              - - values
+                - values
+              header:
+              - header
+              - header
+            peak:
+              values:
+              - intensity: 5.962133916683182
+                rel: 563
+                mz: 1.4658129805029452
+              - intensity: 5.962133916683182
+                rel: 563
+                mz: 1.4658129805029452
+              header:
+              - header
+              - header
+            splash: splash
+            numPeak: 1
+          title: title
+          compound:
+            names:
+            - names
+            - names
+            inchi: inchi
+            smiles: smiles
+            classes:
+            - classes
+            - classes
+            mass: 0.8008281904610115
+            cdk_depict:
+            - cdk_depict
+            - cdk_depict
+            link:
+            - identifier: identifier
+              database: CAS
+            - identifier: identifier
+              database: CAS
+            formula: formula
+          license: CC0
+          species:
+            lineage:
+            - lineage
+            - lineage
+            name: name
+            link:
+            - identifier: identifier
+              database: CAS
+            - identifier: identifier
+              database: CAS
+            sample:
+            - sample
+            - sample
+          publication: publication
+          acquisition:
+            general:
+            - subtag: CONCENTRATION
+              value: value
+            - subtag: CONCENTRATION
+              value: value
+            ion_mobility:
+            - subtag: CCS
+              value: value
+            - subtag: CCS
+              value: value
+            mass_spectrometry:
+              ms_type: MS
+              subtags:
+              - subtag: MS_TYPE
+                value: value
+              - subtag: MS_TYPE
+                value: value
+              ion_mode: POSITIVE
+            chromatography:
+            - subtag: CARRIER_GAS
+              value: value
+            - subtag: CARRIER_GAS
+              value: value
+            instrument: instrument
+            instrument_type: instrument_type
+          authors:
+          - name: name
+            marc-relator: abr
+          - name: name
+            marc-relator: abr
       properties:
-        metadata:
-          $ref: '#/components/schemas/Metadata'
         data:
-          description: A list of compounds with associated spectra.
+          description: A list of records.
           items:
-            $ref: '#/components/schemas/SearchResult_data_inner'
+            $ref: '#/components/schemas/MBRecord'
           type: array
       type: object
     MBRecord:
@@ -676,7 +860,6 @@ components:
           compound_count: 0
           spectra_count: 0
           limit: 1
-          page: 1
           version: version
           result_count: 0
           timestamp: timestamp
@@ -736,7 +919,6 @@ components:
         compound_count: 0
         spectra_count: 0
         limit: 1
-        page: 1
         version: version
         result_count: 0
         timestamp: timestamp
@@ -758,9 +940,6 @@ components:
           type: integer
         result_count:
           minimum: 0
-          type: integer
-        page:
-          minimum: 1
           type: integer
         limit:
           minimum: 1
@@ -871,66 +1050,6 @@ components:
       items:
         $ref: '#/components/schemas/MsDataProcessing_inner'
       type: array
-    SearchResult_data_inner_spectra_inner:
-      description: Spectra for the given compound
-      example:
-        id: id
-        title: title
-      properties:
-        title:
-          description: Record title
-          type: string
-        id:
-          description: MassBank ID.
-          type: string
-      type: object
-    SearchResult_data_inner:
-      description: Data for a single compound.
-      example:
-        spectra:
-        - id: id
-          title: title
-        - id: id
-          title: title
-        data: "{}"
-        svg: svg
-        synonyms:
-        - synonyms
-        - synonyms
-        mass: 7.061401241503109
-        name:
-        - name
-        - name
-        formula: formula
-      properties:
-        data:
-          type: object
-        name:
-          description: Compound names.
-          items:
-            type: string
-          type: array
-        synonyms:
-          description: More compound names.
-          items:
-            type: string
-          type: array
-        formula:
-          description: Formula of the compound.
-          type: string
-        mass:
-          description: Exact Mass of the compound.
-          format: double
-          type: number
-        svg:
-          description: Smiles to generate structure.
-          type: string
-        spectra:
-          description: A list of spectra for the compound
-          items:
-            $ref: '#/components/schemas/SearchResult_data_inner_spectra_inner'
-          type: array
-      type: object
     MBRecord_deprecated:
       description: Mark the record as deprecated
       example:

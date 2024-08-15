@@ -1,47 +1,9 @@
 type: object
 properties:
-  metadata:
-    $ref: "./FilterOptions.yaml#/components/schemas/Metadata"
+  # metadata:
+  #   $ref: "./FilterOptions.yaml#/components/schemas/Metadata"
   data:
     type: array
-    description: A list of compounds with associated spectra.
+    description: A list of records.
     items:
-      description: Data for a single compound.
-      type: object
-      properties:
-        data:
-          type: object
-        name:
-          description: Compound names.
-          type: array
-          items:
-            type: string
-        synonyms:
-          type: array
-          description: More compound names.
-          items:
-            type: string
-        formula:
-          description: Formula of the compound.
-          type: string
-        mass:
-          description: Exact Mass of the compound.
-          type: number
-          format: double
-        svg:
-          description: Smiles to generate structure.
-          type: string
-          contentEncoding: "base64"
-        spectra:
-          description: A list of spectra for the compound
-          type: array
-          items:
-            description: Spectra for the given compound
-            type: object
-            properties:
-              title:
-                description: Record title
-                type: string
-              id:
-                description: MassBank ID.
-                type: string
+      $ref: "./MBRecord.yaml"
