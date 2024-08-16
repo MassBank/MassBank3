@@ -44,7 +44,7 @@ spec:
     spec:
       containers:
         - name: massbank3-postgres
-          image: 'postgres:14'
+          image: 'postgres:latest'
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5432

@@ -1,3 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: massbank3-frontend-secret
+  namespace: massbank3
+  labels:
+    app: massbank3-frontend
+data:
+  MB3_API_URL: "https://msbi.ipb-halle.de/MassBank3-api/"
+  MB3_FRONTEND_URL: "https://msbi.ipb-halle.de/"
+  MB3_FRONTEND_BASE_URL: "/MassBank3/"
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,12 +29,11 @@ spec:
     spec:
       containers:
         - name: massbank3-frontend
-          image: rmeier/massbank3-frontend:0.0.1 # Container Image
-          env:
-            - name: VITE_MB3_API_URL
-              value: "http://${MB3_API_HOST}:${MB3_API_PORT}"
-            - name: VITE_MB3_BASE_URL
-              value: "${MB3_FRONTEND_BASE_URL}"
+          image: ipbhalle/massbank3-frontend:dev # Container Image
+          envFrom:
+            - configMapRef:
+                name:
+                  massbank3-frontend-secret
 ---
 apiVersion: v1
 kind: Service
@@ -45,6 +56,8 @@ metadata:
     app: massbank3-frontend
   name: massbank3-frontend-ingress
   namespace: massbank3
+#  annotations:
+#    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
@@ -56,5 +69,5 @@ spec:
                 name: massbank3-frontend-service
                 port:
                   number: 3000
-            path: /massbank3
-            pathType: Prefix
+            path: /MassBank3(/|$)(.*)
+            pathType: ImplementationSpecific
