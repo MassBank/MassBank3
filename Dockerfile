@@ -10,7 +10,7 @@ RUN go get -d -v ./...
 
 RUN go build -a -installsuffix cgo -o mb3server ./cmd/mb3server
 
-FROM ubuntu AS runtime
+FROM scratch AS runtime
 COPY --from=build /go/src/mb3server ./
 EXPOSE 8080/tcp
 ENTRYPOINT ["./mb3server"]
