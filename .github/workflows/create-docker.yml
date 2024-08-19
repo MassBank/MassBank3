@@ -19,7 +19,7 @@ jobs:
           - dockerfile: ./Dockerfile-dbtool
             image: ipbhalle/massbank3-dbtool
             context: .
-          - dockerfile: ./Dockerfile
+          - dockerfile: ./Dockerfile-server
             image: ipbhalle/massbank3-server
             context: .
           - dockerfile: ./Dockerfile-frontend

@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: massbank3-mb3dbtool-secret
+  name: massbank3-dbtool-secret
   namespace: massbank3
   labels:
-    app: massbank3-mb3dbtool
+    app: massbank3-dbtool
 data:
   DB_PORT: "5432"
   DB_PASSWORD: "massbank3password"
@@ -20,23 +20,23 @@ data:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: massbank3-mb3dbtool-deployment # Name des Deployments für uns Nutzer
+  name: massbank3-dbtool-deployment # Name des Deployments für uns Nutzer
   namespace: massbank3
   labels:
-    app: massbank3-mb3dbtool # Labels des Deployments
+    app: massbank3-dbtool # Labels des Deployments
 spec:
   selector:
     matchLabels:
-      app: massbank3-mb3dbtool # Welche Container gehören zum Deployment? (*)
+      app: massbank3-dbtool # Welche Container gehören zum Deployment? (*)
   template:
     metadata:
       labels:
-        app: massbank3-mb3dbtool  # Label des Pods muss/ sollte mit (*) übereinstimmen
+        app: massbank3-dbtool  # Label des Pods muss/ sollte mit (*) übereinstimmen
     spec:
       containers:
-        - name: massbank3-mb3dbtool
+        - name: massbank3-dbtool
           image: ipbhalle/massbank3-dbtool:dev
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
-                name: massbank3-mb3dbtool-secret
+                name: massbank3-dbtool-secret
