@@ -14,21 +14,20 @@ data:
   MB3_SERVER_PORT: "8080"
   SIMILARITY_SERVICE_COSINE_HOST: "massbank3-similarity-service-cosine"
   SIMILARITY_SERVICE_COSINE_PORT: "8080"
-  MB_DB_INIT: "false"
+  MB_DB_INIT: "true"
   MB_GIT_REPO: "https://github.com/MassBank/MassBank-data"
   MB_GIT_BRANCH: "main"
   MB_DATA_DIRECTORY: ""
   MB_DROP_ALL: "true"
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
   name: massbank3-mb3dbtool-deployment # Name des Deployments für uns Nutzer
   namespace: massbank3
   labels:
     app: massbank3-mb3dbtool # Labels des Deployments
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: massbank3-mb3dbtool # Welche Container gehören zum Deployment? (*)
@@ -44,13 +43,3 @@ spec:
           envFrom:
             - configMapRef:
                 name: massbank3-mb3dbtool-secret
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: massbank3-mb3dbtool-service
-  namespace: massbank3
-spec:
-  type: NodePort
-  selector:
-    app: massbank3-mb3dbtool # Das gleiche Label wie im Deployment
