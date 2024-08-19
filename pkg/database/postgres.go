@@ -330,7 +330,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		}
 		// compound names
 		result.Compound.Names = &[]string{}
-		query = "SELECT name FROM compound_name WHERE compound_id IN (SELECT compound_id FROM compound_name WHERE massbank_id = $1);"
+		query = "SELECT name FROM compound_name WHERE massbank_id = $1;"
 		rows, err = p.database.Query(query, massbankId)
 		if err == nil {
 			defer rows.Close()
@@ -349,7 +349,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		
 		// compound classes
 		result.Compound.Classes = &[]string{}
-		query = "SELECT class FROM compound_class WHERE compound_id IN (SELECT compound_id FROM compound_class WHERE massbank_id = $1);"
+		query = "SELECT class FROM compound_class WHERE massbank_id = $1;"
 		rows, err = p.database.Query(query, massbankId)
 		if err == nil {
 			defer rows.Close()
@@ -368,7 +368,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		
 		// compound link
 		result.Compound.Link = &[]massbank.DatabaseProperty{}
-		query = "SELECT database, identifier FROM compound_link WHERE compound_id IN (SELECT compound_id FROM compound_link WHERE massbank_id = $1);"
+		query = "SELECT database, identifier FROM compound_link WHERE massbank_id = $1;"
 		rows, err = p.database.Query(query, massbankId)
 		if err == nil {
 			defer rows.Close()
@@ -538,7 +538,6 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 			}
 		}		
 	}
-	
 
 	return &result, err
 }
@@ -1037,6 +1036,18 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId str
 			q = `INSERT INTO compound_name (name, compound_id, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
 			for _, name := range *record.Compound.Names {							
 				_, err = tx.Exec(q, name, compoundId, massbankId)
+				if err != nil {
+					if err2 := tx.Rollback(); err2 != nil {
+						return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+					}
+					return err
+				}
+			}
+		}
+		if(record.Compound.Classes != nil) {
+			q = `INSERT INTO compound_class (class, compound_id, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
+			for _, c := range *record.Compound.Classes {								
+				_, err = tx.Exec(q, c, compoundId, massbankId)
 				if err != nil {
 					if err2 := tx.Rollback(); err2 != nil {
 						return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
