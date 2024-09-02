@@ -542,7 +542,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	return &result, err
 }
 
-// GetSimpleRecord see [MB3Database.GetRecord]
+// GetSimpleRecord see [MB3Database.GetSimpleRecord]
 func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) {
 	var result = massbank.MassBank2{}
 

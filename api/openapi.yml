@@ -142,24 +142,6 @@ paths:
             application/json:
               schema:
                 $ref: "./schemas/MBRecord.yaml"
-  /records/{accession}/svg:
-    parameters:
-      - name: accession
-        in: path
-        description: The accession id of the record
-        required: true
-        schema:
-          type: string
-    get:
-      summary: The SVG image for an accession
-      operationId: getSVG
-      responses:
-        "200":
-          description: "A compound SVG"
-          content:
-            image/svg+xml:
-              schema:
-                type: string
   /records/count:
     get:
       summary: The number of all records

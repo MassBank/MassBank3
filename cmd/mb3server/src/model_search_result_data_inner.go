@@ -25,9 +25,6 @@ type SearchResultDataInner struct {
 	// Exact Mass of the compound.
 	Mass float64 `json:"mass,omitempty"`
 
-	// Smiles to generate structure.
-	Svg string `json:"svg,omitempty"`
-
 	// A list of spectra for the compound
 	Spectra []SearchResultDataInnerSpectraInner `json:"spectra,omitempty"`
 }

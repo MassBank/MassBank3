@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
-	"net/url"
 	"os"
 	"sort"
 	"strconv"
@@ -183,35 +181,6 @@ func getMsTypes(msType []string) *[]massbank.MsType {
 		result = nil
 	}
 	return result
-}
-
-func GetSvg(accession string) (*string, error) {
-	if err := initDB(); err != nil {
-		return nil, err
-	}
-	smiles, err := db.GetSmiles(&accession)
-	if err != nil {
-		return nil, err
-	}
-	svg, err := getSvgFromSmiles(smiles)
-	if err != nil {
-		return nil, err
-	}
-	return svg, nil
-}
-
-func getSvgFromSmiles(smiles *string) (*string, error) {
-	smilesEsc := url.QueryEscape(*smiles)
-	resp, err := http.Get(ServerConfig.CdkDepictUrl + "/depict/bot/svg?smi=" + smilesEsc + "&w=50&h=50&abbr=on&hdisp=bridgehead&showtitle=false&zoom=1&annotate=none&r=1")
-	if err != nil {
-		return nil, err
-	}
-	svgB, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	svgS := string(svgB)
-	return &svgS, nil
 }
 
 func GetCount() (*int64, error) {

@@ -23,7 +23,6 @@ type DefaultAPIRouter interface {
 	GetMetadata(http.ResponseWriter, *http.Request)
 	GetRecord(http.ResponseWriter, *http.Request)
 	GetRecords(http.ResponseWriter, *http.Request)
-	GetSVG(http.ResponseWriter, *http.Request)
 	GetSimilarity(http.ResponseWriter, *http.Request)
 	GetSimpleRecord(http.ResponseWriter, *http.Request)
 }
@@ -38,7 +37,6 @@ type DefaultAPIServicer interface {
 	GetMetadata(context.Context) (ImplResponse, error)
 	GetRecord(context.Context, string) (ImplResponse, error)
 	GetRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, string, []string) (ImplResponse, error)
-	GetSVG(context.Context, string) (ImplResponse, error)
 	GetSimilarity(context.Context, []string, []string, []string, []string, string, string, float64, string, int32, int32, []string) (ImplResponse, error)
 	GetSimpleRecord(context.Context, string) (ImplResponse, error)
 }

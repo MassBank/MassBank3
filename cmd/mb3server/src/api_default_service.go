@@ -75,12 +75,6 @@ func (s *DefaultAPIService) GetRecords(ctx context.Context, instrumentType []str
 
 }
 
-func (s *DefaultAPIService) GetSVG(ctx context.Context, s2 string) (ImplResponse, error) {
-	svg, err := GetSvg(s2)
-
-	return Response(http.StatusOK, *svg), err
-}
-
 // GetSimilarity implements DefaultAPIServicer.
 func (s *DefaultAPIService) GetSimilarity(ctx context.Context, peakList []string, referenceSpectraList []string, instrumentType []string, msType []string, ionMode string, exactMass string, massTolerance float64, formula string, limit int32, intensityCutoff int32, contributor []string) (ImplResponse, error) {
 	// TODO - update GetSimilarity with the required logic for this service method.

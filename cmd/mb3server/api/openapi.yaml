@@ -179,26 +179,6 @@ paths:
                 $ref: '#/components/schemas/MBRecord'
           description: "A simple MassBank record (accession, title, peaks, smiles)"
       summary: "Get a MassBank record in simple format (accession, title, peaks, smiles)"
-  /records/{accession}/svg:
-    get:
-      operationId: getSVG
-      parameters:
-      - description: The accession id of the record
-        explode: false
-        in: path
-        name: accession
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "200":
-          content:
-            image/svg+xml:
-              schema:
-                type: string
-          description: A compound SVG
-      summary: The SVG image for an accession
   /records/count:
     get:
       operationId: getCount
