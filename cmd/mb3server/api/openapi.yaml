@@ -136,9 +136,147 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchResult'
+                items:
+                  $ref: '#/components/schemas/MBRecord'
+                type: array
           description: A list of records
       summary: Get a list of records
+  /records/simple:
+    get:
+      operationId: getSimpleRecords
+      parameters:
+      - description: "Filter by a list of instrument type, which will be associated\
+          \ by OR."
+        explode: true
+        in: query
+        name: instrument_type
+        required: false
+        schema:
+          $ref: '#/components/schemas/InstrumentType'
+        style: form
+      - description: Filter by SPLASH.
+        explode: true
+        in: query
+        name: splash
+        required: false
+        schema:
+          $ref: '#/components/schemas/Splash'
+        style: form
+      - description: "Filter by a List of MS types, which are associated by OR. If\
+          \ none is given, all is assumed."
+        explode: true
+        in: query
+        name: ms_type
+        required: false
+        schema:
+          $ref: '#/components/schemas/MSType'
+        style: form
+      - description: "Filter by ion mode. If none is given, both is assumed."
+        explode: true
+        in: query
+        name: ion_mode
+        required: false
+        schema:
+          $ref: '#/components/schemas/IonMode'
+        style: form
+      - description: Filter by compound name
+        explode: true
+        in: query
+        name: compound_name
+        required: false
+        schema:
+          $ref: '#/components/schemas/CompoundName'
+        style: form
+      - description: Filter by exact mass.
+        explode: true
+        in: query
+        name: exact_mass
+        required: false
+        schema:
+          $ref: '#/components/schemas/ExactMass'
+        style: form
+      - description: "Tolerance for mass filters. Default: 0.3"
+        explode: true
+        in: query
+        name: mass_tolerance
+        required: false
+        schema:
+          $ref: '#/components/schemas/MassTolerance'
+        style: form
+      - description: Filter by formula.
+        explode: true
+        in: query
+        name: formula
+        required: false
+        schema:
+          $ref: '#/components/schemas/Formula'
+        style: form
+      - description: Filter by peaks.
+        explode: true
+        in: query
+        name: peaks
+        required: false
+        schema:
+          $ref: '#/components/schemas/Peaks'
+        style: form
+      - description: "Intensity for peak search, defaults to 100."
+        explode: true
+        in: query
+        name: intensity
+        required: false
+        schema:
+          $ref: '#/components/schemas/Intensity'
+        style: form
+      - description: Filter by peak difference
+        explode: true
+        in: query
+        name: peak_differences
+        required: false
+        schema:
+          $ref: '#/components/schemas/Peaks'
+        style: form
+      - description: Filter by peak list.
+        explode: true
+        in: query
+        name: peak_list
+        required: false
+        schema:
+          $ref: '#/components/schemas/PeakList'
+        style: form
+      - description: "The Instensity cutoff for Peaklist search. Default: 5"
+        explode: true
+        in: query
+        name: intensity_cutoff
+        required: false
+        schema:
+          $ref: '#/components/schemas/IntensityCutoff'
+        style: form
+      - description: Filter by InChIKey. Complete or Partial
+        explode: true
+        in: query
+        name: inchi_key
+        required: false
+        schema:
+          $ref: '#/components/schemas/InChIKey'
+        style: form
+      - description: a contributor (institution)
+        explode: true
+        in: query
+        name: contributor
+        required: false
+        schema:
+          $ref: '#/components/schemas/Contributor'
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/MBRecord'
+                type: array
+          description: A list of simple records
+      summary: "Get a list of records in simple format (accession, title, peaks, smiles)"
   /records/{accession}:
     get:
       operationId: getRecord
@@ -424,242 +562,6 @@ components:
         description: The short version of the contributor name
         type: string
       type: array
-    SearchResult:
-      example:
-        data:
-        - date:
-            created: 2000-01-23
-            modified: 2000-01-23
-            updated: 2000-01-23
-          copyright: copyright
-          comments:
-          - MBRecord_comments_inner
-          - MBRecord_comments_inner
-          mass_spectrometry:
-            focused_ion:
-            - subtag: BASE_PEAK
-              value: value
-            - subtag: BASE_PEAK
-              value: value
-            data_processing:
-            - subtag: COMMENT
-              value: value
-            - subtag: COMMENT
-              value: value
-          deprecated:
-            date: 2000-01-23
-            reason: reason
-          project: project
-          accession: accession
-          peak:
-            annotation:
-              values:
-              - - values
-                - values
-              - - values
-                - values
-              header:
-              - header
-              - header
-            peak:
-              values:
-              - intensity: 5.962133916683182
-                rel: 563
-                mz: 1.4658129805029452
-              - intensity: 5.962133916683182
-                rel: 563
-                mz: 1.4658129805029452
-              header:
-              - header
-              - header
-            splash: splash
-            numPeak: 1
-          title: title
-          compound:
-            names:
-            - names
-            - names
-            inchi: inchi
-            smiles: smiles
-            classes:
-            - classes
-            - classes
-            mass: 0.8008281904610115
-            cdk_depict:
-            - cdk_depict
-            - cdk_depict
-            link:
-            - identifier: identifier
-              database: CAS
-            - identifier: identifier
-              database: CAS
-            formula: formula
-          license: CC0
-          species:
-            lineage:
-            - lineage
-            - lineage
-            name: name
-            link:
-            - identifier: identifier
-              database: CAS
-            - identifier: identifier
-              database: CAS
-            sample:
-            - sample
-            - sample
-          publication: publication
-          acquisition:
-            general:
-            - subtag: CONCENTRATION
-              value: value
-            - subtag: CONCENTRATION
-              value: value
-            ion_mobility:
-            - subtag: CCS
-              value: value
-            - subtag: CCS
-              value: value
-            mass_spectrometry:
-              ms_type: MS
-              subtags:
-              - subtag: MS_TYPE
-                value: value
-              - subtag: MS_TYPE
-                value: value
-              ion_mode: POSITIVE
-            chromatography:
-            - subtag: CARRIER_GAS
-              value: value
-            - subtag: CARRIER_GAS
-              value: value
-            instrument: instrument
-            instrument_type: instrument_type
-          authors:
-          - name: name
-            marc-relator: abr
-          - name: name
-            marc-relator: abr
-        - date:
-            created: 2000-01-23
-            modified: 2000-01-23
-            updated: 2000-01-23
-          copyright: copyright
-          comments:
-          - MBRecord_comments_inner
-          - MBRecord_comments_inner
-          mass_spectrometry:
-            focused_ion:
-            - subtag: BASE_PEAK
-              value: value
-            - subtag: BASE_PEAK
-              value: value
-            data_processing:
-            - subtag: COMMENT
-              value: value
-            - subtag: COMMENT
-              value: value
-          deprecated:
-            date: 2000-01-23
-            reason: reason
-          project: project
-          accession: accession
-          peak:
-            annotation:
-              values:
-              - - values
-                - values
-              - - values
-                - values
-              header:
-              - header
-              - header
-            peak:
-              values:
-              - intensity: 5.962133916683182
-                rel: 563
-                mz: 1.4658129805029452
-              - intensity: 5.962133916683182
-                rel: 563
-                mz: 1.4658129805029452
-              header:
-              - header
-              - header
-            splash: splash
-            numPeak: 1
-          title: title
-          compound:
-            names:
-            - names
-            - names
-            inchi: inchi
-            smiles: smiles
-            classes:
-            - classes
-            - classes
-            mass: 0.8008281904610115
-            cdk_depict:
-            - cdk_depict
-            - cdk_depict
-            link:
-            - identifier: identifier
-              database: CAS
-            - identifier: identifier
-              database: CAS
-            formula: formula
-          license: CC0
-          species:
-            lineage:
-            - lineage
-            - lineage
-            name: name
-            link:
-            - identifier: identifier
-              database: CAS
-            - identifier: identifier
-              database: CAS
-            sample:
-            - sample
-            - sample
-          publication: publication
-          acquisition:
-            general:
-            - subtag: CONCENTRATION
-              value: value
-            - subtag: CONCENTRATION
-              value: value
-            ion_mobility:
-            - subtag: CCS
-              value: value
-            - subtag: CCS
-              value: value
-            mass_spectrometry:
-              ms_type: MS
-              subtags:
-              - subtag: MS_TYPE
-                value: value
-              - subtag: MS_TYPE
-                value: value
-              ion_mode: POSITIVE
-            chromatography:
-            - subtag: CARRIER_GAS
-              value: value
-            - subtag: CARRIER_GAS
-              value: value
-            instrument: instrument
-            instrument_type: instrument_type
-          authors:
-          - name: name
-            marc-relator: abr
-          - name: name
-            marc-relator: abr
-      properties:
-        data:
-          description: A list of records.
-          items:
-            $ref: '#/components/schemas/MBRecord'
-          type: array
-      type: object
     MBRecord:
       example:
         date:
@@ -720,9 +622,6 @@ components:
           - classes
           - classes
           mass: 0.8008281904610115
-          cdk_depict:
-          - cdk_depict
-          - cdk_depict
           link:
           - identifier: identifier
             database: CAS
@@ -1100,9 +999,6 @@ components:
         - classes
         - classes
         mass: 0.8008281904610115
-        cdk_depict:
-        - cdk_depict
-        - cdk_depict
         link:
         - identifier: identifier
           database: CAS
@@ -1125,12 +1021,6 @@ components:
         formula:
           description: Chemical formula
           type: string
-        cdk_depict:
-          description: Partially defined structures with CDK depict
-          items:
-            description: CDK depict structure
-            type: string
-          type: array
         mass:
           description: Exact mass
           format: double

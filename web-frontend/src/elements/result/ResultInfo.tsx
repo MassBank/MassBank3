@@ -1,7 +1,7 @@
 import './ResultInfo.scss';
 
-import Hit from '../../../../../types/Hit';
-import StructureView from '../../../../basic/StructureView';
+import Hit from '../../types/Hit';
+import StructureView from '../basic/StructureView';
 import ResultLink from './ResultLink';
 import { CSSProperties } from 'react';
 
@@ -17,7 +17,7 @@ function ResultInfo({ hit, imageWidth, imageHeight, style }: InputProps) {
     <div className="info-view" style={style}>
       <p className="accession-text">{hit.accession}</p>
       <div className="score-structure-view">
-        <p className="score-text">Score: {hit.score}</p>
+        {hit.score && <p className="score-text">Score: {hit.score}</p>}
         {hit.record &&
         hit.record.compound.smiles &&
         hit.record.compound.smiles !== '' ? (

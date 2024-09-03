@@ -8,7 +8,7 @@ import Hit from '../../../../types/Hit';
 import SpectralHitsViewComponent from './SpectralHitsViewComponent';
 
 type InputProps = {
-  reference: Peak[];
+  reference?: Peak[];
   hits: Hit[];
   slideIndex?: number;
   width?: number;

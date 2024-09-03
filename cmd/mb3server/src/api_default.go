@@ -91,6 +91,12 @@ func (c *DefaultAPIController) Routes() Routes {
 			"/v1/records/{accession}/simple",
 			c.GetSimpleRecord,
 		},
+		{
+			"GetSimpleRecords",
+			strings.ToUpper("Get"),
+			"/v1/records/simple",
+			c.GetSimpleRecords,
+		},
 	}
 }
 
@@ -236,6 +242,47 @@ func (c *DefaultAPIController) GetSimpleRecord(w http.ResponseWriter, r *http.Re
 	accessionParam := chi.URLParam(r, "accession")
 
 	result, err := c.service.GetSimpleRecord(r.Context(), accessionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+
+}
+
+// GetSimpleRecords - Get a list of records in simple format (accession, title, peaks, smiles)
+func (c *DefaultAPIController) GetSimpleRecords(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	instrumentTypeParam := strings.Split(query.Get("instrument_type"), ",")
+	splashParam := query.Get("splash")
+	msTypeParam := strings.Split(query.Get("ms_type"), ",")
+	ionModeParam := query.Get("ion_mode")
+	compoundNameParam := query.Get("compound_name")
+	exactMassParam := query.Get("exact_mass")
+	massToleranceParam, err := parseFloat64Parameter(query.Get("mass_tolerance"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	formulaParam := query.Get("formula")
+	peaksParam := strings.Split(query.Get("peaks"), ",")
+	intensityParam, err := parseInt32Parameter(query.Get("intensity"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	peakDifferencesParam := strings.Split(query.Get("peak_differences"), ",")
+	peakListParam := strings.Split(query.Get("peak_list"), ",")
+	intensityCutoffParam, err := parseInt32Parameter(query.Get("intensity_cutoff"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	inchiKeyParam := query.Get("inchi_key")
+	contributorParam := strings.Split(query.Get("contributor"), ",")
+	result, err := c.service.GetSimpleRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, intensityCutoffParam, inchiKeyParam, contributorParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

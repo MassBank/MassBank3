@@ -44,6 +44,8 @@ function AccessionView() {
     setRequestedAccession(id);
 
     const rec: Record | undefined = await getRecord(id);
+    console.log(rec);
+
     if (rec) {
       rec.peak.peak.values = rec.peak.peak.values.map((p) => {
         const _p = p;
@@ -58,12 +60,14 @@ function AccessionView() {
     setIsRequesting(false);
   }, []);
 
-  const handleOnClick = useCallback(() => {
-    navigate({
-      pathname: routes.accession.path,
-      search: `?${createSearchParams({ id: accession })}`,
-    });
-  }, [accession, navigate]);
+  const handleOnClick = useCallback(
+    () =>
+      navigate({
+        pathname: routes.accession.path,
+        search: `?${createSearchParams({ id: accession })}`,
+      }),
+    [accession, navigate],
+  );
 
   const recordView = useMemo(
     () =>

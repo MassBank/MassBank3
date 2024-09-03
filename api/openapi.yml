@@ -104,7 +104,111 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./schemas/SearchResult.yaml"
+                type: array
+                items:
+                  $ref: "./schemas/MBRecord.yaml"
+  /records/simple:
+    parameters:
+      - in: query
+        name: instrument_type
+        description: Filter by a list of instrument type, which will be associated by OR.
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/InstrumentType"
+        required: false
+      - in: query
+        description: Filter by SPLASH.
+        name: splash
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Splash"
+        required: false
+      - in: query
+        description: Filter by a List of MS types, which are associated by OR. If none is given, all is assumed.
+        name: ms_type
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/MSType"
+        required: false
+      - in: query
+        name: ion_mode
+        description: Filter by ion mode. If none is given, both is assumed.
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/IonMode"
+        required: false
+      - in: query
+        name: compound_name
+        description: Filter by compound name
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/CompoundName"
+        required: false
+      - in: query
+        name: exact_mass
+        description: Filter by exact mass.
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/ExactMass"
+      - in: query
+        name: mass_tolerance
+        description: "Tolerance for mass filters. Default: 0.3"
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/MassTolerance"
+      - in: query
+        name: formula
+        description: Filter by formula.
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Formula"
+        required: false
+      - in: query
+        name: peaks
+        description: Filter by peaks.
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Peaks"
+        required: false
+      - in: query
+        name: intensity
+        description: Intensity for peak search, defaults to 100.
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Intensity"
+        required: false
+      - in: query
+        name: peak_differences
+        description: Filter by peak difference
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Peaks"
+        required: false
+      - in: query
+        name: peak_list
+        description: Filter by peak list.
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/PeakList"
+        required: false
+      - in: query
+        name: intensity_cutoff
+        description: "The Instensity cutoff for Peaklist search. Default: 5"
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/IntensityCutoff"
+        required: false
+      - in: query
+        name: inchi_key
+        description: Filter by InChIKey. Complete or Partial
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/InChIKey"
+        required: false
+      - in: query
+        name: contributor
+        description: a contributor (institution)
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Contributor"
+        required: false
+    get:
+      summary: Get a list of records in simple format (accession, title, peaks, smiles)
+      operationId: getSimpleRecords
+      responses:
+        "200":
+          description: "A list of simple records"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "./schemas/MBRecord.yaml"
 
   /records/{accession}:
     parameters:

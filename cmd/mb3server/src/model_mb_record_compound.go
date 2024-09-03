@@ -21,9 +21,6 @@ type MbRecordCompound struct {
 	// Chemical formula
 	Formula string `json:"formula"`
 
-	// Partially defined structures with CDK depict
-	CdkDepict []string `json:"cdk_depict,omitempty"`
-
 	// Exact mass
 	Mass float64 `json:"mass"`
 

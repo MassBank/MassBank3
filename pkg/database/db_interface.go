@@ -138,7 +138,7 @@ type MB3Database interface {
 	// database.
 	GetRecord(*string) (*massbank.MassBank2, error)
 
-	// GetRecord gets a single simple MassBank record by the Accession string.
+	// GetSimpleRecord gets a single simple MassBank record by the Accession string.
 	// It should return nil and a [NotFoundError] if the record is not in the
 	// database.
 	GetSimpleRecord(*string) (*massbank.MassBank2, error)
@@ -147,6 +147,11 @@ type MB3Database interface {
 	//
 	// Will return an empty list if the filter does not match any records.
 	GetRecords(filters Filters) (*[]massbank.MassBank2, error)
+
+	// GetSimpleRecords Get an array of MassBank records by filtering
+	//
+	// Will return an empty list if the filter does not match any records.
+	GetSimpleRecords(filters Filters) (*[]massbank.MassBank2, error)
 
 	// GetUniqueValues is used to get the values for filter frontend
 	GetUniqueValues(filters Filters) (MB3Values, error)

@@ -1,15 +1,16 @@
 import './ResultTableRow.scss';
 
 import { MouseEvent, useCallback, useMemo } from 'react';
-import Hit from '../../../../../types/Hit';
-import Peak from '../../../../../types/peak/Peak';
-import Chart from '../../../../basic/Chart';
-import StructureView from '../../../../basic/StructureView';
+
 import ResultLink from './ResultLink';
+import Peak from '../../types/peak/Peak';
+import Hit from '../../types/Hit';
+import Chart from '../basic/Chart';
+import StructureView from '../basic/StructureView';
 
 type InputProps = {
   label: string | number;
-  reference: Peak[];
+  reference?: Peak[];
   hit: Hit;
   height: number;
   chartWidth: number;
@@ -44,9 +45,11 @@ function ResultTableRow({
         onDoubleClick={handleOnDoubleClick}
       >
         <td>{label}</td>
-        <td title={`Score: ${hit.score}`} className="score-col">
-          {hit.score.toFixed(4)}
-        </td>
+        {hit.score && (
+          <td title={`Score: ${hit.score}`} className="score-col">
+            {hit.score.toFixed(4)}
+          </td>
+        )}
         <td className="accession-link-view" style={{ height }}>
           <label>{hit.accession}</label>
           <ResultLink hit={hit} />
@@ -57,17 +60,30 @@ function ResultTableRow({
             width: chartWidth,
           }}
         >
-          <Chart
-            peakData={reference}
-            peakData2={
-              (hit.record ? hit.record.peak.peak.values : []) as Peak[]
-            }
-            width={chartWidth}
-            height={height}
-            disableZoom
-            disableLabels
-            disableOnHover
-          />
+          {reference && reference.length > 0 ? (
+            <Chart
+              peakData={reference}
+              peakData2={
+                (hit.record ? hit.record.peak.peak.values : []) as Peak[]
+              }
+              width={chartWidth}
+              height={height}
+              disableZoom
+              disableLabels
+              disableOnHover
+            />
+          ) : (
+            <Chart
+              peakData={
+                (hit.record ? hit.record.peak.peak.values : []) as Peak[]
+              }
+              width={chartWidth}
+              height={height}
+              disableZoom
+              disableLabels
+              disableOnHover
+            />
+          )}
         </td>
         <td
           style={{

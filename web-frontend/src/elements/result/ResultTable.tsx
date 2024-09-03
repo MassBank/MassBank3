@@ -1,12 +1,12 @@
+import Hit from '../../types/Hit';
+import Peak from '../../types/peak/Peak';
 import './ResultTable.scss';
 
 import { useMemo } from 'react';
-import Hit from '../../../../../types/Hit';
 import ResultTableRow from './ResultTableRow';
-import Peak from '../../../../../types/peak/Peak';
 
 type InputProps = {
-  reference: Peak[];
+  reference?: Peak[];
   hits: Hit[];
   offset: number;
   // eslint-disable-next-line no-unused-vars
@@ -21,16 +21,19 @@ function ResultTable({
   onDoubleClick,
   rowHeight = 200,
 }: InputProps) {
-  const header = (
-    <tr key={'result-table-header'}>
-      <th>#</th>
-      <th>Score</th>
-      <th>Accession</th>
-      <th>Title</th>
-      <th>Chart</th>
-      <th>Structure</th>
-    </tr>
-  );
+  const header = useMemo(() => {
+    const hasScore = hits.some((hit) => hit.score !== undefined);
+    return (
+      <tr key={'result-table-header'}>
+        <th>#</th>
+        {hasScore && <th>Score</th>}
+        <th>Accession</th>
+        <th>Title</th>
+        <th>Chart</th>
+        <th>Structure</th>
+      </tr>
+    );
+  }, [hits]);
 
   const body = useMemo(() => {
     const _body: JSX.Element[] = [];

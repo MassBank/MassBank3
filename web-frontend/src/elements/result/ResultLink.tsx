@@ -1,8 +1,8 @@
 import './ResultLink.scss';
 
-import Hit from '../../../../../types/Hit';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExternalLink } from '@fortawesome/free-solid-svg-icons';
+import Hit from '../../types/Hit';
 
 type InputProps = {
   hit: Hit;

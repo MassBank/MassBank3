@@ -1,23 +1,23 @@
 import './ResultPanel.scss';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import Hit from '../../../../../types/Hit';
-import Record from '../../../../../types/Record';
-import generateID from '../../../../../utils/generateID';
 import axios from 'axios';
-import Peak from '../../../../../types/peak/Peak';
-import CustomModal from '../../../../basic/CustomModal';
-import SpectralHitsCarouselView from '../SpectralHitsCarouselView';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import Pagination from '../../../../basic/Pagination';
 import ResultTable from './ResultTable';
-import Spinner from '../../../../basic/Spinner';
-import Placeholder from '../../../../basic/Placeholder';
+import Hit from '../../types/Hit';
+import Peak from '../../types/peak/Peak';
+import Record from '../../types/Record';
+import generateID from '../../utils/generateID';
+import SpectralHitsCarouselView from '../routes/pages/search/SpectralHitsCarouselView';
+import CustomModal from '../basic/CustomModal';
+import Pagination from '../basic/Pagination';
+import Placeholder from '../basic/Placeholder';
+import Spinner from '../basic/Spinner';
 
 type InputProps = {
+  reference?: Peak[];
   hits: Hit[];
-  reference: Peak[];
   width: number;
   height: number;
   widthOverview?: number;
@@ -25,8 +25,8 @@ type InputProps = {
 };
 
 function ResultPanel({
-  hits,
   reference,
+  hits,
   width,
   height,
   widthOverview = width,
@@ -87,6 +87,7 @@ function ResultPanel({
         const resp = await axios.get(url);
         if (resp.status === 200) {
           const record = await resp.data;
+
           record.peak.peak.values = record.peak.peak.values.map((p) => ({
             ...p,
             id: generateID(),

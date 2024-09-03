@@ -22,8 +22,8 @@ properties:
         description: "reason for deprecation"
         type: string
   title:
-    description: "Short title of the record. It is composed as 
-        'compound.names[0]; acquisition.instrument_type; acquisition.mass_spectrometry.ms_type'"
+    description: "Short title of the record. It is composed as
+      'compound.names[0]; acquisition.instrument_type; acquisition.mass_spectrometry.ms_type'"
     type: string
   date:
     description: "Date of creation or last modification of record"
@@ -113,12 +113,6 @@ properties:
       formula:
         description: "Chemical formula"
         type: string
-      cdk_depict:
-        description: "Partially defined structures with CDK depict"
-        type: array
-        items:
-          description: "CDK depict structure"
-          type: string
       mass:
         description: "Exact mass"
         type: number
@@ -255,13 +249,3 @@ properties:
                   type: integer
                   minimum: 1
                   maximum: 999
-
-
-
-
-
-
-
-
-
-

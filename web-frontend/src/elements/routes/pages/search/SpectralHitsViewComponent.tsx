@@ -2,13 +2,13 @@ import './SpectralHitsViewComponent.scss';
 
 import Peak from '../../../../types/peak/Peak';
 import Hit from '../../../../types/Hit';
-import ResultInfo from './result/ResultInfo';
+import ResultInfo from '../../../result/ResultInfo';
 import Resizable from '../../../record/Resizable';
 import Record from '../../../../types/Record';
 import { useMemo } from 'react';
 
 type InputProps = {
-  reference: Peak[];
+  reference?: Peak[];
   hit: Hit;
   width: number;
   height: number;
@@ -42,12 +42,20 @@ function SpectralHitsViewComponent({
             backgroundColor: 'lightyellow',
           }}
         />
-        <Resizable
-          record={{ peak: { peak: { values: reference } } } as Record}
-          record2={hit.record}
-          width={widthResizable}
-          height={height}
-        />
+        {reference && reference.length > 0 ? (
+          <Resizable
+            record={{ peak: { peak: { values: reference } } } as Record}
+            record2={hit.record}
+            width={widthResizable}
+            height={height}
+          />
+        ) : (
+          <Resizable
+            record={hit.record}
+            width={widthResizable}
+            height={height}
+          />
+        )}
       </div>
     );
   }, [height, hit, reference, width]);

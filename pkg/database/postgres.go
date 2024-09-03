@@ -100,6 +100,7 @@ func (db *PostgresSQLDB) GetIndexes() []Index {
 	indexes = append(indexes, Index{IndexName: "browse_options_instrument_type_index", TableName: "browse_options", Columns: []string{"instrument_type"}})
 	indexes = append(indexes, Index{IndexName: "browse_options_ms_type_index", TableName: "browse_options", Columns: []string{"ms_type"}})
 	indexes = append(indexes, Index{IndexName: "browse_options_ion_mode_index", TableName: "browse_options", Columns: []string{"ion_mode"}})
+	indexes = append(indexes, Index{IndexName: "browse_options_smiles_index", TableName: "browse_options", Columns: []string{"smiles"}})
 
 	return indexes
 }
@@ -395,7 +396,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	if err == nil {
 		result.Acquisition = massbank.AcquisitionProperties{
 			Instrument:     &instrument,
-			InstrumentType: &instrumentType,
+			InstrumentType: &instrumentType, 
 		}
 		// acquisition mass spectrometry
 		result.Acquisition.MassSpectrometry = &[]massbank.SubtagProperty{}
@@ -405,7 +406,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 			defer rows.Close()
 
 			for rows.Next() {
-				var subtag string
+				var subtag string 
 				var value string
 				if err := rows.Scan(&subtag, &value); err != nil {
 					return nil, err
@@ -549,11 +550,19 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 	var massbankId uint
 	var accession string
 	var title string
-	var query = "SELECT id, accession, title FROM massbank WHERE accession = $1;"
+	var smiles string
+	var mz_vec []float64
+	var intensity_vec []float64
+	var relative_intensity_vec []int32
+	var query = "SELECT massbank_id, accession, title, smiles, mz_vec, intensity_vec, relative_intensity_vec FROM browse_options WHERE accession = $1;"
 	err := p.database.QueryRow(query, *s).Scan(
 		&massbankId,
 		&accession,
 		&title,
+		&smiles,
+		(*pq.Float64Array)(&mz_vec),
+		(*pq.Float64Array)(&intensity_vec),
+		(*pq.Int32Array)(&relative_intensity_vec),
 	); 
 	if err != nil {
 		return nil, err
@@ -561,49 +570,17 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 
 	result.RecordTitle = &title
 	result.Accession = &accession
+	result.Compound = massbank.CompoundProperties{
+		Smiles: &smiles,
+	}
 	
-	// compound
-	query = "SELECT smiles FROM compound WHERE id IN (SELECT compound_id FROM compound_name WHERE massbank_id = $1);"
-	var smiles string	
-	err = p.database.QueryRow(query, massbankId).Scan(&smiles)
-	if err == nil {
-		result.Compound = massbank.CompoundProperties{		
-			Smiles:  &smiles,
-		}	
-	}	
-	
-	// peak
 	result.Peak = massbank.PeakProperties{}
-	var spectrumId uint
-
-	query = "SELECT id FROM spectrum WHERE massbank_id = $1;"
-	err = p.database.QueryRow(query, massbankId).Scan(&spectrumId)
-	if err == nil {
-		result.Peak.Peak = &massbank.PkPeak{}
-		query = "SELECT mz, intensity, relative_intensity FROM peak WHERE spectrum_id = $1;"
-		rows, err := p.database.Query(query, spectrumId)
-		if err == nil {
-			defer rows.Close()
-
-			result.Peak.Peak.Mz = []float64{}
-			result.Peak.Peak.Intensity = []float64{}
-			result.Peak.Peak.Rel = []int32{}
-			for rows.Next() {
-				var mz float64
-				var intensity float64
-				var rel int32
-				if err := rows.Scan(&mz, &intensity, &rel); err != nil {
-					return nil, err
-				}
-
-				result.Peak.Peak.Mz = append(result.Peak.Peak.Mz, mz)
-				result.Peak.Peak.Intensity = append(result.Peak.Peak.Intensity, intensity)
-				result.Peak.Peak.Rel = append(result.Peak.Peak.Rel, rel)
-			}
-			if err = rows.Err(); err != nil {
-				return nil, err
-			}
-		}		
+	numPeak := uint(len(mz_vec))
+	result.Peak.NumPeak = &numPeak
+	result.Peak.Peak = &massbank.PkPeak{
+		Mz: mz_vec, 
+		Intensity: intensity_vec, 
+		Rel: relative_intensity_vec,
 	}
 	
 	return &result, err
@@ -626,6 +603,32 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*[]massbank.MassBank2, erro
 	records := []massbank.MassBank2{}
 	for _, accession := range accessions {
 		record, err := p.GetRecord(&accession)
+		if err != nil {
+			return nil, err
+		}
+		records = append(records, *record)
+	}
+
+	return &records, nil
+}
+
+// GetSimpleRecords see [MB3Database.GetSimpleRecords]
+func (p *PostgresSQLDB) GetSimpleRecords(filters Filters) (*[]massbank.MassBank2, error) {
+	if filters.MassEpsilon == nil {
+		filters.MassEpsilon = &DefaultValues.MassEpsilon
+	}
+	if filters.IntensityCutoff == nil {
+		filters.IntensityCutoff = &DefaultValues.IntensityCutoff
+	}
+
+	accessions, err := p.GetAccessionsByFilterOptions(filters)
+	if err != nil {
+		return nil, err
+	}
+
+	records := []massbank.MassBank2{}
+	for _, accession := range accessions {
+		record, err := p.GetSimpleRecord(&accession)
 		if err != nil {
 			return nil, err
 		}
@@ -1188,7 +1191,7 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId str
 		}
 
 		// insert into browse option table
-		q = `INSERT INTO browse_options (massbank_id, accession, contributor, instrument_type, ms_type, ion_mode) VALUES ($1, $2, $3, $4, $5, $6);`
+		q = `INSERT INTO browse_options (massbank_id, accession, contributor, instrument_type, ms_type, ion_mode, title, smiles, mz_vec, intensity_vec, relative_intensity_vec) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`
 		var msType string 
 		var ionMode string
 		for _, subProp := range *record.Acquisition.MassSpectrometry {
@@ -1201,7 +1204,7 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId str
 				break
 			}
 		}
-		_, err = tx.Exec(q, massbankId, *record.Accession, *record.Contributor, *record.Acquisition.InstrumentType, msType, ionMode)
+		_, err = tx.Exec(q, massbankId, *record.Accession, *record.Contributor, *record.Acquisition.InstrumentType, msType, ionMode, *record.RecordTitle, *record.Compound.Smiles, pq.Array(record.Peak.Peak.Mz), pq.Array(record.Peak.Peak.Intensity), pq.Array(record.Peak.Peak.Rel))
 		if err != nil {
 			fmt.Println("Error: ", err)
 			if err2 := tx.Rollback(); err2 != nil {
@@ -1488,7 +1491,12 @@ func (p *PostgresSQLDB) init() error {
 			contributor TEXT NOT NULL REFERENCES contributor(name) ON UPDATE CASCADE ON DELETE CASCADE,
 			instrument_type TEXT NOT NULL,
 			ms_type TEXT NOT NULL,
-			ion_mode TEXT NOT NULL
+			ion_mode TEXT NOT NULL,
+			title TEXT NOT NULL,
+			smiles TEXT NOT NULL,
+			mz_vec FLOAT[] NOT NULL,
+			intensity_vec FLOAT[] NOT NULL,
+			relative_intensity_vec INT[] NOT NULL
 		);
 
 		`;

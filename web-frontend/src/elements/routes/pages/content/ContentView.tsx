@@ -20,6 +20,7 @@ function ContentView() {
   const [recordCount, setRecordCount] = useState<number | undefined>();
   const [content, setContent] = useState<Content | undefined>();
   const [content2, setContent2] = useState<Content | undefined>();
+  // const [hits, setHits] = useState<Hit[]>([]);
 
   async function fetchData(url: string, searchParams?: SearchParams) {
     const params = new URLSearchParams();
@@ -32,7 +33,6 @@ function ContentView() {
     if (resp.status === 200) {
       return await resp.data;
     }
-    console.error(resp.statusText);
 
     return undefined;
   }
@@ -88,14 +88,25 @@ function ContentView() {
       setIsRequesting(true);
 
       const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
-      const newContent = (await fetchData(
-        url,
-        buildSearchParams(prevContent),
-      )) as Content;
+      const searchParams = buildSearchParams(prevContent);
+      const newContent = (await fetchData(url, searchParams)) as Content;
+
+      // const url2 = import.meta.env.VITE_MB3_API_URL + '/v1/records/simple';
+      // const _records = await fetchData(url2, searchParams);
+      // const _hits: Hit[] = _records.map((r: Record) => {
+      //   const hit: Hit = {
+      //     accession: r.accession,
+      //     record: r,
+      //   };
+
+      //   return hit;
+      // });
 
       initFlags(newContent);
       setContent(newContent);
       setContent2({ ...newContent });
+
+      // setHits(_hits);
 
       setIsRequesting(false);
     },
@@ -177,6 +188,19 @@ function ContentView() {
     [content2, handleOnFetchContent],
   );
 
+  // const resultPanel = useMemo(() => {
+  //   return (
+  //     <ResultPanel
+  //       reference={[]}
+  //       hits={hits}
+  //       width={width}
+  //       height={height}
+  //       widthOverview={width}
+  //       heightOverview={height}
+  //     />
+  //   );
+  // }, [height, hits, width]);
+
   return (
     <div ref={ref} className="content-view">
       {isRequesting ? (
@@ -192,6 +216,7 @@ function ContentView() {
           {charts}
           {contentTable}
           {searchButton}
+          {/* {resultPanel} */}
         </>
       )}
     </div>

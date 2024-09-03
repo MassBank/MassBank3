@@ -1,5 +1,5 @@
 export default interface Hit {
   accession: string;
-  score: number;
+  score?: number;
   record?: Record;
 }

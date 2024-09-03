@@ -10,7 +10,7 @@ import Spinner from '../../../basic/Spinner';
 import axios from 'axios';
 import SearchPanel from './SearchPanel';
 import Placeholder from '../../../basic/Placeholder';
-import ResultPanel from './result/ResultPanel';
+import ResultPanel from '../../../result/ResultPanel';
 import { FieldValues } from 'react-hook-form';
 
 function SearchView() {
