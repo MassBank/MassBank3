@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import './ContentTable.scss';
 
-import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { MouseEvent, useMemo } from 'react';
 import ValueCount from '../../../../types/ValueCount';
 import {
   splitStringAndCapitaliseFirstLetter,

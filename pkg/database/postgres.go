@@ -710,6 +710,76 @@ func (p *PostgresSQLDB) GetAccessionsByFilterOptions(filters Filters) ([]string,
 	return accessions, nil
 }
 
+func (p *PostgresSQLDB) GetContributors() ([]string, error) {
+	var contributors = []string{}
+	query := "SELECT name FROM contributor;"
+	rows, err := p.database.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var contributor string
+		if err := rows.Scan(&contributor); err != nil {
+			return nil, err
+		}
+		contributors = append(contributors, contributor)
+	}
+
+	return contributors, nil
+}
+
+func (p *PostgresSQLDB) GetInstrumentTypes() ([]string, error) {
+	var instrumentTypes = []string{}
+	query := "SELECT DISTINCT(instrument_type) FROM acquisition_instrument ORDER BY instrument_type;"
+	rows, err := p.database.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var instrumentType string
+		if err := rows.Scan(&instrumentType); err != nil {
+			return nil, err
+		}
+		instrumentTypes = append(instrumentTypes, instrumentType)
+	}
+
+	return instrumentTypes, nil
+}
+
+type MSTypeAndIonMode struct {
+	MSType []string
+	IonMode []string
+}
+func (p *PostgresSQLDB) GetMsTypeAndIonMode() (*MSTypeAndIonMode, error){
+	var msTypeAndIonMode = MSTypeAndIonMode{}
+
+	query := "SELECT DISTINCT(subtag), value FROM acquisition_mass_spectrometry WHERE subtag = 'MS_TYPE' OR subtag = 'ION_MODE' ORDER BY value;"
+	rows, err := p.database.Query(query)
+	if err != nil {
+		return &MSTypeAndIonMode{}, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var subtag string
+		var value string
+		if err := rows.Scan(&subtag, &value); err != nil {
+			return &MSTypeAndIonMode{}, err
+		}
+		if (subtag == "MS_TYPE") {
+			msTypeAndIonMode.MSType = append(msTypeAndIonMode.MSType, value)
+		} else {
+			msTypeAndIonMode.IonMode = append(msTypeAndIonMode.IonMode, value)
+		}
+	}
+
+	return &msTypeAndIonMode, nil
+}
+
 // GetUniqueValues see [MB3Database.GetUniqueValues]
 func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 
@@ -723,60 +793,37 @@ func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	var ionModes = []MBCountValues{}
 
 	// contributor
-	query := "SELECT name FROM contributor ORDER BY name;"
-	rows, err = p.database.Query(query)
+	cont, err := p.GetContributors();
 	if err != nil {
 		return MB3Values{}, err
 	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var name string
-		if err := rows.Scan(&name); err != nil {
-			return MB3Values{}, err
-		}
-		contributors = append(contributors, MBCountValues{Val: name, Count: 0})
+	for _, c := range cont {
+		contributors = append(contributors, MBCountValues{Val: c, Count: 0})
 	}
 
 	// intrument type
-	query = "SELECT DISTINCT(instrument_type) FROM acquisition_instrument ORDER BY instrument_type;"
-	rows, err = p.database.Query(query)
+	it, err := p.GetInstrumentTypes();
 	if err != nil {
 		return MB3Values{}, err
 	}
-	defer rows.Close()
-	
-	for rows.Next() {
-		var instrumentType string
-		if err := rows.Scan(&instrumentType); err != nil {
-			return MB3Values{}, err
-		}
-		instrumentTypes = append(instrumentTypes, MBCountValues{Val: instrumentType, Count: 0})
+	for _, i := range it {
+		instrumentTypes = append(instrumentTypes, MBCountValues{Val: i, Count: 0})
 	}
 
 	// ms type, ion mode
-	query = "SELECT DISTINCT(subtag), value FROM acquisition_mass_spectrometry WHERE subtag = 'MS_TYPE' OR subtag = 'ION_MODE' ORDER BY value;"
-	rows, err = p.database.Query(query)
+	msTypeAndIonMode, err := p.GetMsTypeAndIonMode()
 	if err != nil {
 		return MB3Values{}, err
 	}
-	defer rows.Close()
-	
-	for rows.Next() {
-		var subtag string
-		var value string
-		if err := rows.Scan(&subtag, &value); err != nil {
-			return MB3Values{}, err
-		}
-		if (subtag == "MS_TYPE") {
-			msTypes = append(msTypes, MBCountValues{Val: value, Count: 0})	
-		} else {
-			ionModes = append(ionModes, MBCountValues{Val: value, Count: 0})
-		}
+	for _, mt := range msTypeAndIonMode.MSType {
+		msTypes = append(msTypes, MBCountValues{Val: mt, Count: 0})
+	}
+	for _, im := range msTypeAndIonMode.IonMode {
+		ionModes = append(ionModes, MBCountValues{Val: im, Count: 0})
 	}
 
 	
-	query = "SELECT contributor, instrument_type, ms_type, ion_mode, COUNT(contributor) FROM browse_options"
+	query := "SELECT contributor, instrument_type, ms_type, ion_mode, COUNT(contributor) FROM browse_options"
 	query = query + p.BuildBrowseOptionsWhere(filters)
 	query = query + " GROUP BY contributor, instrument_type, ms_type, ion_mode;"
 	rows, err = p.database.Query(query)

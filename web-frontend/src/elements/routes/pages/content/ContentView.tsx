@@ -5,12 +5,14 @@ import Spinner from '../../../basic/Spinner';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import Content from '../../../../types/Content';
 import ValueCount from '../../../../types/ValueCount';
-import axios from 'axios';
 import { ArcElement, Chart, Legend, Tooltip } from 'chart.js';
 import SearchParams from '../../../../types/SearchParams';
 import Button from '../../../basic/Button';
 import ContentTable from './ContentTable';
 import ContentChart from './ContentChart';
+import fetchData from '../../../../utils/fetchData';
+import buildSearchParams from '../../../../utils/buildSearchParams';
+import initFlags from '../../../../utils/initFlags';
 
 function ContentView() {
   const ref = useRef(null);
@@ -22,21 +24,6 @@ function ContentView() {
   const [content2, setContent2] = useState<Content | undefined>();
   // const [hits, setHits] = useState<Hit[]>([]);
 
-  async function fetchData(url: string, searchParams?: SearchParams) {
-    const params = new URLSearchParams();
-    if (searchParams) {
-      Object.keys(searchParams).forEach((key) => {
-        params.append(key, searchParams[key].join(','));
-      });
-    }
-    const resp = await axios.get(url, { params });
-    if (resp.status === 200) {
-      return await resp.data;
-    }
-
-    return undefined;
-  }
-
   const handleOnFetchCount = useCallback(async () => {
     setIsRequesting(true);
 
@@ -47,41 +34,6 @@ function ContentView() {
     setRecordCount(count);
     setIsRequesting(false);
   }, []);
-
-  function buildSearchParams(cont: Content | undefined) {
-    const searchParams: SearchParams = {};
-    if (cont) {
-      Object.keys(cont)
-        .filter((k) => k !== 'metadata')
-        .forEach((k) => {
-          const valueCounts = cont[k] as ValueCount[];
-          const filtered = valueCounts
-            .filter((_vc) => _vc.flag === true)
-            .map((_vc) => _vc.value);
-          if (filtered.length !== valueCounts.length) {
-            searchParams[k] = filtered;
-          }
-        });
-    }
-
-    return searchParams;
-  }
-
-  function initFlags(cont: Content) {
-    const keys = Object.keys(cont).filter((key) => key !== 'metadata');
-    for (let k = 0; k < keys.length; k++) {
-      const key = keys[k];
-      cont[key] = (cont[key] as ValueCount[]).map((vc) => {
-        return {
-          ...vc,
-          count: vc.count || 0,
-          flag: vc.count !== undefined && vc.count > 0,
-        };
-      });
-    }
-
-    return cont;
-  }
 
   const handleOnFetchContent = useCallback(
     async (prevContent: Content | undefined) => {

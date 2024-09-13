@@ -1,13 +1,13 @@
 import './SearchPanel.scss';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
 import Button from '../../../basic/Button';
 import {
   referencePeakList,
   referenceSpectraList,
 } from './utils/peakListExample';
-import { Menu, MenuItem, Sidebar, SubMenu } from 'react-pro-sidebar';
+import { Menu, Sidebar, SubMenu } from 'react-pro-sidebar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faAngleLeft,
@@ -18,6 +18,9 @@ import {
   faSignature,
   faSliders,
 } from '@fortawesome/free-solid-svg-icons';
+import Content from '../../../../types/Content';
+import FilterTable from './msSpecFilter/FilterTable';
+import ValueCount from '../../../../types/ValueCount';
 
 const peakListPattern =
   /^(\d+(\.\d+)* \d+(\.\d+)*)(\n\d+(\.\d+)* \d+(\.\d+)*)*$/;
@@ -28,6 +31,7 @@ type InputProps = {
   width: number;
   height: number;
   collapsed: boolean;
+  msSpecFilterOptions: Content | undefined;
   // eslint-disable-next-line no-unused-vars
   onCollapse: (collapsed: boolean) => void;
   // eslint-disable-next-line no-unused-vars
@@ -38,12 +42,14 @@ function SearchPanel({
   width,
   height,
   collapsed,
+  msSpecFilterOptions,
   onCollapse,
   onSubmit,
 }: InputProps) {
   const {
     register,
     handleSubmit,
+    getValues,
     setValue,
     formState: { errors },
   } = useForm();
@@ -61,6 +67,26 @@ function SearchPanel({
       onSubmit(data);
     },
     [onSubmit],
+  );
+
+  useEffect(() => {
+    setValue('msSpecFilterOptions', {
+      contributor: msSpecFilterOptions?.contributor,
+      instrument_type: msSpecFilterOptions?.instrument_type,
+      ms_type: msSpecFilterOptions?.ms_type,
+      ion_mode: msSpecFilterOptions?.ion_mode,
+    });
+  }, [msSpecFilterOptions, setValue]);
+
+  const handleOnSelect = useCallback(
+    (filterName: string, key: string, value: string, isChecked: boolean) => {
+      const newFilterOptions = { ...getValues(filterName) };
+      newFilterOptions[key].find((vc: ValueCount) => vc.value === value).flag =
+        isChecked;
+
+      setValue(filterName, newFilterOptions);
+    },
+    [getValues, setValue],
   );
 
   return (
@@ -86,7 +112,7 @@ function SearchPanel({
           collapsed={collapsed}
           transitionDuration={0}
         >
-          <Menu>
+          <Menu className="menu">
             <SubMenu
               label={<FontAwesomeIcon icon={faSliders} />}
               suffix={collapsed ? '' : 'Basic Search'}
@@ -95,13 +121,13 @@ function SearchPanel({
               label={<FontAwesomeIcon icon={faChartColumn} />}
               suffix={collapsed ? '' : 'Peaks'}
             >
-              <SubMenu label="Similarity">
+              <SubMenu label="Similarity" className="submenu">
                 <SubMenu label="Peak List">
                   <div className="peak-list-input-container">
                     <textarea
                       placeholder="Enter a peak list: m/z and intensity, delimited by a space. For example:&#10;&#10;147.063 11&#10;303.05 999&#10;449.108 64&#10;465.102 588&#10;611.161 670"
                       {...register('peakListInputField', {
-                        required: true,
+                        required: false,
                         pattern: peakListPattern,
                       })}
                       style={{
@@ -175,10 +201,9 @@ function SearchPanel({
                   />
                 </SubMenu>
               </SubMenu>
-              <MenuItem>Peaks</MenuItem>
-              <MenuItem>Peak Differences</MenuItem>
+              <SubMenu label="Peaks" className="submenu"></SubMenu>
+              <SubMenu label="Peak Differences" className="submenu"></SubMenu>
             </SubMenu>
-
             <SubMenu
               label={<FontAwesomeIcon icon={faSignature} />}
               suffix={collapsed ? '' : 'InChiKey'}
@@ -190,7 +215,70 @@ function SearchPanel({
             <SubMenu
               label={<FontAwesomeIcon icon={faFlask} />}
               suffix={collapsed ? '' : 'Mass Spectrometry'}
-            ></SubMenu>
+            >
+              <SubMenu label="Contibutor" className="submenu">
+                {msSpecFilterOptions && (
+                  <FilterTable
+                    filterOptions={msSpecFilterOptions.contributor}
+                    onSelect={(value, isChecked) =>
+                      handleOnSelect(
+                        'msSpecFilterOptions',
+                        'contributor',
+                        value,
+                        isChecked,
+                      )
+                    }
+                    style={{ height: '200px' }}
+                  />
+                )}
+              </SubMenu>
+              <SubMenu label="Instrument Type" className="submenu">
+                {msSpecFilterOptions && (
+                  <FilterTable
+                    filterOptions={msSpecFilterOptions.instrument_type}
+                    onSelect={(value, isChecked) =>
+                      handleOnSelect(
+                        'msSpecFilterOptions',
+                        'instrument_type',
+                        value,
+                        isChecked,
+                      )
+                    }
+                    style={{ height: '200px' }}
+                  />
+                )}
+              </SubMenu>
+              <SubMenu label="MS Type" className="submenu">
+                {msSpecFilterOptions && (
+                  <FilterTable
+                    filterOptions={msSpecFilterOptions.ms_type}
+                    onSelect={(value, isChecked) =>
+                      handleOnSelect(
+                        'msSpecFilterOptions',
+                        'ms_type',
+                        value,
+                        isChecked,
+                      )
+                    }
+                  />
+                )}
+              </SubMenu>
+              <SubMenu label="Ion Mode" className="submenu">
+                {msSpecFilterOptions && (
+                  <FilterTable
+                    filterOptions={msSpecFilterOptions.ion_mode}
+                    onSelect={(value, isChecked) =>
+                      handleOnSelect(
+                        'msSpecFilterOptions',
+                        'ion_mode',
+                        value,
+                        isChecked,
+                      )
+                    }
+                  />
+                )}
+              </SubMenu>
+            </SubMenu>
           </Menu>
         </Sidebar>
         <div

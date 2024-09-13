@@ -42,6 +42,12 @@
       text-align: center;
       font-weight: bold;
     }
+
+    .menu {
+      .submenu {
+        background-color: linen;
+      }
+    }
   }
 
   .search-button-container {
@@ -51,7 +57,7 @@
     justify-content: center;
     align-items: center;
 
-    background-color: lightgrey;
+    background-color: lightskyblue;
 
     .submit-input {
       width: 100%;

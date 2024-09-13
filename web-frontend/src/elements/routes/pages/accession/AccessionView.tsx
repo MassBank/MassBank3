@@ -7,13 +7,13 @@ import Button from '../../../basic/Button';
 import RecordView from '../../../record/RecordView';
 import generateID from '../../../../utils/generateID';
 import Record from '../../../../types/Record';
-import axios from 'axios';
 import {
   createSearchParams,
   useNavigate,
   useSearchParams,
 } from 'react-router-dom';
 import routes from '../../../../constants/routes';
+import fetchData from '../../../../utils/fetchData';
 
 function AccessionView() {
   const navigate = useNavigate();
@@ -26,17 +26,7 @@ function AccessionView() {
 
   async function getRecord(id: string) {
     const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/' + id;
-
-    const resp = await axios.get(url);
-    if (resp.status === 200) {
-      const data = await resp.data;
-      if (typeof data === 'string') {
-        return undefined;
-      }
-      return data;
-    }
-
-    return undefined;
+    return await fetchData(url);
   }
 
   const handleOnSearch = useCallback(async (id: string) => {

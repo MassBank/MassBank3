@@ -1,7 +1,6 @@
 import './ResultPanel.scss';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import ResultTable from './ResultTable';
@@ -14,6 +13,7 @@ import CustomModal from '../basic/CustomModal';
 import Pagination from '../basic/Pagination';
 import Placeholder from '../basic/Placeholder';
 import Spinner from '../basic/Spinner';
+import fetchData from '../../utils/fetchData';
 
 type InputProps = {
   reference?: Peak[];
@@ -84,10 +84,10 @@ function ResultPanel({
           '/v1/records/' +
           accession +
           '/simple';
-        const resp = await axios.get(url);
-        if (resp.status === 200) {
-          const record = await resp.data;
 
+        const record = await fetchData(url);
+
+        if (record) {
           record.peak.peak.values = record.peak.peak.values.map((p) => ({
             ...p,
             id: generateID(),
