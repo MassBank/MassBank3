@@ -1,64 +1,12 @@
 /* eslint-disable no-unused-vars */
 import './ContentTable.scss';
 
-import { MouseEvent, useMemo } from 'react';
+import { useMemo } from 'react';
 import ValueCount from '../../../../types/ValueCount';
-import {
-  splitStringAndCapitaliseFirstLetter,
-  splitStringAndJoin,
-} from '../../../../utils/stringUtils';
+import { splitStringAndJoin } from '../../../../utils/stringUtils';
 import CheckBox from '../../../basic/CheckBox';
 import Content from '../../../../types/Content';
-import Button from '../../../basic/Button';
-
-function buildRow(
-  key: string,
-  i: number,
-  k: number,
-  valueCounts: ValueCount[],
-  elements: JSX.Element[],
-  // eslint-disable-next-line no-unused-vars
-  onSelectAll: (key: string) => void,
-) {
-  return (
-    <tr key={'content-table-row-' + key + '-' + i + '-' + k}>
-      {k < 4 ? (
-        <td
-          rowSpan={
-            Math.floor(valueCounts.length / 4) +
-            (valueCounts.length % 4 === 0 ? 0 : 1)
-          }
-        >
-          {
-            <div>
-              <label>
-                {splitStringAndCapitaliseFirstLetter(key, '_', ' ')}
-              </label>
-              <Button
-                child={
-                  valueCounts.filter((vc) => vc.flag === true).length ===
-                  valueCounts.length
-                    ? 'Unselect'
-                    : 'Select'
-                }
-                onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-
-                  onSelectAll(key);
-                }}
-              />
-            </div>
-          }
-        </td>
-      ) : undefined}
-
-      {elements.map((elem, l) => (
-        <td key={'elem-' + i + '_' + k + '_' + l}>{elem}</td>
-      ))}
-    </tr>
-  );
-}
+import ContentTableRow from './ContentTableRow';
 
 type InputProps = {
   content: Content | undefined;
@@ -108,16 +56,28 @@ function ContentTable({ content, onSelect }: InputProps) {
 
           if ((k + 1) % 4 === 0) {
             _rows.push(
-              buildRow(key, i, k, valueCounts, elements, () =>
-                onSelect(key, undefined, undefined),
-              ),
+              <ContentTableRow
+                key={'content-table-row-' + key + '-' + i + '-' + k}
+                id={key}
+                i={i}
+                k={k}
+                valueCounts={valueCounts}
+                elements={elements}
+                onSelectAll={() => onSelect(key, undefined, undefined)}
+              />,
             );
             elements = [];
           } else if (k === valueCounts.length - 1) {
             _rows.push(
-              buildRow(key, i, k, valueCounts, elements, () =>
-                onSelect(key, undefined, undefined),
-              ),
+              <ContentTableRow
+                key={'content-table-row-' + key + '-' + i + '-' + k}
+                id={key}
+                i={i}
+                k={k}
+                valueCounts={valueCounts}
+                elements={elements}
+                onSelectAll={() => onSelect(key, undefined, undefined)}
+              />,
             );
           }
         }

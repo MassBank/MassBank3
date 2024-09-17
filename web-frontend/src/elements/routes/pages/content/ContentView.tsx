@@ -6,7 +6,6 @@ import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import Content from '../../../../types/Content';
 import ValueCount from '../../../../types/ValueCount';
 import { ArcElement, Chart, Legend, Tooltip } from 'chart.js';
-import SearchParams from '../../../../types/SearchParams';
 import Button from '../../../basic/Button';
 import ContentTable from './ContentTable';
 import ContentChart from './ContentChart';

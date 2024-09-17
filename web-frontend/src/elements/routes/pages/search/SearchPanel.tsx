@@ -21,8 +21,6 @@ import ValueCount from '../../../../types/ValueCount';
 
 const peakListPattern =
   /^(\d+(\.\d+)* \d+(\.\d+)*)(\n\d+(\.\d+)* \d+(\.\d+)*)*$/;
-const msbnkPattern =
-  /^(MSBNK-[a-zA-Z0-9_]+-[a-zA-Z0-9_]+)(\nMSBNK-[a-zA-Z0-9_]+-[a-zA-Z0-9_]+)*$/;
 
 type InputProps = {
   width: number;

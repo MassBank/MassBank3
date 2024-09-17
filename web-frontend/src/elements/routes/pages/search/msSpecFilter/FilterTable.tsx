@@ -1,8 +1,15 @@
 import './FilterTable.scss';
 
-import { CSSProperties, useMemo } from 'react';
+import {
+  CSSProperties,
+  MouseEvent,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import ValueCount from '../../../../../types/ValueCount';
 import FilterTableData from './FilterTableData';
+import Button from '../../../../basic/Button';
 
 type InputProps = {
   filterOptions: ValueCount[];
@@ -16,16 +23,19 @@ type InputProps = {
 };
 
 function FilterTable({ filterOptions, onSelect, style }: InputProps) {
+  const [filterOptionsInner, setFilterOptionInner] = useState<ValueCount[]>([
+    ...filterOptions,
+  ]);
+
   const rows = useMemo(() => {
     const pairs: ValueCount[][] = [];
-    const filterOptions2 = filterOptions ? [...filterOptions] : [];
     let i = 0;
-    for (; i <= filterOptions2.length - 2; i = i + 2) {
-      pairs.push([filterOptions2[i], filterOptions2[i + 1]]);
+    for (; i <= filterOptionsInner.length - 2; i = i + 2) {
+      pairs.push([filterOptionsInner[i], filterOptionsInner[i + 1]]);
     }
-    if (i < filterOptions2.length) {
+    if (i < filterOptionsInner.length) {
       const vc: ValueCount = { value: '', count: 0, flag: true };
-      pairs.push([filterOptions2[i], vc]);
+      pairs.push([filterOptionsInner[i], vc]);
     }
     const rows = pairs.map((pair) => {
       const vc = pair[0];
@@ -39,15 +49,44 @@ function FilterTable({ filterOptions, onSelect, style }: InputProps) {
     });
 
     return rows;
-  }, [filterOptions, onSelect]);
+  }, [filterOptionsInner, onSelect]);
+
+  const allSelected = useMemo(() => {
+    if (filterOptionsInner) {
+      return (
+        filterOptionsInner.filter((vc) => vc.flag === true).length ===
+        filterOptionsInner.length
+      );
+    }
+
+    return false;
+  }, [filterOptionsInner]);
+
+  const handleOnSelectAll = useCallback(() => {
+    setFilterOptionInner(
+      filterOptionsInner.map((vc) => {
+        return { ...vc, flag: !allSelected };
+      }),
+    );
+    filterOptionsInner.forEach((vc) => {
+      onSelect(vc.value, !allSelected);
+    });
+  }, [allSelected, filterOptionsInner, onSelect]);
 
   return (
     <div>
-      {
-        <table className="filter-table" style={style}>
-          <tbody>{rows}</tbody>
-        </table>
-      }
+      <table className="filter-table" style={style}>
+        <tbody>{rows}</tbody>
+      </table>
+      <Button
+        child={allSelected ? 'Unselect' : 'Select'}
+        onClick={(e: MouseEvent<HTMLButtonElement>) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          handleOnSelectAll();
+        }}
+      />
     </div>
   );
 }
