@@ -18,7 +18,7 @@ type InputProps = {
 function FilterTable({ filterOptions, onSelect, style }: InputProps) {
   const rows = useMemo(() => {
     const pairs: ValueCount[][] = [];
-    const filterOptions2 = [...filterOptions];
+    const filterOptions2 = filterOptions ? [...filterOptions] : [];
     let i = 0;
     for (; i <= filterOptions2.length - 2; i = i + 2) {
       pairs.push([filterOptions2[i], filterOptions2[i + 1]]);
