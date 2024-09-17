@@ -6,12 +6,4 @@ const referencePeakList: string[] = [
   '611.161 6700',
 ];
 
-const referenceSpectraList: string[] = [
-  'MSBNK-IPB_Halle-PB001341',
-  'MSBNK-IPB_Halle-PB006202',
-  'MSBNK-IPB_Halle-PB006203',
-  'MSBNK-IPB_Halle-PB001342',
-  'MSBNK-IPB_Halle-PB001343',
-];
-
-export { referencePeakList, referenceSpectraList };
+export default referencePeakList;

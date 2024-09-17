@@ -37,8 +37,8 @@ type DefaultAPIServicer interface {
 	GetCount(context.Context) (ImplResponse, error)
 	GetMetadata(context.Context) (ImplResponse, error)
 	GetRecord(context.Context, string) (ImplResponse, error)
-	GetRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, string, []string) (ImplResponse, error)
-	GetSimilarity(context.Context, []string, []string, []string, []string, string, string, float64, string, int32, int32, []string) (ImplResponse, error)
+	GetRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, string, string, []string) (ImplResponse, error)
+	GetSimilarity(context.Context, []string, []string, int32) (ImplResponse, error)
 	GetSimpleRecord(context.Context, string) (ImplResponse, error)
-	GetSimpleRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, string, []string) (ImplResponse, error)
+	GetSimpleRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, string, string, []string) (ImplResponse, error)
 }

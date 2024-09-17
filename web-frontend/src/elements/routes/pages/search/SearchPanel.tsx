@@ -3,10 +3,7 @@ import './SearchPanel.scss';
 import { useCallback, useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
 import Button from '../../../basic/Button';
-import {
-  referencePeakList,
-  referenceSpectraList,
-} from './utils/peakListExample';
+import referencePeakList from './utils/peakListExample';
 import { Menu, Sidebar, SubMenu } from 'react-pro-sidebar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -122,96 +119,101 @@ function SearchPanel({
               suffix={collapsed ? '' : 'Peaks'}
             >
               <SubMenu label="Similarity" className="submenu">
-                <SubMenu label="Peak List">
-                  <div className="peak-list-input-container">
-                    <textarea
-                      placeholder="Enter a peak list: m/z and intensity, delimited by a space. For example:&#10;&#10;147.063 11&#10;303.05 999&#10;449.108 64&#10;465.102 588&#10;611.161 670"
-                      {...register('peakListInputField', {
-                        required: false,
-                        pattern: peakListPattern,
-                      })}
-                      style={{
-                        width,
-                        height: height / 3 - errorLabelHeight,
-                        resize: 'none',
-                      }}
-                    />
-                    {errors.peakListInputField && (
-                      <p
-                        className="error-label"
-                        style={{
-                          width,
-                          height: errorLabelHeight,
-                        }}
-                      >
-                        Please enter a valid peak list.
-                      </p>
-                    )}
-                  </div>
-                  <Button
-                    child={'Load Example'}
-                    onClick={() => {
-                      setValue(
-                        'peakListInputField',
-                        referencePeakList.join('\n'),
-                        {
-                          shouldValidate: true,
-                        },
-                      );
+                <div className="input-container">
+                  <textarea
+                    placeholder="Enter a peak list: m/z and intensity, delimited by a space. For example:&#10;&#10;147.063 11&#10;303.05 999&#10;449.108 64&#10;465.102 588&#10;611.161 670"
+                    {...register('peakListInputField', {
+                      required: false,
+                      pattern: peakListPattern,
+                    })}
+                    style={{
+                      width,
+                      height: 230 - errorLabelHeight,
+                      resize: 'none',
                     }}
                   />
-                </SubMenu>
-                <SubMenu label="Reference Spectra">
-                  <div className="reference-spectra-list-input-container">
-                    <textarea
-                      placeholder="Enter reference spectra. For example:&#10;&#10;MSBNK-IPB_Halle-PB001341&#10;MSBNK-IPB_Halle-PB006202&#10;MSBNK-IPB_Halle-PB006203&#10;MSBNK-IPB_Halle-PB001342&#10;MSBNK-IPB_Halle-PB001343"
-                      {...register('referenceSpectraInputField', {
-                        required: false,
-                        pattern: msbnkPattern,
-                      })}
+                  {errors.peakListInputField && (
+                    <p
+                      className="error-label"
                       style={{
                         width,
-                        height: height / 3 - errorLabelHeight,
-                        resize: 'none',
+                        height: errorLabelHeight,
                       }}
-                    />
-                    {errors.referenceSpectraInputField && (
-                      <p
-                        className="error-label"
-                        style={{
-                          width,
-                          height: errorLabelHeight,
-                        }}
-                      >
-                        Please enter a valid reference spectra list.
-                      </p>
-                    )}
-                  </div>
-                  <Button
-                    child={'Load Example'}
-                    onClick={() => {
-                      setValue(
-                        'referenceSpectraInputField',
-                        referenceSpectraList.join('\n'),
-                        {
-                          shouldValidate: true,
-                        },
-                      );
-                    }}
-                  />
-                </SubMenu>
+                    >
+                      Please enter a valid peak list.
+                    </p>
+                  )}
+                </div>
+                <Button
+                  child={'Load Example'}
+                  onClick={() => {
+                    setValue(
+                      'peakListInputField',
+                      referencePeakList.join('\n'),
+                      {
+                        shouldValidate: true,
+                      },
+                    );
+                  }}
+                />
               </SubMenu>
               <SubMenu label="Peaks" className="submenu"></SubMenu>
               <SubMenu label="Peak Differences" className="submenu"></SubMenu>
             </SubMenu>
             <SubMenu
               label={<FontAwesomeIcon icon={faSignature} />}
-              suffix={collapsed ? '' : 'InChiKey'}
-            ></SubMenu>
+              suffix={collapsed ? '' : 'InChI'}
+            >
+              <div className="input-container">
+                <textarea
+                  placeholder="InChi or InChIKey, Example:&#10;InChI=1S/C10H10O3/c1-6-5-7-3-2-4-8(11)9(7)10(12)13-6/h2-4,6,11H,5H2,1H3 or &#10;KWILGNNWGSNMPA-UHFFFAOYSA-N"
+                  {...register('inchiInputField', {
+                    required: false,
+                  })}
+                  style={{
+                    width,
+                    height: 60,
+                    resize: 'none',
+                  }}
+                />
+              </div>
+              <Button
+                child={'Load Example'}
+                onClick={() => {
+                  setValue(
+                    'inchiInputField',
+                    'InChI=1S/C10H10O3/c1-6-5-7-3-2-4-8(11)9(7)10(12)13-6/h2-4,6,11H,5H2,1H3',
+                  );
+                }}
+              />
+            </SubMenu>
             <SubMenu
               label={<FontAwesomeIcon icon={faBarcode} />}
               suffix={collapsed ? '' : 'SPLASH'}
-            ></SubMenu>
+            >
+              <div className="input-container">
+                <textarea
+                  placeholder="Example:&#10;splash10-03fr-0900000000-035ec76d23650a15673b"
+                  {...register('splashInputField', {
+                    required: false,
+                  })}
+                  style={{
+                    width,
+                    height: 60,
+                    resize: 'none',
+                  }}
+                />
+              </div>
+              <Button
+                child={'Load Example'}
+                onClick={() => {
+                  setValue(
+                    'splashInputField',
+                    'splash10-03fr-0900000000-035ec76d23650a15673b',
+                  );
+                }}
+              />
+            </SubMenu>
             <SubMenu
               label={<FontAwesomeIcon icon={faFlask} />}
               suffix={collapsed ? '' : 'Mass Spectrometry'}

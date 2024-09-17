@@ -101,6 +101,10 @@ func (db *PostgresSQLDB) GetIndexes() []Index {
 	indexes = append(indexes, Index{IndexName: "browse_options_ms_type_index", TableName: "browse_options", Columns: []string{"ms_type"}})
 	indexes = append(indexes, Index{IndexName: "browse_options_ion_mode_index", TableName: "browse_options", Columns: []string{"ion_mode"}})
 	indexes = append(indexes, Index{IndexName: "browse_options_smiles_index", TableName: "browse_options", Columns: []string{"smiles"}})
+	indexes = append(indexes, Index{IndexName: "browse_options_inchi_index", TableName: "browse_options", Columns: []string{"inchi"}})
+	indexes = append(indexes, Index{IndexName: "browse_options_inchikey_index", TableName: "browse_options", Columns: []string{"inchikey"}})
+	indexes = append(indexes, Index{IndexName: "browse_options_splash_index", TableName: "browse_options", Columns: []string{"splash"}})
+	indexes = append(indexes, Index{IndexName: "browse_options_formula_index", TableName: "browse_options", Columns: []string{"formula"}})
 
 	return indexes
 }
@@ -554,7 +558,11 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 	var mz_vec []float64
 	var intensity_vec []float64
 	var relative_intensity_vec []int32
-	var query = "SELECT massbank_id, accession, title, smiles, mz_vec, intensity_vec, relative_intensity_vec FROM browse_options WHERE accession = $1;"
+	var inchi string
+	var inchikey string;
+	var splash string
+	var formula string
+	var query = "SELECT massbank_id, accession, title, smiles, mz_vec, intensity_vec, relative_intensity_vec, inchi, inchikey, splash, formula FROM browse_options WHERE accession = $1;"
 	err := p.database.QueryRow(query, *s).Scan(
 		&massbankId,
 		&accession,
@@ -563,6 +571,10 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 		(*pq.Float64Array)(&mz_vec),
 		(*pq.Float64Array)(&intensity_vec),
 		(*pq.Int32Array)(&relative_intensity_vec),
+		&inchi,
+		&inchikey,
+		&splash,
+		&formula,
 	); 
 	if err != nil {
 		return nil, err
@@ -572,6 +584,11 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 	result.Accession = &accession
 	result.Compound = massbank.CompoundProperties{
 		Smiles: &smiles,
+		Formula: &formula,
+		InChI: &inchi,
+		Link: &[]massbank.DatabaseProperty{
+			{Database: "INCHIKEY", Identifier: inchikey},
+		},
 	}
 	
 	result.Peak = massbank.PeakProperties{}
@@ -582,6 +599,7 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 		Intensity: intensity_vec, 
 		Rel: relative_intensity_vec,
 	}
+	result.Peak.Splash = &splash
 	
 	return &result, err
 }
@@ -674,7 +692,7 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) string {
 		}
 	}
 
-	if(filters.IonMode != massbank.ANY) {
+	if(filters.IonMode != massbank.ANY) {		
 		subQuery := "ion_mode = '" + string(filters.IonMode) + "'"
 		if(addedWhere || addedAnd) {
 			query = query + " AND " + subQuery
@@ -683,6 +701,50 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) string {
 			query = query + " WHERE " + subQuery
 			addedWhere = true
 		}	
+	}
+
+	if(filters.Inchi != "") {
+		subQuery := "inchi = '" + filters.Inchi + "'"
+		if(addedWhere || addedAnd) {
+			query = query + " AND " + subQuery
+			addedAnd = true
+		} else {
+			query = query + " WHERE " + subQuery
+			addedWhere = true
+		}
+	}
+
+	if(filters.InchiKey != "") {
+		subQuery := "inchikey = '" + filters.InchiKey + "'"
+		if(addedWhere || addedAnd) {
+			query = query + " AND " + subQuery
+			addedAnd = true
+		} else {
+			query = query + " WHERE " + subQuery
+			addedWhere = true
+		}
+	}
+
+	if(filters.Splash != "") {
+		subQuery := "splash = '" + filters.Splash + "'"
+		if(addedWhere || addedAnd) {
+			query = query + " AND " + subQuery
+			addedAnd = true
+		} else {
+			query = query + " WHERE " + subQuery
+			addedWhere = true
+		}
+	}
+
+	if(filters.Formula != "") {
+		subQuery := "formula = '" + filters.Formula + "'"
+		if(addedWhere || addedAnd) {
+			query = query + " AND " + subQuery
+			addedAnd = true
+		} else {
+			query = query + " WHERE " + subQuery
+			addedWhere = true
+		}
 	}
 
 	return query
@@ -1238,7 +1300,17 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId str
 		}
 
 		// insert into browse option table
-		q = `INSERT INTO browse_options (massbank_id, accession, contributor, instrument_type, ms_type, ion_mode, title, smiles, mz_vec, intensity_vec, relative_intensity_vec) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`
+		inchikey := ""
+		if(record.Compound.Link != nil) {
+			for _, link := range *record.Compound.Link {
+				if(link.Database == "INCHIKEY") {
+					inchikey = link.Identifier
+					break
+				}
+			}
+		}
+
+		q = `INSERT INTO browse_options (massbank_id, accession, contributor, instrument_type, ms_type, ion_mode, title, smiles, mz_vec, intensity_vec, relative_intensity_vec, inchi, inchikey, splash, formula) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);`
 		var msType string 
 		var ionMode string
 		for _, subProp := range *record.Acquisition.MassSpectrometry {
@@ -1251,7 +1323,7 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId str
 				break
 			}
 		}
-		_, err = tx.Exec(q, massbankId, *record.Accession, *record.Contributor, *record.Acquisition.InstrumentType, msType, ionMode, *record.RecordTitle, *record.Compound.Smiles, pq.Array(record.Peak.Peak.Mz), pq.Array(record.Peak.Peak.Intensity), pq.Array(record.Peak.Peak.Rel))
+		_, err = tx.Exec(q, massbankId, *record.Accession, *record.Contributor, *record.Acquisition.InstrumentType, msType, ionMode, *record.RecordTitle, *record.Compound.Smiles, pq.Array(record.Peak.Peak.Mz), pq.Array(record.Peak.Peak.Intensity), pq.Array(record.Peak.Peak.Rel), *record.Compound.InChI, inchikey, *record.Peak.Splash, *record.Compound.Formula)
 		if err != nil {
 			fmt.Println("Error: ", err)
 			if err2 := tx.Rollback(); err2 != nil {
@@ -1543,7 +1615,11 @@ func (p *PostgresSQLDB) init() error {
 			smiles TEXT NOT NULL,
 			mz_vec FLOAT[] NOT NULL,
 			intensity_vec FLOAT[] NOT NULL,
-			relative_intensity_vec INT[] NOT NULL
+			relative_intensity_vec INT[] NOT NULL,
+			inchi TEXT NOT NULL,
+			inchikey TEXT NOT NULL,
+			splash TEXT NOT NULL,
+			formula TEXT NOT NULL
 		);
 
 		`;

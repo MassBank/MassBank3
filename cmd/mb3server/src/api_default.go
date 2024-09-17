@@ -187,9 +187,10 @@ func (c *DefaultAPIController) GetRecords(w http.ResponseWriter, r *http.Request
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
+	inchiParam := query.Get("inchi")
 	inchiKeyParam := query.Get("inchi_key")
 	contributorParam := strings.Split(query.Get("contributor"), ",")
-	result, err := c.service.GetRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, intensityCutoffParam, inchiKeyParam, contributorParam)
+	result, err := c.service.GetRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, intensityCutoffParam, inchiParam, inchiKeyParam, contributorParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -205,28 +206,12 @@ func (c *DefaultAPIController) GetSimilarity(w http.ResponseWriter, r *http.Requ
 	query := r.URL.Query()
 	peakListParam := strings.Split(query.Get("peak_list"), ",")
 	referenceSpectraListParam := strings.Split(query.Get("reference_spectra_list"), ",")
-	instrumentTypeParam := strings.Split(query.Get("instrument_type"), ",")
-	msTypeParam := strings.Split(query.Get("ms_type"), ",")
-	ionModeParam := query.Get("ion_mode")
-	exactMassParam := query.Get("exact_mass")
-	massToleranceParam, err := parseFloat64Parameter(query.Get("mass_tolerance"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	formulaParam := query.Get("formula")
 	limitParam, err := parseInt32Parameter(query.Get("limit"), false)
 	if err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	intensityCutoffParam, err := parseInt32Parameter(query.Get("intensity_cutoff"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	contributorParam := strings.Split(query.Get("contributor"), ",")
-	result, err := c.service.GetSimilarity(r.Context(), peakListParam, referenceSpectraListParam, instrumentTypeParam, msTypeParam, ionModeParam, exactMassParam, massToleranceParam, formulaParam, limitParam, intensityCutoffParam, contributorParam)
+	result, err := c.service.GetSimilarity(r.Context(), peakListParam, referenceSpectraListParam, limitParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -280,9 +265,10 @@ func (c *DefaultAPIController) GetSimpleRecords(w http.ResponseWriter, r *http.R
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
+	inchiParam := query.Get("inchi")
 	inchiKeyParam := query.Get("inchi_key")
 	contributorParam := strings.Split(query.Get("contributor"), ",")
-	result, err := c.service.GetSimpleRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, intensityCutoffParam, inchiKeyParam, contributorParam)
+	result, err := c.service.GetSimpleRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, intensityCutoffParam, inchiParam, inchiKeyParam, contributorParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

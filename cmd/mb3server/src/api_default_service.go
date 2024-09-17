@@ -66,21 +66,20 @@ func (s *DefaultAPIService) GetRecord(ctx context.Context, accession string) (Im
 }
 
 // GetRecords - Get a list of records
-func (s *DefaultAPIService) GetRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchiKey string, contributor []string) (ImplResponse, error) {
-	result, err := GetRecords(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, intensityCutoff, inchiKey, contributor)
+func (s *DefaultAPIService) GetRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchi string, inchiKey string, contributor []string) (ImplResponse, error) {
+	result, err := GetRecords(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, intensityCutoff, inchi, inchiKey, contributor)
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), err
 	}
 	return Response(200, result), nil
-
 }
 
 // GetSimilarity implements DefaultAPIServicer.
-func (s *DefaultAPIService) GetSimilarity(ctx context.Context, peakList []string, referenceSpectraList []string, instrumentType []string, msType []string, ionMode string, exactMass string, massTolerance float64, formula string, limit int32, intensityCutoff int32, contributor []string) (ImplResponse, error) {
+func (s *DefaultAPIService) GetSimilarity(ctx context.Context, peakList []string, referenceSpectraList []string, limit int32) (ImplResponse, error) {
 	// TODO - update GetSimilarity with the required logic for this service method.
 	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	result, err := GetSimilarity(peakList, referenceSpectraList, instrumentType, msType, ionMode, exactMass, massTolerance, formula, limit, intensityCutoff, contributor)
+	result, err := GetSimilarity(peakList, referenceSpectraList, limit)
 
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), err
@@ -99,8 +98,8 @@ func (s *DefaultAPIService) GetSimpleRecord(ctx context.Context, accession strin
 }
 
 // GetSimpleRecords - Get a list of records
-func (s *DefaultAPIService) GetSimpleRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchiKey string, contributor []string) (ImplResponse, error) {
-	result, err := GetSimpleRecords(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, intensityCutoff, inchiKey, contributor)
+func (s *DefaultAPIService) GetSimpleRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchi string, inchiKey string, contributor []string) (ImplResponse, error) {
+	result, err := GetSimpleRecords(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, intensityCutoff, inchi, inchiKey, contributor)
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), err
 	}

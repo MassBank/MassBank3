@@ -84,6 +84,12 @@ paths:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/IntensityCutoff"
         required: false
       - in: query
+        name: inchi
+        description: Filter by InChI
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/InChI"
+        required: false
+      - in: query
         name: inchi_key
         description: Filter by InChIKey. Complete or Partial
         schema:
@@ -184,6 +190,12 @@ paths:
         description: "The Instensity cutoff for Peaklist search. Default: 5"
         schema:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/IntensityCutoff"
+        required: false
+      - in: query
+        name: inchi
+        description: Filter by InChI
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/InChI"
         required: false
       - in: query
         name: inchi_key
@@ -328,56 +340,10 @@ paths:
             - MSBNK-IPB_Halle-PB001343
         required: false
       - in: query
-        name: instrument_type
-        description: Filter by a list of instrument type, which will be associated by OR.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/InstrumentType"
-        required: false
-      - in: query
-        description: Filter by a List of MS types, which are associated by OR. If none is given, all is assumed.
-        name: ms_type
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/MSType"
-        required: false
-      - in: query
-        name: ion_mode
-        description: Filter by ion mode. If none is given, both is assumed.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/IonMode"
-        required: false
-      - in: query
-        name: exact_mass
-        description: Filter by exact mass.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/ExactMass"
-      - in: query
-        name: mass_tolerance
-        description: "Tolerance for mass filters. Default: 0.3"
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/MassTolerance"
-      - in: query
-        name: formula
-        description: Filter by formula.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Formula"
-        required: false
-      - in: query
         name: limit
-        description: "Maximum number of results. Default: 20"
+        description: "Maximum number of results."
         schema:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Limit"
-        required: false
-      - in: query
-        name: intensity_cutoff
-        description: "The Instensity cutoff for Peaklist search. Default: 5"
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/IntensityCutoff"
-        required: false
-      - in: query
-        name: contributor
-        description: a contributor (institution)
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Contributor"
         required: false
     get:
       summary: Get a list of records with similarity scores

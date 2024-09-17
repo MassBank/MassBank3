@@ -50,6 +50,7 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 		Formula:           "",
 		Peaks:             nil,
 		PeakDifferences:   nil,
+		Inchi: 			   "",
 		InchiKey:          "",
 		Contributor:       co,
 		IntensityCutoff:   nil,
@@ -97,7 +98,7 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 	return &result, nil
 }
 
-func buildFilters(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchiKey string, contributor []string) (*database.Filters, error) {
+func buildFilters(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchi string, inchiKey string, contributor []string) (*database.Filters, error) {
 	it := &instrumentType
 	if len(*it) == 0 || (len(*it) == 1 && (*it)[0] == "") {
 		it = nil
@@ -132,6 +133,7 @@ func buildFilters(instrumentType []string, splash string, msType []string, ionMo
 		Formula:           formula,
 		Peaks:             nil,
 		PeakDifferences:   nil,
+		Inchi: 			   inchi,
 		InchiKey:          inchiKey,
 		Contributor:       co,
 		IntensityCutoff:   nil, //&_intensityCutoff,
@@ -449,12 +451,12 @@ func GetSimpleRecord(accession string) (*MbRecord, error) {
 	return &result, nil
 }
 
-func GetRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchiKey string, contributor []string) (*[]MbRecord, error) {
+func GetRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchi string, inchiKey string, contributor []string) (*[]MbRecord, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
 
-	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, intensityCutoff, inchiKey, contributor)
+	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, intensityCutoff, inchi, inchiKey, contributor)
 	if err != nil {
 		return nil, err
 	}
@@ -465,25 +467,74 @@ func GetRecords(instrumentType []string, splash string, msType []string, ionMode
 	
 	result := []MbRecord{}
 	for _, record := range *records {
-		result = append(result, *buildSimpleMbRecord(&record))
+		result = append(result, *buildMbRecord(&record))
 	}
 	
 	return &result, nil
 }
 
-func GetSimpleRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchiKey string, contributor []string) (*[]MbRecord, error) {
+func GetSimpleRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchi string, inchiKey string, contributor []string) (*[]MbRecord, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
 
-	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, intensityCutoff, inchiKey, contributor)
+	records := &[]massbank.MassBank2{}
+
+	recordsSimilarity := &[]massbank.MassBank2{}
+	checkSimilarity := len(peakList) > 0 && peakList[0] != ""
+	if(checkSimilarity && inchi == "" && inchiKey == "" && splash == "") {	
+		fmt.Println(" -> filter by Similarity")	
+		similaritySearchResult, err := GetSimilarity(peakList, []string{}, 0)
+		if err != nil {
+			return nil, err
+		}
+		for _, data := range similaritySearchResult.Data {
+			record, err := db.GetSimpleRecord(&data.Accession)
+			if err != nil {
+				return nil, err
+			}
+			*recordsSimilarity = append(*recordsSimilarity, *record)
+		}
+		fmt.Println("recordsSimilarity: ", len(*recordsSimilarity))
+	}
+
+	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, intensityCutoff, inchi, inchiKey, contributor)	
 	if err != nil {
 		return nil, err
 	}
-	records, err := db.GetSimpleRecords(*filters)
-	if err != nil {
-		return nil, err
+	fmt.Println("filters: ", filters)	
+
+	recordsFilters := &[]massbank.MassBank2{}
+	
+	checkFilters := filters.CompoundName != "" || filters.Mass != nil || filters.Formula != "" || 
+		filters.Peaks != nil || filters.PeakDifferences != nil || filters.Inchi != "" || 
+		filters.InchiKey != "" || filters.Splash != "" || filters.IonMode != massbank.ANY || 
+		filters.MsType != nil || filters.InstrumentType != nil || filters.Contributor != nil
+
+	if(!checkSimilarity || checkFilters) {
+			fmt.Println(" -> filter by Filters")
+			recordsFilters, err = db.GetSimpleRecords(*filters)
+			if err != nil {
+				return nil, err
+			}
+			fmt.Println("recordsFilters: ", len(*recordsFilters))
+	}	
+
+	if(len(*recordsFilters) > 0 && len(*recordsSimilarity) > 0) {	
+		for _, recordSimilarity := range *recordsSimilarity {			
+			for _, recordFilter := range *recordsFilters {
+				if (*recordFilter.Accession == *recordSimilarity.Accession) {					
+					*records = append(*records, recordFilter)
+				}
+			}
+		}
+	} else if(len(*recordsFilters) > 0) {
+		*records = *recordsFilters
+	} else if(len(*recordsSimilarity) > 0) {
+		*records = *recordsSimilarity
 	}
+
+	fmt.Println("records: ", len(*records))
 
 	result := []MbRecord{}
 	for _, record := range *records {
@@ -500,7 +551,7 @@ func getEnv(name string, fallback string) string {
 	return fallback
 }
 
-func GetSimilarity(peakList []string, referenceSpectraList []string, instrumentType []string, msType []string, ionMode string, exactMass string, massTolerance float64, formula string, limit int32, intensityCutoff int32, contributor []string) (*SimilaritySearchResult, error) {
+func GetSimilarity(peakList []string, referenceSpectraList []string, limit int32) (*SimilaritySearchResult, error) {
 	sort.Slice(peakList, func(i, j int) bool {
 		split1 := strings.Split(peakList[i], ";")
 		split2 := strings.Split(peakList[j], ";")
@@ -516,15 +567,7 @@ func GetSimilarity(peakList []string, referenceSpectraList []string, instrumentT
 	})
 	fmt.Println("peakList: ", peakList)
 	fmt.Println("referenceSpectraList: ", referenceSpectraList)
-	fmt.Println("instrumentType: ", instrumentType)
-	fmt.Println("msType: ", msType)
-	fmt.Println("ionMode: ", ionMode)
-	fmt.Println("exactMass: ", exactMass)
-	fmt.Println("massTolerance: ", massTolerance)
-	fmt.Println("formula: ", formula)
 	fmt.Println("limit: ", limit)
-	fmt.Println("intensityCutoff: ", intensityCutoff)
-	fmt.Println("contributor: ", contributor)	
 
 	if err := initDB(); err != nil {
 		return nil, err

@@ -12,10 +12,11 @@ import ResultPanel from '../../../result/ResultPanel';
 import { FieldValues } from 'react-hook-form';
 import fetchData from '../../../../utils/fetchData';
 import Content from '../../../../types/Content';
-import ValueCount from '../../../../types/ValueCount';
 import buildSearchParams from '../../../../utils/buildSearchParams';
 import Record from '../../../../types/Record';
 import initFlags from '../../../../utils/initFlags';
+import axios from 'axios';
+import parsePeakListInputField from './utils/parsePeakListAndReferences';
 
 function SearchView() {
   const ref = useRef(null);
@@ -29,7 +30,7 @@ function SearchView() {
   const [collapsed, setCollapsed] = useState<boolean>(false);
 
   const searchPanelWidth = useMemo(
-    () => (collapsed ? 50 : width * 0.25),
+    () => (collapsed ? 50 : width * 0.4),
     [collapsed, width],
   );
   const searchPanelHeight = height;
@@ -49,84 +50,60 @@ function SearchView() {
     handleOnFetchContent();
   }, [handleOnFetchContent]);
 
-  // const searchHits = useCallback(
-  //   async (peakList: Peak[], referenceSpectraList: string[]) => {
-  //     const url = import.meta.env.VITE_MB3_API_URL + '/v1/similarity';
-  //     const searchParams: SearchParams = {};
-  //     searchParams['peak_list'] = peakList.map((p) => `${p.mz};${p.intensity}`);
-  //     if (referenceSpectraList.length > 0) {
-  //       searchParams['reference_spectra_list'] = referenceSpectraList;
-  //     }
-  //     return (await fetchData(url, searchParams)).data;
-  //   },
-  //   [],
-  // );
+  const handleOnSearch = useCallback(async (formData: FieldValues) => {
+    const _msSpecFilterOptions = formData['msSpecFilterOptions'] as Content;
+    const searchParams = buildSearchParams(_msSpecFilterOptions);
 
-  // const handleOnSearchHits = useCallback(
-  //   async (peakList: Peak[], referenceSpectraList: string[]) => {
-  //     setIsRequesting(true);
-  //     const _hits = await searchHits(peakList, referenceSpectraList);
-  //     setReference(peakList);
-  //     setHits(_hits || []);
-  //     setIsRequesting(false);
-  //   },
-  //   [searchHits],
-  // );
+    const peakListInputFieldData = formData['peakListInputField'] as string;
+    if (peakListInputFieldData.trim().length > 0) {
+      const peakList = parsePeakListInputField(peakListInputFieldData);
+      searchParams['peak_list'] = [
+        peakList.map((p) => `${p.mz};${p.intensity}`).join(','),
+      ];
+      setReference(peakList);
+    } else {
+      setReference([]);
+    }
+    const inchi = (formData['inchiInputField'] as string).trim();
+    if (inchi.length > 0) {
+      if (inchi.startsWith('InChI=')) {
+        searchParams['inchi'] = [inchi];
+      } else {
+        searchParams['inchi_key'] = [inchi];
+      }
+    }
+    const splash = (formData['splashInputField'] as string).trim();
+    if (splash.length > 0) {
+      searchParams['splash'] = [splash];
+    }
 
-  const handleOnSearchByFilter = useCallback(
-    async (msSpecFilterOptions: Content) => {
-      setIsRequesting(true);
+    console.log(searchParams);
 
-      const searchParams = buildSearchParams(msSpecFilterOptions);
-      const url2 = import.meta.env.VITE_MB3_API_URL + '/v1/records/simple';
-      const _records = await fetchData(url2, searchParams);
-      const _hits: Hit[] = _records.map((r: Record) => {
-        const hit: Hit = {
-          accession: r.accession,
-          record: r,
-        };
+    const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/simple';
+    console.log(axios.getUri({ url, params: searchParams }));
+    const _records = await fetchData(url, searchParams);
+    const _hits: Hit[] = _records.map((r: Record) => {
+      const hit: Hit = {
+        accession: r.accession,
+        record: r,
+      };
 
-        return hit;
-      });
+      return hit;
+    });
 
-      setHits(_hits);
+    setHits(_hits);
 
-      setIsRequesting(false);
-    },
-    [],
-  );
+    setIsRequesting(false);
+  }, []);
 
   const handleOnSubmit = useCallback(
-    (data: FieldValues) => {
-      console.log(data);
-
+    async (data: FieldValues) => {
+      setIsRequesting(true);
       setCollapsed(true);
-      // const peakListValues: number[][] = data.peakListInputField
-      //   .split('\n')
-      //   .map((line: string) => {
-      //     const [mz, intensity] = line.split(' ');
-      //     return [parseFloat(mz), parseFloat(intensity)];
-      //   });
-      // const max = Math.max(...peakListValues.map((p) => p[1]));
-      // const peakList: Peak[] = peakListValues.map((values: number[]) => {
-      //   const [mz, intensity] = values;
-      //   const rel = Math.floor((intensity / max) * 1000) - 1;
-      //   return {
-      //     mz,
-      //     intensity,
-      //     rel: rel < 0 ? 0 : rel,
-      //     id: generateID(),
-      //   } as Peak;
-      // });
-      // const referenceSpectraList = data.referenceSpectraInputField
-      //   .split('\n')
-      //   .filter((s: string) => s !== '');
 
-      // handleOnSearchHits(peakList, referenceSpectraList);
-
-      handleOnSearchByFilter(data.msSpecFilterOptions);
+      await handleOnSearch(data);
     },
-    [handleOnSearchByFilter],
+    [handleOnSearch],
   );
 
   const searchPanel = useMemo(
@@ -163,19 +140,6 @@ function SearchView() {
     [height, hits, reference, searchPanelWidth, width],
   );
 
-  const placeholder = useMemo(
-    () => (
-      <Placeholder
-        child={''}
-        style={{
-          width: width - searchPanelWidth,
-          height: height,
-        }}
-      />
-    ),
-    [height, searchPanelWidth, width],
-  );
-
   return (
     <div ref={ref} className="search-view">
       {searchPanel}
@@ -184,7 +148,15 @@ function SearchView() {
       ) : hits.length > 0 ? (
         resultPanel
       ) : (
-        placeholder
+        <Placeholder
+          child={collapsed ? 'No results' : ''}
+          style={{
+            width: width - searchPanelWidth,
+            height: height,
+            fontSize: 18,
+            fontWeight: 'bold',
+          }}
+        />
       )}
     </div>
   );

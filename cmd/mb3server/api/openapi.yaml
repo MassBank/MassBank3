@@ -115,6 +115,14 @@ paths:
         schema:
           $ref: '#/components/schemas/IntensityCutoff'
         style: form
+      - description: Filter by InChI
+        explode: true
+        in: query
+        name: inchi
+        required: false
+        schema:
+          $ref: '#/components/schemas/InChI'
+        style: form
       - description: Filter by InChIKey. Complete or Partial
         explode: true
         in: query
@@ -250,6 +258,14 @@ paths:
         required: false
         schema:
           $ref: '#/components/schemas/IntensityCutoff'
+        style: form
+      - description: Filter by InChI
+        explode: true
+        in: query
+        name: inchi
+        required: false
+        schema:
+          $ref: '#/components/schemas/InChI'
         style: form
       - description: Filter by InChIKey. Complete or Partial
         explode: true
@@ -413,79 +429,13 @@ paths:
             type: string
           type: array
         style: form
-      - description: "Filter by a list of instrument type, which will be associated\
-          \ by OR."
-        explode: true
-        in: query
-        name: instrument_type
-        required: false
-        schema:
-          $ref: '#/components/schemas/InstrumentType'
-        style: form
-      - description: "Filter by a List of MS types, which are associated by OR. If\
-          \ none is given, all is assumed."
-        explode: true
-        in: query
-        name: ms_type
-        required: false
-        schema:
-          $ref: '#/components/schemas/MSType'
-        style: form
-      - description: "Filter by ion mode. If none is given, both is assumed."
-        explode: true
-        in: query
-        name: ion_mode
-        required: false
-        schema:
-          $ref: '#/components/schemas/IonMode'
-        style: form
-      - description: Filter by exact mass.
-        explode: true
-        in: query
-        name: exact_mass
-        required: false
-        schema:
-          $ref: '#/components/schemas/ExactMass'
-        style: form
-      - description: "Tolerance for mass filters. Default: 0.3"
-        explode: true
-        in: query
-        name: mass_tolerance
-        required: false
-        schema:
-          $ref: '#/components/schemas/MassTolerance'
-        style: form
-      - description: Filter by formula.
-        explode: true
-        in: query
-        name: formula
-        required: false
-        schema:
-          $ref: '#/components/schemas/Formula'
-        style: form
-      - description: "Maximum number of results. Default: 20"
+      - description: Maximum number of results.
         explode: true
         in: query
         name: limit
         required: false
         schema:
           $ref: '#/components/schemas/Limit'
-        style: form
-      - description: "The Instensity cutoff for Peaklist search. Default: 5"
-        explode: true
-        in: query
-        name: intensity_cutoff
-        required: false
-        schema:
-          $ref: '#/components/schemas/IntensityCutoff'
-        style: form
-      - description: a contributor (institution)
-        explode: true
-        in: query
-        name: contributor
-        required: false
-        schema:
-          $ref: '#/components/schemas/Contributor'
         style: form
       responses:
         "200":
@@ -555,6 +505,8 @@ components:
       maximum: 100
       minimum: 1
       type: integer
+    InChI:
+      type: string
     InChIKey:
       type: string
     Contributor:
