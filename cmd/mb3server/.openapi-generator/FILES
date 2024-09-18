@@ -31,6 +31,8 @@ src/model_mb_record_species.go
 src/model_metadata.go
 src/model_ms_data_processing_inner.go
 src/model_ms_focused_ion_inner.go
+src/model_search_result.go
+src/model_search_result_data_inner.go
 src/model_similarity_search_result.go
 src/model_similarity_search_result_data_inner.go
 src/model_string_count_inner.go

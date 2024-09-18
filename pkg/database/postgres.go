@@ -631,7 +631,7 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*[]massbank.MassBank2, erro
 }
 
 // GetSimpleRecords see [MB3Database.GetSimpleRecords]
-func (p *PostgresSQLDB) GetSimpleRecords(filters Filters) (*[]massbank.MassBank2, error) {
+func (p *PostgresSQLDB) GetSearchRecords(filters Filters) (*[]massbank.MassBank2, error) {
 	if filters.MassEpsilon == nil {
 		filters.MassEpsilon = &DefaultValues.MassEpsilon
 	}

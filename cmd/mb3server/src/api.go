@@ -23,9 +23,9 @@ type DefaultAPIRouter interface {
 	GetMetadata(http.ResponseWriter, *http.Request)
 	GetRecord(http.ResponseWriter, *http.Request)
 	GetRecords(http.ResponseWriter, *http.Request)
+	GetSearchRecords(http.ResponseWriter, *http.Request)
 	GetSimilarity(http.ResponseWriter, *http.Request)
 	GetSimpleRecord(http.ResponseWriter, *http.Request)
-	GetSimpleRecords(http.ResponseWriter, *http.Request)
 }
 
 // DefaultAPIServicer defines the api actions for the DefaultAPI service
@@ -38,7 +38,7 @@ type DefaultAPIServicer interface {
 	GetMetadata(context.Context) (ImplResponse, error)
 	GetRecord(context.Context, string) (ImplResponse, error)
 	GetRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, string, string, []string) (ImplResponse, error)
+	GetSearchRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, string, string, []string) (ImplResponse, error)
 	GetSimilarity(context.Context, []string, []string, int32) (ImplResponse, error)
 	GetSimpleRecord(context.Context, string) (ImplResponse, error)
-	GetSimpleRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, string, string, []string) (ImplResponse, error)
 }

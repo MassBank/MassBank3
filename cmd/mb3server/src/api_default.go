@@ -80,6 +80,12 @@ func (c *DefaultAPIController) Routes() Routes {
 			c.GetRecords,
 		},
 		{
+			"GetSearchRecords",
+			strings.ToUpper("Get"),
+			"/v1/records/search",
+			c.GetSearchRecords,
+		},
+		{
 			"GetSimilarity",
 			strings.ToUpper("Get"),
 			"/v1/similarity",
@@ -90,12 +96,6 @@ func (c *DefaultAPIController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/v1/records/{accession}/simple",
 			c.GetSimpleRecord,
-		},
-		{
-			"GetSimpleRecords",
-			strings.ToUpper("Get"),
-			"/v1/records/simple",
-			c.GetSimpleRecords,
 		},
 	}
 }
@@ -201,44 +201,8 @@ func (c *DefaultAPIController) GetRecords(w http.ResponseWriter, r *http.Request
 
 }
 
-// GetSimilarity - Get a list of records with similarity scores
-func (c *DefaultAPIController) GetSimilarity(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	peakListParam := strings.Split(query.Get("peak_list"), ",")
-	referenceSpectraListParam := strings.Split(query.Get("reference_spectra_list"), ",")
-	limitParam, err := parseInt32Parameter(query.Get("limit"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	result, err := c.service.GetSimilarity(r.Context(), peakListParam, referenceSpectraListParam, limitParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
-
-}
-
-// GetSimpleRecord - Get a MassBank record in simple format (accession, title, peaks, smiles)
-func (c *DefaultAPIController) GetSimpleRecord(w http.ResponseWriter, r *http.Request) {
-	accessionParam := chi.URLParam(r, "accession")
-
-	result, err := c.service.GetSimpleRecord(r.Context(), accessionParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
-
-}
-
-// GetSimpleRecords - Get a list of records in simple format (accession, title, peaks, smiles)
-func (c *DefaultAPIController) GetSimpleRecords(w http.ResponseWriter, r *http.Request) {
+// GetSearchRecords - Get a list of records as a search result in a specific format (accession, title, peaks, smiles, similarity search result)
+func (c *DefaultAPIController) GetSearchRecords(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	instrumentTypeParam := strings.Split(query.Get("instrument_type"), ",")
 	splashParam := query.Get("splash")
@@ -268,7 +232,43 @@ func (c *DefaultAPIController) GetSimpleRecords(w http.ResponseWriter, r *http.R
 	inchiParam := query.Get("inchi")
 	inchiKeyParam := query.Get("inchi_key")
 	contributorParam := strings.Split(query.Get("contributor"), ",")
-	result, err := c.service.GetSimpleRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, intensityCutoffParam, inchiParam, inchiKeyParam, contributorParam)
+	result, err := c.service.GetSearchRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, intensityCutoffParam, inchiParam, inchiKeyParam, contributorParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+
+}
+
+// GetSimilarity - Get a list of records with similarity scores
+func (c *DefaultAPIController) GetSimilarity(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	peakListParam := strings.Split(query.Get("peak_list"), ",")
+	referenceSpectraListParam := strings.Split(query.Get("reference_spectra_list"), ",")
+	limitParam, err := parseInt32Parameter(query.Get("limit"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	result, err := c.service.GetSimilarity(r.Context(), peakListParam, referenceSpectraListParam, limitParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+
+}
+
+// GetSimpleRecord - Get a MassBank record in simple format (accession, title, peaks, smiles)
+func (c *DefaultAPIController) GetSimpleRecord(w http.ResponseWriter, r *http.Request) {
+	accessionParam := chi.URLParam(r, "accession")
+
+	result, err := c.service.GetSimpleRecord(r.Context(), accessionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

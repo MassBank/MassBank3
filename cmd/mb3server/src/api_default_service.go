@@ -98,8 +98,8 @@ func (s *DefaultAPIService) GetSimpleRecord(ctx context.Context, accession strin
 }
 
 // GetSimpleRecords - Get a list of records
-func (s *DefaultAPIService) GetSimpleRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchi string, inchiKey string, contributor []string) (ImplResponse, error) {
-	result, err := GetSimpleRecords(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, intensityCutoff, inchi, inchiKey, contributor)
+func (s *DefaultAPIService) GetSearchRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchi string, inchiKey string, contributor []string) (ImplResponse, error) {
+	result, err := GetSearchRecords(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, intensityCutoff, inchi, inchiKey, contributor)
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), err
 	}

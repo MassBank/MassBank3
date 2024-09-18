@@ -11,14 +11,14 @@ package mb3server
 
 type SearchResult struct {
 
-	// A list of records.
-	Data []MbRecord `json:"data,omitempty"`
+	// A list of records as a search result with similarity score (if requested).
+	Data []SearchResultDataInner `json:"data,omitempty"`
 }
 
 // AssertSearchResultRequired checks if the required fields are not zero-ed
 func AssertSearchResultRequired(obj SearchResult) error {
 	for _, el := range obj.Data {
-		if err := AssertMbRecordRequired(el); err != nil {
+		if err := AssertSearchResultDataInnerRequired(el); err != nil {
 			return err
 		}
 	}

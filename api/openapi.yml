@@ -113,7 +113,7 @@ paths:
                 type: array
                 items:
                   $ref: "./schemas/MBRecord.yaml"
-  /records/simple:
+  /records/search:
     parameters:
       - in: query
         name: instrument_type
@@ -210,17 +210,15 @@ paths:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Contributor"
         required: false
     get:
-      summary: Get a list of records in simple format (accession, title, peaks, smiles)
-      operationId: getSimpleRecords
+      summary: Get a list of records as a search result in a specific format (accession, title, peaks, smiles, similarity search result)
+      operationId: getSearchRecords
       responses:
         "200":
-          description: "A list of simple records"
+          description: "A list of simple records as a search result"
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "./schemas/MBRecord.yaml"
+                $ref: "./schemas/SearchResult.yaml"
 
   /records/{accession}:
     parameters:

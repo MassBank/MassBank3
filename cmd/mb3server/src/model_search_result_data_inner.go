@@ -9,32 +9,17 @@
 
 package mb3server
 
-// SearchResultDataInner - Data for a single compound.
 type SearchResultDataInner struct {
-	Data map[string]interface{} `json:"data,omitempty"`
+	Record MbRecord `json:"record,omitempty"`
 
-	// Compound names.
-	Name []string `json:"name,omitempty"`
-
-	// More compound names.
-	Synonyms []string `json:"synonyms,omitempty"`
-
-	// Formula of the compound.
-	Formula string `json:"formula,omitempty"`
-
-	// Exact Mass of the compound.
-	Mass float64 `json:"mass,omitempty"`
-
-	// A list of spectra for the compound
-	Spectra []SearchResultDataInnerSpectraInner `json:"spectra,omitempty"`
+	// Similarity score to the query spectrum.
+	Score float32 `json:"score,omitempty"`
 }
 
 // AssertSearchResultDataInnerRequired checks if the required fields are not zero-ed
 func AssertSearchResultDataInnerRequired(obj SearchResultDataInner) error {
-	for _, el := range obj.Spectra {
-		if err := AssertSearchResultDataInnerSpectraInnerRequired(el); err != nil {
-			return err
-		}
+	if err := AssertMbRecordRequired(obj.Record); err != nil {
+		return err
 	}
 	return nil
 }

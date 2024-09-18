@@ -4,6 +4,13 @@ properties:
   #   $ref: "./FilterOptions.yaml#/components/schemas/Metadata"
   data:
     type: array
-    description: A list of records.
+    description: A list of records as a search result with similarity score (if requested).
     items:
-      $ref: "./MBRecord.yaml"
+      type: object
+      properties:
+        record:
+          description: MassBank record as a search result.
+          $ref: "./MBRecord.yaml"
+        score:
+          description: Similarity score to the query spectrum.
+          type: number

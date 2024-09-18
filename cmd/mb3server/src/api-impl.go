@@ -473,30 +473,24 @@ func GetRecords(instrumentType []string, splash string, msType []string, ionMode
 	return &result, nil
 }
 
-func GetSimpleRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchi string, inchiKey string, contributor []string) (*[]MbRecord, error) {
+
+
+func GetSearchRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchi string, inchiKey string, contributor []string) (*SearchResult, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
 
-	records := &[]massbank.MassBank2{}
-
-	recordsSimilarity := &[]massbank.MassBank2{}
+	similaritySearchResult := &SimilaritySearchResult{} 
 	checkSimilarity := len(peakList) > 0 && peakList[0] != ""
 	if(checkSimilarity && inchi == "" && inchiKey == "" && splash == "") {	
 		fmt.Println(" -> filter by Similarity")	
-		similaritySearchResult, err := GetSimilarity(peakList, []string{}, 0)
+		similaritySearchResultInner, err := GetSimilarity(peakList, []string{}, 0)
 		if err != nil {
 			return nil, err
-		}
-		for _, data := range similaritySearchResult.Data {
-			record, err := db.GetSimpleRecord(&data.Accession)
-			if err != nil {
-				return nil, err
-			}
-			*recordsSimilarity = append(*recordsSimilarity, *record)
-		}
-		fmt.Println("recordsSimilarity: ", len(*recordsSimilarity))
-	}
+		}		
+		similaritySearchResult = similaritySearchResultInner
+		fmt.Println("similaritySearchResult: ", len(similaritySearchResult.Data))
+	}	
 
 	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, intensityCutoff, inchi, inchiKey, contributor)	
 	if err != nil {
@@ -513,35 +507,51 @@ func GetSimpleRecords(instrumentType []string, splash string, msType []string, i
 
 	if(!checkSimilarity || checkFilters) {
 			fmt.Println(" -> filter by Filters")
-			recordsFilters, err = db.GetSimpleRecords(*filters)
+			recordsFilters, err = db.GetSearchRecords(*filters)
 			if err != nil {
 				return nil, err
 			}
 			fmt.Println("recordsFilters: ", len(*recordsFilters))
 	}	
 
-	if(len(*recordsFilters) > 0 && len(*recordsSimilarity) > 0) {	
-		for _, recordSimilarity := range *recordsSimilarity {			
+	results := &SearchResult{}
+	results.Data = []SearchResultDataInner{}
+	if(len(*recordsFilters) > 0 && len(similaritySearchResult.Data) > 0) {	
+		for _, similarityResult := range similaritySearchResult.Data {		
 			for _, recordFilter := range *recordsFilters {
-				if (*recordFilter.Accession == *recordSimilarity.Accession) {					
-					*records = append(*records, recordFilter)
+				if (*recordFilter.Accession == similarityResult.Accession) {										
+					searchResultData := SearchResultDataInner{						
+						Record: *buildSimpleMbRecord(&recordFilter),
+						Score: similarityResult.Score,
+					}
+					results.Data = append(results.Data, searchResultData)
+					break
 				}
 			}
 		}
+	} else if(len(similaritySearchResult.Data) > 0) {
+		for _, similaritySearchResultData := range similaritySearchResult.Data {
+			record, err := db.GetSimpleRecord(&similaritySearchResultData.Accession)
+			if err != nil {
+				return nil, err
+			}
+			searchResultData := SearchResultDataInner{						
+				Record: *buildSimpleMbRecord(record),
+			}
+			results.Data = append(results.Data, searchResultData)
+		}
 	} else if(len(*recordsFilters) > 0) {
-		*records = *recordsFilters
-	} else if(len(*recordsSimilarity) > 0) {
-		*records = *recordsSimilarity
+		for _, record := range *recordsFilters {
+			searchResultData := SearchResultDataInner{						
+				Record: *buildSimpleMbRecord(&record),
+			}
+			results.Data = append(results.Data, searchResultData)
+		}
 	}
 
-	fmt.Println("records: ", len(*records))
+	fmt.Println("results: ", len(results.Data))
 
-	result := []MbRecord{}
-	for _, record := range *records {
-		result = append(result, *buildSimpleMbRecord(&record))
-	}
-	
-	return &result, nil
+	return results, nil
 }
 
 func getEnv(name string, fallback string) string {

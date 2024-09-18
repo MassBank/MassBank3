@@ -17,6 +17,8 @@ import Record from '../../../../types/Record';
 import initFlags from '../../../../utils/initFlags';
 import axios from 'axios';
 import parsePeakListInputField from './utils/parsePeakListAndReferences';
+import SearchResult from '../../../../types/SearchResult';
+import SearchResultData from '../../../../types/SearchResultData';
 
 function SearchView() {
   const ref = useRef(null);
@@ -79,13 +81,16 @@ function SearchView() {
 
     console.log(searchParams);
 
-    const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/simple';
+    const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/search';
     console.log(axios.getUri({ url, params: searchParams }));
-    const _records = await fetchData(url, searchParams);
-    const _hits: Hit[] = _records.map((r: Record) => {
+    const searchResult = (await fetchData(url, searchParams)) as SearchResult;
+    console.log(searchResult);
+
+    const _hits: Hit[] = searchResult.data.map((d: SearchResultData) => {
       const hit: Hit = {
-        accession: r.accession,
-        record: r,
+        record: d.record,
+        accession: d.record.accession,
+        score: d.score,
       };
 
       return hit;
