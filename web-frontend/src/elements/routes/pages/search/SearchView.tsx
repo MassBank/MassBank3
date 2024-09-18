@@ -13,7 +13,6 @@ import { FieldValues } from 'react-hook-form';
 import fetchData from '../../../../utils/fetchData';
 import Content from '../../../../types/Content';
 import buildSearchParams from '../../../../utils/buildSearchParams';
-import Record from '../../../../types/Record';
 import initFlags from '../../../../utils/initFlags';
 import axios from 'axios';
 import parsePeakListInputField from './utils/parsePeakListAndReferences';
