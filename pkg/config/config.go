@@ -15,7 +15,7 @@ type ToolConfig struct {
 	GitRepo   string
 	GitBranch string
 	DataDir   string
-	Drop      bool
+	Init     bool
 }
 
 type ServerConfig struct {
@@ -35,7 +35,7 @@ const (
 	mbGitRepoDefault       = "https://github.com/MassBank/MassBank-data"
 	mbGitBranchDefault     = "main"
 	mbDataDirectoryDefault = ""
-	mbDropAllDefault       = "true"
+	mbDbInitDefault       = "true"
 	serverPortDefault      = "8080"
 	cdkdepictUrlDefault    = "http://cdkdepict"
 )
@@ -51,16 +51,16 @@ func GetToolConfig() ToolConfig {
 	var err error
 	toolConfig.GitRepo = getEnv("MB_GIT_REPO", mbGitRepoDefault)
 	toolConfig.GitBranch = getEnv("MB_GIT_BRANCH", mbGitBranchDefault)
-	var drop = getEnv("MB_DROP_ALL", mbDropAllDefault)
+	var init = getEnv("MB_DB_INIT", mbDbInitDefault)
 	toolConfig.DataDir = getEnv("MB_DATA_DIRECTORY", mbDataDirectoryDefault)
-	toolConfig.Drop, err = strconv.ParseBool(drop)
+	toolConfig.Init, err = strconv.ParseBool(init)
 	if err != nil {
 		log.Println(err.Error())
 	}
 	flag.StringVar(&toolConfig.GitRepo, "git", toolConfig.GitRepo, "git repository. Overwrites environment variable MB_GIT_REPO")
 	flag.StringVar(&toolConfig.GitBranch, "branch", toolConfig.GitBranch, "git branch. Overwrites environment variable MB_GIT_BRANCH")
 	flag.StringVar(&toolConfig.DataDir, "dir", toolConfig.DataDir, "data directory. Overwrites environment variable MB_DATA_DIRECTORY")
-	flag.BoolVar(&toolConfig.Drop, "dropall", toolConfig.Drop, "drop all data. Overwrites environment variable MB_DROP_ALL")
+	flag.BoolVar(&toolConfig.Init, "init", toolConfig.Init, "init the database. Overwrites environment variable MB_DB_INIT")
 	flag.Parse()
 	if len(toolConfig.GitRepo) > 0 && len(toolConfig.DataDir) > 0 {
 		println("Git repo and data directory are set. Using data directory as default and git repo as fallback.")

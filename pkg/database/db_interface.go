@@ -131,8 +131,8 @@ type MB3Database interface {
 	// Count MassBank records in the database.
 	Count() (int64, error)
 
-	// DropAllRecords drops all MassBank records in the Database.
-	DropAllRecords() error
+	// Initialises the database.
+	Init() error
 
 	// GetRecord gets a single MassBank record by the Accession string.
 	// It should return nil and a [NotFoundError] if the record is not in the
@@ -186,27 +186,6 @@ type MB3Database interface {
 	// The second parameter is the database id of the version information. You
 	// can get it from [UpdateMetadata].
 	AddRecords(records []*massbank.MassBank2, metaDataId string) error
-
-	// UpdateRecord will replace an existing MassBank record. Depending on the
-	// upsert parameter it also inserts the record if it not exists.
-	//
-	// The second parameter is the database id of the version information. You
-	// can get it from [UpdateMetadata].
-	//
-	// This should return number of  modified and inserted records, but this is
-	// not implemented for all databases.
-	UpdateRecord(record *massbank.MassBank2, metaDataId string, upsert bool) (uint64, uint64, error)
-
-	// UpdateRecords will replace existing MassBank record. Depending on the
-	// upsert parameter it also inserts the record if it not exists. This should
-	// roll back the whole transaction if the there is an error.
-	//
-	// The second parameter is the database id of the version information. You
-	// can get it from [UpdateMetadata].
-	//
-	// This should return number of  modified and inserted records, but this is
-	// not implemented for all databases.
-	UpdateRecords(records []*massbank.MassBank2, metaDataId string, upsert bool) (uint64, uint64, error)
 
 	GetSmiles(accession *string) (*string, error)
 }

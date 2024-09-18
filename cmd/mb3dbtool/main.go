@@ -28,79 +28,74 @@ func main() {
 			panic(err)
 		}
 	}
+	fmt.Println("Connecting to database...")
 	if err = db.Connect(); err != nil {
 		panic(err)
 	}
-	if userConfig.Drop {
-		if err := db.DropAllRecords(); err != nil {
+
+	if userConfig.Init {
+		fmt.Println("Start initialising database...")
+		if err := db.Init(); err != nil {
 			println(err.Error())
 		}
-	}
-	var mbfiles []*massbank.MassBank2
-	var versionData *massbank.MbMetaData
-	if len(userConfig.DataDir) > 0 {
-		mbfiles, versionData, err = readDirectoryData(userConfig.DataDir)
-		if err != nil {
-			println(err.Error())
+
+		var mbfiles []*massbank.MassBank2
+		var versionData *massbank.MbMetaData
+		if len(userConfig.DataDir) > 0 {
+			fmt.Println("Reading data from directory...")
+			mbfiles, versionData, err = readDirectoryData(userConfig.DataDir)
+			if err != nil {
+				println(err.Error())
+			}
 		}
-	}
-	if mbfiles == nil && len(userConfig.GitRepo) > 0 {
-		mbfiles, versionData, err = readGitData(userConfig.GitRepo, userConfig.GitBranch)
+		if mbfiles == nil && len(userConfig.GitRepo) > 0 {
+			fmt.Println("Reading data from git repository...")
+			mbfiles, versionData, err = readGitData(userConfig.GitRepo, userConfig.GitBranch)
+			if err != nil {
+				panic(err)
+			}
+		}
+		println("Start updating database...")
+
+		// println("Removing indexes...")
+		// err = db.RemoveIndexes()
+		// if err != nil {
+		// 	println("Could not remove indexes: " + err.Error())
+		// 	panic(err)
+		// }
+		println("Updating metadata...")
+		metaId, err := db.UpdateMetadata(versionData)
 		if err != nil {
+			println("Could not update metadata: " + err.Error())
 			panic(err)
 		}
-	}
-	count, err := db.Count()
-	if err != nil {
-		println(err.Error())
-	}
-	println("Start updating database.")
-
-	println("Removing indexes...")
-	err = db.RemoveIndexes()
-	if err != nil {
-		println("Could not remove indexes: " + err.Error())
-		panic(err)
-	}
-	println("Updating metadata...")
-	metaId, err := db.UpdateMetadata(versionData)
-	if err != nil {
-		println("Could not update metadata: " + err.Error())
-		panic(err)
-	}
-	println("Updating records...")
-	if count < 1 {
+		println("Updating records...")	
 		err = db.AddRecords(mbfiles, metaId)
 		if err != nil {
 			panic(err)
 		}
-	} else {
-		_, _, err := db.UpdateRecords(mbfiles, metaId, true)
+		
+		if mbfiles == nil {
+			panic("No files found")
+		}
+		count, err := db.Count()
 		if err != nil {
 			panic(err)
 		}
-	}
-	if err != nil {
-		println("Could not add records: " + err.Error())
-	}
-	if mbfiles == nil {
-		panic("No files found")
-	}
-	count, err = db.Count()
-	if err != nil {
-		panic(err)
-	}
 
-	println("Database filling was successful. ", count, " records in database.")
+		println("Database filling was successful. ", count, " records in database.")
 
-	println("Adding indexes...")
-	err = db.AddIndexes()
-	if err != nil {
-		println("Could not add indexes: " + err.Error())
-		panic(err)
+		println("Adding indexes...")
+		err = db.AddIndexes()
+		if err != nil {
+			println("Could not add indexes: " + err.Error())
+			panic(err)
+		}
+
+		println("Finished database update.")
+	} else {
+		println("Database initialisation was skipped.")
 	}
-
-	println("Finished database update.")
 }
 
 func readDirectoryData(dir string) ([]*massbank.MassBank2, *massbank.MbMetaData, error) {

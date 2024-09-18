@@ -174,7 +174,7 @@ func (p *PostgresSQLDB) Connect() error {
 			p.database = db
 		}
 	}
-	return p.init()
+	return nil
 }
 
 func (p *PostgresSQLDB) Ping() error {
@@ -217,25 +217,6 @@ func (p *PostgresSQLDB) IsEmpty() (bool, error) {
 		return false, err
 	}
 	return count == 0, nil
-}
-
-// DropAllRecords see [MB3Database.DropAllRecords]
-func (p *PostgresSQLDB) DropAllRecords() error {
-	var err error
-	if err = p.checkDatabase(); err != nil {
-		return err
-	}
-	q := "DROP TABLE massbank CASCADE;"
-	_, err = p.database.Exec(q)
-	if err != nil {
-		return err
-	}
-	q = "DROP TABLE metadata CASCADE;"
-	_, err = p.database.Exec(q)
-	if err != nil {
-		return err
-	}
-	return p.init()
 }
 
 // GetRecord see [MB3Database.GetRecord]
@@ -1341,100 +1322,17 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId str
 		}	
 	}
 
-	return err
+	return nil
 }
 
-// UpdateRecord see [MB3Database.UpdateRecord]
-func (p *PostgresSQLDB) UpdateRecord(record *massbank.MassBank2, metaDataId string, upsert bool) (uint64, uint64, error) {
-	records := []*massbank.MassBank2{record}
-	return p.UpdateRecords(records, metaDataId, upsert)
-}
-
-// UpdateRecords see [MB3Database.UpdateRecords]
-func (p *PostgresSQLDB) UpdateRecords(records []*massbank.MassBank2, metaDataId string, upsert bool) (uint64, uint64, error) {
-	var err error
-	if err = p.checkDatabase(); err != nil {
-		return 0, 0, err
-	}
-	// mid, err := strconv.ParseInt(metaDataId, 10, 64)
-	// if err != nil {
-	// 	return 0, 0, err
-	// }
-	var inserted int64 = 0
-	var modified int64 = 0
-	// var last int64 = 0
-	// var q string
-	// if upsert {
-	// 	q = `
-	// 	INSERT INTO massbank(
-    //                  filename,
-    //                  document,
-    //                  metadata_id)
-	// 		VALUES ($1,$2,$3)
-	// 		ON CONFLICT (accession),metadata_id) DO UPDATE 
-	// 			SET filename = $1,
-	// 			    document = $2;
-	// 	`
-
-	// } else {
-	// 	q = `
-	// 	UPDATE massbank 
-	// 		SET filename = $1,
-	// 		    document = $2
-	// 		WHERE (accession) = $4 
-	// 		  AND  metadata_id= $3 `
-	// }
-	// tx, err := p.database.Begin()
-	// stmt, err := tx.Prepare(q)
-	// if err != nil {
-	// 	return 0, 0, err
-	// }
-	// for _, r := range records {
-	// 	js, err := json.Marshal(r)
-	// 	if err != nil {
-	// 		if err2 := tx.Rollback(); err2 != nil {
-	// 			return 0, 0, errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
-	// 		}
-	// 		return uint64(modified), uint64(inserted), err
-	// 	}
-	// 	var res sql.Result
-	// 	if upsert {
-	// 		res, err = stmt.Exec(r.Metadata.FileName, js, mid)
-	// 	} else {
-	// 		acc, _ := json.Marshal(r.Accession)
-	// 		res, err = stmt.Exec(r.Metadata.FileName, js, mid, acc)
-	// 	}
-	// 	if err != nil {
-	// 		if err2 := tx.Rollback(); err2 != nil {
-	// 			return 0, 0, errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
-	// 		}
-	// 		return 0, 0, err
-	// 	}
-	// 	if res != nil {
-	// 		mod, _ := res.RowsAffected()
-	// 		modified += mod
-	// 		l, _ := res.LastInsertId()
-	// 		if last != l {
-	// 			last = l
-	// 			inserted += 1
-	// 		}
-	// 	}		
-	//
-	// }
-	//
-	// return uint64(modified), uint64(inserted), tx.Commit()
-
-	return uint64(modified), uint64(inserted), err
-}
-
-func (p *PostgresSQLDB) init() error {
+func (p *PostgresSQLDB) Init() error {
 	var err error
 	var query = 
 		`
-		-- DROP SCHEMA public CASCADE;
-		-- CREATE SCHEMA public;
+		DROP SCHEMA public CASCADE;
+		CREATE SCHEMA public;
 
-		CREATE TABLE IF NOT EXISTS metadata (
+		CREATE TABLE metadata (
 			id SERIAL PRIMARY KEY,
 			commit char(40),
 			timestamp timestamp NOT NULL,
@@ -1442,7 +1340,7 @@ func (p *PostgresSQLDB) init() error {
 			UNIQUE (commit, timestamp, version)
 		);
 
-		CREATE TABLE IF NOT EXISTS massbank (
+		CREATE TABLE massbank (
 			id SERIAL PRIMARY KEY,
 			filename TEXT NOT NULL,
 			accession VARCHAR(40) NOT NULL UNIQUE,	
@@ -1454,54 +1352,54 @@ func (p *PostgresSQLDB) init() error {
 		);
 
 		-- contributor
-		CREATE TABLE IF NOT EXISTS contributor (
+		CREATE TABLE contributor (
 			id SERIAL PRIMARY KEY,
 			name TEXT NOT NULL,
 			UNIQUE (name)
 		);
-		CREATE TABLE IF NOT EXISTS accession_contributor (
+		CREATE TABLE accession_contributor (
 			massbank_id INT REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			contributor_id INT NOT NULL REFERENCES contributor(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (massbank_id, contributor_id)
 		);
 
 		-- author
-		CREATE TABLE IF NOT EXISTS author (
+		CREATE TABLE author (
 			id SERIAL PRIMARY KEY,
 			name TEXT NOT NULL
 		);
-		CREATE TABLE IF NOT EXISTS accession_author (
+		CREATE TABLE accession_author (
 			massbank_id INT REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			author_id INT NOT NULL REFERENCES author(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (massbank_id, author_id)
 		);
 
 		-- license
-		CREATE TABLE IF NOT EXISTS license (
+		CREATE TABLE license (
 			id SERIAL PRIMARY KEY,
 			name TEXT NOT NULL,
 			UNIQUE (name)
 		);
-		CREATE TABLE IF NOT EXISTS accession_license (
+		CREATE TABLE accession_license (
 			massbank_id INT REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			license_id INT NOT NULL REFERENCES license(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (massbank_id, license_id)
 		);
 
 		-- publication
-		CREATE TABLE IF NOT EXISTS publication (
+		CREATE TABLE publication (
 			id SERIAL PRIMARY KEY,
 			name TEXT NOT NULL,
 			UNIQUE (name)
 		);
-		CREATE TABLE IF NOT EXISTS accession_publication (
+		CREATE TABLE accession_publication (
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			publication_id INT NOT NULL REFERENCES publication(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (massbank_id, publication_id)
 		);
 
 		-- compound
-		CREATE TABLE IF NOT EXISTS compound (
+		CREATE TABLE compound (
 			id SERIAL PRIMARY KEY,
 			inchi TEXT NOT NULL,
 			formula TEXT NOT NULL,
@@ -1509,19 +1407,19 @@ func (p *PostgresSQLDB) init() error {
 			mass FLOAT NOT NULL,
 			UNIQUE (inchi, formula, smiles, mass)
 		);
-		CREATE TABLE IF NOT EXISTS compound_name (
+		CREATE TABLE compound_name (
 			name TEXT NOT NULL,
 			compound_id INT NOT NULL REFERENCES compound(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (name, compound_id, massbank_id)		
 		);
-		CREATE TABLE IF NOT EXISTS compound_class (
+		CREATE TABLE compound_class (
 			class TEXT NOT NULL,
 			compound_id INT NOT NULL REFERENCES compound(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (class, compound_id, massbank_id)
 		);
-		CREATE TABLE IF NOT EXISTS compound_link (
+		CREATE TABLE compound_link (
 			database TEXT NOT NULL,
 			identifier TEXT NOT NULL,
 			compound_id INT NOT NULL REFERENCES compound(id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -1530,40 +1428,40 @@ func (p *PostgresSQLDB) init() error {
 		);
 
 		-- acquisition
-		CREATE TABLE IF NOT EXISTS acquisition_instrument (
+		CREATE TABLE acquisition_instrument (
 			id SERIAL PRIMARY KEY,
 			instrument TEXT NOT NULL,
 			instrument_type TEXT NOT NULL,
 			UNIQUE (instrument, instrument_type)
 		);
-		CREATE TABLE IF NOT EXISTS accession_acquisition (
+		CREATE TABLE accession_acquisition (
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			acquisition_instrument_id INT NOT NULL REFERENCES acquisition_instrument(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
-		CREATE TABLE IF NOT EXISTS acquisition_mass_spectrometry (
+		CREATE TABLE acquisition_mass_spectrometry (
 			subtag TEXT NOT NULL,
 			value TEXT NOT NULL,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
-		CREATE TABLE IF NOT EXISTS acquisition_chromatography (
+		CREATE TABLE acquisition_chromatography (
 			subtag TEXT NOT NULL,
 			value TEXT NOT NULL,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
-		CREATE TABLE IF NOT EXISTS acquisition_general (
+		CREATE TABLE acquisition_general (
 			subtag TEXT NOT NULL,
 			value TEXT NOT NULL,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
 
 		-- mass spectrometry
-		CREATE TABLE IF NOT EXISTS mass_spectrometry_focused_ion (
+		CREATE TABLE mass_spectrometry_focused_ion (
 			subtag TEXT NOT NULL,
 			value TEXT NOT NULL,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (subtag, value, massbank_id)
 		);
-		CREATE TABLE IF NOT EXISTS mass_spectrometry_data_processing (
+		CREATE TABLE mass_spectrometry_data_processing (
 			subtag TEXT NOT NULL,
 			value TEXT NOT NULL,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -1571,13 +1469,13 @@ func (p *PostgresSQLDB) init() error {
 		);
 
 		-- spectrum (peak)
-		CREATE TABLE IF NOT EXISTS spectrum (
+		CREATE TABLE spectrum (
 			id SERIAL PRIMARY KEY,
 			splash TEXT NOT NULL,
 			num_peak INT NOT NULL,			
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
-		CREATE TABLE IF NOT EXISTS peak (
+		CREATE TABLE peak (
 			mz FLOAT NOT NULL,
 			intensity FLOAT NOT NULL,
 			relative_intensity FLOAT NOT NULL,	
@@ -1592,11 +1490,11 @@ func (p *PostgresSQLDB) init() error {
 		
 
 		-- project
-		-- CREATE TABLE IF NOT EXISTS project (
+		-- CREATE TABLE project (
 		-- 	id SERIAL PRIMARY KEY,
 		-- 	name TEXT NOT NULL UNIQUE
 		-- );
-		-- CREATE TABLE IF NOT EXISTS accession_project (
+		-- CREATE TABLE accession_project (
 		-- 	massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 		-- 	project_id INT NOT NULL REFERENCES project(id) ON UPDATE CASCADE ON DELETE CASCADE,
 		-- 	UNIQUE (massbank_id, project_id)
@@ -1604,7 +1502,7 @@ func (p *PostgresSQLDB) init() error {
 		
 		-- species (sample)
 
-		CREATE TABLE IF NOT EXISTS browse_options (
+		CREATE TABLE browse_options (
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			accession VARCHAR(40) NOT NULL REFERENCES massbank(accession) ON UPDATE CASCADE ON DELETE CASCADE,
 			contributor TEXT NOT NULL REFERENCES contributor(name) ON UPDATE CASCADE ON DELETE CASCADE,
