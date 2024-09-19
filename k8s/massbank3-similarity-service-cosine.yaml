@@ -6,11 +6,7 @@ metadata:
   labels:
     app: massbank3-similarity-service-cosine
 data:
-  DB_PORT: "5432"
-  DB_PASSWORD: "massbank3password"
-  DB_HOST: "massbank3-postgres-service"
-  DB_NAME: "massbank3"
-  DB_USER: "massbank3"
+  MSP: "/msp/MassBank_NIST.msp"
 
 ---
 apiVersion: apps/v1
@@ -32,11 +28,29 @@ spec:
     spec:
       containers:
         - name: massbank3-frontend
-          image: ipbhalle/massbank3-similarity-service-cosine:dev # Container Image
+          image: ipbhalle/massbank3-similarity-service:latest # Container Image
+          imagePullPolicy: Always
           envFrom:
             - configMapRef:
                 name:
                   massbank3-similarity-service-cosine-secret
+          volumeMounts:
+            - mountPath: /msp
+              name: massbank3-similarity-service-cosine-volume
+      initContainers:
+        - name: install
+          image: busybox:latest
+          command:
+            - wget
+            - "-O"
+            - "/msp/MassBank_NIST.msp"
+            - https://github.com/MassBank/MassBank-data/releases/latest/download/MassBank_NIST.msp
+          volumeMounts:
+            - mountPath: /msp
+              name: massbank3-similarity-service-cosine-volume
+      volumes:
+        - name: massbank3-similarity-service-cosine-volume
+          emptyDir: { }
 ---
 apiVersion: v1
 kind: Service
