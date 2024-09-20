@@ -13,7 +13,7 @@ function buildSearchParams(cont: Content | undefined) {
           .filter((_vc) => _vc.flag === true)
           .map((_vc) => _vc.value);
         if (filtered.length !== valueCounts.length) {
-          searchParams[k] = filtered;
+          searchParams[k] = [filtered.join(',')];
         }
       });
   }
