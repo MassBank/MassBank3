@@ -46,6 +46,8 @@ function AccessionView() {
         document.title = rec.compound.names[0] + ' Mass Spectrum';
       }
       setRecord(rec);
+    } else {
+      setRecord(undefined);
     }
     setIsRequesting(false);
   }, []);
