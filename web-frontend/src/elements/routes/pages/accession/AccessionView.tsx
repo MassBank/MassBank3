@@ -36,7 +36,7 @@ function AccessionView() {
     const rec: Record | undefined = await getRecord(id);
     console.log(rec);
 
-    if (rec) {
+    if (rec && typeof rec === 'object') {
       rec.peak.peak.values = rec.peak.peak.values.map((p) => {
         const _p = p;
         _p.id = generateID();
@@ -45,8 +45,8 @@ function AccessionView() {
       if (rec.compound && rec.compound.names && rec.compound.names.length > 0) {
         document.title = rec.compound.names[0] + ' Mass Spectrum';
       }
+      setRecord(rec);
     }
-    setRecord(rec);
     setIsRequesting(false);
   }, []);
 
