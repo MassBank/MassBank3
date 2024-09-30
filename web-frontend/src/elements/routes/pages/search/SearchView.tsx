@@ -18,6 +18,7 @@ import axios from 'axios';
 import parsePeakListInputField from './utils/parsePeakListAndReferences';
 import SearchResult from '../../../../types/SearchResult';
 import SearchResultData from '../../../../types/SearchResultData';
+import BasicSearchFilterOptions from '../../../../types/filterOptions/basicSearchFilterOptions';
 
 function SearchView() {
   const ref = useRef(null);
@@ -78,6 +79,30 @@ function SearchView() {
       searchParams['splash'] = [splash];
     }
 
+    const _basicSearchFilterOptions = formData[
+      'basicSearchFilterOptions'
+    ] as BasicSearchFilterOptions;
+
+    const compoundName = _basicSearchFilterOptions.compoundName.trim();
+    if (compoundName.length > 0) {
+      searchParams['compound_name'] = [compoundName];
+    }
+    const formula = _basicSearchFilterOptions.formula.trim();
+    if (formula.length > 0) {
+      searchParams['formula'] = [formula];
+    }
+    const exactMass = _basicSearchFilterOptions.exactMass.trim();
+    if (exactMass.length > 0) {
+      searchParams['exact_mass'] = [exactMass];
+
+      const massTolerance = _basicSearchFilterOptions.massTolerance.trim();
+      if (exactMass.length > 0) {
+        searchParams['mass_tolerance'] = [massTolerance];
+      } else {
+        searchParams['mass_tolerance'] = ['0.0'];
+      }
+    }
+
     console.log(searchParams);
 
     const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/search';
@@ -85,15 +110,17 @@ function SearchView() {
     const searchResult = (await fetchData(url, searchParams)) as SearchResult;
     console.log(searchResult);
 
-    const _hits: Hit[] = searchResult.data.map((d: SearchResultData) => {
-      const hit: Hit = {
-        record: d.record,
-        accession: d.record.accession,
-        score: d.score,
-      };
+    const _hits: Hit[] = searchResult.data
+      ? searchResult.data.map((d: SearchResultData) => {
+          const hit: Hit = {
+            record: d.record,
+            accession: d.record.accession,
+            score: d.score,
+          };
 
-      return hit;
-    });
+          return hit;
+        })
+      : [];
 
     setHits(_hits);
 

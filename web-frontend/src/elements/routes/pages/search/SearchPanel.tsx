@@ -70,7 +70,7 @@ function SearchPanel({
       instrument_type: msSpecFilterOptions?.instrument_type,
       ms_type: msSpecFilterOptions?.ms_type,
       ion_mode: msSpecFilterOptions?.ion_mode,
-    });
+    } as Content);
   }, [msSpecFilterOptions, setValue]);
 
   const handleOnSelect = useCallback(
@@ -111,7 +111,96 @@ function SearchPanel({
             <SubMenu
               label={<FontAwesomeIcon icon={faSliders} />}
               suffix={collapsed ? '' : 'Basic Search'}
-            ></SubMenu>
+            >
+              <div
+                className="basic-search-input-container"
+                style={{ width, height: 250 }}
+              >
+                <div className="input-container">
+                  <label>Compound Name</label>
+                  <textarea
+                    placeholder="Enter a compound name. For example:&#10;&#10;Rutin"
+                    {...register('basicSearchFilterOptions.compoundName', {
+                      required: false,
+                    })}
+                    style={{
+                      width: width / 2 - 5,
+                      height: 70,
+                      resize: 'none',
+                    }}
+                  />
+                  <Button
+                    child={'Load Example'}
+                    onClick={() =>
+                      setValue('basicSearchFilterOptions.compoundName', 'Rutin')
+                    }
+                  />
+                </div>
+                <div className="input-container">
+                  <label>Molecular Formula</label>
+                  <textarea
+                    placeholder="Enter a molecular formula. For example:&#10;&#10;C27H30O16"
+                    {...register('basicSearchFilterOptions.formula', {
+                      required: false,
+                    })}
+                    style={{
+                      width: width / 2 - 5,
+                      height: 70,
+                      resize: 'none',
+                    }}
+                  />
+                  <Button
+                    child={'Load Example'}
+                    onClick={() =>
+                      setValue('basicSearchFilterOptions.formula', 'C27H30O16')
+                    }
+                  />
+                </div>
+                <div className="input-container">
+                  <label>Exact Mass</label>
+                  <textarea
+                    placeholder="Enter an exact mass. For example:&#10;&#10;610.15338"
+                    {...register('basicSearchFilterOptions.exactMass', {
+                      required: false,
+                    })}
+                    style={{
+                      width: width / 2 - 5,
+                      height: 70,
+                      resize: 'none',
+                    }}
+                  />
+                  <Button
+                    child={'Load Example'}
+                    onClick={() =>
+                      setValue(
+                        'basicSearchFilterOptions.exactMass',
+                        '610.15338',
+                      )
+                    }
+                  />
+                </div>
+                <div className="input-container">
+                  <label>Mass Tolerance</label>
+                  <textarea
+                    placeholder="Enter a tolerance. For example:&#10;&#10;0.1"
+                    {...register('basicSearchFilterOptions.massTolerance', {
+                      required: false,
+                    })}
+                    style={{
+                      width: width / 2 - 5,
+                      height: 70,
+                      resize: 'none',
+                    }}
+                  />
+                  <Button
+                    child={'Load Example'}
+                    onClick={() =>
+                      setValue('basicSearchFilterOptions.massTolerance', '0.1')
+                    }
+                  />
+                </div>
+              </div>
+            </SubMenu>
             <SubMenu
               label={<FontAwesomeIcon icon={faChartColumn} />}
               suffix={collapsed ? '' : 'Peaks'}
@@ -144,15 +233,15 @@ function SearchPanel({
                 </div>
                 <Button
                   child={'Load Example'}
-                  onClick={() => {
+                  onClick={() =>
                     setValue(
                       'peakListInputField',
                       referencePeakList.join('\n'),
                       {
                         shouldValidate: true,
                       },
-                    );
-                  }}
+                    )
+                  }
                 />
               </SubMenu>
               <SubMenu label="Peaks" className="submenu"></SubMenu>
@@ -164,7 +253,7 @@ function SearchPanel({
             >
               <div className="input-container">
                 <textarea
-                  placeholder="InChi or InChIKey, Example:&#10;InChI=1S/C10H10O3/c1-6-5-7-3-2-4-8(11)9(7)10(12)13-6/h2-4,6,11H,5H2,1H3 or &#10;KWILGNNWGSNMPA-UHFFFAOYSA-N"
+                  placeholder="InChi or InChIKey, Example:&#10;IKGXIBQEEMLURG-NVPNHPEKSA-N"
                   {...register('inchiInputField', {
                     required: false,
                   })}
@@ -177,12 +266,9 @@ function SearchPanel({
               </div>
               <Button
                 child={'Load Example'}
-                onClick={() => {
-                  setValue(
-                    'inchiInputField',
-                    'InChI=1S/C10H10O3/c1-6-5-7-3-2-4-8(11)9(7)10(12)13-6/h2-4,6,11H,5H2,1H3',
-                  );
-                }}
+                onClick={() =>
+                  setValue('inchiInputField', 'IKGXIBQEEMLURG-NVPNHPEKSA-N')
+                }
               />
             </SubMenu>
             <SubMenu
@@ -191,7 +277,7 @@ function SearchPanel({
             >
               <div className="input-container">
                 <textarea
-                  placeholder="Example:&#10;splash10-03fr-0900000000-035ec76d23650a15673b"
+                  placeholder="Example:&#10;splash10-0wmi-0009506000-98ca7f7c8f3072af4481"
                   {...register('splashInputField', {
                     required: false,
                   })}
@@ -204,12 +290,12 @@ function SearchPanel({
               </div>
               <Button
                 child={'Load Example'}
-                onClick={() => {
+                onClick={() =>
                   setValue(
                     'splashInputField',
-                    'splash10-03fr-0900000000-035ec76d23650a15673b',
-                  );
-                }}
+                    'splash10-0wmi-0009506000-98ca7f7c8f3072af4481',
+                  )
+                }
               />
             </SubMenu>
             <SubMenu

@@ -129,7 +129,7 @@ func buildFilters(instrumentType []string, splash string, msType []string, ionMo
 		IonMode:           getIonMode(ionMode),
 		CompoundName:      compoundName,
 		Mass:              _exactMass,
-		MassEpsilon:       nil,
+		MassEpsilon:       &massTolerance,
 		Formula:           formula,
 		Peaks:             nil,
 		PeakDifferences:   nil,

@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Code-Hex/dd"
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"github.com/lib/pq"
 )
@@ -105,6 +104,7 @@ func (db *PostgresSQLDB) GetIndexes() []Index {
 	indexes = append(indexes, Index{IndexName: "browse_options_inchikey_index", TableName: "browse_options", Columns: []string{"inchikey"}})
 	indexes = append(indexes, Index{IndexName: "browse_options_splash_index", TableName: "browse_options", Columns: []string{"splash"}})
 	indexes = append(indexes, Index{IndexName: "browse_options_formula_index", TableName: "browse_options", Columns: []string{"formula"}})
+	indexes = append(indexes, Index{IndexName: "browse_options_mass_index", TableName: "browse_options", Columns: []string{"mass"}})
 
 	return indexes
 }
@@ -539,11 +539,9 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 	var mz_vec []float64
 	var intensity_vec []float64
 	var relative_intensity_vec []int32
-	var inchi string
-	var inchikey string;
-	var splash string
 	var formula string
-	var query = "SELECT massbank_id, accession, title, smiles, mz_vec, intensity_vec, relative_intensity_vec, inchi, inchikey, splash, formula FROM browse_options WHERE accession = $1;"
+	var mass float64
+	var query = "SELECT massbank_id, accession, title, smiles, mz_vec, intensity_vec, relative_intensity_vec, formula, mass FROM browse_options WHERE accession = $1;"
 	err := p.database.QueryRow(query, *s).Scan(
 		&massbankId,
 		&accession,
@@ -552,10 +550,8 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 		(*pq.Float64Array)(&mz_vec),
 		(*pq.Float64Array)(&intensity_vec),
 		(*pq.Int32Array)(&relative_intensity_vec),
-		&inchi,
-		&inchikey,
-		&splash,
 		&formula,
+		&mass,
 	); 
 	if err != nil {
 		return nil, err
@@ -566,10 +562,6 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 	result.Compound = massbank.CompoundProperties{
 		Smiles: &smiles,
 		Formula: &formula,
-		InChI: &inchi,
-		Link: &[]massbank.DatabaseProperty{
-			{Database: "INCHIKEY", Identifier: inchikey},
-		},
 	}
 	
 	result.Peak = massbank.PeakProperties{}
@@ -580,7 +572,7 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 		Intensity: intensity_vec, 
 		Rel: relative_intensity_vec,
 	}
-	result.Peak.Splash = &splash
+	result.Compound.Mass = &mass
 	
 	return &result, err
 }
@@ -728,13 +720,35 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) string {
 		}
 	}
 
+	if(filters.Mass != nil && filters.MassEpsilon != nil) {
+		subQuery := "ABS(mass - " + strconv.FormatFloat(*filters.Mass, 'f', -1, 64) + ") <= " + strconv.FormatFloat(*filters.MassEpsilon, 'f', -1, 64)
+		if(addedWhere || addedAnd) {
+			query = query + " AND " + subQuery
+			addedAnd = true
+		} else {
+			query = query + " WHERE " + subQuery
+			addedWhere = true
+		}
+	}
+
+	if(filters.CompoundName != "") {
+		subQuery := "massbank_id IN (SELECT DISTINCT(massbank_id) FROM compound_name WHERE LOWER(name) LIKE LOWER('%" + filters.CompoundName + "%'))"
+		if(addedWhere || addedAnd) {
+			query = query + " AND " + subQuery
+			addedAnd = true
+		} else {
+			query = query + " WHERE " + subQuery
+			addedWhere = true
+		}
+	}
+
 	return query
 }
 
 func (p *PostgresSQLDB) GetAccessionsByFilterOptions(filters Filters) ([]string, error) {
 	var accessions = []string{}
 	query := "SELECT accession FROM browse_options"
-	query = query + p.BuildBrowseOptionsWhere(filters) + ";"
+	query = query + p.BuildBrowseOptionsWhere(filters) + " ORDER BY contributor, accession;"
 
 	rows, err := p.database.Query(query)
 	if err != nil {
@@ -1291,7 +1305,7 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId str
 			}
 		}
 
-		q = `INSERT INTO browse_options (massbank_id, accession, contributor, instrument_type, ms_type, ion_mode, title, smiles, mz_vec, intensity_vec, relative_intensity_vec, inchi, inchikey, splash, formula) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);`
+		q = `INSERT INTO browse_options (massbank_id, accession, contributor, instrument_type, ms_type, ion_mode, title, smiles, mz_vec, intensity_vec, relative_intensity_vec, inchi, inchikey, splash, formula, mass) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);`
 		var msType string 
 		var ionMode string
 		for _, subProp := range *record.Acquisition.MassSpectrometry {
@@ -1304,7 +1318,7 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId str
 				break
 			}
 		}
-		_, err = tx.Exec(q, massbankId, *record.Accession, *record.Contributor, *record.Acquisition.InstrumentType, msType, ionMode, *record.RecordTitle, *record.Compound.Smiles, pq.Array(record.Peak.Peak.Mz), pq.Array(record.Peak.Peak.Intensity), pq.Array(record.Peak.Peak.Rel), *record.Compound.InChI, inchikey, *record.Peak.Splash, *record.Compound.Formula)
+		_, err = tx.Exec(q, massbankId, *record.Accession, *record.Contributor, *record.Acquisition.InstrumentType, msType, ionMode, *record.RecordTitle, *record.Compound.Smiles, pq.Array(record.Peak.Peak.Mz), pq.Array(record.Peak.Peak.Intensity), pq.Array(record.Peak.Peak.Rel), *record.Compound.InChI, inchikey, *record.Peak.Splash, *record.Compound.Formula, *record.Compound.Mass)
 		if err != nil {
 			fmt.Println("Error: ", err)
 			if err2 := tx.Rollback(); err2 != nil {
@@ -1517,7 +1531,8 @@ func (p *PostgresSQLDB) Init() error {
 			inchi TEXT NOT NULL,
 			inchikey TEXT NOT NULL,
 			splash TEXT NOT NULL,
-			formula TEXT NOT NULL
+			formula TEXT NOT NULL,
+			mass FLOAT NOT NULL
 		);
 
 		`;
@@ -1533,15 +1548,4 @@ func (p *PostgresSQLDB) checkDatabase() error {
 		return errors.New("database not ready")
 	}
 	return p.database.Ping()
-}
-
-func (p *PostgresSQLDB) GetSmiles(accession *string) (*string, error) {
-	var result string
-	var b []byte
-	if err := p.database.QueryRow("SELECT document->'compound'->>'smiles' FROM massbank WHERE document->>'accession' = $1", *accession).Scan(&b); err != nil {
-		return nil, err
-	}
-	println(dd.Dump(b))
-	result = string(b)
-	return &result, nil
 }

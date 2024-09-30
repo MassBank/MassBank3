@@ -186,8 +186,6 @@ type MB3Database interface {
 	// The second parameter is the database id of the version information. You
 	// can get it from [UpdateMetadata].
 	AddRecords(records []*massbank.MassBank2, metaDataId string) error
-
-	GetSmiles(accession *string) (*string, error)
 }
 
 var db MB3Database
