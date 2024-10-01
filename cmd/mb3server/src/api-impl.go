@@ -530,13 +530,14 @@ func GetSearchRecords(instrumentType []string, splash string, msType []string, i
 			}
 		}
 	} else if(len(similaritySearchResult.Data) > 0) {
-		for _, similaritySearchResultData := range similaritySearchResult.Data {
-			record, err := db.GetSimpleRecord(&similaritySearchResultData.Accession)
+		for _, similarityResult := range similaritySearchResult.Data {
+			record, err := db.GetSimpleRecord(&similarityResult.Accession)
 			if err != nil {
 				return nil, err
 			}
 			searchResultData := SearchResultDataInner{						
 				Record: *buildSimpleMbRecord(record),
+				Score: similarityResult.Score,
 			}
 			results.Data = append(results.Data, searchResultData)
 		}
