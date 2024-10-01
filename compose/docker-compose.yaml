@@ -57,6 +57,9 @@ services:
       - DB_HOST
       - DB_NAME
       - DB_USER
+      - MSP
+    volumes:
+      - "${MSP_VOLUME_PATH}${MSP}:${MSP}"
 
   mb3frontend:
     build:
