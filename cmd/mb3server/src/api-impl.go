@@ -516,7 +516,7 @@ func GetSearchRecords(instrumentType []string, splash string, msType []string, i
 
 	results := &SearchResult{}
 	results.Data = []SearchResultDataInner{}
-	if(len(*recordsFilters) > 0 && len(similaritySearchResult.Data) > 0) {	
+	if(len(similaritySearchResult.Data) > 0 && len(*recordsFilters) > 0) {	
 		for _, similarityResult := range similaritySearchResult.Data {		
 			for _, recordFilter := range *recordsFilters {
 				if (*recordFilter.Accession == similarityResult.Accession) {										
