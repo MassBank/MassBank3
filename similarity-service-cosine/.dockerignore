@@ -1,7 +1,0 @@
-#project files and folders
-.idea/
-Dockerfile
-
-#generated folders
-gen/
-venv/
