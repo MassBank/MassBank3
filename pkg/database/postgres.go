@@ -748,7 +748,14 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) string {
 func (p *PostgresSQLDB) GetAccessionsByFilterOptions(filters Filters) ([]string, error) {
 	var accessions = []string{}
 	query := "SELECT accession FROM browse_options"
-	query = query + p.BuildBrowseOptionsWhere(filters) + " ORDER BY contributor, accession;"
+	query = query + p.BuildBrowseOptionsWhere(filters)
+	if(filters.Mass != nil && filters.MassEpsilon != nil) {
+		query = query + " ORDER BY ABS(mass - " + strconv.FormatFloat(*filters.Mass, 'f', -1, 64) + ");"
+	} else {
+		query = query + " ORDER BY contributor, accession;"
+	}
+
+	fmt.Println("query: ", query)
 
 	rows, err := p.database.Query(query)
 	if err != nil {
