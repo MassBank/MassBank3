@@ -25,9 +25,6 @@ jobs:
           - dockerfile: ./Dockerfile-frontend
             image: ipbhalle/massbank3-frontend
             context: .
-          - dockerfile: ./similarity-service-cosine/Dockerfile
-            image: ipbhalle/massbank3-similarity-service-cosine
-            context: ./similarity-service-cosine
 
     steps:
       - name: Checkout
