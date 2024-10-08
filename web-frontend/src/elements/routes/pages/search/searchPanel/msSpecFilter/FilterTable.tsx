@@ -7,9 +7,9 @@ import {
   useMemo,
   useState,
 } from 'react';
-import ValueCount from '../../../../../types/ValueCount';
 import FilterTableData from './FilterTableData';
-import Button from '../../../../basic/Button';
+import ValueCount from '../../../../../../types/ValueCount';
+import Button from '../../../../../basic/Button';
 
 type InputProps = {
   filterOptions: ValueCount[];

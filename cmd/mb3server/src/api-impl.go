@@ -53,7 +53,7 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 		Inchi: 			   "",
 		InchiKey:          "",
 		Contributor:       co,
-		IntensityCutoff:   nil,
+		Intensity:   nil,
 	}
 	vals, err := db.GetUniqueValues(filters)
 	if err != nil {
@@ -98,7 +98,7 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 	return &result, nil
 }
 
-func buildFilters(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchi string, inchiKey string, contributor []string) (*database.Filters, error) {
+func buildFilters(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, inchi string, inchiKey string, contributor []string) (*database.Filters, error) {
 	it := &instrumentType
 	if len(*it) == 0 || (len(*it) == 1 && (*it)[0] == "") {
 		it = nil
@@ -119,8 +119,22 @@ func buildFilters(instrumentType []string, splash string, msType []string, ionMo
 		_exactMass = nil
 	}
 
+	var _peaks *[]float64
+	if len(peaks) > 0 && peaks[0] != "" {
+		_peaks = &[]float64{}
+		for _, p := range peaks {
+			peak, err := strconv.ParseFloat(p, 64)
+			if err != nil {
+				return nil, err
+			}
+			*_peaks = append(*_peaks, peak)
+		}
+	} else {
+		_peaks = nil
+	}
 
-	// _intensityCutoff := int64(intensityCutoff)
+
+	_intensity := int64(intensity)
 
 	var filters = database.Filters{
 		InstrumentType:    it,
@@ -131,12 +145,12 @@ func buildFilters(instrumentType []string, splash string, msType []string, ionMo
 		Mass:              _exactMass,
 		MassEpsilon:       &massTolerance,
 		Formula:           formula,
-		Peaks:             nil,
+		Peaks:             _peaks,
 		PeakDifferences:   nil,
 		Inchi: 			   inchi,
 		InchiKey:          inchiKey,
 		Contributor:       co,
-		IntensityCutoff:   nil, //&_intensityCutoff,
+		Intensity:   &_intensity,
 	}
 
 	return &filters, nil
@@ -451,12 +465,12 @@ func GetSimpleRecord(accession string) (*MbRecord, error) {
 	return &result, nil
 }
 
-func GetRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchi string, inchiKey string, contributor []string) (*[]MbRecord, error) {
+func GetRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, inchi string, inchiKey string, contributor []string) (*[]MbRecord, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
 
-	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, intensityCutoff, inchi, inchiKey, contributor)
+	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, inchi, inchiKey, contributor)
 	if err != nil {
 		return nil, err
 	}
@@ -475,7 +489,7 @@ func GetRecords(instrumentType []string, splash string, msType []string, ionMode
 
 
 
-func GetSearchRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, intensityCutoff int32, inchi string, inchiKey string, contributor []string) (*SearchResult, error) {
+func GetSearchRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, inchi string, inchiKey string, contributor []string) (*SearchResult, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
@@ -492,7 +506,7 @@ func GetSearchRecords(instrumentType []string, splash string, msType []string, i
 		fmt.Println("similaritySearchResult: ", len(similaritySearchResult.Data))
 	}	
 
-	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, intensityCutoff, inchi, inchiKey, contributor)	
+	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, inchi, inchiKey, contributor)	
 	if err != nil {
 		return nil, err
 	}

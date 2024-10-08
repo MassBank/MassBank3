@@ -78,12 +78,6 @@ paths:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/PeakList"
         required: false
       - in: query
-        name: intensity_cutoff
-        description: "The Instensity cutoff for Peaklist search. Default: 5"
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/IntensityCutoff"
-        required: false
-      - in: query
         name: inchi
         description: Filter by InChI
         schema:
@@ -184,12 +178,6 @@ paths:
         description: Filter by peak list.
         schema:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/PeakList"
-        required: false
-      - in: query
-        name: intensity_cutoff
-        description: "The Instensity cutoff for Peaklist search. Default: 5"
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/IntensityCutoff"
         required: false
       - in: query
         name: inchi

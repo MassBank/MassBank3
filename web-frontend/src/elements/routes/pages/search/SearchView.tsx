@@ -6,7 +6,7 @@ import Peak from '../../../../types/peak/Peak';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import Hit from '../../../../types/Hit';
 import Spinner from '../../../basic/Spinner';
-import SearchPanel from './SearchPanel';
+import SearchPanel from './searchPanel/SearchPanel';
 import Placeholder from '../../../basic/Placeholder';
 import ResultPanel from '../../../result/ResultPanel';
 import { FieldValues } from 'react-hook-form';
@@ -15,10 +15,11 @@ import Content from '../../../../types/Content';
 import buildSearchParams from '../../../../utils/buildSearchParams';
 import initFlags from '../../../../utils/initFlags';
 import axios from 'axios';
-import parsePeakListInputField from './utils/parsePeakListAndReferences';
 import SearchResult from '../../../../types/SearchResult';
 import SearchResultData from '../../../../types/SearchResultData';
 import BasicSearchFilterOptions from '../../../../types/filterOptions/basicSearchFilterOptions';
+import parsePeakListInputField from './searchPanel/utils/parsePeakListAndReferences';
+import { Molecule } from 'openchemlib';
 
 function SearchView() {
   const ref = useRef(null);
@@ -53,12 +54,17 @@ function SearchView() {
   }, [handleOnFetchContent]);
 
   const handleOnSearch = useCallback(async (formData: FieldValues) => {
+    console.log('formData', formData);
+
     const _msSpecFilterOptions = formData['msSpecFilterOptions'] as Content;
     const searchParams = buildSearchParams(_msSpecFilterOptions);
 
-    const peakListInputFieldData = formData['peakListInputField'] as string;
-    if (peakListInputFieldData.trim().length > 0) {
-      const peakList = parsePeakListInputField(peakListInputFieldData);
+    const similarityPeakListInputFieldData =
+      formData['similarity']['peakListInputField'];
+    if (similarityPeakListInputFieldData.trim().length > 0) {
+      const peakList = parsePeakListInputField(
+        similarityPeakListInputFieldData,
+      );
       searchParams['peak_list'] = [
         peakList.map((p) => `${p.mz};${p.intensity}`).join(','),
       ];
@@ -66,6 +72,29 @@ function SearchView() {
     } else {
       setReference([]);
     }
+
+    const peaksSearchData = formData['peakSearch'];
+    const peaks = Object.keys(peaksSearchData)
+      .filter((key) => key.startsWith('p'))
+      .map((key) => peaksSearchData[key] as number)
+      .filter((p) => !isNaN(p));
+    if (peaks.length > 0) {
+      searchParams['peaks'] = [peaks.join(',')];
+
+      if (
+        !isNaN(peaksSearchData['massTolerance']) &&
+        peaksSearchData['massTolerance'] > 0
+      ) {
+        searchParams['mass_tolerance'] = [peaksSearchData['massTolerance']];
+      }
+      if (
+        !isNaN(peaksSearchData['intensity']) &&
+        peaksSearchData['intensity'] > 0
+      ) {
+        searchParams['intensity'] = [peaksSearchData['intensity']];
+      }
+    }
+
     const inchi = (formData['inchiInputField'] as string).trim();
     if (inchi.length > 0) {
       if (inchi.startsWith('InChI=')) {
@@ -91,16 +120,23 @@ function SearchView() {
     if (formula.length > 0) {
       searchParams['formula'] = [formula];
     }
-    const exactMass = _basicSearchFilterOptions.exactMass.trim();
-    if (exactMass.length > 0) {
-      searchParams['exact_mass'] = [exactMass];
+    const exactMass = _basicSearchFilterOptions.exactMass;
+    if (exactMass > 0) {
+      searchParams['exact_mass'] = [String(exactMass)];
 
-      const massTolerance = _basicSearchFilterOptions.massTolerance.trim();
-      if (exactMass.length > 0) {
-        searchParams['mass_tolerance'] = [massTolerance];
+      const massTolerance = _basicSearchFilterOptions.massTolerance;
+      if (exactMass > 0) {
+        searchParams['mass_tolerance'] = [String(massTolerance)];
       } else {
         searchParams['mass_tolerance'] = ['0.0'];
       }
+    }
+
+    const molfile = formData['structureInputField'] as string;
+    if (molfile && molfile.trim().length > 0) {
+      const mol = Molecule.fromMolfile(molfile);
+      const smiles = mol.toSmiles();
+      searchParams['smiles'] = [smiles];
     }
 
     console.log(searchParams);
