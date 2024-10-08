@@ -582,8 +582,8 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*[]massbank.MassBank2, erro
 	if filters.MassEpsilon == nil {
 		filters.MassEpsilon = &DefaultValues.MassEpsilon
 	}
-	if filters.IntensityCutoff == nil {
-		filters.IntensityCutoff = &DefaultValues.IntensityCutoff
+	if filters.Intensity == nil {
+		filters.Intensity = &DefaultValues.Intensity
 	}
 
 	accessions, err := p.GetAccessionsByFilterOptions(filters)
@@ -608,8 +608,8 @@ func (p *PostgresSQLDB) GetSearchRecords(filters Filters) (*[]massbank.MassBank2
 	if filters.MassEpsilon == nil {
 		filters.MassEpsilon = &DefaultValues.MassEpsilon
 	}
-	if filters.IntensityCutoff == nil {
-		filters.IntensityCutoff = &DefaultValues.IntensityCutoff
+	if filters.Intensity == nil {
+		filters.Intensity = &DefaultValues.Intensity
 	}
 
 	accessions, err := p.GetAccessionsByFilterOptions(filters)
@@ -733,6 +733,45 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) string {
 
 	if(filters.CompoundName != "") {
 		subQuery := "massbank_id IN (SELECT DISTINCT(massbank_id) FROM compound_name WHERE LOWER(name) LIKE LOWER('%" + filters.CompoundName + "%'))"
+		if(addedWhere || addedAnd) {
+			query = query + " AND " + subQuery
+			addedAnd = true
+		} else {
+			query = query + " WHERE " + subQuery
+			addedWhere = true
+		}
+	}
+
+	if(filters.Peaks != nil && filters.MassEpsilon != nil) {
+		peaksCount := len(*filters.Peaks)
+		var from = "FROM " 				
+		var where = "WHERE "
+		if(peaksCount == 1) {
+			from = from + "peak AS p1"
+			where = where + "p1.mz BETWEEN " + strconv.FormatFloat((*filters.Peaks)[0] - *filters.MassEpsilon, 'f', -1, 64) + " AND " + strconv.FormatFloat((*filters.Peaks)[0] + *filters.MassEpsilon, 'f', -1, 64)
+			if(filters.Intensity != nil) {
+				where = where + " AND p1.relative_intensity >= " + strconv.FormatInt(*filters.Intensity, 10)
+			}
+		} else {
+			for i := 0; i < peaksCount; i++ {
+				from = from + "peak AS p" + strconv.Itoa(i+1)
+				if(i < peaksCount - 1) {
+					from = from + ", "
+				}
+				if(i == 0) {
+					where = where + "p1.mz BETWEEN " + strconv.FormatFloat((*filters.Peaks)[i] - *filters.MassEpsilon, 'f', -1, 64) + " AND " + strconv.FormatFloat((*filters.Peaks)[i] + *filters.MassEpsilon, 'f', -1, 64)
+				} else{
+					where = where + "p" + strconv.Itoa(i+1) + ".spectrum_id=p1.spectrum_id AND p" + strconv.Itoa(i+1) + ".mz BETWEEN " + strconv.FormatFloat((*filters.Peaks)[i] - *filters.MassEpsilon, 'f', -1, 64) + " AND " + strconv.FormatFloat((*filters.Peaks)[i] + *filters.MassEpsilon, 'f', -1, 64)					
+				}
+				if(filters.Intensity != nil) {
+					where = where + " AND p" + strconv.Itoa(i+1) + ".relative_intensity >= " + strconv.FormatInt(*filters.Intensity, 10)
+				}
+				if(i < peaksCount - 1) {
+					where = where + " AND "
+				}
+			}
+		}
+		subQuery := "massbank_id IN (SELECT massbank_id FROM spectrum WHERE id IN (SELECT DISTINCT(p1.spectrum_id) " + from + " " + where + "))"
 		if(addedWhere || addedAnd) {
 			query = query + " AND " + subQuery
 			addedAnd = true

@@ -1,7 +1,7 @@
-import ValueCount from '../../../../../types/ValueCount';
-import { splitStringAndJoin } from '../../../../../utils/stringUtils';
-import CheckBox from '../../../../basic/CheckBox';
-import Placeholder from '../../../../basic/Placeholder';
+import ValueCount from '../../../../../../types/ValueCount';
+import { splitStringAndJoin } from '../../../../../../utils/stringUtils';
+import CheckBox from '../../../../../basic/CheckBox';
+import Placeholder from '../../../../../basic/Placeholder';
 
 type InputProps = {
   vc: ValueCount;

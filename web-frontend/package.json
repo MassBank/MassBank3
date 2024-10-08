@@ -41,6 +41,7 @@
     "react": ">=18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": ">=18.2.0",
+    "react-dropzone": "^14.2.9",
     "react-hook-form": "^7.52.2",
     "react-loader-spinner": "^6.1.6",
     "react-mf": "^2.0.3",
