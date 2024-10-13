@@ -20,7 +20,7 @@ import Content from '../../../../../types/Content';
 import ValueCount from '../../../../../types/ValueCount';
 import FilterTable from './msSpecFilter/FilterTable';
 import PeakSearch from './peakSearch/PeakSearch';
-import StructureEditor from '../../../../basic/StructureEditor';
+import StructuralEditor from '../../../../basic/StructuralEditor';
 
 const peakListPattern =
   /^(\d+(\.\d+)* \d+(\.\d+)*)(\n\d+(\.\d+)* \d+(\.\d+)*)*$/;
@@ -86,6 +86,11 @@ function SearchPanel({
       setValue(filterName, newFilterOptions);
     },
     [getValues, setValue],
+  );
+
+  const handleOnChangeStructure = useCallback(
+    (molfile: string) => setValue('structureInputField', molfile),
+    [setValue],
   );
 
   return (
@@ -392,11 +397,10 @@ function SearchPanel({
                 label={<FontAwesomeIcon icon={faShareNodes} />}
                 suffix={collapsed ? '' : 'Structure'}
               >
-                <StructureEditor
-                  onChange={(molfile: string) =>
-                    setValue('structureInputField', molfile)
-                  }
+                <StructuralEditor
+                  onChange={handleOnChangeStructure}
                   width={width}
+                  height={650}
                 />
               </SubMenu>
             </Menu>

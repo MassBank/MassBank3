@@ -12,7 +12,7 @@ type InputProps = {
   type: React.HTMLInputTypeAttribute;
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
   onChange: (value: any) => void;
-  onKeyDown: () => void;
+  onKeyDown?: () => void;
   defaultValue?: string | number;
   label?: string;
   min?: number;
@@ -27,7 +27,7 @@ type InputProps = {
 function Input({
   type,
   onChange,
-  onKeyDown,
+  onKeyDown = () => {},
   defaultValue,
   label,
   min,

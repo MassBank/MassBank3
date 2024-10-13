@@ -163,7 +163,8 @@ func (c *DefaultAPIController) GetSearchRecords(w http.ResponseWriter, r *http.R
 	inchiParam := query.Get("inchi")
 	inchiKeyParam := query.Get("inchi_key")
 	contributorParam := strings.Split(query.Get("contributor"), ",")
-	result, err := c.service.GetSearchRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, inchiParam, inchiKeyParam, contributorParam)
+	substructureParam := query.Get("substructure")
+	result, err := c.service.GetSearchRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, inchiParam, inchiKeyParam, contributorParam, substructureParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

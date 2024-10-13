@@ -136,7 +136,7 @@ function SearchView() {
     if (molfile && molfile.trim().length > 0) {
       const mol = Molecule.fromMolfile(molfile);
       const smiles = mol.toSmiles();
-      searchParams['smiles'] = [smiles];
+      searchParams['substructure'] = [smiles];
     }
 
     console.log(searchParams);
