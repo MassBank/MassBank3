@@ -54,8 +54,6 @@ function SearchView() {
   }, [handleOnFetchContent]);
 
   const handleOnSearch = useCallback(async (formData: FieldValues) => {
-    console.log('formData', formData);
-
     const _msSpecFilterOptions = formData['msSpecFilterOptions'] as Content;
     const searchParams = buildSearchParams(_msSpecFilterOptions);
 

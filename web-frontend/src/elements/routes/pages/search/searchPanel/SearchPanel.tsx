@@ -400,7 +400,7 @@ function SearchPanel({
                 <StructuralEditor
                   onChange={handleOnChangeStructure}
                   width={width}
-                  height={650}
+                  height={width + 200}
                 />
               </SubMenu>
             </Menu>
