@@ -1,0 +1,6 @@
+FROM ipbhalle/crimsydb:bingo_pg12
+
+COPY ./bingo/*.sql /docker-entrypoint-initdb.d/
+COPY ./bingo/*.sh /usr/local/bin/
+
+RUN chmod +x /usr/local/bin/*.sh

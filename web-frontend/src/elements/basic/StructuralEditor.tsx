@@ -34,11 +34,7 @@ function StructuralEditor({
   );
 
   const handleOnChangeSmilesInput = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setSmiles(e.target.value);
-    },
+    (value: string) => setSmiles(value),
     [],
   );
 

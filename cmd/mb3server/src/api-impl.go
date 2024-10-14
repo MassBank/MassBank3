@@ -2,7 +2,6 @@ package mb3server
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -681,55 +680,26 @@ func getEnv(name string, fallback string) string {
 }
 
 func FilterBySubstructure(substructure string) (*SearchResult, error) {
-	hostname := getEnv("STRUCTURE_SEARCH_SERVICE_DB_HOST", "structure-search-service")
-	portString := getEnv("STRUCTURE_SEARCH_SERVICE_DB_PORT", "8080")
-	port, err := strconv.ParseUint(portString, 10, 32)
+	if err := initDB(); err != nil {
+		return nil, err
+	}
+
+	result := SearchResult{}
+	result.Data = []SearchResultDataInner{}
+
+	records, err := db.GetRecordsBySubstructure(substructure)
 	if err != nil {
 		return nil, err
 	}
-	dbName := getEnv("STRUCTURE_SEARCH_SERVICE_DB_NAME", "massbank3")
-	dbUser := getEnv("STRUCTURE_SEARCH_SERVICE_DB_USER", "massbank3")
-	dbPassword := getEnv("STRUCTURE_SEARCH_SERVICE_DB_PASSWORD", "massbank3password")
 
-	records := SearchResult{}
-	records.Data = []SearchResultDataInner{}
-
-	var db *sql.DB
-	dbConnectionString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-			hostname, port, dbUser, dbPassword, dbName)
-	if db, err = sql.Open("postgres", dbConnectionString); err != nil {
-		return nil, err
-	} else {
-		if err := db.Ping(); err != nil {
-			return nil, err
-		} 
-	}
-	
-	q := "SELECT accession FROM molecules WHERE molecule @('" + substructure + "', '')::bingo.sub"
-	fmt.Println("substructure query: ", q)
-	rows, err := db.Query(q)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var accession string
-		if err := rows.Scan(&accession); err != nil {
-			return nil, err
-		}
-		record, err := GetSimpleRecord(accession)
-		if err != nil {
-			return nil, err
-		}
+	for _, record := range *records {
 		searchResultData := SearchResultDataInner{
-			Record: *record,
+			Record: *buildSimpleMbRecord(&record),
 		}
-		records.Data = append(records.Data, searchResultData)		
+		result.Data = append(result.Data, searchResultData)
 	}
 
-
-	return &records, nil
+	return &result, nil
 }
 
 func GetSimilarity(peakList []string, referenceSpectraList []string, limit int32) (*SimilaritySearchResult, error) {
