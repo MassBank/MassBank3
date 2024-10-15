@@ -34,11 +34,11 @@ type DefaultAPIRouter interface {
 // and updated with the logic required for the API.
 type DefaultAPIServicer interface {
 	GetRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, string, string, []string) (ImplResponse, error)
-	GetSearchRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, string, string, []string, string) (ImplResponse, error)
+	GetSearchRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, float64, string, string, []string, string) (ImplResponse, error)
 	GetRecord(context.Context, string) (ImplResponse, error)
 	GetSimpleRecord(context.Context, string) (ImplResponse, error)
 	GetCount(context.Context) (ImplResponse, error)
 	GetBrowseOptions(context.Context, []string, []string, string, []string) (ImplResponse, error)
 	GetMetadata(context.Context) (ImplResponse, error)
-	GetSimilarity(context.Context, []string, []string, int32) (ImplResponse, error)
+	GetSimilarity(context.Context, []string, []string, int32, float64) (ImplResponse, error)
 }

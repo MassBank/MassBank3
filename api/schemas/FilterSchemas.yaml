@@ -46,6 +46,12 @@ components:
         type: string
         description: "A tuple of m/z and intensity, e.g. (193.4;57)"
         pattern: "\\([0-9]+(\\.[0-9]*)?;[0-9]+\\)"
+    PeakListThreshold:
+      type: number
+      format: double
+      minimum: 0.0
+      maximum: 1.0
+      default: 0.8
     Limit:
       type: integer
       minimum: 1

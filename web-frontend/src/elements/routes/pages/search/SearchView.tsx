@@ -66,6 +66,9 @@ function SearchView() {
       searchParams['peak_list'] = [
         peakList.map((p) => `${p.mz};${p.intensity}`).join(','),
       ];
+      const peakListThreshold =
+        formData['similarity']['peakListThresholdInputField'];
+      searchParams['peak_list_threshold'] = [peakListThreshold];
       setReference(peakList);
     } else {
       setReference([]);

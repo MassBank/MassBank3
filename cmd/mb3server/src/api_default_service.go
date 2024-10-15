@@ -75,11 +75,11 @@ func (s *DefaultAPIService) GetRecords(ctx context.Context, instrumentType []str
 }
 
 // GetSimilarity implements DefaultAPIServicer.
-func (s *DefaultAPIService) GetSimilarity(ctx context.Context, peakList []string, referenceSpectraList []string, limit int32) (ImplResponse, error) {
+func (s *DefaultAPIService) GetSimilarity(ctx context.Context, peakList []string, referenceSpectraList []string, limit int32, threshold float64) (ImplResponse, error) {
 	// TODO - update GetSimilarity with the required logic for this service method.
 	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	result, err := GetSimilarity(peakList, referenceSpectraList, limit)
+	result, err := GetSimilarity(peakList, referenceSpectraList, limit, threshold)
 
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), err
@@ -98,8 +98,8 @@ func (s *DefaultAPIService) GetSimpleRecord(ctx context.Context, accession strin
 }
 
 // GetSimpleRecords - Get a list of records
-func (s *DefaultAPIService) GetSearchRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, inchi string, inchiKey string, contributor []string, substructure string) (ImplResponse, error) {
-	result, err := GetSearchRecords(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, inchi, inchiKey, contributor, substructure)
+func (s *DefaultAPIService) GetSearchRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, peakListThreshold float64, inchi string, inchiKey string, contributor []string, substructure string) (ImplResponse, error) {
+	result, err := GetSearchRecords(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, peakListThreshold, inchi, inchiKey, contributor, substructure)
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), err
 	}

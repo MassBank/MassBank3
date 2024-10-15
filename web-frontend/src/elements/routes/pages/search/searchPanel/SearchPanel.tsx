@@ -21,6 +21,7 @@ import ValueCount from '../../../../../types/ValueCount';
 import FilterTable from './msSpecFilter/FilterTable';
 import PeakSearch from './peakSearch/PeakSearch';
 import StructuralEditor from '../../../../basic/StructuralEditor';
+import Input from '../../../../basic/Input';
 
 const peakListPattern =
   /^(\d+(\.\d+)* \d+(\.\d+)*)(\n\d+(\.\d+)* \d+(\.\d+)*)*$/;
@@ -75,6 +76,7 @@ function SearchPanel({
       ms_type: msSpecFilterOptions?.ms_type,
       ion_mode: msSpecFilterOptions?.ion_mode,
     } as Content);
+    setValue('similarity.peakListThresholdInputField', 0.8);
   }, [msSpecFilterOptions, setValue]);
 
   const handleOnSelect = useCallback(
@@ -86,6 +88,12 @@ function SearchPanel({
       setValue(filterName, newFilterOptions);
     },
     [getValues, setValue],
+  );
+
+  const handleOnChangeThresholdValue = useCallback(
+    (value: number) =>
+      setValue('similarity.peakListThresholdInputField', value),
+    [setValue],
   );
 
   const handleOnChangeStructure = useCallback(
@@ -257,6 +265,17 @@ function SearchPanel({
                       </p>
                     )}
                   </div>
+                  <Input
+                    type="number"
+                    defaultValue={0.8}
+                    placeholder="0.8"
+                    min={0}
+                    max={1}
+                    step="any"
+                    label="Minimal Score:"
+                    onChange={handleOnChangeThresholdValue}
+                    style={{ width, marginLeft: 10, marginRight: 80 }}
+                  />
                   <Button
                     child={'Load Example'}
                     onClick={() =>

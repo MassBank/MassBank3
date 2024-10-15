@@ -491,7 +491,7 @@ func GetRecords(instrumentType []string, splash string, msType []string, ionMode
 
 
 
-func GetSearchRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, inchi string, inchiKey string, contributor []string, substructure string) (*SearchResult, error) {
+func GetSearchRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, peakListThreshold float64, inchi string, inchiKey string, contributor []string, substructure string) (*SearchResult, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
@@ -520,9 +520,9 @@ func GetSearchRecords(instrumentType []string, splash string, msType []string, i
 
 	similaritySearchResult := &SimilaritySearchResult{} 
 	checkSimilarity := len(peakList) > 0 && peakList[0] != ""
-	if(checkSimilarity && inchi == "" && inchiKey == "" && splash == "") {	
+	if(checkSimilarity) {
 		fmt.Println(" -> filter by Similarity")	
-		similaritySearchResult, err = GetSimilarity(peakList, []string{}, 0)
+		similaritySearchResult, err = GetSimilarity(peakList, []string{}, 0, peakListThreshold)
 		if err != nil {
 			return nil, err
 		}		
@@ -702,7 +702,7 @@ func FilterBySubstructure(substructure string) (*SearchResult, error) {
 	return &result, nil
 }
 
-func GetSimilarity(peakList []string, referenceSpectraList []string, limit int32) (*SimilaritySearchResult, error) {
+func GetSimilarity(peakList []string, referenceSpectraList []string, limit int32, threshold float64) (*SimilaritySearchResult, error) {
 	sort.Slice(peakList, func(i, j int) bool {
 		split1 := strings.Split(peakList[i], ";")
 		split2 := strings.Split(peakList[j], ";")
@@ -719,6 +719,7 @@ func GetSimilarity(peakList []string, referenceSpectraList []string, limit int32
 	fmt.Println("peakList: ", peakList)
 	fmt.Println("referenceSpectraList: ", referenceSpectraList)
 	fmt.Println("limit: ", limit)
+	fmt.Println("threshold: ", threshold)
 
 	if err := initDB(); err != nil {
 		return nil, err
@@ -793,14 +794,16 @@ func GetSimilarity(peakList []string, referenceSpectraList []string, limit int32
 	records := SimilaritySearchResult{}
 	records.Data = []SimilaritySearchResultDataInner{}
 	for i, res := range result.SimilarityScoreList {		
-		records.Data = append(records.Data, SimilaritySearchResultDataInner{
+		if(threshold <= 0 || res.SimilarityScore >= threshold){
+			records.Data = append(records.Data, SimilaritySearchResultDataInner{
 			Accession: res.Accession,
 			Score: float32(res.SimilarityScore),			
-		})
+			})
 
-		if limit > 0 {
-			if int32(i) >= limit - 1 {
-				break
+			if limit > 0 {
+				if int32(i) >= limit - 1 {
+					break
+				}
 			}
 		}
 	}
