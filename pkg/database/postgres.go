@@ -603,14 +603,8 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*[]massbank.MassBank2, erro
 	return &records, nil
 }
 
-
-
-// GetRecordsBySubstructure see [MB3Database.GetRecordsBySubstructure]
-func (p *PostgresSQLDB) GetRecordsBySubstructure(substructure string) (*[]massbank.MassBank2, error) {
-	
-	fmt.Println("substructure: ", substructure)
-	
-	records := []massbank.MassBank2{}
+func (p *PostgresSQLDB) GetAccessionsBySubstructure(substructure string) ([]string, error) {
+	accessions := []string{}
 	q := "SELECT accession FROM molecules WHERE molecule @($1, '')::bingo.sub"
 	rows, err := p.database.Query(q, substructure)
 	if err != nil {
@@ -623,6 +617,24 @@ func (p *PostgresSQLDB) GetRecordsBySubstructure(substructure string) (*[]massba
 		if err := rows.Scan(&accession); err != nil {
 			return nil, err
 		}
+		accessions = append(accessions, accession)
+	}
+
+	return accessions, nil
+}
+
+
+// GetRecordsBySubstructure see [MB3Database.GetRecordsBySubstructure]
+func (p *PostgresSQLDB) GetRecordsBySubstructure(substructure string) (*[]massbank.MassBank2, error) {
+	
+	fmt.Println("substructure: ", substructure)
+	
+	records := []massbank.MassBank2{}
+	accessions, err := p.GetAccessionsBySubstructure(substructure)
+	if err != nil {
+		return nil, err
+	}
+	for _, accession := range accessions {
 		record, err := p.GetSimpleRecord(&accession)
 		if err != nil {
 			return nil, err
