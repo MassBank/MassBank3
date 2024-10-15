@@ -6,7 +6,7 @@
 \connect :MB3_DATABASE
 
 -- Bingo database extension (chemistry) --
-\i /opt/bingo/bingo_install.sql
+\i /opt/bingo-postgres/bingo_install.sql
 GRANT USAGE ON SCHEMA bingo TO :MB3_USER;
 GRANT SELECT ON bingo.bingo_config TO :MB3_USER;
 GRANT SELECT ON bingo.bingo_tau_config TO :MB3_USER;
