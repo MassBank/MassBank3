@@ -516,6 +516,7 @@ func GetSearchRecords(instrumentType []string, splash string, msType []string, i
 
 	// similarity search
 	setSimilaritySearch := mapset.NewSet[string]()
+	similarityResultMap := make(map[string]float32)	
 
 	similaritySearchResult := &SimilaritySearchResult{} 
 	checkSimilarity := len(peakList) > 0 && peakList[0] != ""
@@ -527,6 +528,7 @@ func GetSearchRecords(instrumentType []string, splash string, msType []string, i
 		}		
 		for _, similarityResult := range similaritySearchResult.Data {
 			setSimilaritySearch.Add(similarityResult.Accession)
+			similarityResultMap[similarityResult.Accession] = similarityResult.Score
 		}
 		fmt.Println("similaritySearchResult: ", len(similaritySearchResult.Data))
 	}	
@@ -572,9 +574,13 @@ func GetSearchRecords(instrumentType []string, splash string, msType []string, i
 			}
 			searchResultData := SearchResultDataInner{
 				Record: *buildSimpleMbRecord(record),
+				Score: similarityResultMap[accession],		
 			}
 			results.Data = append(results.Data, searchResultData)
 		}
+		sort.Slice(results.Data, func(i, j int) bool {
+			return results.Data[i].Score > results.Data[j].Score
+		})
 	} else if(checkSubstructure && checkSimilarity && !checkFilters) {
 		fmt.Println(" -> combined results (substructure + similarity)")
 		intersection := setSubstructureSearch.Intersect(setSimilaritySearch)
@@ -585,9 +591,13 @@ func GetSearchRecords(instrumentType []string, splash string, msType []string, i
 			}
 			searchResultData := SearchResultDataInner{
 				Record: *buildSimpleMbRecord(record),
+				Score: similarityResultMap[accession],
 			}
 			results.Data = append(results.Data, searchResultData)
 		}
+		sort.Slice(results.Data, func(i, j int) bool {
+			return results.Data[i].Score > results.Data[j].Score
+		})
 	} else if(checkSubstructure && !checkSimilarity && checkFilters) {
 		fmt.Println(" -> combined results (substructure + filters)")
 		intersection := setSubstructureSearch.Intersect(setFilterSearch)
@@ -611,9 +621,13 @@ func GetSearchRecords(instrumentType []string, splash string, msType []string, i
 			}
 			searchResultData := SearchResultDataInner{
 				Record: *buildSimpleMbRecord(record),
+				Score: similarityResultMap[accession],
 			}
 			results.Data = append(results.Data, searchResultData)
 		}
+		sort.Slice(results.Data, func(i, j int) bool {
+			return results.Data[i].Score > results.Data[j].Score
+		})
 	} else {
 		fmt.Println("no combined results found -> single results")
 		if(checkSimilarity && !checkFilters && !checkSubstructure) {
