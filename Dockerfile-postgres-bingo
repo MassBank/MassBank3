@@ -7,13 +7,17 @@ RUN apt-get update \
 RUN wget --no-check-certificate https://lifescience.opensource.epam.com/downloads/bingo-1.24.0/bingo-postgres-15-linux-x86_64.zip
 RUN mkdir -p /opt/bingo-postgres
 RUN unzip -p bingo-postgres-15-linux-x86_64.zip | tar -xzf- -C /opt/bingo-postgres --strip-components=1
-RUN rm bingo-postgres-15-linux-x86_64.zip
 WORKDIR /opt/bingo-postgres
 RUN /bin/sh bingo-pg-install.sh -libdir /opt/bingo-postgres/lib -y
 RUN install -o postgres -g postgres /opt/bingo-postgres/lib/libbingo-postgres.so /usr/lib/postgresql/15/lib/bingo_postgres.so
 RUN install -o postgres -g postgres /opt/bingo-postgres/bingo_install.sql /docker-entrypoint-initdb.d/bingo_install.sql
 
+FROM postgres:15 as base
+COPY --from=builder /opt/bingo-postgres /opt/bingo-postgres
+COPY --from=builder /docker-entrypoint-initdb.d/bingo_install.sql /docker-entrypoint-initdb.d/bingo_install.sql
+
 ##
+
 ## Steps to finalize the installation:
 ##
 ## GRANT USAGE ON SCHEMA bingo TO %ROLE%;
