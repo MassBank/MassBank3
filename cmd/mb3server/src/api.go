@@ -18,14 +18,14 @@ import (
 // The DefaultAPIRouter implementation should parse necessary information from the http request,
 // pass the data to a DefaultAPIServicer to perform the required actions, then write the service results to the http response.
 type DefaultAPIRouter interface {
-	GetBrowseOptions(http.ResponseWriter, *http.Request)
-	GetCount(http.ResponseWriter, *http.Request)
-	GetMetadata(http.ResponseWriter, *http.Request)
-	GetRecord(http.ResponseWriter, *http.Request)
 	GetRecords(http.ResponseWriter, *http.Request)
 	GetSearchRecords(http.ResponseWriter, *http.Request)
-	GetSimilarity(http.ResponseWriter, *http.Request)
+	GetRecord(http.ResponseWriter, *http.Request)
 	GetSimpleRecord(http.ResponseWriter, *http.Request)
+	GetCount(http.ResponseWriter, *http.Request)
+	GetBrowseOptions(http.ResponseWriter, *http.Request)
+	GetMetadata(http.ResponseWriter, *http.Request)
+	GetSimilarity(http.ResponseWriter, *http.Request)
 }
 
 // DefaultAPIServicer defines the api actions for the DefaultAPI service
@@ -33,12 +33,12 @@ type DefaultAPIRouter interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type DefaultAPIServicer interface {
-	GetBrowseOptions(context.Context, []string, []string, string, []string) (ImplResponse, error)
-	GetCount(context.Context) (ImplResponse, error)
-	GetMetadata(context.Context) (ImplResponse, error)
+	GetRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, string, string, []string) (ImplResponse, error)
+	GetSearchRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, string, string, []string, string) (ImplResponse, error)
 	GetRecord(context.Context, string) (ImplResponse, error)
-	GetRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, string, string, []string) (ImplResponse, error)
-	GetSearchRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, int32, string, string, []string) (ImplResponse, error)
-	GetSimilarity(context.Context, []string, []string, int32) (ImplResponse, error)
 	GetSimpleRecord(context.Context, string) (ImplResponse, error)
+	GetCount(context.Context) (ImplResponse, error)
+	GetBrowseOptions(context.Context, []string, []string, string, []string) (ImplResponse, error)
+	GetMetadata(context.Context) (ImplResponse, error)
+	GetSimilarity(context.Context, []string, []string, int32) (ImplResponse, error)
 }

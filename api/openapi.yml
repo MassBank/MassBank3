@@ -78,12 +78,6 @@ paths:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/PeakList"
         required: false
       - in: query
-        name: intensity_cutoff
-        description: "The Instensity cutoff for Peaklist search. Default: 5"
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/IntensityCutoff"
-        required: false
-      - in: query
         name: inchi
         description: Filter by InChI
         schema:
@@ -186,12 +180,6 @@ paths:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/PeakList"
         required: false
       - in: query
-        name: intensity_cutoff
-        description: "The Instensity cutoff for Peaklist search. Default: 5"
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/IntensityCutoff"
-        required: false
-      - in: query
         name: inchi
         description: Filter by InChI
         schema:
@@ -208,6 +196,12 @@ paths:
         description: a contributor (institution)
         schema:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Contributor"
+        required: false
+      - in: query
+        name: substructure
+        description: "Substructure to search for, in SMILES format."
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Substructure"
         required: false
     get:
       summary: Get a list of records as a search result in a specific format (accession, title, peaks, smiles, similarity search result)

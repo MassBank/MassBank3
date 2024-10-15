@@ -1,6 +1,6 @@
 export default interface BasicSearchFilterOptions {
   compoundName: string;
-  exactMass: string;
-  massTolerance: string;
+  exactMass: number;
+  massTolerance: number;
   formula: string;
 }

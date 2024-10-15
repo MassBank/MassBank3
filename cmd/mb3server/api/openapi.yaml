@@ -107,14 +107,6 @@ paths:
         schema:
           $ref: '#/components/schemas/PeakList'
         style: form
-      - description: "The Instensity cutoff for Peaklist search. Default: 5"
-        explode: true
-        in: query
-        name: intensity_cutoff
-        required: false
-        schema:
-          $ref: '#/components/schemas/IntensityCutoff'
-        style: form
       - description: Filter by InChI
         explode: true
         in: query
@@ -251,14 +243,6 @@ paths:
         schema:
           $ref: '#/components/schemas/PeakList'
         style: form
-      - description: "The Instensity cutoff for Peaklist search. Default: 5"
-        explode: true
-        in: query
-        name: intensity_cutoff
-        required: false
-        schema:
-          $ref: '#/components/schemas/IntensityCutoff'
-        style: form
       - description: Filter by InChI
         explode: true
         in: query
@@ -282,6 +266,14 @@ paths:
         required: false
         schema:
           $ref: '#/components/schemas/Contributor'
+        style: form
+      - description: "Substructure to search for, in SMILES format."
+        explode: true
+        in: query
+        name: substructure
+        required: false
+        schema:
+          $ref: '#/components/schemas/Substructure'
         style: form
       responses:
         "200":
@@ -499,11 +491,6 @@ components:
         pattern: "\\([0-9]+(\\.[0-9]*)?;[0-9]+\\)"
         type: string
       type: array
-    IntensityCutoff:
-      default: 5
-      maximum: 100
-      minimum: 1
-      type: integer
     InChI:
       type: string
     InChIKey:
@@ -682,6 +669,8 @@ components:
       - license
       - title
       type: object
+    Substructure:
+      type: string
     SearchResult:
       example:
         data:
