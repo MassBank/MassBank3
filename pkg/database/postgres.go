@@ -603,6 +603,49 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*[]massbank.MassBank2, erro
 	return &records, nil
 }
 
+func (p *PostgresSQLDB) GetAccessionsBySubstructure(substructure string) ([]string, error) {
+	accessions := []string{}
+	q := "SELECT accession FROM molecules WHERE molecule @($1, '')::bingo.sub"
+	rows, err := p.database.Query(q, substructure)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var accession string
+		if err := rows.Scan(&accession); err != nil {
+			return nil, err
+		}
+		accessions = append(accessions, accession)
+	}
+
+	return accessions, nil
+}
+
+
+// GetRecordsBySubstructure see [MB3Database.GetRecordsBySubstructure]
+func (p *PostgresSQLDB) GetRecordsBySubstructure(substructure string) (*[]massbank.MassBank2, error) {
+	
+	fmt.Println("substructure: ", substructure)
+	
+	records := []massbank.MassBank2{}
+	accessions, err := p.GetAccessionsBySubstructure(substructure)
+	if err != nil {
+		return nil, err
+	}
+	for _, accession := range accessions {
+		record, err := p.GetSimpleRecord(&accession)
+		if err != nil {
+			return nil, err
+		}
+		records = append(records, *record)
+	}
+
+	return &records, nil
+}
+
+
 // GetSimpleRecords see [MB3Database.GetSimpleRecords]
 func (p *PostgresSQLDB) GetSearchRecords(filters Filters) (*[]massbank.MassBank2, error) {
 	if filters.MassEpsilon == nil {
@@ -1021,6 +1064,12 @@ func (p *PostgresSQLDB) RemoveIndexes() error {
 		}
 	}
 
+	// add bingo index on molecules table
+	query := "DROP INDEX IF EXISTS bingo_molecules_idx;"
+	if _, err := p.database.Exec(query); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -1035,6 +1084,12 @@ func (p *PostgresSQLDB) AddIndexes() error {
 		if _, err := p.database.Exec(query); err != nil {
 			return err
 		}
+	}
+
+	// add bingo index on molecules table
+	query := "CREATE INDEX IF NOT EXISTS bingo_molecules_idx ON molecules USING bingo_idx (molecule bingo.molecule);"
+	if _, err := p.database.Exec(query); err != nil {
+		return err
 	}
 
 	return nil
@@ -1373,6 +1428,17 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId str
 			return err
 		}
 
+		if(record.Compound.Smiles != nil && *record.Compound.Smiles != ""){
+			q = `INSERT INTO molecules (molecule, accession) VALUES ($1, $2);`
+			_, err = tx.Exec(q, *record.Compound.Smiles, *record.Accession)
+			if err != nil {
+				if err2 := tx.Rollback(); err2 != nil {
+					return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+				}
+				return err
+			}
+		}
+
 		err = tx.Commit()
 		if err != nil {
 			if err2 := tx.Rollback(); err2 != nil {
@@ -1389,10 +1455,7 @@ func (p *PostgresSQLDB) Init() error {
 	var err error
 	var query = 
 		`
-		DROP SCHEMA public CASCADE;
-		CREATE SCHEMA public;
-
-		CREATE TABLE metadata (
+		CREATE TABLE IF NOT EXISTS metadata (
 			id SERIAL PRIMARY KEY,
 			commit char(40),
 			timestamp timestamp NOT NULL,
@@ -1400,7 +1463,7 @@ func (p *PostgresSQLDB) Init() error {
 			UNIQUE (commit, timestamp, version)
 		);
 
-		CREATE TABLE massbank (
+		CREATE TABLE IF NOT EXISTS massbank (
 			id SERIAL PRIMARY KEY,
 			filename TEXT NOT NULL,
 			accession VARCHAR(40) NOT NULL UNIQUE,	
@@ -1412,54 +1475,54 @@ func (p *PostgresSQLDB) Init() error {
 		);
 
 		-- contributor
-		CREATE TABLE contributor (
+		CREATE TABLE IF NOT EXISTS contributor (
 			id SERIAL PRIMARY KEY,
 			name TEXT NOT NULL,
 			UNIQUE (name)
 		);
-		CREATE TABLE accession_contributor (
+		CREATE TABLE IF NOT EXISTS accession_contributor (
 			massbank_id INT REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			contributor_id INT NOT NULL REFERENCES contributor(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (massbank_id, contributor_id)
 		);
 
 		-- author
-		CREATE TABLE author (
+		CREATE TABLE IF NOT EXISTS author (
 			id SERIAL PRIMARY KEY,
 			name TEXT NOT NULL
 		);
-		CREATE TABLE accession_author (
+		CREATE TABLE IF NOT EXISTS accession_author (
 			massbank_id INT REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			author_id INT NOT NULL REFERENCES author(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (massbank_id, author_id)
 		);
 
 		-- license
-		CREATE TABLE license (
+		CREATE TABLE IF NOT EXISTS license (
 			id SERIAL PRIMARY KEY,
 			name TEXT NOT NULL,
 			UNIQUE (name)
 		);
-		CREATE TABLE accession_license (
+		CREATE TABLE IF NOT EXISTS accession_license (
 			massbank_id INT REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			license_id INT NOT NULL REFERENCES license(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (massbank_id, license_id)
 		);
 
 		-- publication
-		CREATE TABLE publication (
+		CREATE TABLE IF NOT EXISTS publication (
 			id SERIAL PRIMARY KEY,
 			name TEXT NOT NULL,
 			UNIQUE (name)
 		);
-		CREATE TABLE accession_publication (
+		CREATE TABLE IF NOT EXISTS accession_publication (
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			publication_id INT NOT NULL REFERENCES publication(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (massbank_id, publication_id)
 		);
 
 		-- compound
-		CREATE TABLE compound (
+		CREATE TABLE IF NOT EXISTS compound (
 			id SERIAL PRIMARY KEY,
 			inchi TEXT NOT NULL,
 			formula TEXT NOT NULL,
@@ -1467,19 +1530,19 @@ func (p *PostgresSQLDB) Init() error {
 			mass FLOAT NOT NULL,
 			UNIQUE (inchi, formula, smiles, mass)
 		);
-		CREATE TABLE compound_name (
+		CREATE TABLE IF NOT EXISTS compound_name (
 			name TEXT NOT NULL,
 			compound_id INT NOT NULL REFERENCES compound(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (name, compound_id, massbank_id)		
 		);
-		CREATE TABLE compound_class (
+		CREATE TABLE IF NOT EXISTS compound_class (
 			class TEXT NOT NULL,
 			compound_id INT NOT NULL REFERENCES compound(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (class, compound_id, massbank_id)
 		);
-		CREATE TABLE compound_link (
+		CREATE TABLE IF NOT EXISTS compound_link (
 			database TEXT NOT NULL,
 			identifier TEXT NOT NULL,
 			compound_id INT NOT NULL REFERENCES compound(id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -1488,40 +1551,40 @@ func (p *PostgresSQLDB) Init() error {
 		);
 
 		-- acquisition
-		CREATE TABLE acquisition_instrument (
+		CREATE TABLE IF NOT EXISTS acquisition_instrument (
 			id SERIAL PRIMARY KEY,
 			instrument TEXT NOT NULL,
 			instrument_type TEXT NOT NULL,
 			UNIQUE (instrument, instrument_type)
 		);
-		CREATE TABLE accession_acquisition (
+		CREATE TABLE IF NOT EXISTS accession_acquisition (
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			acquisition_instrument_id INT NOT NULL REFERENCES acquisition_instrument(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
-		CREATE TABLE acquisition_mass_spectrometry (
+		CREATE TABLE IF NOT EXISTS acquisition_mass_spectrometry (
 			subtag TEXT NOT NULL,
 			value TEXT NOT NULL,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
-		CREATE TABLE acquisition_chromatography (
+		CREATE TABLE IF NOT EXISTS acquisition_chromatography (
 			subtag TEXT NOT NULL,
 			value TEXT NOT NULL,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
-		CREATE TABLE acquisition_general (
+		CREATE TABLE IF NOT EXISTS acquisition_general (
 			subtag TEXT NOT NULL,
 			value TEXT NOT NULL,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
 
 		-- mass spectrometry
-		CREATE TABLE mass_spectrometry_focused_ion (
+		CREATE TABLE IF NOT EXISTS mass_spectrometry_focused_ion (
 			subtag TEXT NOT NULL,
 			value TEXT NOT NULL,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (subtag, value, massbank_id)
 		);
-		CREATE TABLE mass_spectrometry_data_processing (
+		CREATE TABLE IF NOT EXISTS mass_spectrometry_data_processing (
 			subtag TEXT NOT NULL,
 			value TEXT NOT NULL,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -1529,13 +1592,13 @@ func (p *PostgresSQLDB) Init() error {
 		);
 
 		-- spectrum (peak)
-		CREATE TABLE spectrum (
+		CREATE TABLE IF NOT EXISTS spectrum (
 			id SERIAL PRIMARY KEY,
 			splash TEXT NOT NULL,
 			num_peak INT NOT NULL,			
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
-		CREATE TABLE peak (
+		CREATE TABLE IF NOT EXISTS peak (
 			mz FLOAT NOT NULL,
 			intensity FLOAT NOT NULL,
 			relative_intensity FLOAT NOT NULL,	
@@ -1550,11 +1613,11 @@ func (p *PostgresSQLDB) Init() error {
 		
 
 		-- project
-		-- CREATE TABLE project (
+		-- CREATE TABLE IF NOT EXISTS  project (
 		-- 	id SERIAL PRIMARY KEY,
 		-- 	name TEXT NOT NULL UNIQUE
 		-- );
-		-- CREATE TABLE accession_project (
+		-- CREATE TABLE IF NOT EXISTS accession_project (
 		-- 	massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 		-- 	project_id INT NOT NULL REFERENCES project(id) ON UPDATE CASCADE ON DELETE CASCADE,
 		-- 	UNIQUE (massbank_id, project_id)
@@ -1562,7 +1625,7 @@ func (p *PostgresSQLDB) Init() error {
 		
 		-- species (sample)
 
-		CREATE TABLE browse_options (
+		CREATE TABLE IF NOT EXISTS browse_options (
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			accession VARCHAR(40) NOT NULL REFERENCES massbank(accession) ON UPDATE CASCADE ON DELETE CASCADE,
 			contributor TEXT NOT NULL REFERENCES contributor(name) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -1580,6 +1643,14 @@ func (p *PostgresSQLDB) Init() error {
 			formula TEXT NOT NULL,
 			mass FLOAT NOT NULL
 		);
+
+		CREATE TABLE IF NOT EXISTS molecules (
+			id SERIAL NOT NULL PRIMARY KEY,
+			molecule TEXT NOT NULL,
+			accession TEXT NOT NULL
+		);
+
+		TRUNCATE metadata, massbank, contributor, accession_contributor, author, accession_author, license, accession_license, publication, accession_publication, compound, compound_name, compound_class, compound_link, acquisition_instrument, accession_acquisition, acquisition_mass_spectrometry, acquisition_chromatography, acquisition_general, mass_spectrometry_focused_ion, mass_spectrometry_data_processing, spectrum, peak, peak_annotation, browse_options, molecules CASCADE;
 
 		`;
 	

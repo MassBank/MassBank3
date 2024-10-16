@@ -1,6 +1,6 @@
 import './StructuralEditor.scss';
 
-import { ChangeEvent, MouseEvent, useCallback, useMemo, useState } from 'react';
+import { MouseEvent, useCallback, useMemo, useState } from 'react';
 import { StructureEditor } from 'react-ocl/full';
 import { useDropzone } from 'react-dropzone';
 import { Molecule } from 'openchemlib';
@@ -34,11 +34,7 @@ function StructuralEditor({
   );
 
   const handleOnChangeSmilesInput = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setSmiles(e.target.value);
-    },
+    (value: string) => setSmiles(value),
     [],
   );
 

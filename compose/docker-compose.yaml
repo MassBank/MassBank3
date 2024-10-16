@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: docker.io/postgres:latest
+    image: ipbhalle/postgres:15-bingo-1.24.0
     restart: always
     ports:
       - "${DB_PORT}:5432"
@@ -8,6 +8,9 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - "${DB_LOCAL_PATH}:/var/lib/postgresql/data"
+      - "../bingo/x_datamodel.sql:/docker-entrypoint-initdb.d/x_datamodel.sql"
     healthcheck:
       test:
         [
@@ -42,11 +45,6 @@ services:
       - MB3_SERVER_PORT
       - SIMILARITY_SERVICE_COSINE_HOST=similarity-service
       - SIMILARITY_SERVICE_COSINE_PORT=8080
-      - STRUCTURE_SEARCH_SERVICE_DB_HOST=${STRUCTURE_SEARCH_SERVICE_DB_HOST}
-      - STRUCTURE_SEARCH_SERVICE_DB_PORT=${STRUCTURE_SEARCH_SERVICE_DB_PORT}
-      - STRUCTURE_SEARCH_SERVICE_DB_NAME=${STRUCTURE_SEARCH_SERVICE_DB_NAME}
-      - STRUCTURE_SEARCH_SERVICE_DB_USER=${STRUCTURE_SEARCH_SERVICE_DB_USER}
-      - STRUCTURE_SEARCH_SERVICE_DB_PASSWORD=${STRUCTURE_SEARCH_SERVICE_DB_PASSWORD}
 
   similarity-service:
     image: ipbhalle/massbank3-similarity-service:v0.1
@@ -89,17 +87,3 @@ services:
       - MB_GIT_BRANCH
       - MB_DATA_DIRECTORY
       - MB_DROP_ALL
-
-  structure-search-service:
-    build:
-      context: ..
-      dockerfile: Dockerfile-structure-search
-    restart: always
-    ports:
-      - "${STRUCTURE_SEARCH_SERVICE_PORT}:8080"
-    environment:
-      - POSTGRES_DB=${STRUCTURE_SEARCH_SERVICE_DB_NAME}
-      - POSTGRES_USER=${STRUCTURE_SEARCH_SERVICE_DB_USER}
-      - POSTGRES_PASSWORD=${STRUCTURE_SEARCH_SERVICE_DB_PASSWORD}
-    # volumes:
-    #   -

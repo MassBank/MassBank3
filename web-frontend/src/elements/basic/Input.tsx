@@ -17,6 +17,7 @@ type InputProps = {
   label?: string;
   min?: number;
   max?: number;
+  step?: number | 'any';
   inputWidth?: string;
   className?: string;
   placeholder?: string;
@@ -32,6 +33,7 @@ function Input({
   label,
   min,
   max,
+  step = 'any',
   inputWidth = '80px',
   className = 'Input',
   placeholder = '',
@@ -72,6 +74,7 @@ function Input({
           placeholder={placeholder}
           min={min}
           max={max}
+          step={step}
           style={
             {
               ...style,
@@ -93,6 +96,7 @@ function Input({
       max,
       min,
       placeholder,
+      step,
       style,
       type,
     ],

@@ -180,6 +180,12 @@ paths:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/PeakList"
         required: false
       - in: query
+        name: peak_list_threshold
+        description: Threshold as minimal score for peak list search.
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/PeakListThreshold"
+        required: false
+      - in: query
         name: inchi
         description: Filter by InChI
         schema:
@@ -336,6 +342,12 @@ paths:
         description: "Maximum number of results."
         schema:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Limit"
+        required: false
+      - in: query
+        name: threshold
+        description: Threshold as minimal score.
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/PeakListThreshold"
         required: false
     get:
       summary: Get a list of records with similarity scores

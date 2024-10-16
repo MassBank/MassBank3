@@ -243,6 +243,14 @@ paths:
         schema:
           $ref: '#/components/schemas/PeakList'
         style: form
+      - description: Threshold as minimal score for peak list search.
+        explode: true
+        in: query
+        name: peak_list_threshold
+        required: false
+        schema:
+          $ref: '#/components/schemas/PeakListThreshold'
+        style: form
       - description: Filter by InChI
         explode: true
         in: query
@@ -427,6 +435,14 @@ paths:
         required: false
         schema:
           $ref: '#/components/schemas/Limit'
+        style: form
+      - description: Threshold as minimal score.
+        explode: true
+        in: query
+        name: threshold
+        required: false
+        schema:
+          $ref: '#/components/schemas/PeakListThreshold'
         style: form
       responses:
         "200":
@@ -669,6 +685,12 @@ components:
       - license
       - title
       type: object
+    PeakListThreshold:
+      default: 0.7
+      format: double
+      maximum: 1.0
+      minimum: 0.0
+      type: number
     Substructure:
       type: string
     SearchResult:

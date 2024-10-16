@@ -154,6 +154,18 @@ type MB3Database interface {
 	// Will return an empty list if the filter does not match any records.
 	GetSearchRecords(filters Filters) (*[]massbank.MassBank2, error)
 
+	// GetRecordsBySubstructure Get an array of MassBank accessions by filtering by substructure
+	//
+	// Will return an empty list if the filter does not match any records.
+	GetAccessionsBySubstructure(substructure string) ([]string, error)
+
+	GetAccessionsByFilterOptions(filters Filters) ([]string, error)
+
+	// GetRecordsBySubstructure Get an array of MassBank records by filtering by substructure
+	//
+	// Will return an empty list if the filter does not match any records.
+	GetRecordsBySubstructure(substructure string) (*[]massbank.MassBank2, error)
+
 	// GetUniqueValues is used to get the values for filter frontend
 	GetUniqueValues(filters Filters) (MB3Values, error)
 

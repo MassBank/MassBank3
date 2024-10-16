@@ -160,11 +160,16 @@ func (c *DefaultAPIController) GetSearchRecords(w http.ResponseWriter, r *http.R
 	}
 	peakDifferencesParam := strings.Split(query.Get("peak_differences"), ",")
 	peakListParam := strings.Split(query.Get("peak_list"), ",")
+	peakListThresholdParam, err := parseFloat64Parameter(query.Get("peak_list_threshold"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
 	inchiParam := query.Get("inchi")
 	inchiKeyParam := query.Get("inchi_key")
 	contributorParam := strings.Split(query.Get("contributor"), ",")
 	substructureParam := query.Get("substructure")
-	result, err := c.service.GetSearchRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, inchiParam, inchiKeyParam, contributorParam, substructureParam)
+	result, err := c.service.GetSearchRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, peakListThresholdParam, inchiParam, inchiKeyParam, contributorParam, substructureParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -259,7 +264,12 @@ func (c *DefaultAPIController) GetSimilarity(w http.ResponseWriter, r *http.Requ
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.GetSimilarity(r.Context(), peakListParam, referenceSpectraListParam, limitParam)
+	thresholdParam, err := parseFloat64Parameter(query.Get("threshold"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	result, err := c.service.GetSimilarity(r.Context(), peakListParam, referenceSpectraListParam, limitParam, thresholdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
