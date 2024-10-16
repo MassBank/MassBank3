@@ -6,7 +6,7 @@
 \connect :MB3_DATABASE
 
 -- Bingo database extension (chemistry) --
-\i /opt/bingo-postgres/bingo_install.sql
+-- \i /opt/bingo-postgres/bingo_install.sql
 GRANT USAGE ON SCHEMA bingo TO :MB3_USER;
 GRANT SELECT ON bingo.bingo_config TO :MB3_USER;
 GRANT SELECT ON bingo.bingo_tau_config TO :MB3_USER;
@@ -26,3 +26,6 @@ REVOKE ALL ON ALL TABLES IN SCHEMA :MB3_SCHEMA FROM public;
 
 -- set schema --
 SET search_path TO :MB3_SCHEMA;
+
+-- update ALLOW_NON_UNIQUE_DEAROMATIZATION to 1 --
+UPDATE bingo.bingo_config SET cvalue = 1 WHERE cname = 'ALLOW_NON_UNIQUE_DEAROMATIZATION';
