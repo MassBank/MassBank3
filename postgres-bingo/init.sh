@@ -1,0 +1,28 @@
+#!/bin/bash
+set -e
+
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+    \set MB3_SCHEMA massbank3
+    \set MB3_DATABASE $POSTGRES_DB
+    \set MB3_USER $POSTGRES_USER
+
+	-- schema --
+    CREATE SCHEMA IF NOT EXISTS :MB3_SCHEMA;
+    CREATE SCHEMA IF NOT EXISTS AUTHORIZATION :MB3_USER;
+
+    -- adjust schema search path --
+    ALTER USER :MB3_USER SET search_path to :MB3_SCHEMA, public;
+
+    -- privileges --
+    GRANT USAGE ON SCHEMA :MB3_SCHEMA, public TO :MB3_USER;
+    GRANT CONNECT, TEMPORARY, TEMP  ON  DATABASE :MB3_DATABASE to :MB3_USER;
+    GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA :MB3_SCHEMA to :MB3_USER;
+    GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public to :MB3_USER;
+    REVOKE ALL ON ALL TABLES IN SCHEMA :MB3_SCHEMA FROM public;
+
+    -- set schema --
+    SET search_path TO :MB3_SCHEMA;
+
+    -- update ALLOW_NON_UNIQUE_DEAROMATIZATION to 1 --
+    UPDATE bingo.bingo_config SET cvalue = 1 WHERE cname = 'ALLOW_NON_UNIQUE_DEAROMATIZATION';
+EOSQL

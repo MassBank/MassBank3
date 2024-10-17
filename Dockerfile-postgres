@@ -1,6 +1,0 @@
-FROM ipbhalle/postgres:15-bingo-1.24.0
-
-COPY ./postgres-bingo/entrypoint.sh /entrypoint.sh
-COPY ./postgres-bingo/datamodel.sql /datamodel.sql
-
-ENTRYPOINT bash entrypoint.sh ${POSTGRES_DB} ${POSTGRES_USER} ${POSTGRES_PASSWORD}
