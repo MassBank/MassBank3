@@ -15,13 +15,3 @@ RUN install -o postgres -g postgres /opt/bingo-postgres/bingo_install.sql /docke
 FROM postgres:15 as base
 COPY --from=builder /opt/bingo-postgres /opt/bingo-postgres
 COPY --from=builder /docker-entrypoint-initdb.d/bingo_install.sql /docker-entrypoint-initdb.d/bingo_install.sql
-
-##
-
-## Steps to finalize the installation:
-##
-## GRANT USAGE ON SCHEMA bingo TO %ROLE%;
-## GRANT SELECT ON bingo.bingo_config TO %ROLE%;
-## GRANT SELECT ON bingo.bingo_tau_config TO %ROLE%;
-##
-##

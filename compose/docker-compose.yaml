@@ -1,16 +1,17 @@
 services:
   postgres:
-    image: ipbhalle/postgres:15-bingo-1.24.0
+    build:
+      context: ..
+      dockerfile: Dockerfile-postgres
     restart: always
     ports:
       - "${DB_PORT}:5432"
     environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_USER: ${DB_USER}
       POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - "${DB_LOCAL_PATH}:/var/lib/postgresql/data"
-      - "../bingo/x_datamodel.sql:/docker-entrypoint-initdb.d/x_datamodel.sql"
     healthcheck:
       test:
         [
