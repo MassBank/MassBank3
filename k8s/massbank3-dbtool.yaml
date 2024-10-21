@@ -11,7 +11,7 @@ data:
   DB_HOST: "massbank3-postgres-service"
   DB_NAME: "massbank3"
   DB_USER: "massbank3"
-  MB_DB_INIT: "false"
+  MB_DB_INIT: "true"
   MB_GIT_REPO: "https://github.com/MassBank/MassBank-data"
   MB_GIT_BRANCH: "main"
   MB_DATA_DIRECTORY: ""
@@ -25,9 +25,6 @@ metadata:
   labels:
     app: massbank3-dbtool # Labels des Deployments
 spec:
-  selector:
-    matchLabels:
-      app: massbank3-dbtool # Welche Container gehören zum Deployment? (*)
   template:
     metadata:
       labels:
@@ -36,7 +33,8 @@ spec:
       containers:
         - name: massbank3-dbtool
           image: ipbhalle/massbank3-dbtool:dev
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           envFrom:
             - configMapRef:
                 name: massbank3-dbtool-secret
+      restartPolicy: Never 
