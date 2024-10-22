@@ -846,65 +846,81 @@ func (p *PostgresSQLDB) GetSearchRecords(filters Filters) (*[]massbank.MassBank2
 }
 
 // BuildSearchOptionsWhere to build the where clause within the browse_options table
-func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) string {
+func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) (string, []string) {
 	var query = ""
 	addedWhere := false
 	addedAnd := false
 
+	parameters := []string{}
+
 	if(filters.Contributor != nil) {
-		query = query + " WHERE contributor IN (" + "'" + strings.Join(*filters.Contributor, "','") + "'" + ")"
-		addedWhere = true
+		var placeholder []string
+		for _, contributor := range *filters.Contributor {
+			parameters = append(parameters, contributor)
+			placeholder = append(placeholder, "$" + strconv.Itoa(len(parameters)))
+		}
+		query = query + " WHERE contributor IN (" + strings.Join(placeholder, ",") + ")"
+		addedWhere = true		
 	}
 	if (filters.InstrumentType != nil) {
-		subQuery := "instrument_type IN (" + "'" + strings.Join(*filters.InstrumentType, "','") + "'" + ")"
+		var placeholder []string
+		for _, it := range *filters.InstrumentType {
+			parameters = append(parameters, it)
+			placeholder = append(placeholder, "$" + strconv.Itoa(len(parameters)))
+		}
+		subQuery := "instrument_type IN (" + strings.Join(placeholder, ",")+ ")"
 		if(addedWhere) {
 			query = query + " AND " + subQuery
 			addedAnd = true
 		} else {
 			query = query + " WHERE " + subQuery
 			addedWhere = true
-		}
+		}		
 	}
 
-	if(filters.MsType != nil) {
-		var msTypes []string
+	if(filters.MsType != nil) {	
+		var placeholder []string	
 		for _, ms := range *filters.MsType {
-			msTypes = append(msTypes, ms.String())
+			parameters = append(parameters, ms.String())
+			placeholder = append(placeholder, "$" + strconv.Itoa(len(parameters)))
 		}
-		subQuery := "ms_type IN (" + "'" + strings.Join(msTypes, "','") + "'" + ")"
+		subQuery := "ms_type IN (" + strings.Join(placeholder, ",") + ")"
 		if(addedWhere || addedAnd) {
 			query = query + " AND " + subQuery
 			addedAnd = true
 		} else {
 			query = query + " WHERE " + subQuery
 			addedWhere = true
-		}
+		}		
 	}
 
 	if(filters.IonMode != massbank.ANY) {		
-		subQuery := "ion_mode = '" + string(filters.IonMode) + "'"
+		parameters = append(parameters, string(filters.IonMode))
+		subQuery := "ion_mode = $" + strconv.Itoa(len(parameters))
 		if(addedWhere || addedAnd) {
 			query = query + " AND " + subQuery
 			addedAnd = true
 		} else {
 			query = query + " WHERE " + subQuery
 			addedWhere = true
-		}	
+		}		
 	}
 
 	if(filters.Inchi != "") {
-		subQuery := "inchi = '" + filters.Inchi + "'"
+		parameters = append(parameters, filters.Inchi)
+		subQuery := "inchi = $" + strconv.Itoa(len(parameters))
 		if(addedWhere || addedAnd) {
 			query = query + " AND " + subQuery
 			addedAnd = true
 		} else {
 			query = query + " WHERE " + subQuery
 			addedWhere = true
-		}
+		}		
 	}
 
 	if(filters.InchiKey != "") {
-		subQuery := "inchikey = '" + filters.InchiKey + "'"
+		parameters = append(parameters, filters.InchiKey)
+		subQuery := "inchikey = $" + strconv.Itoa(len(parameters))
 		if(addedWhere || addedAnd) {
 			query = query + " AND " + subQuery
 			addedAnd = true
@@ -915,29 +931,33 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) string {
 	}
 
 	if(filters.Splash != "") {
-		subQuery := "splash = '" + filters.Splash + "'"
+		parameters = append(parameters, filters.Splash)
+		subQuery := "splash = $" + strconv.Itoa(len(parameters))
 		if(addedWhere || addedAnd) {
 			query = query + " AND " + subQuery
 			addedAnd = true
 		} else {
 			query = query + " WHERE " + subQuery
 			addedWhere = true
-		}
+		}		
 	}
 
 	if(filters.Formula != "") {
-		subQuery := "formula = '" + filters.Formula + "'"
+		parameters = append(parameters, filters.Formula)
+		subQuery := "formula = $" + strconv.Itoa(len(parameters))
 		if(addedWhere || addedAnd) {
 			query = query + " AND " + subQuery
 			addedAnd = true
 		} else {
 			query = query + " WHERE " + subQuery
 			addedWhere = true
-		}
+		}		
 	}
 
 	if(filters.Mass != nil && filters.MassEpsilon != nil) {
-		subQuery := "ABS(mass - " + strconv.FormatFloat(*filters.Mass, 'f', -1, 64) + ") <= " + strconv.FormatFloat(*filters.MassEpsilon, 'f', -1, 64)
+		parameters = append(parameters, strconv.FormatFloat(*filters.Mass, 'f', -1, 64))
+		parameters = append(parameters, strconv.FormatFloat(*filters.MassEpsilon, 'f', -1, 64))
+		subQuery := "ABS(mass - $" + strconv.Itoa(len(parameters)-1) + ") <= $" + strconv.Itoa(len(parameters))
 		if(addedWhere || addedAnd) {
 			query = query + " AND " + subQuery
 			addedAnd = true
@@ -948,39 +968,46 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) string {
 	}
 
 	if(filters.CompoundName != "") {
-		subQuery := "massbank_id IN (SELECT DISTINCT(massbank_id) FROM compound_name WHERE LOWER(name) LIKE LOWER('%" + filters.CompoundName + "%'))"
+		parameters = append(parameters, filters.CompoundName)
+		subQuery := "massbank_id IN (SELECT DISTINCT(massbank_id) FROM compound_name WHERE LOWER(name) LIKE LOWER(CONCAT('%%',$" + strconv.Itoa(len(parameters)) + "::text,'%%')))"
 		if(addedWhere || addedAnd) {
 			query = query + " AND " + subQuery
 			addedAnd = true
 		} else {
 			query = query + " WHERE " + subQuery
 			addedWhere = true
-		}
+		}		
 	}
 
 	if(filters.Peaks != nil && filters.MassEpsilon != nil) {
 		peaksCount := len(*filters.Peaks)
 		var from = "FROM " 				
 		var where = "WHERE "
-		if(peaksCount == 1) {
+		if(peaksCount == 1) {			
+			parameters = append(parameters,  strconv.FormatFloat((*filters.Peaks)[0] - *filters.MassEpsilon, 'f', -1, 64))
+			parameters = append(parameters,  strconv.FormatFloat((*filters.Peaks)[0] + *filters.MassEpsilon, 'f', -1, 64))
 			from = from + "peak AS p1"
-			where = where + "p1.mz BETWEEN " + strconv.FormatFloat((*filters.Peaks)[0] - *filters.MassEpsilon, 'f', -1, 64) + " AND " + strconv.FormatFloat((*filters.Peaks)[0] + *filters.MassEpsilon, 'f', -1, 64)
+			where = where + "p1.mz BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
 			if(filters.Intensity != nil) {
-				where = where + " AND p1.relative_intensity >= " + strconv.FormatInt(*filters.Intensity, 10)
+				parameters = append(parameters, strconv.FormatInt(*filters.Intensity, 10))
+				where = where + " AND p1.relative_intensity >= $" + strconv.Itoa(len(parameters))
 			}
-		} else {
+		} else {			
 			for i := 0; i < peaksCount; i++ {
+				parameters = append(parameters,  strconv.FormatFloat((*filters.Peaks)[i] - *filters.MassEpsilon, 'f', -1, 64))
+				parameters = append(parameters,  strconv.FormatFloat((*filters.Peaks)[i] + *filters.MassEpsilon, 'f', -1, 64))
 				from = from + "peak AS p" + strconv.Itoa(i+1)
 				if(i < peaksCount - 1) {
 					from = from + ", "
 				}
 				if(i == 0) {
-					where = where + "p1.mz BETWEEN " + strconv.FormatFloat((*filters.Peaks)[i] - *filters.MassEpsilon, 'f', -1, 64) + " AND " + strconv.FormatFloat((*filters.Peaks)[i] + *filters.MassEpsilon, 'f', -1, 64)
-				} else{
-					where = where + "p" + strconv.Itoa(i+1) + ".spectrum_id=p1.spectrum_id AND p" + strconv.Itoa(i+1) + ".mz BETWEEN " + strconv.FormatFloat((*filters.Peaks)[i] - *filters.MassEpsilon, 'f', -1, 64) + " AND " + strconv.FormatFloat((*filters.Peaks)[i] + *filters.MassEpsilon, 'f', -1, 64)					
+					where = where + "p1.mz BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
+				} else {
+					where = where + "p" + strconv.Itoa(i+1) + ".spectrum_id=p1.spectrum_id AND p" + strconv.Itoa(i+1) + ".mz BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
 				}
 				if(filters.Intensity != nil) {
-					where = where + " AND p" + strconv.Itoa(i+1) + ".relative_intensity >= " + strconv.FormatInt(*filters.Intensity, 10)
+					parameters = append(parameters, strconv.FormatInt(*filters.Intensity, 10))
+					where = where + " AND p" + strconv.Itoa(i+1) + ".relative_intensity >= $" + strconv.Itoa(len(parameters))
 				}
 				if(i < peaksCount - 1) {
 					where = where + " AND "
@@ -997,15 +1024,19 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) string {
 		}
 	}
 
-	return query
+	fmt.Println("parameters: ", parameters)
+
+	return query, parameters
 }
 
 func (p *PostgresSQLDB) GetAccessionsByFilterOptions(filters Filters) ([]string, error) {
 	var accessions = []string{}
 	query := "SELECT accession FROM browse_options"
-	query = query + p.BuildBrowseOptionsWhere(filters)
+	subQuery, parameters := p.BuildBrowseOptionsWhere(filters)
+	query = query + subQuery
 	if(filters.Mass != nil && filters.MassEpsilon != nil) {
-		query = query + " ORDER BY ABS(mass - " + strconv.FormatFloat(*filters.Mass, 'f', -1, 64) + ");"
+		parameters = append(parameters, strconv.FormatFloat(*filters.Mass, 'f', -1, 64))
+		query = query + " ORDER BY ABS(mass - $" + strconv.Itoa(len(parameters)) + ");"
 	} else {
 		query = query + " ORDER BY contributor, accession;"
 	}
@@ -1018,7 +1049,11 @@ func (p *PostgresSQLDB) GetAccessionsByFilterOptions(filters Filters) ([]string,
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query()
+	args := make([]interface{}, len(parameters))
+	for i, v := range parameters {
+		args[i] = v
+	}
+	rows, err := stmt.Query(args...)
 	if err != nil {
 		return nil, err
 	}
@@ -1149,7 +1184,8 @@ func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 
 	
 	query := "SELECT contributor, instrument_type, ms_type, ion_mode, COUNT(contributor) FROM browse_options"
-	query = query + p.BuildBrowseOptionsWhere(filters)
+	subQuery, parameters := p.BuildBrowseOptionsWhere(filters)
+	query = query + subQuery
 	query = query + " GROUP BY contributor, instrument_type, ms_type, ion_mode;"
 	stmt, err := p.database.Prepare(query)
 	if err != nil {
@@ -1157,7 +1193,11 @@ func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	}
 	defer stmt.Close()
 
-	rows, err = stmt.Query()
+	args := make([]interface{}, len(parameters))
+	for i, v := range parameters {
+		args[i] = v
+	}
+	rows, err = stmt.Query(args...)
 	if err != nil {
 		return MB3Values{}, err
 	}
