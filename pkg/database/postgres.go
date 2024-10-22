@@ -1024,8 +1024,6 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) (string, []stri
 		}
 	}
 
-	fmt.Println("parameters: ", parameters)
-
 	return query, parameters
 }
 
@@ -1041,7 +1039,8 @@ func (p *PostgresSQLDB) GetAccessionsByFilterOptions(filters Filters) ([]string,
 		query = query + " ORDER BY contributor, accession;"
 	}
 
-	fmt.Println("query: ", query)
+	fmt.Println("GetAccessionsByFilterOptions -> query: ", query)
+	fmt.Println(" -> parameters: ", parameters)
 
 	stmt, err := p.database.Prepare(query)
 	if err != nil {
@@ -1142,7 +1141,6 @@ func (p *PostgresSQLDB) GetMsTypeAndIonMode() (*MSTypeAndIonMode, error){
 
 // GetUniqueValues see [MB3Database.GetUniqueValues]
 func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
-
 	var val MB3Values = MB3Values{}
 	var rows *sql.Rows
 	var err error
@@ -1187,6 +1185,10 @@ func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	subQuery, parameters := p.BuildBrowseOptionsWhere(filters)
 	query = query + subQuery
 	query = query + " GROUP BY contributor, instrument_type, ms_type, ion_mode;"
+
+	fmt.Println("GetUniqueValues -> query: ", query)
+	fmt.Println(" -> parameters: ", parameters)
+
 	stmt, err := p.database.Prepare(query)
 	if err != nil {
 		return MB3Values{}, err
