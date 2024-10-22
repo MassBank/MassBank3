@@ -540,7 +540,7 @@ func GetSearchRecords(instrumentType []string, splash string, msType []string, i
 	}
 	fmt.Println("filters: ", filters)	
 	
-	checkFilters := filters.CompoundName != "" || filters.Mass != nil || filters.Formula != "" || 
+	checkFilters := (!checkSimilarity && !checkSubstructure) || filters.CompoundName != "" || filters.Mass != nil || filters.Formula != "" || 
 		filters.Peaks != nil || filters.PeakDifferences != nil || filters.Inchi != "" || 
 		filters.InchiKey != "" || filters.Splash != "" || filters.IonMode != massbank.ANY || 
 		filters.MsType != nil || filters.InstrumentType != nil || filters.Contributor != nil
@@ -548,7 +548,7 @@ func GetSearchRecords(instrumentType []string, splash string, msType []string, i
 	setFilterSearch := mapset.NewSet[string]()
 
 	accessionsFilters := []string{}
-	if((!checkSimilarity && !checkSubstructure) || checkFilters) {
+	if(checkFilters) {
 			fmt.Println(" -> filter by Filters")
 			accessionsFilters, err = db.GetAccessionsByFilterOptions(*filters)
 			if err != nil {

@@ -42,16 +42,18 @@ function ContentView() {
       const searchParams = buildSearchParams(prevContent);
       const newContent = (await fetchData(url, searchParams)) as Content;
 
-      // const url2 = import.meta.env.VITE_MB3_API_URL + '/v1/records/simple';
-      // const _records = await fetchData(url2, searchParams);
-      // const _hits: Hit[] = _records.map((r: Record) => {
-      //   const hit: Hit = {
-      //     accession: r.accession,
-      //     record: r,
-      //   };
+      // const url2 = import.meta.env.VITE_MB3_API_URL + '/v1/records/search';
+      // const _records = (await fetchData(url2, searchParams)) as SearchResult;
 
-      //   return hit;
-      // });
+      // const _hits: Hit[] = _records.data
+      //   .map((res: SearchResultData) => res.record)
+      //   .map((r: Record) => {
+      //     const hit: Hit = {
+      //       accession: r.accession,
+      //       record: r,
+      //     };
+      //     return hit;
+      //   });
 
       initFlags(newContent);
       setContent(newContent);
