@@ -16,7 +16,6 @@ import buildSearchParams from '../../../../utils/buildSearchParams';
 import initFlags from '../../../../utils/initFlags';
 import axios from 'axios';
 import SearchResult from '../../../../types/SearchResult';
-import SearchResultData from '../../../../types/SearchResultData';
 import BasicSearchFilterOptions from '../../../../types/filterOptions/basicSearchFilterOptions';
 import parsePeakListInputField from './searchPanel/utils/parsePeakListAndReferences';
 import { Molecule } from 'openchemlib';
@@ -147,18 +146,7 @@ function SearchView() {
     const searchResult = (await fetchData(url, searchParams)) as SearchResult;
     console.log(searchResult);
 
-    const _hits: Hit[] = searchResult.data
-      ? searchResult.data.map((d: SearchResultData) => {
-          const hit: Hit = {
-            record: d.record,
-            accession: d.record.accession,
-            score: d.score,
-          };
-
-          return hit;
-        })
-      : [];
-
+    const _hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
     setHits(_hits);
 
     setIsRequesting(false);

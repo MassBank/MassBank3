@@ -152,7 +152,7 @@ type MB3Database interface {
 	// GetSimpleRecords Get an array of MassBank records by filtering
 	//
 	// Will return an empty list if the filter does not match any records.
-	GetSearchRecords(filters Filters) (*[]massbank.MassBank2, error)
+	GetSearchResults(filters Filters) (*[]string, error)
 
 	// GetRecordsBySubstructure Get an array of MassBank accessions by filtering by substructure
 	//

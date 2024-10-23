@@ -210,11 +210,11 @@ paths:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Substructure"
         required: false
     get:
-      summary: Get a list of records as a search result in a specific format (accession, title, peaks, smiles, similarity search result)
-      operationId: getSearchRecords
+      summary: Get a list of records as a search result in a specific format (accession, similarity score)
+      operationId: getSearchResults
       responses:
         "200":
-          description: "A list of simple records as a search result"
+          description: "A list of search results"
           content:
             application/json:
               schema:

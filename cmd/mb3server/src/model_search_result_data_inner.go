@@ -10,7 +10,9 @@
 package mb3server
 
 type SearchResultDataInner struct {
-	Record MbRecord `json:"record,omitempty"`
+
+	// The accession id of the record.
+	Accession string `json:"accession,omitempty"`
 
 	// Similarity score to the query spectrum.
 	Score float32 `json:"score,omitempty"`
@@ -18,9 +20,6 @@ type SearchResultDataInner struct {
 
 // AssertSearchResultDataInnerRequired checks if the required fields are not zero-ed
 func AssertSearchResultDataInnerRequired(obj SearchResultDataInner) error {
-	if err := AssertMbRecordRequired(obj.Record); err != nil {
-		return err
-	}
 	return nil
 }
 

@@ -12,6 +12,9 @@ import ContentChart from './ContentChart';
 import fetchData from '../../../../utils/fetchData';
 import buildSearchParams from '../../../../utils/buildSearchParams';
 import initFlags from '../../../../utils/initFlags';
+// import Hit from '../../../../types/Hit';
+// import SearchResult from '../../../../types/SearchResult';
+// import ResultPanel from '../../../result/ResultPanel';
 
 function ContentView() {
   const ref = useRef(null);
@@ -43,22 +46,12 @@ function ContentView() {
       const newContent = (await fetchData(url, searchParams)) as Content;
 
       // const url2 = import.meta.env.VITE_MB3_API_URL + '/v1/records/search';
-      // const _records = (await fetchData(url2, searchParams)) as SearchResult;
-
-      // const _hits: Hit[] = _records.data
-      //   .map((res: SearchResultData) => res.record)
-      //   .map((r: Record) => {
-      //     const hit: Hit = {
-      //       accession: r.accession,
-      //       record: r,
-      //     };
-      //     return hit;
-      //   });
+      // const result = (await fetchData(url2, searchParams)) as SearchResult;
+      // const _hits: Hit[] = result.data ? (result.data as Hit[]) : [];
 
       initFlags(newContent);
       setContent(newContent);
       setContent2({ ...newContent });
-
       // setHits(_hits);
 
       setIsRequesting(false);

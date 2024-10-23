@@ -19,7 +19,7 @@ import (
 // pass the data to a DefaultAPIServicer to perform the required actions, then write the service results to the http response.
 type DefaultAPIRouter interface {
 	GetRecords(http.ResponseWriter, *http.Request)
-	GetSearchRecords(http.ResponseWriter, *http.Request)
+	GetSearchResults(http.ResponseWriter, *http.Request)
 	GetRecord(http.ResponseWriter, *http.Request)
 	GetSimpleRecord(http.ResponseWriter, *http.Request)
 	GetCount(http.ResponseWriter, *http.Request)
@@ -34,7 +34,7 @@ type DefaultAPIRouter interface {
 // and updated with the logic required for the API.
 type DefaultAPIServicer interface {
 	GetRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, string, string, []string) (ImplResponse, error)
-	GetSearchRecords(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, float64, string, string, []string, string) (ImplResponse, error)
+	GetSearchResults(context.Context, []string, string, []string, string, string, string, float64, string, []string, int32, []string, []string, float64, string, string, []string, string) (ImplResponse, error)
 	GetRecord(context.Context, string) (ImplResponse, error)
 	GetSimpleRecord(context.Context, string) (ImplResponse, error)
 	GetCount(context.Context) (ImplResponse, error)

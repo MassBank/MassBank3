@@ -1,5 +1,5 @@
-import SearchResultData from './SearchResultData';
+import Hit from './Hit';
 
 export default interface SearchResult {
-  data: SearchResultData[];
+  data: Hit[];
 }

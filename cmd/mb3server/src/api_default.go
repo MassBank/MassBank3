@@ -56,10 +56,10 @@ func (c *DefaultAPIController) Routes() Routes {
 			c.GetRecords,
 		},
 		{
-			"GetSearchRecords",
+			"GetSearchResults",
 			strings.ToUpper("Get"),
 			"/v1/records/search",
-			c.GetSearchRecords,
+			c.GetSearchResults,
 		},
 		{
 			"GetRecord",
@@ -137,8 +137,8 @@ func (c *DefaultAPIController) GetRecords(w http.ResponseWriter, r *http.Request
 
 }
 
-// GetSearchRecords - Get a list of records as a search result in a specific format (accession, title, peaks, smiles, similarity search result)
-func (c *DefaultAPIController) GetSearchRecords(w http.ResponseWriter, r *http.Request) {
+// GetSearchResults - Get a list of records as a search result in a specific format (accession, similarity score)
+func (c *DefaultAPIController) GetSearchResults(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	instrumentTypeParam := strings.Split(query.Get("instrument_type"), ",")
 	splashParam := query.Get("splash")
@@ -169,7 +169,7 @@ func (c *DefaultAPIController) GetSearchRecords(w http.ResponseWriter, r *http.R
 	inchiKeyParam := query.Get("inchi_key")
 	contributorParam := strings.Split(query.Get("contributor"), ",")
 	substructureParam := query.Get("substructure")
-	result, err := c.service.GetSearchRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, peakListThresholdParam, inchiParam, inchiKeyParam, contributorParam, substructureParam)
+	result, err := c.service.GetSearchResults(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, peakListThresholdParam, inchiParam, inchiKeyParam, contributorParam, substructureParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

@@ -491,7 +491,7 @@ func GetRecords(instrumentType []string, splash string, msType []string, ionMode
 
 
 
-func GetSearchRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, peakListThreshold float64, inchi string, inchiKey string, contributor []string, substructure string) (*SearchResult, error) {
+func GetSearchResults(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, peakListThreshold float64, inchi string, inchiKey string, contributor []string, substructure string) (*SearchResult, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
@@ -567,13 +567,9 @@ func GetSearchRecords(instrumentType []string, splash string, msType []string, i
 	if(checkSubstructure && checkSimilarity && checkFilters) {
 		fmt.Println(" -> combined results (substructure + similarity + filters)")
 		intersection := setSubstructureSearch.Intersect(setSimilaritySearch).Intersect(setFilterSearch)
-		for _, accession := range intersection.ToSlice() {
-			record, err := db.GetSimpleRecord(&accession)
-			if err != nil {
-				return nil, err
-			}
+		for _, accession := range intersection.ToSlice() {			
 			searchResultData := SearchResultDataInner{
-				Record: *buildSimpleMbRecord(record),
+				Accession: accession,
 				Score: similarityResultMap[accession],		
 			}
 			results.Data = append(results.Data, searchResultData)
@@ -584,13 +580,9 @@ func GetSearchRecords(instrumentType []string, splash string, msType []string, i
 	} else if(checkSubstructure && checkSimilarity && !checkFilters) {
 		fmt.Println(" -> combined results (substructure + similarity)")
 		intersection := setSubstructureSearch.Intersect(setSimilaritySearch)
-		for _, accession := range intersection.ToSlice() {
-			record, err := db.GetSimpleRecord(&accession)
-			if err != nil {
-				return nil, err
-			}
+		for _, accession := range intersection.ToSlice() {			
 			searchResultData := SearchResultDataInner{
-				Record: *buildSimpleMbRecord(record),
+				Accession: accession,
 				Score: similarityResultMap[accession],
 			}
 			results.Data = append(results.Data, searchResultData)
@@ -601,26 +593,18 @@ func GetSearchRecords(instrumentType []string, splash string, msType []string, i
 	} else if(checkSubstructure && !checkSimilarity && checkFilters) {
 		fmt.Println(" -> combined results (substructure + filters)")
 		intersection := setSubstructureSearch.Intersect(setFilterSearch)
-		for _, accession := range intersection.ToSlice() {
-			record, err := db.GetSimpleRecord(&accession)
-			if err != nil {
-				return nil, err
-			}
+		for _, accession := range intersection.ToSlice() {			
 			searchResultData := SearchResultDataInner{
-				Record: *buildSimpleMbRecord(record),
+				Accession: accession,
 			}
 			results.Data = append(results.Data, searchResultData)
 		}
 	} else if(!checkSubstructure && checkSimilarity && checkFilters) {
 		fmt.Println(" -> combined results (similarity + filters)")
 		intersection := setSimilaritySearch.Intersect(setFilterSearch)
-		for _, accession := range intersection.ToSlice() {
-			record, err := db.GetSimpleRecord(&accession)
-			if err != nil {
-				return nil, err
-			}
+		for _, accession := range intersection.ToSlice() {			
 			searchResultData := SearchResultDataInner{
-				Record: *buildSimpleMbRecord(record),
+				Accession: accession,
 				Score: similarityResultMap[accession],
 			}
 			results.Data = append(results.Data, searchResultData)
@@ -631,36 +615,20 @@ func GetSearchRecords(instrumentType []string, splash string, msType []string, i
 	} else {
 		fmt.Println("no combined results found -> single results")
 		if(checkSimilarity && !checkFilters && !checkSubstructure) {
-			for _, similarityResult := range similaritySearchResult.Data {
-				record, err := db.GetSimpleRecord(&similarityResult.Accession)
-				if err != nil {
-					return nil, err
-				}
-				searchResultData := SearchResultDataInner{
-					Record: *buildSimpleMbRecord(record),
-					Score: similarityResult.Score,
-				}
-				results.Data = append(results.Data, searchResultData)
+			for _, similarityResult := range similaritySearchResult.Data {								
+				results.Data = append(results.Data, SearchResultDataInner(similarityResult))
 			}
 		} else if(checkFilters && !checkSimilarity && !checkSubstructure) {
-			for _, accession := range accessionsFilters {
-				record, err := db.GetSimpleRecord(&accession)
-				if err != nil {
-					return nil, err
-				}
+			for _, accession := range accessionsFilters {				
 				searchResultData := SearchResultDataInner{
-					Record: *buildSimpleMbRecord(record),
+					Accession: accession,
 				}
 				results.Data = append(results.Data, searchResultData)
 			}
 		} else if(checkSubstructure && !checkSimilarity && !checkFilters) {
-			for _, accession := range accessionsSubstructureSearch {
-				record, err := db.GetSimpleRecord(&accession)
-				if err != nil {
-					return nil, err
-				}
+			for _, accession := range accessionsSubstructureSearch {				
 				searchResultData := SearchResultDataInner{
-					Record: *buildSimpleMbRecord(record),
+					Accession: accession,
 				}
 				results.Data = append(results.Data, searchResultData)
 			}
@@ -679,28 +647,28 @@ func getEnv(name string, fallback string) string {
 	return fallback
 }
 
-func FilterBySubstructure(substructure string) (*SearchResult, error) {
-	if err := initDB(); err != nil {
-		return nil, err
-	}
+// func FilterBySubstructure(substructure string) (*SearchResult, error) {
+// 	if err := initDB(); err != nil {
+// 		return nil, err
+// 	}
 
-	result := SearchResult{}
-	result.Data = []SearchResultDataInner{}
+// 	result := SearchResult{}
+// 	result.Data = []SearchResultDataInner{}
 
-	records, err := db.GetRecordsBySubstructure(substructure)
-	if err != nil {
-		return nil, err
-	}
+// 	records, err := db.GetRecordsBySubstructure(substructure)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	for _, record := range *records {
-		searchResultData := SearchResultDataInner{
-			Record: *buildSimpleMbRecord(&record),
-		}
-		result.Data = append(result.Data, searchResultData)
-	}
+// 	for _, record := range *records {
+// 		searchResultData := SearchResultDataInner{
+// 			Record: *buildSimpleMbRecord(&record),
+// 		}
+// 		result.Data = append(result.Data, searchResultData)
+// 	}
 
-	return &result, nil
-}
+// 	return &result, nil
+// }
 
 func GetSimilarity(peakList []string, referenceSpectraList []string, limit int32, threshold float64) (*SimilaritySearchResult, error) {
 	sort.Slice(peakList, func(i, j int) bool {

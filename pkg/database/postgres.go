@@ -818,9 +818,8 @@ func (p *PostgresSQLDB) GetRecordsBySubstructure(substructure string) (*[]massba
 	return &records, nil
 }
 
-
-// GetSimpleRecords see [MB3Database.GetSimpleRecords]
-func (p *PostgresSQLDB) GetSearchRecords(filters Filters) (*[]massbank.MassBank2, error) {
+// GetSearchResults see [MB3Database.GetSearchResults]
+func (p *PostgresSQLDB) GetSearchResults(filters Filters) (*[]string, error) {
 	if filters.MassEpsilon == nil {
 		filters.MassEpsilon = &DefaultValues.MassEpsilon
 	}
@@ -833,16 +832,7 @@ func (p *PostgresSQLDB) GetSearchRecords(filters Filters) (*[]massbank.MassBank2
 		return nil, err
 	}
 
-	records := []massbank.MassBank2{}
-	for _, accession := range accessions {
-		record, err := p.GetSimpleRecord(&accession)
-		if err != nil {
-			return nil, err
-		}
-		records = append(records, *record)
-	}
-
-	return &records, nil
+	return &accessions, nil
 }
 
 // BuildSearchOptionsWhere to build the where clause within the browse_options table

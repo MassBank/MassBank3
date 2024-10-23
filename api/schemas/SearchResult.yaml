@@ -8,9 +8,9 @@ properties:
     items:
       type: object
       properties:
-        record:
-          description: MassBank record as a search result.
-          $ref: "./MBRecord.yaml"
+        accession:
+          description: The accession id of the record.
+          type: string
         score:
           description: Similarity score to the query spectrum.
           type: number
