@@ -14,7 +14,6 @@ import fetchData from '../../../../utils/fetchData';
 import Content from '../../../../types/Content';
 import buildSearchParams from '../../../../utils/buildSearchParams';
 import initFlags from '../../../../utils/initFlags';
-import axios from 'axios';
 import SearchResult from '../../../../types/SearchResult';
 import BasicSearchFilterOptions from '../../../../types/filterOptions/basicSearchFilterOptions';
 import parsePeakListInputField from './searchPanel/utils/parsePeakListAndReferences';
@@ -32,7 +31,7 @@ function SearchView() {
   const [collapsed, setCollapsed] = useState<boolean>(false);
 
   const searchPanelWidth = useMemo(
-    () => (collapsed ? 50 : width * 0.4),
+    () => (collapsed ? 50 : width * 0.3),
     [collapsed, width],
   );
   const searchPanelHeight = height;
@@ -138,13 +137,8 @@ function SearchView() {
       const smiles = mol.toSmiles();
       searchParams['substructure'] = [smiles];
     }
-
-    console.log(searchParams);
-
     const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/search';
-    console.log(axios.getUri({ url, params: searchParams }));
     const searchResult = (await fetchData(url, searchParams)) as SearchResult;
-    console.log(searchResult);
 
     const _hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
     setHits(_hits);
