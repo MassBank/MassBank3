@@ -110,7 +110,7 @@ function StructuralEditor({
             type="text"
             label="SMILES:"
             onChange={handleOnChangeSmilesInput}
-            defaultValue={smiles}
+            value={smiles}
             placeholder='e.g. "C=O"'
           />
           <Button
