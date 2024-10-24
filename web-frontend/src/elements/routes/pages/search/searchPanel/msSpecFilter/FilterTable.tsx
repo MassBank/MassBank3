@@ -19,10 +19,16 @@ type InputProps = {
     // eslint-disable-next-line no-unused-vars
     isChecked: boolean,
   ) => void;
+  showCounts?: boolean;
   style?: CSSProperties;
 };
 
-function FilterTable({ filterOptions, onSelect, style }: InputProps) {
+function FilterTable({
+  filterOptions,
+  onSelect,
+  showCounts = false,
+  style,
+}: InputProps) {
   const [filterOptionsInner, setFilterOptionInner] = useState<ValueCount[]>(
     filterOptions ? [...filterOptions] : [],
   );
@@ -41,15 +47,21 @@ function FilterTable({ filterOptions, onSelect, style }: InputProps) {
       const vc = pair[0];
       const vc2 = pair.length === 2 ? pair[1] : undefined;
       return (
-        <tr key={'ms_spec_filter_' + vc.value}>
-          <FilterTableData vc={vc} onSelect={onSelect} />
-          {vc2 && <FilterTableData vc={vc2} onSelect={onSelect} />}
+        <tr key={'ms_spec_filter_' + vc.value} style={{ height: '25px' }}>
+          <FilterTableData vc={vc} onSelect={onSelect} showCount={showCounts} />
+          {vc2 && (
+            <FilterTableData
+              vc={vc2}
+              onSelect={onSelect}
+              showCount={showCounts}
+            />
+          )}
         </tr>
       );
     });
 
     return rows;
-  }, [filterOptionsInner, onSelect]);
+  }, [filterOptionsInner, onSelect, showCounts]);
 
   const allSelected = useMemo(() => {
     if (filterOptionsInner) {

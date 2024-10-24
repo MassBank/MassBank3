@@ -267,14 +267,15 @@ function SearchPanel({
                   </div>
                   <Input
                     type="number"
-                    defaultValue={0.8}
+                    value={0.8}
                     placeholder="0.8"
                     min={0}
                     max={1}
                     step="any"
                     label="Minimal Score:"
                     onChange={handleOnChangeThresholdValue}
-                    style={{ width, marginLeft: 10, marginRight: 80 }}
+                    style={{ width }}
+                    inputStyle={{ width: 100, marginLeft: 5 }}
                   />
                   <Button
                     child={'Load Example'}

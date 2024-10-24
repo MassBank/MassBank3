@@ -5,7 +5,9 @@ import {
   CSSProperties,
   KeyboardEvent,
   useCallback,
+  useEffect,
   useMemo,
+  useState,
 } from 'react';
 
 type InputProps = {
@@ -13,15 +15,15 @@ type InputProps = {
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
   onChange: (value: any) => void;
   onKeyDown?: () => void;
-  defaultValue?: string | number;
+  value?: string | number;
   label?: string;
   min?: number;
   max?: number;
   step?: number | 'any';
-  inputWidth?: string;
   className?: string;
   placeholder?: string;
   style?: CSSProperties;
+  inputStyle?: CSSProperties;
   fontStyle?: CSSProperties;
 };
 
@@ -29,21 +31,31 @@ function Input({
   type,
   onChange,
   onKeyDown = () => {},
-  defaultValue,
+  value,
   label,
   min,
   max,
   step = 'any',
-  inputWidth = '80px',
   className = 'Input',
   placeholder = '',
-  style,
+  style = { width: '100%' },
+  inputStyle = { width: '100%' },
   fontStyle,
 }: InputProps) {
+  const [internalValue, setInternalValue] = useState<
+    string | number | undefined
+  >(value);
+
+  useEffect(() => {
+    setInternalValue(value);
+  }, [value]);
+
   const handleOnChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       e.preventDefault();
       e.stopPropagation();
+
+      setInternalValue(e.target.value);
       if (type === 'file') {
         onChange(e.target.files);
       } else {
@@ -64,22 +76,21 @@ function Input({
 
   return useMemo(
     () => (
-      <div className={className}>
+      <div className={className} style={style}>
         {label && <label style={fontStyle}>{`${label}`}</label>}
         <input
           type={type}
           onChange={handleOnChange}
           onKeyDown={handleOnKeyDown}
-          defaultValue={defaultValue}
+          value={internalValue}
           placeholder={placeholder}
           min={min}
           max={max}
           step={step}
           style={
             {
-              ...style,
+              ...inputStyle,
               ...fontStyle,
-              '--inputWidth': inputWidth,
             } as React.CSSProperties
           }
         />
@@ -87,11 +98,11 @@ function Input({
     ),
     [
       className,
-      defaultValue,
       fontStyle,
       handleOnChange,
       handleOnKeyDown,
-      inputWidth,
+      inputStyle,
+      internalValue,
       label,
       max,
       min,

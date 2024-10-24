@@ -86,11 +86,11 @@ function AccessionView() {
           <Input
             type="search"
             placeholder="e.g. MSBNK-AAFC-AC000114"
-            defaultValue={accession && accession !== '' ? accession : undefined}
+            value={accession && accession !== '' ? accession : undefined}
             label="Search for accession: "
             onChange={(acc: string) => setAccession(acc.trim())}
             onKeyDown={handleOnClick}
-            inputWidth="300px"
+            inputStyle={{ width: '300px' }}
           />
           <Button
             child="Search"

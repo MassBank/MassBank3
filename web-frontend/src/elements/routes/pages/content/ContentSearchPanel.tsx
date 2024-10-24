@@ -12,18 +12,19 @@ type InputProps = {
   width: number;
   height: number;
   collapsed: boolean;
-  msSpecFilterOptions: Content | undefined;
+  content: Content | undefined;
   // eslint-disable-next-line no-unused-vars
   onCollapse: (collapsed: boolean) => void;
   // eslint-disable-next-line no-unused-vars
   onSubmit: (newBrowseContent: Content) => void;
+  showCounts?: boolean;
 };
 
 function ContentSearchPanel({
   width,
   height,
   collapsed,
-  msSpecFilterOptions,
+  content,
   onCollapse,
   onSubmit,
 }: InputProps) {
@@ -35,12 +36,12 @@ function ContentSearchPanel({
 
   useEffect(() => {
     setValue('msSpecFilterOptions', {
-      contributor: msSpecFilterOptions?.contributor,
-      instrument_type: msSpecFilterOptions?.instrument_type,
-      ms_type: msSpecFilterOptions?.ms_type,
-      ion_mode: msSpecFilterOptions?.ion_mode,
+      contributor: content?.contributor,
+      instrument_type: content?.instrument_type,
+      ms_type: content?.ms_type,
+      ion_mode: content?.ion_mode,
     } as Content);
-  }, [msSpecFilterOptions, setValue]);
+  }, [content, setValue]);
 
   const handleOnCollapse = useCallback(() => {
     onCollapse(!collapsed);
@@ -91,13 +92,10 @@ function ContentSearchPanel({
             transitionDuration={0}
           >
             <Menu className="menu">
-              <SubMenu
-                label={collapsed ? 'Cont' : 'Contibutor'}
-                className="submenu"
-              >
-                {msSpecFilterOptions && (
+              <SubMenu label={'Contibutor'} className="submenu">
+                {content && (
                   <FilterTable
-                    filterOptions={msSpecFilterOptions.contributor}
+                    filterOptions={content.contributor}
                     onSelect={(value, isChecked) =>
                       handleOnSelect(
                         'msSpecFilterOptions',
@@ -107,16 +105,14 @@ function ContentSearchPanel({
                       )
                     }
                     style={{ height: '200px' }}
+                    showCounts
                   />
                 )}
               </SubMenu>
-              <SubMenu
-                label={collapsed ? 'Inst' : 'Instrument Type'}
-                className="submenu"
-              >
-                {msSpecFilterOptions && (
+              <SubMenu label={'Instrument Type'} className="submenu">
+                {content && (
                   <FilterTable
-                    filterOptions={msSpecFilterOptions.instrument_type}
+                    filterOptions={content.instrument_type}
                     onSelect={(value, isChecked) =>
                       handleOnSelect(
                         'msSpecFilterOptions',
@@ -126,16 +122,14 @@ function ContentSearchPanel({
                       )
                     }
                     style={{ height: '200px' }}
+                    showCounts
                   />
                 )}
               </SubMenu>
-              <SubMenu
-                label={collapsed ? 'Type' : 'MS Type'}
-                className="submenu"
-              >
-                {msSpecFilterOptions && (
+              <SubMenu label={'MS Type'} className="submenu">
+                {content && (
                   <FilterTable
-                    filterOptions={msSpecFilterOptions.ms_type}
+                    filterOptions={content.ms_type}
                     onSelect={(value, isChecked) =>
                       handleOnSelect(
                         'msSpecFilterOptions',
@@ -144,16 +138,14 @@ function ContentSearchPanel({
                         isChecked,
                       )
                     }
+                    showCounts
                   />
                 )}
               </SubMenu>
-              <SubMenu
-                label={collapsed ? 'Ion' : 'Ion Mode'}
-                className="submenu"
-              >
-                {msSpecFilterOptions && (
+              <SubMenu label={'Ion Mode'} className="submenu">
+                {content && (
                   <FilterTable
-                    filterOptions={msSpecFilterOptions.ion_mode}
+                    filterOptions={content.ion_mode}
                     onSelect={(value, isChecked) =>
                       handleOnSelect(
                         'msSpecFilterOptions',
@@ -162,6 +154,7 @@ function ContentSearchPanel({
                         isChecked,
                       )
                     }
+                    showCounts
                   />
                 )}
               </SubMenu>

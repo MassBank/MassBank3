@@ -31,7 +31,7 @@ function SearchView() {
   const [collapsed, setCollapsed] = useState<boolean>(false);
 
   const searchPanelWidth = useMemo(
-    () => (collapsed ? 50 : width * 0.3),
+    () => (collapsed ? 100 : Math.max(width * 0.3, 500)),
     [collapsed, width],
   );
   const searchPanelHeight = height;

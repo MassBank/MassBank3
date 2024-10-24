@@ -14,6 +14,7 @@ import Pagination from '../basic/Pagination';
 import Placeholder from '../basic/Placeholder';
 import Spinner from '../basic/Spinner';
 import fetchData from '../../utils/fetchData';
+import Input from '../basic/Input';
 
 type InputProps = {
   reference?: Peak[];
@@ -181,21 +182,41 @@ function ResultPanel({
     [heightOverview, showModal, spectralHitsCarouselView, widthOverview],
   );
 
-  const pagination = useMemo(
-    () => (
-      <Pagination
-        total={Math.ceil(hits.length / pageLimit)}
-        onPageChange={(pageIndex: number) => setResultPageIndex(pageIndex - 1)}
-        style={{ height: '50px' }}
-      />
-    ),
+  const handleOnSelectPage = useCallback(
+    (pageIndex: number) => {
+      if (pageIndex > 0 && pageIndex <= Math.ceil(hits.length / pageLimit)) {
+        setResultPageIndex(pageIndex - 1);
+      }
+    },
     [hits.length],
+  );
+
+  const paginationContainer = useMemo(
+    () => (
+      <div className="pagination-container">
+        <Pagination
+          total={Math.ceil(hits.length / pageLimit)}
+          onPageChange={handleOnSelectPage}
+          currentPage={resultPageIndex + 1}
+        />
+        <Input
+          type="number"
+          onChange={handleOnSelectPage}
+          value={resultPageIndex + 1}
+          min={1}
+          max={Math.ceil(hits.length / pageLimit)}
+          label="Select page: "
+          style={{ width: '200px', marginRight: '30px' }}
+        />
+      </div>
+    ),
+    [handleOnSelectPage, hits.length, resultPageIndex],
   );
 
   return resultTableData.length > 0 ? (
     <div className="result-container" style={{ width, height }}>
       <p className="hit-count-paragraph">{`${hits.length} hits were found!`}</p>
-      {pagination}
+      {paginationContainer}
       {isRequesting ? (
         <Spinner buttonDisabled={true} />
       ) : (

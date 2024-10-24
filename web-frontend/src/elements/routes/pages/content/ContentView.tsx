@@ -25,7 +25,7 @@ function ContentView() {
   const [hits, setHits] = useState<Hit[]>([]);
 
   const searchPanelWidth = useMemo(
-    () => (collapsed ? 80 : width * 0.3),
+    () => (collapsed ? 175 : Math.max(width * 0.3, 500)),
     [collapsed, width],
   );
 
@@ -122,10 +122,11 @@ function ContentView() {
       <ContentSearchPanel
         collapsed={collapsed}
         onCollapse={handleOnCollapse}
-        msSpecFilterOptions={browseContent}
+        content={browseContent}
         onSubmit={handleOnSubmit}
         height={height}
         width={searchPanelWidth}
+        showCounts
       />
     ),
     [
