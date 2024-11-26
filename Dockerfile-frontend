@@ -11,6 +11,6 @@ RUN npm run clean-install
 # for production mode
 RUN npm run build
 
-ENTRYPOINT sh entrypoint.sh ${MB3_API_URL} ${MB3_FRONTEND_URL} ${MB3_FRONTEND_BASE_URL}
+ENTRYPOINT sh entrypoint.sh ${MB3_API_URL} ${MB3_FRONTEND_URL} ${MB3_FRONTEND_BASE_URL} "${MB3_FRONTEND_VERSION}"
 
 EXPOSE 3000

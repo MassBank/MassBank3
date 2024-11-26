@@ -8,19 +8,11 @@ function Routing() {
       <Route path={routes.search.path} element={<routes.search.element />} />
       <Route path={routes.content.path} element={<routes.content.element />} />
       <Route
-        path={routes.download.path}
-        element={<routes.download.element />}
-      />
-      <Route
         path={routes.accession.path}
         element={<routes.accession.element />}
       />
-      <Route
-        path={routes.documentation.path}
-        element={<routes.documentation.element />}
-      />
-      <Route path={routes.about.path} element={<routes.about.element />} />
       <Route path={routes.news.path} element={<routes.news.element />} />
+      <Route path={routes.about.path} element={<routes.about.element />} />
       <Route
         path={routes.notFound.path}
         element={<routes.notFound.element />}

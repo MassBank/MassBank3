@@ -5,17 +5,21 @@ import { Link, useLocation } from 'react-router-dom';
 function Header() {
   const location = useLocation();
 
+  const url =
+    import.meta.env.VITE_MB3_FRONTEND_URL + import.meta.env.VITE_MB3_BASE_URL;
   const logoLink = (
     <li className="custom-li" key="logo-li">
-      <img
-        src={import.meta.env.VITE_MB3_BASE_URL + '/logos/logo.svg'}
-        alt="MassBank Europe"
-      />
+      <a href={url} target="_self">
+        <img
+          src={import.meta.env.VITE_MB3_BASE_URL + '/logos/logo.svg'}
+          alt="MassBank Europe"
+        />
+      </a>
     </li>
   );
 
   const routeLinks = Object.keys(routes)
-    .filter((r) => r !== 'notFound')
+    .filter((r) => r !== 'notFound' && r !== 'home')
     .map((r) => {
       const route = routes[r];
       return (
