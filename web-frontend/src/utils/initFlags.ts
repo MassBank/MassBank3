@@ -1,7 +1,7 @@
-import Content from '../types/Content';
+import ContentFilterOptions from '../types/filterOptions/ContentFilterOtions';
 import ValueCount from '../types/ValueCount';
 
-function initFlags(cont: Content) {
+function initFlags(cont: ContentFilterOptions) {
   const keys = Object.keys(cont).filter((key) => key !== 'metadata');
   for (let k = 0; k < keys.length; k++) {
     const key = keys[k];

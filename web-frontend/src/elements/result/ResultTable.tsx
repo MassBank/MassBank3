@@ -1,9 +1,51 @@
 import Hit from '../../types/Hit';
 import Peak from '../../types/peak/Peak';
-import './ResultTable.scss';
 
-import { useMemo } from 'react';
-import ResultTableRow from './ResultTableRow';
+import { useCallback, useMemo } from 'react';
+import { Content } from 'antd/es/layout/layout';
+import { Table } from 'antd';
+import ResultTableDataType from '../../types/ResultTableDataType';
+import ResultLink from './ResultLink';
+import Chart from '../basic/Chart';
+import StructureView from '../basic/StructureView';
+
+const columns = [
+  {
+    title: 'Index',
+    dataIndex: 'index',
+    key: 'index',
+  },
+  {
+    title: 'Score',
+    dataIndex: 'score',
+    key: 'score',
+  },
+  {
+    title: 'Accession',
+    dataIndex: 'accession',
+    key: 'accession',
+  },
+  {
+    title: 'Link',
+    dataIndex: 'link',
+    key: 'link',
+  },
+  {
+    title: 'Title',
+    dataIndex: 'title',
+    key: 'title',
+  },
+  {
+    title: 'Chart',
+    dataIndex: 'chart',
+    key: 'chart',
+  },
+  {
+    title: 'Structure',
+    dataIndex: 'structure',
+    key: 'structure',
+  },
+];
 
 type InputProps = {
   reference?: Peak[];
@@ -12,6 +54,8 @@ type InputProps = {
   // eslint-disable-next-line no-unused-vars
   onDoubleClick: (slideIndex: number) => void;
   rowHeight?: number;
+  chartWidth?: number;
+  imageWidth?: number;
 };
 
 function ResultTable({
@@ -19,53 +63,96 @@ function ResultTable({
   hits,
   offset,
   onDoubleClick,
-  rowHeight = 200,
+  rowHeight = 100,
+  chartWidth = 200,
+  imageWidth = 200,
 }: InputProps) {
-  const header = useMemo(() => {
-    const hasScore = hits.some((hit) => hit.score !== undefined);
-    return (
-      <tr key={'result-table-header'}>
-        <th>#</th>
-        {hasScore && <th>Score</th>}
-        <th>Accession</th>
-        <th>Title</th>
-        <th>Chart</th>
-        <th>Structure</th>
-      </tr>
-    );
-  }, [hits]);
-
-  const body = useMemo(() => {
-    const _body: JSX.Element[] = [];
-
-    hits.forEach((hit, i) => {
-      _body.push(
-        <ResultTableRow
-          key={'result-table-row_' + i + '_' + hit.score}
-          reference={reference}
-          hit={hit}
-          label={offset + i + 1}
+  const buildChart = useCallback(
+    (hit: Hit) =>
+      reference && reference.length > 0 ? (
+        <Chart
+          peakData={reference}
+          peakData2={(hit.record ? hit.record.peak.peak.values : []) as Peak[]}
+          width={chartWidth}
           height={rowHeight}
-          chartWidth={500}
-          imageWidth={rowHeight}
-          onDoubleClick={() => onDoubleClick(i)}
-        />,
-      );
+          disableZoom
+          disableLabels
+          disableOnHover
+        />
+      ) : (
+        <Chart
+          peakData={(hit.record ? hit.record.peak.peak.values : []) as Peak[]}
+          width={chartWidth}
+          height={rowHeight}
+          disableZoom
+          disableLabels
+          disableOnHover
+        />
+      ),
+    [chartWidth, reference, rowHeight],
+  );
+
+  const buildStructure = useCallback(
+    (smiles: string) => (
+      <StructureView
+        smiles={smiles}
+        imageWidth={imageWidth}
+        imageHeight={rowHeight}
+      />
+    ),
+    [imageWidth, rowHeight],
+  );
+
+  const dataSource: ResultTableDataType[] = useMemo(() => {
+    const rows: ResultTableDataType[] = [];
+    hits.forEach((hit, i) => {
+      const row: ResultTableDataType = {
+        key: 'result-table-row_' + i + '_' + hit.score,
+        index: offset + i + 1,
+        score: hit.score ? hit.score.toFixed(4) : undefined,
+        accession: hit.accession,
+        link: <ResultLink hit={hit} />,
+        title: hit.record.title,
+        chart: buildChart(hit),
+        structure: buildStructure(hit.record.compound.smiles),
+      };
+
+      rows.push(row);
     });
 
-    return _body;
-  }, [hits, offset, onDoubleClick, reference, rowHeight]);
+    return rows;
+  }, [buildChart, buildStructure, hits, offset]);
 
-  return (
-    <div className="result-table-container">
-      <table>
-        <thead>{header}</thead>
-        <tbody>
-          {body}
-          <tr className="auto-height" />
-        </tbody>
-      </table>
-    </div>
+  const handleOnDoubleClick = useCallback(
+    (record: ResultTableDataType) => ({
+      onDoubleClick: () => {
+        onDoubleClick(record.index - 1);
+      },
+    }),
+    [onDoubleClick],
+  );
+
+  return useMemo(
+    () => (
+      <Content
+        style={{
+          width: '100%',
+          height: '100%',
+          overflow: 'scroll',
+          userSelect: 'none',
+          textAlign: 'center',
+        }}
+      >
+        <Table<ResultTableDataType>
+          style={{ width: '100%', height: '100%' }}
+          columns={columns}
+          dataSource={dataSource}
+          pagination={false}
+          onRow={handleOnDoubleClick}
+        />
+      </Content>
+    ),
+    [dataSource, handleOnDoubleClick],
   );
 }
 

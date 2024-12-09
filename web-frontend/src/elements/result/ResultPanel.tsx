@@ -1,5 +1,3 @@
-import './ResultPanel.scss';
-
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -10,11 +8,10 @@ import Record from '../../types/Record';
 import generateID from '../../utils/generateID';
 import SpectralHitsCarouselView from '../routes/pages/search/SpectralHitsCarouselView';
 import CustomModal from '../basic/CustomModal';
-import Pagination from '../basic/Pagination';
 import Placeholder from '../basic/Placeholder';
-import Spinner from '../basic/Spinner';
 import fetchData from '../../utils/fetchData';
-import Input from '../basic/Input';
+import { Button, InputNumber, Pagination, Spin } from 'antd';
+import { Content } from 'antd/es/layout/layout';
 
 type InputProps = {
   reference?: Peak[];
@@ -42,6 +39,7 @@ function ResultPanel({
   >();
 
   const pageLimit = 20;
+  const paginationHeight = 50;
 
   const resultTableData = useMemo(() => {
     const _resultTableData: Hit[][] = [];
@@ -110,6 +108,14 @@ function ResultPanel({
 
   const [resultTable, setResultTable] = useState<JSX.Element | undefined>();
 
+  const handleOnDoubleClick = useCallback(
+    (_slideIndex: number) => {
+      setSlideIndex(_slideIndex);
+      setShowModal(true);
+    },
+    [setShowModal],
+  );
+
   const buildResultTable = useCallback(() => {
     setIsRequesting(true);
     const _hits =
@@ -121,11 +127,10 @@ function ResultPanel({
           reference={reference}
           hits={_hitsWithRecords || []}
           offset={resultPageIndex * pageLimit}
-          onDoubleClick={(_slideIndex: number) => {
-            setSlideIndex(_slideIndex);
-            setShowModal(true);
-          }}
-          rowHeight={200}
+          onDoubleClick={handleOnDoubleClick}
+          rowHeight={150}
+          chartWidth={150}
+          imageWidth={150}
         />,
       );
       setSpectralHitsCarouselView(
@@ -141,6 +146,7 @@ function ResultPanel({
     });
   }, [
     fetchRecords,
+    handleOnDoubleClick,
     heightOverview,
     reference,
     resultPageIndex,
@@ -183,51 +189,127 @@ function ResultPanel({
   );
 
   const handleOnSelectPage = useCallback(
-    (pageIndex: number) => {
-      if (pageIndex > 0 && pageIndex <= Math.ceil(hits.length / pageLimit)) {
+    (pageIndex: number | null) => {
+      if (
+        pageIndex &&
+        pageIndex > 0 &&
+        pageIndex <= Math.ceil(hits.length / pageLimit)
+      ) {
         setResultPageIndex(pageIndex - 1);
       }
     },
     [hits.length],
   );
 
-  const paginationContainer = useMemo(
-    () => (
-      <div className="pagination-container">
+  const handleOnDownloadResult = useCallback(() => {
+    console.log('Download result');
+  }, []);
+
+  const paginationContainer = useMemo(() => {
+    return (
+      <Content
+        style={{
+          width: '100%',
+          height: paginationHeight,
+          display: 'flex',
+          justifyContent: 'space-evenly',
+          alignItems: 'center',
+        }}
+      >
+        <Content
+          style={{
+            textWrap: 'nowrap',
+            textAlign: 'center',
+            fontWeight: 'bold',
+            width: 200,
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >{`${hits.length} Results`}</Content>
         <Pagination
           total={Math.ceil(hits.length / pageLimit)}
-          onPageChange={handleOnSelectPage}
-          currentPage={resultPageIndex + 1}
+          onChange={handleOnSelectPage}
+          current={resultPageIndex + 1}
+          showTitle
+          showSizeChanger={false}
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+          }}
         />
-        <Input
-          type="number"
+        <InputNumber
           onChange={handleOnSelectPage}
           value={resultPageIndex + 1}
           min={1}
           max={Math.ceil(hits.length / pageLimit)}
-          label="Select page: "
-          style={{ width: '200px', marginRight: '30px' }}
+          addonBefore="Page: "
+          style={{
+            width: 200,
+          }}
         />
-      </div>
-    ),
-    [handleOnSelectPage, hits.length, resultPageIndex],
-  );
+        <Button
+          children="Download"
+          onClick={() => handleOnDownloadResult()}
+          style={{
+            width: 100,
+          }}
+        />
+      </Content>
+    );
+  }, [
+    handleOnDownloadResult,
+    handleOnSelectPage,
+    hits.length,
+    resultPageIndex,
+  ]);
 
-  return resultTableData.length > 0 ? (
-    <div className="result-container" style={{ width, height }}>
-      <p className="hit-count-paragraph">{`${hits.length} hits were found!`}</p>
-      {paginationContainer}
-      {isRequesting ? (
-        <Spinner buttonDisabled={true} />
+  return useMemo(
+    () =>
+      resultTableData.length > 0 ? (
+        <Content style={{ width, height }}>
+          {isRequesting ? (
+            <Content
+              style={{
+                width: '100%',
+                height: height - paginationHeight,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Spin size="large" />
+            </Content>
+          ) : (
+            <Content
+              style={{
+                width: '100%',
+                height: height - paginationHeight,
+                overflow: 'scroll',
+              }}
+            >
+              {paginationContainer}
+              {resultTable}
+              {customModal}
+            </Content>
+          )}
+        </Content>
       ) : (
-        <div className="result-table-modal-container">
-          {resultTable}
-          {customModal}
-        </div>
-      )}
-    </div>
-  ) : (
-    <Placeholder child="No hits found" style={{ width, height }} />
+        <Placeholder child="No hits found" style={{ width, height }} />
+      ),
+    [
+      customModal,
+      height,
+      isRequesting,
+      paginationContainer,
+      resultTable,
+      resultTableData.length,
+      width,
+    ],
   );
 }
 

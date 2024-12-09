@@ -1,7 +1,7 @@
 import { MouseEvent } from 'react';
 import ValueCount from '../../../../types/ValueCount';
 import { splitStringAndCapitaliseFirstLetter } from '../../../../utils/stringUtils';
-import Button from '../../../basic/Button';
+import { Button } from 'antd';
 
 type InputProps = {
   id: string;
@@ -34,7 +34,7 @@ function ContentTableRow({
             <div>
               <label>{splitStringAndCapitaliseFirstLetter(id, '_', ' ')}</label>
               <Button
-                child={
+                children={
                   valueCounts.filter((vc) => vc.flag === true).length ===
                   valueCounts.length
                     ? 'Unselect'

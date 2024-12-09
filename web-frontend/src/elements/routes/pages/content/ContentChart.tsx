@@ -5,7 +5,7 @@ import { Doughnut } from 'react-chartjs-2';
 import { splitStringAndCapitaliseFirstLetter } from '../../../../utils/stringUtils';
 import calculateColour from '../../../../utils/calculateColour';
 import ValueCount from '../../../../types/ValueCount';
-import Content from '../../../../types/Content';
+import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const options: any = {
@@ -25,7 +25,7 @@ const options: any = {
 };
 
 type InputProps = {
-  content: Content;
+  content: ContentFilterOptions;
   identifier: string;
   width: number;
 };

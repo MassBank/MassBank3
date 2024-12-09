@@ -41,15 +41,10 @@
     "react": ">=18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": ">=18.2.0",
-    "react-dropzone": "^14.2.9",
-    "react-hook-form": "^7.52.2",
-    "react-loader-spinner": "^6.1.6",
     "react-mf": "^2.0.3",
     "react-modal": "^3.16.1",
     "react-multi-carousel": "^2.8.5",
-    "react-ocl": "^6.1.0",
-    "react-pro-sidebar": "^1.1.0",
-    "react-responsive-pagination": "^2.7.0"
+    "react-ocl": "^6.1.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.24.8",
@@ -65,6 +60,7 @@
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "antd": "^5.22.3",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",

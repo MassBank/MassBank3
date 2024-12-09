@@ -1,9 +1,7 @@
 import './ContentView.scss';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Spinner from '../../../basic/Spinner';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
-import Content from '../../../../types/Content';
 import { ArcElement, Chart, Legend, Tooltip } from 'chart.js';
 import ContentChart from './ContentChart';
 import fetchData from '../../../../utils/fetchData';
@@ -14,13 +12,17 @@ import ContentSearchPanel from './ContentSearchPanel';
 import SearchResult from '../../../../types/SearchResult';
 import Hit from '../../../../types/Hit';
 import ResultPanel from '../../../result/ResultPanel';
+import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
+import { Spin } from 'antd';
 
 function ContentView() {
   const ref = useRef(null);
   const { width, height } = useContainerDimensions(ref);
 
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
-  const [browseContent, setBrowseContent] = useState<Content | undefined>();
+  const [browseContent, setBrowseContent] = useState<
+    ContentFilterOptions | undefined
+  >();
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const [hits, setHits] = useState<Hit[]>([]);
 
@@ -30,17 +32,20 @@ function ContentView() {
   );
 
   const handleOnFetchContent = useCallback(
-    async (newBrowseContent: Content | undefined) => {
+    async (newBrowseContent: ContentFilterOptions | undefined) => {
       setIsRequesting(true);
 
-      let _browseContent: Content | undefined = newBrowseContent;
+      let _browseContent: ContentFilterOptions | undefined = newBrowseContent;
       if (!_browseContent) {
         const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
-        _browseContent = (await fetchData(url)) as Content;
+        _browseContent = (await fetchData(url)) as ContentFilterOptions;
       } else {
         const searchParams = buildSearchParams(_browseContent);
         const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
-        _browseContent = (await fetchData(url, searchParams)) as Content;
+        _browseContent = (await fetchData(
+          url,
+          searchParams,
+        )) as ContentFilterOptions;
       }
       initFlags(_browseContent);
       setBrowseContent(_browseContent);
@@ -106,7 +111,7 @@ function ContentView() {
   }, [height, hits, searchPanelWidth, width]);
 
   const handleOnSubmit = useCallback(
-    async (newBrowseContent: Content) => {
+    async (newBrowseContent: ContentFilterOptions) => {
       setCollapsed(true);
       await handleOnFetchContent(newBrowseContent);
     },
@@ -142,7 +147,7 @@ function ContentView() {
   return (
     <div ref={ref} className="content-view">
       {isRequesting ? (
-        <Spinner buttonDisabled buttonStyle={{ display: 'none' }} />
+        <Spin size="large" />
       ) : (
         <div className="inner-content-view" style={{ width, height }}>
           {contentSearchPanel}

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { brushX, scaleLinear, select } from 'd3';
 import ChartElement from './ChartElement';
-import Button from './Button';
 import Peak from '../../types/peak/Peak';
+import { Button } from 'antd';
 
 type InputProps = {
   peakData: Peak[];
@@ -468,9 +468,9 @@ function Chart({
           }}
         >
           <Button
-            child={isShowLabel ? 'Hide Labels' : 'Show Labels'}
+            children={isShowLabel ? 'Hide Labels' : 'Show Labels'}
             onClick={() => setIsShowLabel(!isShowLabel)}
-            buttonStyle={{
+            style={{
               border: '1px solid black',
               padding: '3px',
             }}

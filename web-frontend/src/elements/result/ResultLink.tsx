@@ -1,8 +1,7 @@
-import './ResultLink.scss';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExternalLink } from '@fortawesome/free-solid-svg-icons';
 import Hit from '../../types/Hit';
+import { Content } from 'antd/es/layout/layout';
 
 type InputProps = {
   hit: Hit;
@@ -17,7 +16,15 @@ function ResultLink({ hit }: InputProps) {
 
   return (
     hit.record && (
-      <div className="link-container">
+      <Content
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <a
           className="link"
           href={hit.accession && hit.accession !== '' ? url : '?'}
@@ -26,7 +33,7 @@ function ResultLink({ hit }: InputProps) {
         >
           <FontAwesomeIcon icon={faExternalLink} title={hit.record.title} />
         </a>
-      </div>
+      </Content>
     )
   );
 }

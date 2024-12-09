@@ -1,22 +1,22 @@
 import { useCallback, useEffect } from 'react';
-import { FieldValues, FormProvider, useForm } from 'react-hook-form';
 import ValueCount from '../../../../types/ValueCount';
-import Content from '../../../../types/Content';
-import Button from '../../../basic/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Menu, Sidebar, SubMenu } from 'react-pro-sidebar';
 import FilterTable from '../search/searchPanel/msSpecFilter/FilterTable';
 import { faAngleLeft, faList } from '@fortawesome/free-solid-svg-icons';
+import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
+import { useForm } from 'antd/es/form/Form';
+import SearchFields from '../../../../types/filterOptions/SearchFields';
+import { Button, Form } from 'antd';
 
 type InputProps = {
   width: number;
   height: number;
   collapsed: boolean;
-  content: Content | undefined;
+  content: ContentFilterOptions | undefined;
   // eslint-disable-next-line no-unused-vars
   onCollapse: (collapsed: boolean) => void;
   // eslint-disable-next-line no-unused-vars
-  onSubmit: (newBrowseContent: Content) => void;
+  onSubmit: (newBrowseContent: ContentFilterOptions) => void;
   showCounts?: boolean;
 };
 
@@ -28,59 +28,67 @@ function ContentSearchPanel({
   onCollapse,
   onSubmit,
 }: InputProps) {
-  const formMethods = useForm();
-  const { getValues, handleSubmit, setValue } = formMethods;
+  const [form] = useForm<SearchFields>();
+  const { getFieldValue, setFieldValue } = form;
 
   const collapseButtonHeight = 40;
   const submitButtonHeight = 40;
 
   useEffect(() => {
-    setValue('msSpecFilterOptions', {
+    setFieldValue('msSpecFilterOptions', {
       contributor: content?.contributor,
       instrument_type: content?.instrument_type,
       ms_type: content?.ms_type,
       ion_mode: content?.ion_mode,
-    } as Content);
-  }, [content, setValue]);
+    } as ContentFilterOptions);
+  }, [content, setFieldValue]);
 
   const handleOnCollapse = useCallback(() => {
     onCollapse(!collapsed);
   }, [collapsed, onCollapse]);
 
   const handleOnSubmit = useCallback(
-    (data: FieldValues) => {
-      onSubmit(data['msSpecFilterOptions'] as Content);
+    (data: SearchFields) => {
+      onSubmit(data['msSpecFilterOptions'] as ContentFilterOptions);
     },
     [onSubmit],
   );
 
   const handleOnSelect = useCallback(
     (filterName: string, key: string, value: string, isChecked: boolean) => {
-      const newFilterOptions = { ...getValues(filterName) };
+      const newFilterOptions = { ...getFieldValue(filterName) };
       newFilterOptions[key].find((vc: ValueCount) => vc.value === value).flag =
         isChecked;
 
-      setValue(filterName, newFilterOptions);
+      setFieldValue(filterName, newFilterOptions);
     },
-    [getValues, setValue],
+    [getFieldValue, setFieldValue],
   );
 
   return (
-    <FormProvider {...formMethods}>
-      <form onSubmit={handleSubmit((data) => handleOnSubmit(data))}>
-        <div className="search-panel-container" style={{ width }}>
-          <div
-            className="collapse-button-container"
-            style={{ height: collapseButtonHeight }}
-          >
-            <Button
-              onClick={handleOnCollapse}
-              child={
-                <FontAwesomeIcon icon={collapsed ? faList : faAngleLeft} />
-              }
-            />
-          </div>
-          <Sidebar
+    <Form
+      form={form}
+      labelCol={{ span: 8 }}
+      wrapperCol={{ span: 16 }}
+      style={{ width, height }}
+      initialValues={{ remember: true }}
+      onFinish={handleOnSubmit}
+      // onFinishFailed={handleOnFormError}
+      autoComplete="off"
+    >
+      <div className="search-panel-container" style={{ width }}>
+        {/* <div
+          className="collapse-button-container"
+          style={{ height: collapseButtonHeight }}
+        >
+          <Button
+            onClick={handleOnCollapse}
+            children={
+              <FontAwesomeIcon icon={collapsed ? faList : faAngleLeft} />
+            }
+          />
+        </div> */}
+        {/* <Sidebar
             className="sidebar"
             style={{
               width,
@@ -159,18 +167,26 @@ function ContentSearchPanel({
                 )}
               </SubMenu>
             </Menu>
-          </Sidebar>
-          <div
-            className="search-button-container"
-            style={{ height: collapseButtonHeight }}
+          </Sidebar> */}
+        {/* <div
+          className="search-button-container"
+          style={{ height: collapseButtonHeight }}
+        >
+          {!collapsed && (
+            <input type="submit" value="Search" className="submit-input" />
+          )}
+        </div> */}
+        <Form.Item label={null}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            style={{ height: submitButtonHeight }}
           >
-            {!collapsed && (
-              <input type="submit" value="Search" className="submit-input" />
-            )}
-          </div>
-        </div>
-      </form>
-    </FormProvider>
+            Submit
+          </Button>
+        </Form.Item>
+      </div>
+    </Form>
   );
 }
 

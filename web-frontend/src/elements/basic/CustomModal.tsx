@@ -3,7 +3,7 @@ import './CustomModal.scss';
 import { CSSProperties, useCallback, useRef } from 'react';
 import Modal from 'react-modal';
 import ReactModal from 'react-modal';
-import Button from './Button';
+import { Button } from 'antd';
 
 Modal.setAppElement('#root');
 
@@ -50,13 +50,14 @@ function CustomModal({
   showCloseButton = onClose !== undefined,
   body,
   footer = showCloseButton ? (
-    <Button child="Close" onClick={onClose ? onClose : () => {}} />
+    <Button children="Close" onClick={onClose ? onClose : () => {}} />
   ) : null,
   modalStyle = defaultModalStyle,
   headerContainerStyle,
   bodyContainerStyle,
   footerContainerStyle,
 }: InputProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const modalRef = useRef<any>();
 
   const handleOnClose = useCallback(() => {

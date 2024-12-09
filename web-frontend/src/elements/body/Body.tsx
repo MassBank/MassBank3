@@ -1,13 +1,21 @@
-import './Body.scss';
-
+import { Content } from 'antd/es/layout/layout';
 import Routes from '../routes/Routes';
 
-function Main() {
+function Body() {
   return (
-    <div className="body-panel">
+    <Content
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       <Routes />
-    </div>
+    </Content>
   );
 }
 
-export default Main;
+export default Body;

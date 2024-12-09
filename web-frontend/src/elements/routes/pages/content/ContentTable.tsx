@@ -4,12 +4,13 @@ import './ContentTable.scss';
 import { useMemo } from 'react';
 import ValueCount from '../../../../types/ValueCount';
 import { splitStringAndJoin } from '../../../../utils/stringUtils';
-import CheckBox from '../../../basic/CheckBox';
-import Content from '../../../../types/Content';
 import ContentTableRow from './ContentTableRow';
+import { Checkbox } from 'antd';
+import { CheckboxChangeEvent } from 'antd/es/checkbox';
+import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
 
 type InputProps = {
-  content: Content | undefined;
+  content: ContentFilterOptions | undefined;
   onSelect: (
     key: string,
     value: string | undefined,
@@ -42,15 +43,15 @@ function ContentTable({ content, onSelect }: InputProps) {
         for (let k = 0; k < valueCounts.length; k++) {
           const vc = valueCounts[k];
           elements.push(
-            <CheckBox
-              defaultValue={vc.flag || false}
-              onChange={(isChecked: boolean) =>
-                onSelect(key, vc.value, isChecked)
-              }
-              label={
+            <Checkbox
+              value={vc.flag || false}
+              onChange={(e: CheckboxChangeEvent) => {
+                onSelect(key, vc.value, e.target.checked);
+              }}
+              children={
                 splitStringAndJoin(vc.value, '_', ' ') + ' (' + vc.count + ')'
               }
-              isCheckedOutside={vc.flag}
+              checked={vc.flag}
             />,
           );
 
