@@ -47,7 +47,7 @@ services:
       - SIMILARITY_SERVICE_COSINE_PORT=8080
 
   similarity-service:
-    image: ipbhalle/massbank3-similarity-service:v0.1
+    image: quay.io/massbank/massbank3-similarity-service:latest
     restart: always
     ports:
       - "${SIMILARITY_SERVICE_PORT}:8080"
@@ -63,9 +63,9 @@ services:
     ports:
       - "${EXPORT_SERVICE_PORT}:8080"
     environment:
-      - MB_DATA_DIRECTORY=/MassBank-data
+      MB_DATA_DIRECTORY: "/MassBank-data"
     volumes:
-      - "${MB_DATA_DIRECTORY}:/MassBank-data"
+      - "${EXPORT_MB_DATA_DIRECTORY}:/MassBank-data"
 
   mb3frontend:
     build:
