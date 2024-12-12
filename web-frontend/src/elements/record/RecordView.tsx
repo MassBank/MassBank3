@@ -4,7 +4,6 @@ import Record from '../../types/Record';
 import useContainerDimensions from '../../utils/useContainerDimensions';
 import { useMemo, useRef } from 'react';
 import StructureView from '../basic/StructureView';
-import { MF } from 'react-mf';
 import AnnotationTable from './AnnotationTable';
 import SubTagTableRows from './SubTagTableRows';
 import Resizable from './Resizable';
@@ -126,7 +125,7 @@ function RecordView({ record }: inputProps) {
             <tr>
               <td>Formula</td>
               <td>
-                <MF mf={record.compound.formula} />{' '}
+                <p>{record.compound.formula}</p>
               </td>
             </tr>
             <tr>

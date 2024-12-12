@@ -19,6 +19,7 @@ import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterO
 import { Content } from 'antd/es/layout/layout';
 import { Layout, Spin } from 'antd';
 import Sider from 'antd/es/layout/Sider';
+import ValueCount from '../../../../types/ValueCount';
 
 function SearchView() {
   const ref = useRef(null);
@@ -32,7 +33,7 @@ function SearchView() {
   const [collapsed, setCollapsed] = useState<boolean>(false);
 
   const searchPanelWidth = useMemo(
-    () => (collapsed ? 100 : Math.max(width * 0.3, 500)),
+    () => (collapsed ? 50 : Math.max(width * 0.3, 500)),
     [collapsed, width],
   );
   const searchPanelHeight = height;
@@ -55,7 +56,18 @@ function SearchView() {
   const handleOnSearch = useCallback(async (formData: SearchFields) => {
     console.log('formData', formData);
 
-    const searchParams = buildSearchParams(formData.massSpecFilterOptions);
+    const mapper = (data: string[]) => {
+      return (data || []).map((value) => ({ value }) as ValueCount);
+    };
+    const formData_massSpecFilterOptions = {
+      contributor: mapper(formData.massSpecFilterOptions?.contributor || []),
+      instrument_type: mapper(
+        formData.massSpecFilterOptions?.instrument_type || [],
+      ),
+      ms_type: mapper(formData.massSpecFilterOptions?.ms_type || []),
+      ion_mode: mapper(formData.massSpecFilterOptions?.ion_mode || []),
+    } as ContentFilterOptions;
+    const searchParams = buildSearchParams(formData_massSpecFilterOptions);
 
     const similarityPeakListInputFieldData = (
       formData.peaks?.similarity?.peakList || ''
@@ -148,7 +160,7 @@ function SearchView() {
   const handleOnSubmit = useCallback(
     async (data: SearchFields) => {
       setIsRequesting(true);
-      // setCollapsed(true);
+      setCollapsed(true);
 
       await handleOnSearch(data);
     },
@@ -182,8 +194,8 @@ function SearchView() {
         reference={reference}
         width={width - searchPanelWidth}
         height={height}
-        widthOverview={width}
-        heightOverview={height - 100}
+        widthOverview={width * 0.9}
+        heightOverview={height * 0.9}
       />
     ),
     [height, hits, reference, searchPanelWidth, width],

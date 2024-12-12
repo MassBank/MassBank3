@@ -1,11 +1,10 @@
-import './SpectralHitsViewComponent.scss';
-
 import Peak from '../../../../types/peak/Peak';
 import Hit from '../../../../types/Hit';
 import ResultInfo from '../../../result/ResultInfo';
 import Resizable from '../../../record/Resizable';
 import Record from '../../../../types/Record';
 import { useMemo } from 'react';
+import { Content } from 'antd/es/layout/layout';
 
 type InputProps = {
   reference?: Peak[];
@@ -20,16 +19,20 @@ function SpectralHitsViewComponent({
   width,
   height,
 }: InputProps) {
-  const spectralHitsViewComponent = useMemo(() => {
+  return useMemo(() => {
     const widthResultInfo = width * 0.25;
     const widthResizable = width - widthResultInfo;
 
     return (
-      <div
-        className="component-container"
+      <Content
         style={{
           width,
           height,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          border: '1px solid red',
+          margin: 0,
         }}
       >
         <ResultInfo
@@ -39,7 +42,6 @@ function SpectralHitsViewComponent({
           style={{
             width: widthResultInfo,
             height,
-            backgroundColor: 'lightyellow',
           }}
         />
         {reference && reference.length > 0 ? (
@@ -56,11 +58,9 @@ function SpectralHitsViewComponent({
             height={height}
           />
         )}
-      </div>
+      </Content>
     );
   }, [height, hit, reference, width]);
-
-  return spectralHitsViewComponent;
 }
 
 export default SpectralHitsViewComponent;

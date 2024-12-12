@@ -1,79 +1,61 @@
-import 'react-multi-carousel/lib/styles.css';
-import './SpectralHitsCarouselView.scss';
-
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import Peak from '../../../../types/peak/Peak';
-import Carousel, { ResponsiveType } from 'react-multi-carousel';
 import Hit from '../../../../types/Hit';
 import SpectralHitsViewComponent from './SpectralHitsViewComponent';
+import { Carousel } from 'antd';
 
 type InputProps = {
   reference?: Peak[];
   hits: Hit[];
   slideIndex?: number;
-  width?: number;
-  height?: number;
+  width: number;
+  height: number;
 };
 
 function SpectralHitsCarouselView({
   reference,
   hits,
   slideIndex = 0,
-  width = 500,
-  height = 300,
+  width,
+  height,
 }: InputProps) {
-  const elements = useMemo(() => {
-    const _width = width - 120;
-    const _height = height - 40;
+  const _width = width - 100;
+  const _height = height - 50;
 
+  const elements = useMemo(() => {
     return hits
       .filter((hit) => hit.record)
-      .map((hit) => (
+      .map((hit, i) => (
         <SpectralHitsViewComponent
-          key={
-            'spectral-hits-view-component_' + hit.accession + '_' + hit.score
-          }
+          key={'spectral-hits-view-component_' + i + '_' + hit.accession}
           reference={reference}
           hit={hit}
           width={_width}
           height={_height}
         />
       ));
-  }, [height, hits, reference, width]);
+  }, [_height, _width, hits, reference]);
 
-  const responsive = useMemo(() => {
-    const items = 1;
-    const breakpoint = { max: width, min: 100 };
-    const responsive: ResponsiveType = {};
-    elements.forEach((_element, i) => {
-      responsive['item_' + i] = {
-        breakpoint: breakpoint,
-        items: items,
-      };
-    });
-
-    return responsive;
-  }, [elements, width]);
-
-  const [carousel, setCarousel] = useState<Carousel | null>(null);
-
-  useEffect(() => {
-    carousel?.setState({ currentSlide: slideIndex });
-  }, [carousel, slideIndex]);
-
-  return (
-    <div className="spectra-view-wrapper" style={{ width, height }}>
+  return useMemo(
+    () => (
       <Carousel
-        className="spectra-view-carousel"
-        responsive={responsive}
-        swipeable={false}
-        draggable={false}
-        showDots={true}
-        ref={(el) => setCarousel(el)}
+        initialSlide={slideIndex}
+        arrows={true}
+        infinite={false}
+        dots={false}
+        style={{
+          width: _width,
+          height: _height,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          border: '1px solid green',
+        }}
       >
         {elements}
       </Carousel>
-    </div>
+    ),
+    [_height, _width, elements, slideIndex],
   );
 }
 

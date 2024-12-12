@@ -1,16 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import ResultTable from './ResultTable';
 import Hit from '../../types/Hit';
 import Peak from '../../types/peak/Peak';
 import Record from '../../types/Record';
 import generateID from '../../utils/generateID';
-import SpectralHitsCarouselView from '../routes/pages/search/SpectralHitsCarouselView';
-import CustomModal from '../basic/CustomModal';
 import Placeholder from '../basic/Placeholder';
 import fetchData from '../../utils/fetchData';
-import { Button, InputNumber, Pagination, Spin } from 'antd';
+import { Button, Pagination, Spin } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 
 type InputProps = {
@@ -27,16 +23,16 @@ function ResultPanel({
   hits,
   width,
   height,
-  widthOverview = width,
-  heightOverview = height,
+  // widthOverview = width,
+  // heightOverview = height,
 }: InputProps) {
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [slideIndex, setSlideIndex] = useState<number>(0);
+  // const [showModal, setShowModal] = useState<boolean>(false);
+  // const [slideIndex, setSlideIndex] = useState<number>(0);
   const [resultPageIndex, setResultPageIndex] = useState<number>(0);
-  const [spectralHitsCarouselView, setSpectralHitsCarouselView] = useState<
-    JSX.Element | undefined
-  >();
+  // const [spectralHitsCarouselView, setSpectralHitsCarouselView] = useState<
+  // JSX.Element | undefined
+  // >();
 
   const pageLimit = 20;
   const paginationHeight = 50;
@@ -108,13 +104,13 @@ function ResultPanel({
 
   const [resultTable, setResultTable] = useState<JSX.Element | undefined>();
 
-  const handleOnDoubleClick = useCallback(
-    (_slideIndex: number) => {
-      setSlideIndex(_slideIndex);
-      setShowModal(true);
-    },
-    [setShowModal],
-  );
+  // const handleOnDoubleClick = useCallback(
+  //   (_slideIndex: number) => {
+  //     setSlideIndex(_slideIndex);
+  //     setShowModal(true);
+  //   },
+  //   [setShowModal],
+  // );
 
   const buildResultTable = useCallback(() => {
     setIsRequesting(true);
@@ -127,66 +123,45 @@ function ResultPanel({
           reference={reference}
           hits={_hitsWithRecords || []}
           offset={resultPageIndex * pageLimit}
-          onDoubleClick={handleOnDoubleClick}
+          height={height - paginationHeight}
+          // onDoubleClick={handleOnDoubleClick}
           rowHeight={150}
           chartWidth={150}
           imageWidth={150}
         />,
       );
-      setSpectralHitsCarouselView(
-        <SpectralHitsCarouselView
-          reference={reference}
-          hits={_hitsWithRecords || []}
-          slideIndex={slideIndex}
-          width={widthOverview}
-          height={heightOverview - 50}
-        />,
-      );
+      // setSpectralHitsCarouselView(
+      //   <SpectralHitsCarouselView
+      //     reference={reference}
+      //     hits={_hitsWithRecords || []}
+      //     slideIndex={slideIndex}
+      //     width={widthOverview}
+      //     height={heightOverview}
+      //   />,
+      // );
       setIsRequesting(false);
     });
-  }, [
-    fetchRecords,
-    handleOnDoubleClick,
-    heightOverview,
-    reference,
-    resultPageIndex,
-    resultTableData,
-    slideIndex,
-    widthOverview,
-  ]);
+  }, [fetchRecords, height, reference, resultPageIndex, resultTableData]);
 
   useEffect(() => {
     buildResultTable();
   }, [buildResultTable]);
 
-  const customModal = useMemo(
-    () => (
-      <CustomModal
-        show={showModal}
-        body={spectralHitsCarouselView}
-        onClose={() => setShowModal(false)}
-        modalStyle={{
-          content: { width: widthOverview, height: heightOverview },
-        }}
-        header={
-          <FontAwesomeIcon
-            icon={faTimes}
-            style={{ color: 'red', cursor: 'pointer', paddingRight: '20px' }}
-            onClick={() => setShowModal(false)}
-          />
-        }
-        headerContainerStyle={{
-          width: '100%',
-          height: '10px',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'flex-end',
-        }}
-        footerContainerStyle={{ display: 'none' }}
-      />
-    ),
-    [heightOverview, showModal, spectralHitsCarouselView, widthOverview],
-  );
+  // const modal = useMemo(
+  //   () => (
+  //     <Modal
+  //       open={showModal}
+  //       onCancel={() => setShowModal(false)}
+  //       footer={null}
+  //       width={widthOverview}
+  //       height={heightOverview}
+  //       centered
+  //     >
+  //       {spectralHitsCarouselView}
+  //     </Modal>
+  //   ),
+  //   [heightOverview, showModal, spectralHitsCarouselView, widthOverview],
+  // );
 
   const handleOnSelectPage = useCallback(
     (pageIndex: number | null) => {
@@ -234,6 +209,7 @@ function ResultPanel({
           current={resultPageIndex + 1}
           showTitle
           showSizeChanger={false}
+          showQuickJumper
           style={{
             width: '100%',
             height: '100%',
@@ -242,22 +218,14 @@ function ResultPanel({
             alignItems: 'center',
           }}
         />
-        <InputNumber
-          onChange={handleOnSelectPage}
-          value={resultPageIndex + 1}
-          min={1}
-          max={Math.ceil(hits.length / pageLimit)}
-          addonBefore="Page: "
-          style={{
-            width: 200,
-          }}
-        />
+
         <Button
           children="Download"
           onClick={() => handleOnDownloadResult()}
           style={{
             width: 100,
           }}
+          disabled
         />
       </Content>
     );
@@ -276,7 +244,7 @@ function ResultPanel({
             <Content
               style={{
                 width: '100%',
-                height: height - paginationHeight,
+                height,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -288,13 +256,13 @@ function ResultPanel({
             <Content
               style={{
                 width: '100%',
-                height: height - paginationHeight,
+                height,
                 overflow: 'scroll',
               }}
             >
               {paginationContainer}
               {resultTable}
-              {customModal}
+              {/* {modal} */}
             </Content>
           )}
         </Content>
@@ -302,7 +270,6 @@ function ResultPanel({
         <Placeholder child="No hits found" style={{ width, height }} />
       ),
     [
-      customModal,
       height,
       isRequesting,
       paginationContainer,

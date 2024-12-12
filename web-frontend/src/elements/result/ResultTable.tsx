@@ -2,7 +2,6 @@ import Hit from '../../types/Hit';
 import Peak from '../../types/peak/Peak';
 
 import { useCallback, useMemo } from 'react';
-import { Content } from 'antd/es/layout/layout';
 import { Table } from 'antd';
 import ResultTableDataType from '../../types/ResultTableDataType';
 import ResultLink from './ResultLink';
@@ -51,8 +50,9 @@ type InputProps = {
   reference?: Peak[];
   hits: Hit[];
   offset: number;
+  height: number;
   // eslint-disable-next-line no-unused-vars
-  onDoubleClick: (slideIndex: number) => void;
+  // onDoubleClick: (slideIndex: number) => void;
   rowHeight?: number;
   chartWidth?: number;
   imageWidth?: number;
@@ -62,7 +62,8 @@ function ResultTable({
   reference,
   hits,
   offset,
-  onDoubleClick,
+  height,
+  // onDoubleClick,
   rowHeight = 100,
   chartWidth = 200,
   imageWidth = 200,
@@ -123,36 +124,33 @@ function ResultTable({
     return rows;
   }, [buildChart, buildStructure, hits, offset]);
 
-  const handleOnDoubleClick = useCallback(
-    (record: ResultTableDataType) => ({
-      onDoubleClick: () => {
-        onDoubleClick(record.index - 1);
-      },
-    }),
-    [onDoubleClick],
-  );
+  // const handleOnDoubleClick = useCallback(
+  //   (record: ResultTableDataType) => ({
+  //     onDoubleClick: () => {
+  //       onDoubleClick(record.index - 1);
+  //     },
+  //   }),
+  //   [onDoubleClick],
+  // );
 
   return useMemo(
     () => (
-      <Content
+      <Table<ResultTableDataType>
         style={{
           width: '100%',
-          height: '100%',
-          overflow: 'scroll',
+          height,
           userSelect: 'none',
+          overflow: 'scroll',
           textAlign: 'center',
         }}
-      >
-        <Table<ResultTableDataType>
-          style={{ width: '100%', height: '100%' }}
-          columns={columns}
-          dataSource={dataSource}
-          pagination={false}
-          onRow={handleOnDoubleClick}
-        />
-      </Content>
+        columns={columns}
+        dataSource={dataSource}
+        pagination={false}
+        // onRow={handleOnDoubleClick}
+        sticky
+      />
     ),
-    [dataSource, handleOnDoubleClick],
+    [dataSource, height],
   );
 }
 

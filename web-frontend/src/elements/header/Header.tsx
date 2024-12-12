@@ -23,6 +23,7 @@ function Header() {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
+          boxShadow: 'none',
         }}
       >
         <Link to={url} target="_self">
@@ -47,6 +48,7 @@ function Header() {
             key={route.path + '-li'}
             style={{
               border: 'none',
+              boxShadow: 'none',
             }}
           >
             <Link

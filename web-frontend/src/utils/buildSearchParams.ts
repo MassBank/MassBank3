@@ -1,5 +1,6 @@
 import ContentFilterOptions from '../types/filterOptions/ContentFilterOtions';
 import SearchParams from '../types/SearchParams';
+import ValueCount from '../types/ValueCount';
 
 function buildSearchParams(cont: ContentFilterOptions | undefined) {
   const searchParams: SearchParams = {};
@@ -7,7 +8,7 @@ function buildSearchParams(cont: ContentFilterOptions | undefined) {
     Object.keys(cont)
       .filter((k) => k !== 'metadata')
       .forEach((k) => {
-        const values = cont[k] as string[];
+        const values = (cont[k] as ValueCount[]).map((v) => v.value);
         if (values.length > 0) {
           searchParams[k] = [values.join(',')];
         }

@@ -1,4 +1,3 @@
-import ContentFilterOptions from './ContentFilterOtions';
 import PeakSearchFilterOptions from './PeakSearchFilterOptions';
 import SimilarityFilterOptions from './SimilarityFilterOptions';
 
@@ -10,7 +9,12 @@ interface SearchFields {
   };
   inchi?: string;
   splash?: string;
-  massSpecFilterOptions?: ContentFilterOptions;
+  massSpecFilterOptions?: {
+    contributor: string[];
+    instrument_type: string[];
+    ion_mode: string[];
+    ms_type: string[];
+  };
   structure?: string;
 }
 

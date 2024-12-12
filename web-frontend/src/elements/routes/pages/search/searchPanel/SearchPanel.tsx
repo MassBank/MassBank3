@@ -9,6 +9,9 @@ import SearchFields from '../../../../../types/filterOptions/SearchFields';
 import ContentFilterOptions from '../../../../../types/filterOptions/ContentFilterOtions';
 import { useForm } from 'antd/es/form/Form';
 import SearchPanelMenuItems from './SearchPanelMenuItems';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleDown, faAngleRight } from '@fortawesome/free-solid-svg-icons';
+import { Content } from 'antd/es/layout/layout';
 
 const submitButtonHeight = 40;
 
@@ -24,22 +27,25 @@ type InputProps = {
 function SearchPanel({
   width,
   height,
+  collapsed,
   massSpecFilterOptions,
+  onCollapse,
   onSubmit,
 }: InputProps) {
   const [current, setCurrent] = useState('1');
   const [form] = useForm<SearchFields>();
   const { setFieldValue } = form;
 
-  const handleOnClick: MenuProps['onClick'] = (e) => {
+  const handleOnClick: MenuProps['onClick'] = useCallback((e) => {
     setCurrent(e.key);
-  };
+  }, []);
 
   const handleOnSubmit: FormProps<SearchFields>['onFinish'] = useCallback(
     (values: SearchFields) => {
+      onCollapse(true);
       onSubmit(values);
     },
-    [onSubmit],
+    [onCollapse, onSubmit],
   );
 
   const handleOnError: FormProps<SearchFields>['onFinishFailed'] = useCallback(
@@ -54,9 +60,9 @@ function SearchPanel({
     [setFieldValue],
   );
 
-  // const handleOnCollapse = useCallback(() => {
-  //   onCollapse(!collapsed);
-  // }, [collapsed, onCollapse]);
+  const handleOnCollapse = useCallback(() => {
+    onCollapse(!collapsed);
+  }, [collapsed, onCollapse]);
 
   const initialValues: SearchFields = useMemo(() => {
     return {
@@ -105,32 +111,71 @@ function SearchPanel({
           onFinish={handleOnSubmit}
           onFinishFailed={handleOnError}
         >
-          <Menu
-            onClick={handleOnClick}
+          <Content
+            style={{
+              width,
+              height: collapsed ? height : submitButtonHeight,
+              display: 'flex',
+              justifyContent: 'left',
+              alignItems: 'start',
+            }}
+          >
+            <Button
+              onClick={handleOnCollapse}
+              style={{
+                width: 50,
+                height: submitButtonHeight,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                border: 'none',
+                color: 'blue',
+                boxShadow: 'none',
+              }}
+              size="large"
+            >
+              <FontAwesomeIcon icon={collapsed ? faAngleRight : faAngleDown} />
+            </Button>
+          </Content>
+          <Content
             style={{
               width: '100%',
               height: height - submitButtonHeight,
-              overflow: 'scroll',
-            }}
-            // defaultOpenKeys={['basicSearchMenuItem']}
-            selectedKeys={[current]}
-            mode="inline"
-            items={SearchPanelMenuItems({
-              massSpecFilterOptions,
-              onChangeStructure: handleOnChangeStructure,
-              width,
-            })}
-          />
-          <Button
-            type="primary"
-            htmlType="submit"
-            style={{
-              width: 150,
-              height: submitButtonHeight,
+              display: collapsed ? 'none' : 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
           >
-            Submit
-          </Button>
+            <Menu
+              onClick={handleOnClick}
+              style={{
+                width: '100%',
+                height: '100%',
+                overflow: 'scroll',
+              }}
+              // defaultOpenKeys={['basicSearchMenuItem']}
+              selectedKeys={[current]}
+              mode="inline"
+              items={SearchPanelMenuItems({
+                massSpecFilterOptions,
+                onChangeStructure: handleOnChangeStructure,
+                width,
+              })}
+              inlineCollapsed={collapsed}
+            />
+
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{
+                width: 150,
+                height: submitButtonHeight,
+              }}
+            >
+              Submit
+            </Button>
+          </Content>
         </Form>
       </Form.Provider>
     ),
@@ -141,6 +186,9 @@ function SearchPanel({
       initialValues,
       handleOnSubmit,
       handleOnError,
+      collapsed,
+      handleOnCollapse,
+      handleOnClick,
       current,
       massSpecFilterOptions,
       handleOnChangeStructure,
