@@ -9,7 +9,7 @@ function initFlags(cont: ContentFilterOptions) {
       return {
         ...vc,
         count: vc.count || 0,
-        flag: vc.count !== undefined && vc.count > 0,
+        flag: vc.flag !== undefined ? vc.flag : vc.count > 0,
       };
     });
   }

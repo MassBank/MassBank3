@@ -191,20 +191,23 @@ function ResultPanel({
           alignItems: 'center',
         }}
       >
-        <Content
-          style={{
-            textWrap: 'nowrap',
-            textAlign: 'center',
-            fontWeight: 'bold',
-            width: 200,
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >{`${hits.length} Results`}</Content>
         <Pagination
-          total={Math.ceil(hits.length / pageLimit)}
+          total={hits.length}
+          pageSize={pageLimit}
+          showTotal={(total) => (
+            <Content
+              style={{
+                textWrap: 'nowrap',
+                textAlign: 'center',
+                fontWeight: 'bold',
+                width: 200,
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >{`${total} Results`}</Content>
+          )}
           onChange={handleOnSelectPage}
           current={resultPageIndex + 1}
           showTitle
@@ -214,7 +217,7 @@ function ResultPanel({
             width: '100%',
             height: '100%',
             display: 'flex',
-            justifyContent: 'space-evenly',
+            justifyContent: 'space-around',
             alignItems: 'center',
           }}
         />
@@ -224,6 +227,8 @@ function ResultPanel({
           onClick={() => handleOnDownloadResult()}
           style={{
             width: 100,
+            marginRight: 30,
+            marginLeft: 20,
           }}
           disabled
         />

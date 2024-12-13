@@ -1,12 +1,15 @@
-import { useCallback, useEffect } from 'react';
-import ValueCount from '../../../../types/ValueCount';
+import { useCallback, useEffect, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import FilterTable from '../search/searchPanel/msSpecFilter/FilterTable';
-import { faAngleLeft, faList } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
-import { useForm } from 'antd/es/form/Form';
+import { FormProps, useForm } from 'antd/es/form/Form';
 import SearchFields from '../../../../types/filterOptions/SearchFields';
-import { Button, Form } from 'antd';
+import { Button, Form, Menu } from 'antd';
+import { Content } from 'antd/es/layout/layout';
+import MassSpecFilterOptionsMenuItems from '../search/searchPanel/msSpecFilter/MassSpecFilterOptionsMenuItems';
+import ValueCount from '../../../../types/ValueCount';
+
+const submitButtonHeight = 40;
 
 type InputProps = {
   width: number;
@@ -16,8 +19,7 @@ type InputProps = {
   // eslint-disable-next-line no-unused-vars
   onCollapse: (collapsed: boolean) => void;
   // eslint-disable-next-line no-unused-vars
-  onSubmit: (newBrowseContent: ContentFilterOptions) => void;
-  showCounts?: boolean;
+  onSubmit: (newBrowseContent: SearchFields) => void;
 };
 
 function ContentSearchPanel({
@@ -29,164 +31,121 @@ function ContentSearchPanel({
   onSubmit,
 }: InputProps) {
   const [form] = useForm<SearchFields>();
-  const { getFieldValue, setFieldValue } = form;
-
-  const collapseButtonHeight = 40;
-  const submitButtonHeight = 40;
+  const { setFieldValue } = form;
 
   useEffect(() => {
-    setFieldValue('msSpecFilterOptions', {
-      contributor: content?.contributor,
-      instrument_type: content?.instrument_type,
-      ms_type: content?.ms_type,
-      ion_mode: content?.ion_mode,
-    } as ContentFilterOptions);
+    const mapper = (vcs: ValueCount[]) => {
+      return vcs.filter((vc) => vc.flag === true).map((vc) => vc.value);
+    };
+    setFieldValue('massSpecFilterOptions', {
+      contributor: mapper(content?.contributor || []),
+      instrument_type: mapper(content?.instrument_type || []),
+      ms_type: mapper(content?.ms_type || []),
+      ion_mode: mapper(content?.ion_mode || []),
+    } as SearchFields['massSpecFilterOptions']);
   }, [content, setFieldValue]);
 
   const handleOnCollapse = useCallback(() => {
     onCollapse(!collapsed);
   }, [collapsed, onCollapse]);
 
-  const handleOnSubmit = useCallback(
-    (data: SearchFields) => {
-      onSubmit(data['msSpecFilterOptions'] as ContentFilterOptions);
+  const handleOnSubmit: FormProps<SearchFields>['onFinish'] = useCallback(
+    (values: SearchFields) => {
+      onCollapse(true);
+      onSubmit(values);
     },
-    [onSubmit],
+    [onCollapse, onSubmit],
   );
 
-  const handleOnSelect = useCallback(
-    (filterName: string, key: string, value: string, isChecked: boolean) => {
-      const newFilterOptions = { ...getFieldValue(filterName) };
-      newFilterOptions[key].find((vc: ValueCount) => vc.value === value).flag =
-        isChecked;
-
-      setFieldValue(filterName, newFilterOptions);
-    },
-    [getFieldValue, setFieldValue],
-  );
-
-  return (
-    <Form
-      form={form}
-      labelCol={{ span: 8 }}
-      wrapperCol={{ span: 16 }}
-      style={{ width, height }}
-      initialValues={{ remember: true }}
-      onFinish={handleOnSubmit}
-      // onFinishFailed={handleOnFormError}
-      autoComplete="off"
-    >
-      <div className="search-panel-container" style={{ width }}>
-        {/* <div
-          className="collapse-button-container"
-          style={{ height: collapseButtonHeight }}
+  return useMemo(
+    () => (
+      <Form.Provider>
+        <Form
+          form={form}
+          autoComplete="off"
+          layout="inline"
+          style={{
+            width,
+            height,
+            backgroundColor: 'white',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            userSelect: 'none',
+          }}
+          onFinish={handleOnSubmit}
         >
-          <Button
-            onClick={handleOnCollapse}
-            children={
-              <FontAwesomeIcon icon={collapsed ? faList : faAngleLeft} />
-            }
-          />
-        </div> */}
-        {/* <Sidebar
-            className="sidebar"
+          <Content
             style={{
               width,
-              height: height - (collapseButtonHeight + submitButtonHeight),
-              zIndex: 0,
-              backgroundColor: 'orange',
+              height: collapsed ? height : submitButtonHeight,
+              display: 'flex',
+              justifyContent: 'left',
+              alignItems: 'start',
             }}
-            collapsed={collapsed}
-            transitionDuration={0}
           >
-            <Menu className="menu">
-              <SubMenu label={'Contibutor'} className="submenu">
-                {content && (
-                  <FilterTable
-                    filterOptions={content.contributor}
-                    onSelect={(value, isChecked) =>
-                      handleOnSelect(
-                        'msSpecFilterOptions',
-                        'contributor',
-                        value,
-                        isChecked,
-                      )
-                    }
-                    style={{ height: '200px' }}
-                    showCounts
-                  />
-                )}
-              </SubMenu>
-              <SubMenu label={'Instrument Type'} className="submenu">
-                {content && (
-                  <FilterTable
-                    filterOptions={content.instrument_type}
-                    onSelect={(value, isChecked) =>
-                      handleOnSelect(
-                        'msSpecFilterOptions',
-                        'instrument_type',
-                        value,
-                        isChecked,
-                      )
-                    }
-                    style={{ height: '200px' }}
-                    showCounts
-                  />
-                )}
-              </SubMenu>
-              <SubMenu label={'MS Type'} className="submenu">
-                {content && (
-                  <FilterTable
-                    filterOptions={content.ms_type}
-                    onSelect={(value, isChecked) =>
-                      handleOnSelect(
-                        'msSpecFilterOptions',
-                        'ms_type',
-                        value,
-                        isChecked,
-                      )
-                    }
-                    showCounts
-                  />
-                )}
-              </SubMenu>
-              <SubMenu label={'Ion Mode'} className="submenu">
-                {content && (
-                  <FilterTable
-                    filterOptions={content.ion_mode}
-                    onSelect={(value, isChecked) =>
-                      handleOnSelect(
-                        'msSpecFilterOptions',
-                        'ion_mode',
-                        value,
-                        isChecked,
-                      )
-                    }
-                    showCounts
-                  />
-                )}
-              </SubMenu>
-            </Menu>
-          </Sidebar> */}
-        {/* <div
-          className="search-button-container"
-          style={{ height: collapseButtonHeight }}
-        >
-          {!collapsed && (
-            <input type="submit" value="Search" className="submit-input" />
-          )}
-        </div> */}
-        <Form.Item label={null}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            style={{ height: submitButtonHeight }}
+            <Button
+              onClick={handleOnCollapse}
+              style={{
+                width: 50,
+                height: submitButtonHeight,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                border: 'none',
+                color: 'blue',
+                boxShadow: 'none',
+              }}
+              size="large"
+            >
+              <FontAwesomeIcon icon={collapsed ? faAngleRight : faAngleDown} />
+            </Button>
+          </Content>
+          <Content
+            style={{
+              width: '100%',
+              height: height - submitButtonHeight,
+              display: collapsed ? 'none' : 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
           >
-            Submit
-          </Button>
-        </Form.Item>
-      </div>
-    </Form>
+            <Menu
+              style={{
+                width: '100%',
+                height: '100%',
+                overflow: 'scroll',
+              }}
+              mode="inline"
+              items={MassSpecFilterOptionsMenuItems({
+                massSpecFilterOptions: content,
+              })}
+              inlineCollapsed={collapsed}
+              // defaultOpenKeys={[
+              //   'massSpecFilterOptionsContributor',
+              //   'massSpecFilterOptionsInstrumentType',
+              //   'massSpecFilterOptionsMsType',
+              //   'massSpecFilterOptionsIonMode',
+              // ]}
+            />
+
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{
+                width: 150,
+                height: submitButtonHeight,
+              }}
+            >
+              Submit
+            </Button>
+          </Content>
+        </Form>
+      </Form.Provider>
+    ),
+    [collapsed, content, form, handleOnCollapse, handleOnSubmit, height, width],
   );
 }
 

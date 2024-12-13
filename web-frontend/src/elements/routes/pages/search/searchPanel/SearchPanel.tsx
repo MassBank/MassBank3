@@ -32,13 +32,8 @@ function SearchPanel({
   onCollapse,
   onSubmit,
 }: InputProps) {
-  const [current, setCurrent] = useState('1');
   const [form] = useForm<SearchFields>();
   const { setFieldValue } = form;
-
-  const handleOnClick: MenuProps['onClick'] = useCallback((e) => {
-    setCurrent(e.key);
-  }, []);
 
   const handleOnSubmit: FormProps<SearchFields>['onFinish'] = useCallback(
     (values: SearchFields) => {
@@ -148,14 +143,12 @@ function SearchPanel({
             }}
           >
             <Menu
-              onClick={handleOnClick}
               style={{
                 width: '100%',
                 height: '100%',
                 overflow: 'scroll',
               }}
               // defaultOpenKeys={['basicSearchMenuItem']}
-              selectedKeys={[current]}
               mode="inline"
               items={SearchPanelMenuItems({
                 massSpecFilterOptions,
@@ -188,8 +181,6 @@ function SearchPanel({
       handleOnError,
       collapsed,
       handleOnCollapse,
-      handleOnClick,
-      current,
       massSpecFilterOptions,
       handleOnChangeStructure,
     ],

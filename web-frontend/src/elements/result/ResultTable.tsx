@@ -8,16 +8,11 @@ import ResultLink from './ResultLink';
 import Chart from '../basic/Chart';
 import StructureView from '../basic/StructureView';
 
-const columns = [
+const defaultColumns = [
   {
     title: 'Index',
     dataIndex: 'index',
     key: 'index',
-  },
-  {
-    title: 'Score',
-    dataIndex: 'score',
-    key: 'score',
   },
   {
     title: 'Accession',
@@ -133,6 +128,20 @@ function ResultTable({
   //   [onDoubleClick],
   // );
 
+  const columns = useMemo(() => {
+    const _columns = [...defaultColumns];
+
+    if (hits.find((hit) => hit.score !== undefined)) {
+      _columns.splice(1, 0, {
+        title: 'Score',
+        dataIndex: 'score',
+        key: 'score',
+      });
+    }
+
+    return _columns;
+  }, [hits]);
+
   return useMemo(
     () => (
       <Table<ResultTableDataType>
@@ -150,7 +159,7 @@ function ResultTable({
         sticky
       />
     ),
-    [dataSource, height],
+    [columns, dataSource, height],
   );
 }
 

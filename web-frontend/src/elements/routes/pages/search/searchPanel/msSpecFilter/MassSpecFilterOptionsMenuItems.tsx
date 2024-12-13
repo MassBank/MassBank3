@@ -32,7 +32,7 @@ function MassSpecFilterOptionsMenuItems({ massSpecFilterOptions }: InputProps) {
       ],
     },
     {
-      key: 'massSpecFilterOptionsIntrumentType',
+      key: 'massSpecFilterOptionsInstrumentType',
       label: 'Instrument Type',
       children: [
         {

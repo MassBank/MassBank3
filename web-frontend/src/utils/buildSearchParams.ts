@@ -8,7 +8,9 @@ function buildSearchParams(cont: ContentFilterOptions | undefined) {
     Object.keys(cont)
       .filter((k) => k !== 'metadata')
       .forEach((k) => {
-        const values = (cont[k] as ValueCount[]).map((v) => v.value);
+        const values = (cont[k] as ValueCount[])
+          .filter((vc) => (vc.flag !== undefined ? vc.flag : true))
+          .map((vc) => vc.value);
         if (values.length > 0) {
           searchParams[k] = [values.join(',')];
         }

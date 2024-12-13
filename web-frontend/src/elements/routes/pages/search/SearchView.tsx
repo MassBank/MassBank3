@@ -19,7 +19,7 @@ import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterO
 import { Content } from 'antd/es/layout/layout';
 import { Layout, Spin } from 'antd';
 import Sider from 'antd/es/layout/Sider';
-import ValueCount from '../../../../types/ValueCount';
+import massSpecFilterOptionsFormDataToContentMapper from '../../../../utils/massSpecFilterOptionsFormDataToContentMapper';
 
 function SearchView() {
   const ref = useRef(null);
@@ -36,7 +36,6 @@ function SearchView() {
     () => (collapsed ? 50 : Math.max(width * 0.3, 500)),
     [collapsed, width],
   );
-  const searchPanelHeight = height;
 
   const handleOnFetchContent = useCallback(async () => {
     setIsRequesting(true);
@@ -54,20 +53,11 @@ function SearchView() {
   }, [handleOnFetchContent]);
 
   const handleOnSearch = useCallback(async (formData: SearchFields) => {
-    console.log('formData', formData);
-
-    const mapper = (data: string[]) => {
-      return (data || []).map((value) => ({ value }) as ValueCount);
-    };
-    const formData_massSpecFilterOptions = {
-      contributor: mapper(formData.massSpecFilterOptions?.contributor || []),
-      instrument_type: mapper(
-        formData.massSpecFilterOptions?.instrument_type || [],
-      ),
-      ms_type: mapper(formData.massSpecFilterOptions?.ms_type || []),
-      ion_mode: mapper(formData.massSpecFilterOptions?.ion_mode || []),
-    } as ContentFilterOptions;
-    const searchParams = buildSearchParams(formData_massSpecFilterOptions);
+    const formData_content = massSpecFilterOptionsFormDataToContentMapper(
+      formData.massSpecFilterOptions,
+      undefined,
+    );
+    const searchParams = buildSearchParams(formData_content);
 
     const similarityPeakListInputFieldData = (
       formData.peaks?.similarity?.peakList || ''
@@ -171,7 +161,7 @@ function SearchView() {
     () => (
       <SearchPanel
         width={searchPanelWidth}
-        height={searchPanelHeight}
+        height={height}
         collapsed={collapsed}
         massSpecFilterOptions={massSpecFilterOptions}
         onCollapse={(collapsed: boolean) => setCollapsed(collapsed)}
@@ -180,7 +170,7 @@ function SearchView() {
     ),
     [
       searchPanelWidth,
-      searchPanelHeight,
+      height,
       collapsed,
       massSpecFilterOptions,
       handleOnSubmit,
@@ -213,14 +203,7 @@ function SearchView() {
             alignItems: 'center',
           }}
         >
-          <Sider
-            style={{
-              height: searchPanelHeight,
-            }}
-            width={searchPanelWidth}
-          >
-            {searchPanel}
-          </Sider>
+          <Sider width={searchPanelWidth}>{searchPanel}</Sider>
           <Content
             style={{
               width: width - searchPanelWidth,
@@ -256,7 +239,6 @@ function SearchView() {
       isRequesting,
       resultPanel,
       searchPanel,
-      searchPanelHeight,
       searchPanelWidth,
       width,
     ],
