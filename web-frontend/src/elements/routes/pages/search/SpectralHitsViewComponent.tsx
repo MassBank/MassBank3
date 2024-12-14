@@ -28,11 +28,12 @@ function SpectralHitsViewComponent({
         style={{
           width,
           height,
+          textAlign: 'center',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          border: '1px solid red',
-          margin: 0,
+          margin: '0 auto',
+          border: '1px solid grey',
         }}
       >
         <ResultInfo

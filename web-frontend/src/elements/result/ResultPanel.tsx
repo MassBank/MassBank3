@@ -6,8 +6,9 @@ import Record from '../../types/Record';
 import generateID from '../../utils/generateID';
 import Placeholder from '../basic/Placeholder';
 import fetchData from '../../utils/fetchData';
-import { Button, Pagination, Spin } from 'antd';
+import { Button, Modal, Pagination, Spin } from 'antd';
 import { Content } from 'antd/es/layout/layout';
+import SpectralHitsCarouselView from '../routes/pages/search/SpectralHitsCarouselView';
 
 type InputProps = {
   reference?: Peak[];
@@ -23,16 +24,16 @@ function ResultPanel({
   hits,
   width,
   height,
-  // widthOverview = width,
-  // heightOverview = height,
+  widthOverview = width,
+  heightOverview = height,
 }: InputProps) {
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
-  // const [showModal, setShowModal] = useState<boolean>(false);
-  // const [slideIndex, setSlideIndex] = useState<number>(0);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [slideIndex, setSlideIndex] = useState<number>(0);
   const [resultPageIndex, setResultPageIndex] = useState<number>(0);
-  // const [spectralHitsCarouselView, setSpectralHitsCarouselView] = useState<
-  // JSX.Element | undefined
-  // >();
+  const [spectralHitsCarouselView, setSpectralHitsCarouselView] = useState<
+    JSX.Element | undefined
+  >();
 
   const pageLimit = 20;
   const paginationHeight = 50;
@@ -104,13 +105,13 @@ function ResultPanel({
 
   const [resultTable, setResultTable] = useState<JSX.Element | undefined>();
 
-  // const handleOnDoubleClick = useCallback(
-  //   (_slideIndex: number) => {
-  //     setSlideIndex(_slideIndex);
-  //     setShowModal(true);
-  //   },
-  //   [setShowModal],
-  // );
+  const handleOnDoubleClick = useCallback(
+    (_slideIndex: number) => {
+      setSlideIndex(_slideIndex);
+      setShowModal(true);
+    },
+    [setShowModal],
+  );
 
   const buildResultTable = useCallback(() => {
     setIsRequesting(true);
@@ -124,44 +125,54 @@ function ResultPanel({
           hits={_hitsWithRecords || []}
           offset={resultPageIndex * pageLimit}
           height={height - paginationHeight}
-          // onDoubleClick={handleOnDoubleClick}
+          onDoubleClick={handleOnDoubleClick}
           rowHeight={150}
           chartWidth={150}
           imageWidth={150}
         />,
       );
-      // setSpectralHitsCarouselView(
-      //   <SpectralHitsCarouselView
-      //     reference={reference}
-      //     hits={_hitsWithRecords || []}
-      //     slideIndex={slideIndex}
-      //     width={widthOverview}
-      //     height={heightOverview}
-      //   />,
-      // );
+      setSpectralHitsCarouselView(
+        <SpectralHitsCarouselView
+          reference={reference}
+          hits={_hitsWithRecords || []}
+          slideIndex={slideIndex}
+          width={widthOverview}
+          height={heightOverview}
+        />,
+      );
       setIsRequesting(false);
     });
-  }, [fetchRecords, height, reference, resultPageIndex, resultTableData]);
+  }, [
+    fetchRecords,
+    handleOnDoubleClick,
+    height,
+    heightOverview,
+    reference,
+    resultPageIndex,
+    resultTableData,
+    slideIndex,
+    widthOverview,
+  ]);
 
   useEffect(() => {
     buildResultTable();
   }, [buildResultTable]);
 
-  // const modal = useMemo(
-  //   () => (
-  //     <Modal
-  //       open={showModal}
-  //       onCancel={() => setShowModal(false)}
-  //       footer={null}
-  //       width={widthOverview}
-  //       height={heightOverview}
-  //       centered
-  //     >
-  //       {spectralHitsCarouselView}
-  //     </Modal>
-  //   ),
-  //   [heightOverview, showModal, spectralHitsCarouselView, widthOverview],
-  // );
+  const modal = useMemo(
+    () => (
+      <Modal
+        open={showModal}
+        onCancel={() => setShowModal(false)}
+        footer={null}
+        width={widthOverview}
+        height={heightOverview}
+        centered
+      >
+        {spectralHitsCarouselView}
+      </Modal>
+    ),
+    [heightOverview, showModal, spectralHitsCarouselView, widthOverview],
+  );
 
   const handleOnSelectPage = useCallback(
     (pageIndex: number | null) => {
@@ -267,7 +278,7 @@ function ResultPanel({
             >
               {paginationContainer}
               {resultTable}
-              {/* {modal} */}
+              {modal}
             </Content>
           )}
         </Content>
@@ -277,6 +288,7 @@ function ResultPanel({
     [
       height,
       isRequesting,
+      modal,
       paginationContainer,
       resultTable,
       resultTableData.length,

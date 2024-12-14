@@ -1,78 +1,120 @@
 import './PeakTable.scss';
 
-import { CSSProperties, useMemo } from 'react';
-import PeakTableRow from './PeakTableRow';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Peak from '../../types/peak/Peak';
-import { splitStringAndCapitaliseFirstLetter } from '../../utils/stringUtils';
 import LinkedPeakAnnotation from '../../types/peak/LinkedPeakAnnotation';
 import PeakAnnotation from '../../types/peak/PeakAnnotation';
+import { Table } from 'antd';
+import PeakTableDataType from '../../types/PeakTableDataType';
+import { useHighlightData } from '../../highlight/Index';
+
+const columns = [
+  {
+    title: 'mz',
+    dataIndex: 'mz',
+    key: 'mz',
+  },
+  {
+    title: 'Intensity',
+    dataIndex: 'intensity',
+    key: 'intensity',
+  },
+  {
+    title: 'Rel. Int.',
+    dataIndex: 'rel',
+    key: 'rel',
+  },
+];
 
 type InputProps = {
   peaks: Peak[];
   annotations?: PeakAnnotation;
   linkedAnnotations?: LinkedPeakAnnotation[];
-  style?: CSSProperties;
-  tableStyle?: CSSProperties;
+  width: number;
+  height: number;
 };
 
-function PeakTable({
-  peaks,
-  annotations,
-  linkedAnnotations,
-  style,
-  tableStyle,
-}: InputProps) {
-  const rows = useMemo(
+function PeakTable({ peaks, width, height }: InputProps) {
+  const highlightData = useHighlightData();
+  const [activeKey, setActiveKey] = useState<string | undefined>();
+
+  useEffect(() => {
+    const p = peaks.find((p) => highlightData.highlight.highlighted.has(p.id));
+    if (p) {
+      setActiveKey(p.id);
+    } else {
+      setActiveKey(undefined);
+    }
+  }, [activeKey, highlightData.highlight.highlighted, peaks]);
+
+  const dataSource = useMemo(
     () =>
-      peaks.map((p, i) => {
-        if (
-          annotations &&
-          annotations.header &&
-          annotations.header.length > 0 &&
-          linkedAnnotations &&
-          linkedAnnotations.length > 0
-        ) {
-          const annoRowIndex = linkedAnnotations[i].annotationIndex;
-          const annotation: string[] = [];
-          annotations.values.forEach((anno, k) => {
-            if (annotations.header[k] !== 'm/z') {
-              annotation.push(anno[annoRowIndex]);
-            }
-          });
-          return <PeakTableRow peak={p} annotation={annotation} key={p.id} />;
-        }
-        return <PeakTableRow peak={p} annotation={undefined} key={p.id} />;
+      peaks.map((p) => {
+        return {
+          key: p.id,
+          mz: p.mz.toFixed(4),
+          intensity: p.intensity.toFixed(1),
+          rel: p.rel,
+        } as PeakTableDataType;
       }),
-    [annotations, linkedAnnotations, peaks],
+    [peaks],
   );
 
-  return (
-    <div className="peak-table" style={style}>
-      <table style={tableStyle}>
-        <thead>
-          <tr>
-            <th>m/z</th>
-            <th>Intensity</th>
-            <th>Relative Intensity</th>
-            {annotations &&
-              annotations.header &&
-              annotations.header.length > 0 &&
-              annotations.header.map(
-                (h) =>
-                  h !== 'm/z' && (
-                    <th key={'anno-header-' + h}>
-                      {splitStringAndCapitaliseFirstLetter(h, '_', ' ')}
-                    </th>
-                  ),
-              )}
-          </tr>
-        </thead>
-        <tbody>
-          {rows}
-          <tr className="auto-height" />
-        </tbody>
-      </table>
-    </div>
+  const handleOnMouseEnter = useCallback(
+    (key: string) => {
+      setActiveKey(key);
+      highlightData.dispatch({
+        type: 'SHOW',
+        payload: { convertedHighlights: new Set<string>([key]) },
+      });
+    },
+    [highlightData],
+  );
+
+  const handleOnMouseLeave = useCallback(
+    (key: string) => {
+      setActiveKey(undefined);
+      highlightData.dispatch({
+        type: 'HIDE',
+        payload: { convertedHighlights: new Set<string>([key]) },
+      });
+    },
+    [highlightData],
+  );
+
+  return useMemo(
+    () => (
+      <Table<PeakTableDataType>
+        style={{
+          width,
+          height,
+          userSelect: 'none',
+          overflow: 'scroll',
+          textAlign: 'center',
+        }}
+        sticky
+        columns={columns}
+        dataSource={dataSource}
+        pagination={false}
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => handleOnMouseEnter(record.key.toString()),
+            onMouseLeave: () => handleOnMouseLeave(record.key.toString()),
+          };
+        }}
+        rowClassName={(record) => {
+          return record.key === activeKey ? 'table-row-highlight' : '';
+        }}
+      />
+    ),
+    [
+      activeKey,
+      dataSource,
+      handleOnMouseEnter,
+      handleOnMouseLeave,
+      height,
+      width,
+    ],
   );
 }
 

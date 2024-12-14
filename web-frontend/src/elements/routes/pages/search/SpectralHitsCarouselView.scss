@@ -1,0 +1,24 @@
+.slick-prev::after {
+  visibility: hidden;
+}
+
+.slick-next::after {
+  visibility: hidden;
+}
+
+.slick-arrow::before {
+  background-color: transparent;
+  color: black;
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.slick-arrow.slick-prev::before {
+  content: '<';
+  color: black;
+}
+
+.slick-arrow.slick-next::before {
+  content: '>';
+  color: black;
+}

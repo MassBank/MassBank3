@@ -1,3 +1,5 @@
+import './SpectralHitsCarouselView.scss';
+
 import { useMemo } from 'react';
 import Peak from '../../../../types/peak/Peak';
 import Hit from '../../../../types/Hit';
@@ -19,8 +21,7 @@ function SpectralHitsCarouselView({
   width,
   height,
 }: InputProps) {
-  const _width = width - 100;
-  const _height = height - 50;
+  const _width = width - 75;
 
   const elements = useMemo(() => {
     return hits
@@ -30,32 +31,28 @@ function SpectralHitsCarouselView({
           key={'spectral-hits-view-component_' + i + '_' + hit.accession}
           reference={reference}
           hit={hit}
-          width={_width}
-          height={_height}
+          width={_width - 80}
+          height={height}
         />
       ));
-  }, [_height, _width, hits, reference]);
+  }, [_width, height, hits, reference]);
 
   return useMemo(
     () => (
       <Carousel
         initialSlide={slideIndex}
-        arrows={true}
         infinite={false}
         dots={false}
         style={{
           width: _width,
-          height: _height,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          border: '1px solid green',
+          height,
         }}
+        arrows
       >
         {elements}
       </Carousel>
     ),
-    [_height, _width, elements, slideIndex],
+    [_width, elements, height, slideIndex],
   );
 }
 

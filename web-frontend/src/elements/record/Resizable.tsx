@@ -1,5 +1,3 @@
-import './Resizable.scss';
-
 import PeakTable from './PeakTable';
 import Chart from '../basic/Chart';
 
@@ -15,6 +13,8 @@ import Peak from '../../types/peak/Peak';
 import Record from '../../types/Record';
 import getLinkedAnnotations from '../../utils/getLinkedAnnotations';
 import LinkedPeakAnnotation from '../../types/peak/LinkedPeakAnnotation';
+import { Content } from 'antd/es/layout/layout';
+import Placeholder from '../basic/Placeholder';
 
 const sidebarWidth = 10;
 const defaultChartWidthRatio = 0.75;
@@ -36,7 +36,7 @@ function Resizable({ record, record2, width, height }: InputProps) {
   useEffect(() => {
     const _chartWidth = width * defaultChartWidthRatio - sidebarWidth;
     setChartWidth(_chartWidth);
-    const _peakTableWidth = width - _chartWidth;
+    const _peakTableWidth = width - _chartWidth - sidebarWidth;
     setPeakTableWidth(_peakTableWidth);
   }, [width]);
 
@@ -141,14 +141,20 @@ function Resizable({ record, record2, width, height }: InputProps) {
 
   const sidebar = useMemo(
     () => (
-      <div
-        className="sidebar"
+      <Content
         style={{
-          width: sidebarWidth,
-          height,
           backgroundColor: isResizing ? 'lightskyblue' : 'lightgrey',
         }}
-      />
+      >
+        <Placeholder
+          child={''}
+          style={{
+            width: sidebarWidth,
+            height,
+            visibility: 'hidden',
+          }}
+        />
+      </Content>
     ),
     [height, isResizing],
   );
@@ -159,10 +165,8 @@ function Resizable({ record, record2, width, height }: InputProps) {
         peaks={filteredPeakData}
         annotations={record.peak.annotation}
         linkedAnnotations={filteredLinkedAnnotations}
-        style={{
-          width: peakTableWidth,
-          height: record2 && filteredPeakData2 ? height / 2 : height,
-        }}
+        width={peakTableWidth}
+        height={record2 && filteredPeakData2 ? height / 2 : height}
       />
     ),
     [
@@ -183,10 +187,8 @@ function Resizable({ record, record2, width, height }: InputProps) {
           peaks={filteredPeakData2}
           annotations={record2.peak.annotation}
           linkedAnnotations={filteredLinkedAnnotations2}
-          style={{
-            width: peakTableWidth,
-            height: height / 2,
-          }}
+          width={peakTableWidth}
+          height={height / 2}
         />
       ),
     [
@@ -200,21 +202,33 @@ function Resizable({ record, record2, width, height }: InputProps) {
 
   const resizable = useMemo(
     () => (
-      <div
+      <Content
         ref={ref}
-        className="resizable"
-        style={{ height }}
+        style={{
+          width,
+          height,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
         onMouseDown={startResizing}
         onMouseMove={resize}
         onMouseUp={stopResizing}
       >
         {chart}
         {sidebar}
-        <div className="peak-tables-view">
+        <Content
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
           {peakTable}
           {peakTable2}
-        </div>
-      </div>
+        </Content>
+      </Content>
     ),
     [
       chart,
@@ -225,6 +239,7 @@ function Resizable({ record, record2, width, height }: InputProps) {
       sidebar,
       startResizing,
       stopResizing,
+      width,
     ],
   );
 

@@ -47,7 +47,7 @@ type InputProps = {
   offset: number;
   height: number;
   // eslint-disable-next-line no-unused-vars
-  // onDoubleClick: (slideIndex: number) => void;
+  onDoubleClick: (slideIndex: number) => void;
   rowHeight?: number;
   chartWidth?: number;
   imageWidth?: number;
@@ -58,7 +58,7 @@ function ResultTable({
   hits,
   offset,
   height,
-  // onDoubleClick,
+  onDoubleClick,
   rowHeight = 100,
   chartWidth = 200,
   imageWidth = 200,
@@ -119,14 +119,14 @@ function ResultTable({
     return rows;
   }, [buildChart, buildStructure, hits, offset]);
 
-  // const handleOnDoubleClick = useCallback(
-  //   (record: ResultTableDataType) => ({
-  //     onDoubleClick: () => {
-  //       onDoubleClick(record.index - 1);
-  //     },
-  //   }),
-  //   [onDoubleClick],
-  // );
+  const handleOnDoubleClick = useCallback(
+    (record: ResultTableDataType) => ({
+      onDoubleClick: () => {
+        onDoubleClick(record.index - 1);
+      },
+    }),
+    [onDoubleClick],
+  );
 
   const columns = useMemo(() => {
     const _columns = [...defaultColumns];
@@ -155,11 +155,11 @@ function ResultTable({
         columns={columns}
         dataSource={dataSource}
         pagination={false}
-        // onRow={handleOnDoubleClick}
+        onRow={handleOnDoubleClick}
         sticky
       />
     ),
-    [columns, dataSource, height],
+    [columns, dataSource, handleOnDoubleClick, height],
   );
 }
 
