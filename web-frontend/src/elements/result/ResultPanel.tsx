@@ -135,7 +135,7 @@ function ResultPanel({
         <SpectralHitsCarouselView
           reference={reference}
           hits={_hitsWithRecords || []}
-          slideIndex={slideIndex}
+          slideIndex={slideIndex % pageLimit}
           width={widthOverview}
           height={heightOverview}
         />,
