@@ -1,36 +1,56 @@
-import './ResultInfo.scss';
-
+import { Content } from 'antd/es/layout/layout';
 import Hit from '../../types/Hit';
 import StructureView from '../basic/StructureView';
 import ResultLink from './ResultLink';
-import { CSSProperties } from 'react';
+import Placeholder from '../basic/Placeholder';
 
 type InputProps = {
   hit: Hit;
+  width: number;
+  height: number;
   imageWidth?: number;
   imageHeight?: number;
-  style?: CSSProperties;
 };
 
-function ResultInfo({ hit, imageWidth, imageHeight, style }: InputProps) {
+function ResultInfo({
+  hit,
+  imageWidth,
+  imageHeight,
+  width,
+  height,
+}: InputProps) {
   return (
-    <div className="info-view" style={style}>
-      <p className="accession-text">{hit.accession}</p>
-      <div className="score-structure-view">
-        {hit.score && <p className="score-text">Score: {hit.score}</p>}
-        {hit.record &&
-        hit.record.compound.smiles &&
-        hit.record.compound.smiles !== '' ? (
-          <StructureView
-            smiles={hit.record.compound.smiles}
-            imageWidth={imageWidth}
-            imageHeight={imageHeight}
-          />
-        ) : undefined}
-      </div>
+    <Content
+      style={{
+        width,
+        height,
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        border: '1px solid grey',
+      }}
+    >
+      <p>{hit.accession}</p>
+
+      {hit.score && <p>Score: {hit.score}</p>}
+      {hit.record && hit.record.compound.smiles ? (
+        <StructureView
+          smiles={hit.record.compound.smiles}
+          imageWidth={imageWidth}
+          imageHeight={imageHeight}
+        />
+      ) : (
+        <Placeholder
+          child="No structure"
+          style={{ width: imageWidth, height: imageHeight }}
+        />
+      )}
+
       <label>{hit.record.title}</label>
       <ResultLink hit={hit} />
-    </div>
+    </Content>
   );
 }
 

@@ -6,15 +6,20 @@ import Record from '../../types/Record';
 import generateID from '../../utils/generateID';
 import Placeholder from '../basic/Placeholder';
 import fetchData from '../../utils/fetchData';
-import { Button, Modal, Pagination, Spin } from 'antd';
+import { Button, Modal, Pagination, Select, Spin } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import SpectralHitsCarouselView from '../routes/pages/search/SpectralHitsCarouselView';
+import ResultTableSortOptionType from '../../types/ResultTableSortOptionType';
+import resultTableSortOptionValues from '../../constants/resultTableSortOptionValues';
 
 type InputProps = {
   reference?: Peak[];
   hits: Hit[];
   width: number;
   height: number;
+  sortOptions?: ResultTableSortOptionType[];
+  // eslint-disable-next-line no-unused-vars
+  onSort?: (value: string) => void;
   widthOverview?: number;
   heightOverview?: number;
 };
@@ -24,6 +29,8 @@ function ResultPanel({
   hits,
   width,
   height,
+  sortOptions = [],
+  onSort = () => {},
   widthOverview = width,
   heightOverview = height,
 }: InputProps) {
@@ -31,6 +38,9 @@ function ResultPanel({
   const [showModal, setShowModal] = useState<boolean>(false);
   const [slideIndex, setSlideIndex] = useState<number>(0);
   const [resultPageIndex, setResultPageIndex] = useState<number>(0);
+  const [selectedSortOption, setSelectedSortOption] = useState<
+    string | undefined
+  >(resultTableSortOptionValues.index);
   const [spectralHitsCarouselView, setSpectralHitsCarouselView] = useState<
     JSX.Element | undefined
   >();
@@ -123,7 +133,6 @@ function ResultPanel({
         <ResultTable
           reference={reference}
           hits={_hitsWithRecords || []}
-          offset={resultPageIndex * pageLimit}
           height={height - paginationHeight}
           onDoubleClick={handleOnDoubleClick}
           rowHeight={150}
@@ -191,6 +200,14 @@ function ResultPanel({
     console.log('Download result');
   }, []);
 
+  const handleOnSelect = useCallback(
+    (value: string) => {
+      setSelectedSortOption(value);
+      onSort(value);
+    },
+    [onSort],
+  );
+
   const paginationContainer = useMemo(() => {
     return (
       <Content
@@ -232,7 +249,21 @@ function ResultPanel({
             alignItems: 'center',
           }}
         />
-
+        {sortOptions.length > 0 && (
+          <Select
+            defaultValue={selectedSortOption}
+            style={{ width: 200 }}
+            placeholder="Search to Select"
+            optionFilterProp="label"
+            filterSort={(optionA, optionB) =>
+              (optionA?.label ?? '')
+                .toLowerCase()
+                .localeCompare((optionB?.label ?? '').toLowerCase())
+            }
+            options={sortOptions}
+            onSelect={handleOnSelect}
+          />
+        )}
         <Button
           children="Download"
           onClick={() => handleOnDownloadResult()}
@@ -246,10 +277,13 @@ function ResultPanel({
       </Content>
     );
   }, [
-    handleOnDownloadResult,
-    handleOnSelectPage,
     hits.length,
+    handleOnSelectPage,
     resultPageIndex,
+    sortOptions,
+    selectedSortOption,
+    handleOnSelect,
+    handleOnDownloadResult,
   ]);
 
   return useMemo(
@@ -283,7 +317,10 @@ function ResultPanel({
           )}
         </Content>
       ) : (
-        <Placeholder child="No hits found" style={{ width, height }} />
+        <Placeholder
+          child="No hits found"
+          style={{ width, height, fontSize: 18, fontWeight: 'bold' }}
+        />
       ),
     [
       height,

@@ -6,8 +6,6 @@ import Peak from '../../../../types/peak/Peak';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import Hit from '../../../../types/Hit';
 import SearchPanel from './searchPanel/SearchPanel';
-import Placeholder from '../../../basic/Placeholder';
-import ResultPanel from '../../../result/ResultPanel';
 import fetchData from '../../../../utils/fetchData';
 import buildSearchParams from '../../../../utils/buildSearchParams';
 import initFlags from '../../../../utils/initFlags';
@@ -16,10 +14,9 @@ import parsePeakListInputField from './searchPanel/utils/parsePeakListAndReferen
 import { Molecule } from 'openchemlib';
 import SearchFields from '../../../../types/filterOptions/SearchFields';
 import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
-import { Content } from 'antd/es/layout/layout';
-import { Layout, Spin } from 'antd';
-import Sider from 'antd/es/layout/Sider';
+import { Layout } from 'antd';
 import massSpecFilterOptionsFormDataToContentMapper from '../../../../utils/massSpecFilterOptionsFormDataToContentMapper';
+import SearchAndResultPanel from '../../../result/SearchAndResultPanel';
 
 function SearchView() {
   const ref = useRef(null);
@@ -141,9 +138,15 @@ function SearchView() {
     const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/search';
     const searchResult = (await fetchData(url, searchParams)) as SearchResult;
 
-    const _hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
-    setHits(_hits);
+    let _hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
+    _hits = _hits.map((hit, i) => {
+      return {
+        ...hit,
+        index: i,
+      };
+    });
 
+    setHits(_hits);
     setIsRequesting(false);
   }, []);
 
@@ -177,67 +180,26 @@ function SearchView() {
     ],
   );
 
-  const resultPanel = useMemo(
-    () => (
-      <ResultPanel
-        hits={hits}
-        reference={reference}
-        width={width - searchPanelWidth}
-        height={height}
-        widthOverview={width * 0.9}
-        heightOverview={height * 0.9}
-      />
-    ),
-    [height, hits, reference, searchPanelWidth, width],
-  );
-
   return useMemo(
     () => (
       <Layout ref={ref} style={{ width: '100%', height: '100%' }}>
-        <Content
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Sider width={searchPanelWidth}>{searchPanel}</Sider>
-          <Content
-            style={{
-              width: width - searchPanelWidth,
-              height,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            {isRequesting ? (
-              <Spin size="large" />
-            ) : hits.length > 0 ? (
-              resultPanel
-            ) : (
-              <Placeholder
-                child={collapsed ? 'No results' : ''}
-                style={{
-                  width: width - searchPanelWidth,
-                  height: height,
-                  fontSize: 18,
-                  fontWeight: 'bold',
-                }}
-              />
-            )}
-          </Content>
-        </Content>
+        <SearchAndResultPanel
+          searchPanel={searchPanel}
+          width={width}
+          height={height}
+          searchPanelWidth={searchPanelWidth}
+          searchPanelHeight={height}
+          isRequesting={isRequesting}
+          reference={reference}
+          hits={hits}
+        />
       </Layout>
     ),
     [
-      collapsed,
       height,
-      hits.length,
+      hits,
       isRequesting,
-      resultPanel,
+      reference,
       searchPanel,
       searchPanelWidth,
       width,

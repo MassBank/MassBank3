@@ -20,7 +20,7 @@ function SpectralHitsViewComponent({
   height,
 }: InputProps) {
   return useMemo(() => {
-    const widthResultInfo = width * 0.25;
+    const widthResultInfo = width / 4;
     const widthResizable = width - widthResultInfo;
 
     return (
@@ -38,12 +38,10 @@ function SpectralHitsViewComponent({
       >
         <ResultInfo
           hit={hit}
-          imageWidth={widthResultInfo}
-          imageHeight={height}
-          style={{
-            width: widthResultInfo,
-            height,
-          }}
+          width={widthResultInfo}
+          height={height}
+          imageWidth={widthResultInfo - 50}
+          // imageHeight={200}
         />
         {reference && reference.length > 0 ? (
           <Resizable

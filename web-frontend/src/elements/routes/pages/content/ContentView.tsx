@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
-import { ArcElement, Chart, Legend, Tooltip } from 'chart.js';
 import ContentChart from './ContentChart';
 import fetchData from '../../../../utils/fetchData';
 import buildSearchParams from '../../../../utils/buildSearchParams';
@@ -9,29 +8,27 @@ import initFlags from '../../../../utils/initFlags';
 import ContentSearchPanel from './ContentSearchPanel';
 import SearchResult from '../../../../types/SearchResult';
 import Hit from '../../../../types/Hit';
-import ResultPanel from '../../../result/ResultPanel';
 import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
-import { Layout, Spin } from 'antd';
+import { Layout } from 'antd';
 import { Content } from 'antd/es/layout/layout';
-import Sider from 'antd/es/layout/Sider';
-import Placeholder from '../../../basic/Placeholder';
 import SearchFields from '../../../../types/filterOptions/SearchFields';
 import massSpecFilterOptionsFormDataToContentMapper from '../../../../utils/massSpecFilterOptionsFormDataToContentMapper';
+import SearchAndResultPanel from '../../../result/SearchAndResultPanel';
 
 function ContentView() {
   const ref = useRef(null);
   const { width, height } = useContainerDimensions(ref);
 
-  const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [browseContent, setBrowseContent] = useState<
     ContentFilterOptions | undefined
   >();
-  const [collapsed, setCollapsed] = useState<boolean>(true);
+  const [isRequesting, setIsRequesting] = useState<boolean>(false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
   const [hits, setHits] = useState<Hit[]>([]);
 
   const searchPanelWidth = useMemo(
-    () => (collapsed ? 50 : Math.max(width * 0.3, 400)),
-    [collapsed, width],
+    () => (isCollapsed ? 50 : Math.max(width * 0.3, 400)),
+    [isCollapsed, width],
   );
 
   const handleOnFetchContent = useCallback(
@@ -56,12 +53,15 @@ function ContentView() {
       const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/search';
       const searchResult = (await fetchData(url, searchParams)) as SearchResult;
 
-      const _hits: Hit[] = searchResult.data
-        ? (searchResult.data as Hit[])
-        : [];
+      let _hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
+      _hits = _hits.map((hit, i) => {
+        return {
+          ...hit,
+          index: i,
+        };
+      });
 
       setHits(_hits);
-
       setIsRequesting(false);
     },
     [],
@@ -70,8 +70,6 @@ function ContentView() {
   useEffect(() => {
     handleOnFetchContent(undefined);
   }, [handleOnFetchContent]);
-
-  Chart.register(ArcElement, Tooltip, Legend);
 
   const heights = useMemo(() => {
     return {
@@ -115,22 +113,9 @@ function ContentView() {
     return undefined;
   }, [browseContent, heights.chartPanelHeight, width]);
 
-  const resultPanel = useMemo(() => {
-    return (
-      <ResultPanel
-        reference={[]}
-        hits={hits}
-        width={width - searchPanelWidth}
-        height={heights.searchPanelHeight}
-        widthOverview={width}
-        heightOverview={height}
-      />
-    );
-  }, [height, heights.searchPanelHeight, hits, searchPanelWidth, width]);
-
   const handleOnSubmit = useCallback(
     async (formData: SearchFields) => {
-      setCollapsed(true);
+      setIsCollapsed(true);
 
       const formData_content = massSpecFilterOptionsFormDataToContentMapper(
         formData.massSpecFilterOptions,
@@ -142,13 +127,13 @@ function ContentView() {
   );
 
   const handleOnCollapse = useCallback((_collapsed: boolean) => {
-    setCollapsed(_collapsed);
+    setIsCollapsed(_collapsed);
   }, []);
 
   const contentSearchPanel = useMemo(
     () => (
       <ContentSearchPanel
-        collapsed={collapsed}
+        collapsed={isCollapsed}
         onCollapse={handleOnCollapse}
         content={browseContent}
         onSubmit={handleOnSubmit}
@@ -157,7 +142,7 @@ function ContentView() {
       />
     ),
     [
-      collapsed,
+      isCollapsed,
       handleOnCollapse,
       browseContent,
       handleOnSubmit,
@@ -180,53 +165,25 @@ function ContentView() {
           }}
         >
           {charts}
-          <Content
-            style={{
-              width,
-              height: heights.searchPanelHeight,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <Sider width={searchPanelWidth}>{contentSearchPanel}</Sider>
-            <Content
-              style={{
-                width: width - searchPanelWidth,
-                height: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              {isRequesting ? (
-                <Spin size="large" />
-              ) : hits.length > 0 ? (
-                resultPanel
-              ) : (
-                <Placeholder
-                  child={collapsed ? 'No results' : ''}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    fontSize: 18,
-                    fontWeight: 'bold',
-                  }}
-                />
-              )}
-            </Content>
-          </Content>
+          <SearchAndResultPanel
+            searchPanel={contentSearchPanel}
+            width={width}
+            height={heights.searchPanelHeight}
+            searchPanelWidth={searchPanelWidth}
+            searchPanelHeight={heights.searchPanelHeight}
+            isRequesting={isRequesting}
+            reference={[]}
+            hits={hits}
+          />
         </Content>
       </Layout>
     ),
     [
       charts,
-      collapsed,
       contentSearchPanel,
       heights.searchPanelHeight,
-      hits.length,
+      hits,
       isRequesting,
-      resultPanel,
       searchPanelWidth,
       width,
     ],

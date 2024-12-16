@@ -44,7 +44,6 @@ const defaultColumns = [
 type InputProps = {
   reference?: Peak[];
   hits: Hit[];
-  offset: number;
   height: number;
   // eslint-disable-next-line no-unused-vars
   onDoubleClick: (slideIndex: number) => void;
@@ -56,7 +55,6 @@ type InputProps = {
 function ResultTable({
   reference,
   hits,
-  offset,
   height,
   onDoubleClick,
   rowHeight = 100,
@@ -101,10 +99,11 @@ function ResultTable({
 
   const dataSource: ResultTableDataType[] = useMemo(() => {
     const rows: ResultTableDataType[] = [];
-    hits.forEach((hit, i) => {
+
+    hits.forEach((hit) => {
       const row: ResultTableDataType = {
-        key: 'result-table-row_' + i + '_' + hit.score,
-        index: offset + i + 1,
+        key: 'result-table-row_' + hit.index + '_' + hit.score,
+        index: hit.index + 1,
         score: hit.score ? hit.score.toFixed(4) : undefined,
         accession: hit.accession,
         link: <ResultLink hit={hit} />,
@@ -117,7 +116,7 @@ function ResultTable({
     });
 
     return rows;
-  }, [buildChart, buildStructure, hits, offset]);
+  }, [buildChart, buildStructure, hits]);
 
   const handleOnDoubleClick = useCallback(
     (record: ResultTableDataType) => ({
