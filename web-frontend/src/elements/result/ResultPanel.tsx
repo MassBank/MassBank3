@@ -136,7 +136,7 @@ function ResultPanel({
           onDoubleClick={handleOnDoubleClick}
           rowHeight={150}
           chartWidth={250}
-          imageWidth={200}
+          imageWidth={250}
         />,
       );
       setSpectralHitsCarouselView(
