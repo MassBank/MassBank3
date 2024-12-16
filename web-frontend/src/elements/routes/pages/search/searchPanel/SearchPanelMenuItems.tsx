@@ -58,7 +58,7 @@ function SearchPanelMenuItems({
               labelCol={{ span: 8 }}
               wrapperCol={{ span: 16 }}
             >
-              <Input type="text" placeholder="Rutin" />
+              <Input type="text" placeholder="Rutin" allowClear />
             </Form.Item>
           ),
         },
@@ -85,7 +85,7 @@ function SearchPanelMenuItems({
               labelCol={{ span: 8 }}
               wrapperCol={{ span: 16 }}
             >
-              <Input type="text" placeholder="C27H30O16" />
+              <Input type="text" placeholder="C27H30O16" allowClear />
             </Form.Item>
           ),
         },
@@ -180,6 +180,7 @@ function SearchPanelMenuItems({
                   <Input.TextArea
                     placeholder="m/z and intensity, delimited by a space. &#10;&#10;147.063 11&#10;303.05 999&#10;449.108 64&#10;465.102 588&#10;611.161 670"
                     autoSize={{ minRows: 5 }}
+                    allowClear
                   />
                 </Form.Item>
               ),
@@ -328,7 +329,11 @@ function SearchPanelMenuItems({
                 height: '100%',
               }}
             >
-              <Input type="text" placeholder="IKGXIBQEEMLURG-NVPNHPEKSA-N" />
+              <Input
+                type="text"
+                placeholder="IKGXIBQEEMLURG-NVPNHPEKSA-N"
+                allowClear
+              />
             </Form.Item>
           ),
         },
@@ -358,6 +363,7 @@ function SearchPanelMenuItems({
               <Input
                 type="text"
                 placeholder="splash10-0wmi-0009506000-98ca7f7c8f3072af4481"
+                allowClear
               />
             </Form.Item>
           ),

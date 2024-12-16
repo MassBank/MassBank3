@@ -84,6 +84,7 @@ function PeakSearchRow({ index }: InputProps) {
               type="text"
               onChange={handleOnChangeFormula}
               style={{ width: '100%', height: '100%' }}
+              allowClear
             />
           </Form.Item>
         </Col>

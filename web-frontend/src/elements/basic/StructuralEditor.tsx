@@ -154,6 +154,7 @@ function StructuralEditor({ onChange = () => {}, width, height }: InputProps) {
             width: '100%',
             backgroundColor: 'transparent',
           }}
+          allowClear
         />
         <Divider style={{ borderColor: 'grey' }}>OR</Divider>
         <Dragger

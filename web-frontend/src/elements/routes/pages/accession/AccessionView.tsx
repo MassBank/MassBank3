@@ -95,6 +95,7 @@ function AccessionView() {
             addonBefore="Search for accession: "
             onChange={handleOnChange}
             onKeyDown={handleOnClick}
+            allowClear
           />
           <Button
             children="Search"
