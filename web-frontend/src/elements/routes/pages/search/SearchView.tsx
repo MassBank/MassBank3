@@ -202,6 +202,8 @@ function SearchView() {
               height={height}
               searchPanelWidth={searchPanelWidth}
               searchPanelHeight={height}
+              widthOverview={width}
+              heightOverview={height}
               isRequesting={isRequesting}
               reference={reference}
               hits={hits}

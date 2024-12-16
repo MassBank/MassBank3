@@ -43,22 +43,33 @@ function ResultInfo({
       >
         {hit.accession}
       </p>
-      <p
+      <Content
         style={{
+          width: '100%',
+          height: 50,
           marginTop: 5,
           marginBottom: 5,
-          width: '100%',
-          height: 20,
-          fontSize: 17,
-          fontWeight: 'bolder',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
         {hit.score ? (
-          `Score: ${hit.score}`
+          <p
+            style={{
+              margin: 0,
+              width: '100%',
+              height: '100%',
+              fontSize: 17,
+              fontWeight: 'bolder',
+            }}
+          >
+            {`Score: ${hit.score}`}
+          </p>
         ) : (
           <Placeholder child="" style={{ height: 20 }} />
         )}
-      </p>
+      </Content>
       <Content
         style={{
           width: '100%',
