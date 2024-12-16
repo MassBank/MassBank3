@@ -125,7 +125,7 @@ function RecordView({ record }: inputProps) {
             <tr>
               <td>Formula</td>
               <td>
-                <p>{record.compound.formula}</p>
+                <p>{record.compound.formula} </p>
               </td>
             </tr>
             <tr>
