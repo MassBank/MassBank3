@@ -1,3 +1,4 @@
+import { Content } from 'antd/es/layout/layout';
 import { useMemo } from 'react';
 import { SmilesSvgRenderer } from 'react-ocl';
 
@@ -6,7 +7,6 @@ interface InputProps {
   imageWidth?: number;
   imageHeight?: number;
   onDoubleClick?: () => void;
-  className?: string;
 }
 
 function StructureView({
@@ -14,21 +14,29 @@ function StructureView({
   imageWidth,
   imageHeight,
   onDoubleClick = () => {},
-  className = 'StructureView',
 }: InputProps) {
   return useMemo(
     () => (
-      <div className={className} onDoubleClick={onDoubleClick}>
+      <Content
+        onDoubleClick={onDoubleClick}
+        style={{
+          width: imageWidth,
+          height: imageHeight,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <SmilesSvgRenderer
           smiles={smiles}
           width={imageWidth}
           height={imageHeight}
           autoCrop={true}
-          autoCropMargin={10}
+          autoCropMargin={5}
         />
-      </div>
+      </Content>
     ),
-    [className, imageHeight, imageWidth, onDoubleClick, smiles],
+    [imageHeight, imageWidth, onDoubleClick, smiles],
   );
 }
 

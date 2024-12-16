@@ -1,26 +1,24 @@
-import './ResultPanel.scss';
-
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import ResultTable from './ResultTable';
 import Hit from '../../types/Hit';
 import Peak from '../../types/peak/Peak';
 import Record from '../../types/Record';
 import generateID from '../../utils/generateID';
-import SpectralHitsCarouselView from '../routes/pages/search/SpectralHitsCarouselView';
-import CustomModal from '../basic/CustomModal';
-import Pagination from '../basic/Pagination';
 import Placeholder from '../basic/Placeholder';
-import Spinner from '../basic/Spinner';
 import fetchData from '../../utils/fetchData';
-import Input from '../basic/Input';
+import { Button, Modal, Pagination, Select, Spin } from 'antd';
+import { Content } from 'antd/es/layout/layout';
+import SpectralHitsCarouselView from '../routes/pages/search/SpectralHitsCarouselView';
+import ResultTableSortOptionType from '../../types/ResultTableSortOptionType';
 
 type InputProps = {
   reference?: Peak[];
   hits: Hit[];
   width: number;
   height: number;
+  sortOptions?: ResultTableSortOptionType[];
+  // eslint-disable-next-line no-unused-vars
+  onSort?: (value: string) => void;
   widthOverview?: number;
   heightOverview?: number;
 };
@@ -30,6 +28,8 @@ function ResultPanel({
   hits,
   width,
   height,
+  sortOptions = [],
+  onSort = () => {},
   widthOverview = width,
   heightOverview = height,
 }: InputProps) {
@@ -37,11 +37,15 @@ function ResultPanel({
   const [showModal, setShowModal] = useState<boolean>(false);
   const [slideIndex, setSlideIndex] = useState<number>(0);
   const [resultPageIndex, setResultPageIndex] = useState<number>(0);
+  const [selectedSortOption, setSelectedSortOption] = useState<
+    string | undefined
+  >();
   const [spectralHitsCarouselView, setSpectralHitsCarouselView] = useState<
     JSX.Element | undefined
   >();
 
   const pageLimit = 20;
+  const paginationHeight = 50;
 
   const resultTableData = useMemo(() => {
     const _resultTableData: Hit[][] = [];
@@ -110,6 +114,14 @@ function ResultPanel({
 
   const [resultTable, setResultTable] = useState<JSX.Element | undefined>();
 
+  const handleOnDoubleClick = useCallback(
+    (_slideIndex: number) => {
+      setSlideIndex(_slideIndex);
+      setShowModal(true);
+    },
+    [setShowModal],
+  );
+
   const buildResultTable = useCallback(() => {
     setIsRequesting(true);
     const _hits =
@@ -120,27 +132,28 @@ function ResultPanel({
         <ResultTable
           reference={reference}
           hits={_hitsWithRecords || []}
-          offset={resultPageIndex * pageLimit}
-          onDoubleClick={(_slideIndex: number) => {
-            setSlideIndex(_slideIndex);
-            setShowModal(true);
-          }}
-          rowHeight={200}
+          height={height - paginationHeight}
+          onDoubleClick={handleOnDoubleClick}
+          rowHeight={150}
+          chartWidth={250}
+          imageWidth={250}
         />,
       );
       setSpectralHitsCarouselView(
         <SpectralHitsCarouselView
           reference={reference}
           hits={_hitsWithRecords || []}
-          slideIndex={slideIndex}
+          slideIndex={slideIndex % pageLimit}
           width={widthOverview}
-          height={heightOverview - 50}
+          height={heightOverview}
         />,
       );
       setIsRequesting(false);
     });
   }, [
     fetchRecords,
+    handleOnDoubleClick,
+    height,
     heightOverview,
     reference,
     resultPageIndex,
@@ -153,81 +166,172 @@ function ResultPanel({
     buildResultTable();
   }, [buildResultTable]);
 
-  const customModal = useMemo(
+  const modal = useMemo(
     () => (
-      <CustomModal
-        show={showModal}
-        body={spectralHitsCarouselView}
-        onClose={() => setShowModal(false)}
-        modalStyle={{
-          content: { width: widthOverview, height: heightOverview },
-        }}
-        header={
-          <FontAwesomeIcon
-            icon={faTimes}
-            style={{ color: 'red', cursor: 'pointer', paddingRight: '20px' }}
-            onClick={() => setShowModal(false)}
-          />
-        }
-        headerContainerStyle={{
-          width: '100%',
-          height: '10px',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'flex-end',
-        }}
-        footerContainerStyle={{ display: 'none' }}
-      />
+      <Modal
+        open={showModal}
+        onCancel={() => setShowModal(false)}
+        footer={null}
+        width={widthOverview}
+        height={heightOverview}
+        centered
+      >
+        {spectralHitsCarouselView}
+      </Modal>
     ),
     [heightOverview, showModal, spectralHitsCarouselView, widthOverview],
   );
 
   const handleOnSelectPage = useCallback(
-    (pageIndex: number) => {
-      if (pageIndex > 0 && pageIndex <= Math.ceil(hits.length / pageLimit)) {
+    (pageIndex: number | null) => {
+      if (
+        pageIndex &&
+        pageIndex > 0 &&
+        pageIndex <= Math.ceil(hits.length / pageLimit)
+      ) {
         setResultPageIndex(pageIndex - 1);
       }
     },
     [hits.length],
   );
 
-  const paginationContainer = useMemo(
-    () => (
-      <div className="pagination-container">
-        <Pagination
-          total={Math.ceil(hits.length / pageLimit)}
-          onPageChange={handleOnSelectPage}
-          currentPage={resultPageIndex + 1}
-        />
-        <Input
-          type="number"
-          onChange={handleOnSelectPage}
-          value={resultPageIndex + 1}
-          min={1}
-          max={Math.ceil(hits.length / pageLimit)}
-          label="Select page: "
-          style={{ width: '200px', marginRight: '30px' }}
-        />
-      </div>
-    ),
-    [handleOnSelectPage, hits.length, resultPageIndex],
+  const handleOnDownloadResult = useCallback(() => {
+    console.log('Download result');
+  }, []);
+
+  const handleOnSelect = useCallback(
+    (value: string) => {
+      setSelectedSortOption(value);
+      onSort(value);
+    },
+    [onSort],
   );
 
-  return resultTableData.length > 0 ? (
-    <div className="result-container" style={{ width, height }}>
-      <p className="hit-count-paragraph">{`${hits.length} hits were found!`}</p>
-      {paginationContainer}
-      {isRequesting ? (
-        <Spinner buttonDisabled={true} />
+  const paginationContainer = useMemo(() => {
+    return (
+      <Content
+        style={{
+          width: '100%',
+          height: paginationHeight,
+          display: 'flex',
+          justifyContent: 'space-evenly',
+          alignItems: 'center',
+        }}
+      >
+        <Pagination
+          total={hits.length}
+          pageSize={pageLimit}
+          showTotal={(total) => (
+            <Content
+              style={{
+                textWrap: 'nowrap',
+                textAlign: 'center',
+                fontWeight: 'bold',
+                color: 'brown',
+                width: 200,
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >{`${total} Results`}</Content>
+          )}
+          onChange={handleOnSelectPage}
+          current={resultPageIndex + 1}
+          showTitle
+          showSizeChanger={false}
+          showQuickJumper
+          locale={{ jump_to: 'Page', page: '' }}
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+          }}
+        />
+        {sortOptions.length > 0 && (
+          <Select
+            defaultValue={selectedSortOption}
+            style={{ width: 200 }}
+            placeholder="Sort by"
+            optionFilterProp="label"
+            filterSort={(optionA, optionB) =>
+              (optionA?.label ?? '')
+                .toLowerCase()
+                .localeCompare((optionB?.label ?? '').toLowerCase())
+            }
+            options={sortOptions}
+            onSelect={handleOnSelect}
+          />
+        )}
+        <Button
+          children="Download"
+          onClick={() => handleOnDownloadResult()}
+          style={{
+            width: 100,
+            marginRight: 30,
+            marginLeft: 20,
+          }}
+          disabled
+        />
+      </Content>
+    );
+  }, [
+    hits.length,
+    handleOnSelectPage,
+    resultPageIndex,
+    sortOptions,
+    selectedSortOption,
+    handleOnSelect,
+    handleOnDownloadResult,
+  ]);
+
+  return useMemo(
+    () =>
+      resultTableData.length > 0 ? (
+        <Content style={{ width, height }}>
+          {isRequesting ? (
+            <Content
+              style={{
+                width: '100%',
+                height,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Spin size="large" />
+            </Content>
+          ) : (
+            <Content
+              style={{
+                width: '100%',
+                height,
+                overflow: 'scroll',
+              }}
+            >
+              {paginationContainer}
+              {resultTable}
+              {modal}
+            </Content>
+          )}
+        </Content>
       ) : (
-        <div className="result-table-modal-container">
-          {resultTable}
-          {customModal}
-        </div>
-      )}
-    </div>
-  ) : (
-    <Placeholder child="No hits found" style={{ width, height }} />
+        <Placeholder
+          child="No hits found"
+          style={{ width, height, fontSize: 18, fontWeight: 'bold' }}
+        />
+      ),
+    [
+      height,
+      isRequesting,
+      modal,
+      paginationContainer,
+      resultTable,
+      resultTableData.length,
+      width,
+    ],
   );
 }
 

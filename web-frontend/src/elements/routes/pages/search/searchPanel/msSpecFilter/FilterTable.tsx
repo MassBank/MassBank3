@@ -1,105 +1,105 @@
-import './FilterTable.scss';
-
-import {
-  CSSProperties,
-  MouseEvent,
-  useCallback,
-  useMemo,
-  useState,
-} from 'react';
-import FilterTableData from './FilterTableData';
+import { MouseEvent, useCallback, useMemo, useState } from 'react';
 import ValueCount from '../../../../../../types/ValueCount';
-import Button from '../../../../../basic/Button';
+import { Button, Checkbox, Form } from 'antd';
+import { Content } from 'antd/es/layout/layout';
+import useFormInstance from 'antd/es/form/hooks/useFormInstance';
+import SearchFields from '../../../../../../types/filterOptions/SearchFields';
 
 type InputProps = {
   filterOptions: ValueCount[];
-  onSelect: (
-    // eslint-disable-next-line no-unused-vars
-    value: string,
-    // eslint-disable-next-line no-unused-vars
-    isChecked: boolean,
-  ) => void;
-  showCounts?: boolean;
-  style?: CSSProperties;
+  filterName: string;
+  label: string;
+  height?: number;
 };
 
 function FilterTable({
   filterOptions,
-  onSelect,
-  showCounts = false,
-  style,
+  filterName,
+  label,
+  height = 250,
 }: InputProps) {
-  const [filterOptionsInner, setFilterOptionInner] = useState<ValueCount[]>(
-    filterOptions ? [...filterOptions] : [],
+  const formInstance = useFormInstance<SearchFields>();
+  const { setFieldValue } = formInstance;
+
+  const createOptions = useCallback((_filterOptions: ValueCount[]) => {
+    return _filterOptions.map((vc) => {
+      return {
+        label: vc.value,
+        value: vc.value,
+        checked: vc.flag || false,
+      };
+    });
+  }, []);
+
+  const options = useMemo(
+    () => createOptions(filterOptions),
+    [createOptions, filterOptions],
   );
 
-  const rows = useMemo(() => {
-    const pairs: ValueCount[][] = [];
-    let i = 0;
-    for (; i <= filterOptionsInner.length - 2; i = i + 2) {
-      pairs.push([filterOptionsInner[i], filterOptionsInner[i + 1]]);
-    }
-    if (i < filterOptionsInner.length) {
-      const vc: ValueCount = { value: '', count: 0, flag: true };
-      pairs.push([filterOptionsInner[i], vc]);
-    }
-    const rows = pairs.map((pair) => {
-      const vc = pair[0];
-      const vc2 = pair.length === 2 ? pair[1] : undefined;
-      return (
-        <tr key={'ms_spec_filter_' + vc.value} style={{ height: '25px' }}>
-          <FilterTableData vc={vc} onSelect={onSelect} showCount={showCounts} />
-          {vc2 && (
-            <FilterTableData
-              vc={vc2}
-              onSelect={onSelect}
-              showCount={showCounts}
-            />
-          )}
-        </tr>
-      );
-    });
-
-    return rows;
-  }, [filterOptionsInner, onSelect, showCounts]);
-
-  const allSelected = useMemo(() => {
-    if (filterOptionsInner) {
-      return (
-        filterOptionsInner.filter((vc) => vc.flag === true).length ===
-        filterOptionsInner.length
-      );
-    }
-
-    return false;
-  }, [filterOptionsInner]);
+  const [allSelected, setAllSelected] = useState<boolean>(true);
 
   const handleOnSelectAll = useCallback(() => {
-    setFilterOptionInner(
-      filterOptionsInner.map((vc) => {
-        return { ...vc, flag: !allSelected };
-      }),
+    setFieldValue(
+      [filterName, label],
+      allSelected ? [] : options.map((vc) => vc.value),
     );
-    filterOptionsInner.forEach((vc) => {
-      onSelect(vc.value, !allSelected);
-    });
-  }, [allSelected, filterOptionsInner, onSelect]);
+    setAllSelected(!allSelected);
+  }, [allSelected, filterName, label, options, setFieldValue]);
 
-  return (
-    <div>
-      <table className="filter-table" style={style}>
-        <tbody>{rows}</tbody>
-      </table>
-      <Button
-        child={allSelected ? 'Unselect' : 'Select'}
-        onClick={(e: MouseEvent<HTMLButtonElement>) => {
-          e.preventDefault();
-          e.stopPropagation();
-
-          handleOnSelectAll();
+  return useMemo(
+    () => (
+      <Content
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          textAlign: 'center',
         }}
-      />
-    </div>
+      >
+        <Content
+          style={{
+            width: '100%',
+            height,
+            overflow: 'scroll',
+          }}
+        >
+          <Form.Item
+            name={[filterName, label]}
+            rules={[{ required: false }]}
+            style={{
+              width: '100%',
+              height: '100%',
+            }}
+            initialValue={options
+              .filter((vc) => vc.checked)
+              .map((vc) => vc.value)}
+          >
+            <Checkbox.Group
+              options={options}
+              style={{
+                width: '100%',
+                height: '100%',
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+              }}
+            />
+          </Form.Item>
+        </Content>
+        <Button
+          children={allSelected ? 'Unselect' : 'Select'}
+          onClick={(e: MouseEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            handleOnSelectAll();
+          }}
+        />
+      </Content>
+    ),
+    [allSelected, filterName, handleOnSelectAll, height, label, options],
   );
 }
 

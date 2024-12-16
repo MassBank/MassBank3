@@ -1,36 +1,25 @@
 import './ContentChart.scss';
 
 import { useMemo } from 'react';
-import { Doughnut } from 'react-chartjs-2';
-import { splitStringAndCapitaliseFirstLetter } from '../../../../utils/stringUtils';
-import calculateColour from '../../../../utils/calculateColour';
+import {
+  splitStringAndCapitaliseFirstLetter,
+  splitStringAndJoin,
+} from '../../../../utils/stringUtils';
 import ValueCount from '../../../../types/ValueCount';
-import Content from '../../../../types/Content';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const options: any = {
-  plugins: {
-    legend: {
-      position: 'right',
-      labels: {
-        boxWidth: 10,
-        padding: 5,
-        font: {
-          size: 10,
-        },
-      },
-      align: 'center',
-    },
-  },
-};
+import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
+import { Pie } from '@ant-design/plots';
+import { Content } from 'antd/es/layout/layout';
 
 type InputProps = {
-  content: Content;
+  content: ContentFilterOptions;
   identifier: string;
   width: number;
+  height: number;
 };
 
-function ContentChart({ content, identifier, width }: InputProps) {
+function ContentChart({ content, identifier, width, height }: InputProps) {
+  const topN = 10;
+
   const chart = useMemo(() => {
     const filteredValueCounts = [
       ...(content[identifier] as ValueCount[]),
@@ -53,50 +42,83 @@ function ContentChart({ content, identifier, width }: InputProps) {
         };
       });
 
-    contentValueCounts.splice(10);
+    contentValueCounts.splice(topN);
 
     const labels = contentValueCounts.map(
-      (vc) => vc.value + ' (' + vc.percentage.toPrecision(3) + '%)',
+      (vc) =>
+        splitStringAndJoin(vc.value, '_', ' ') +
+        ' (' +
+        vc.percentage.toPrecision(3) +
+        '%)',
     );
     const counts = contentValueCounts.map((vc) => vc.count);
 
-    const finalData = {
-      labels: labels,
-      datasets: [
-        {
-          data: counts,
-          backgroundColor: labels.map((l, i) =>
-            calculateColour(0, labels.length, i),
-          ),
-          borderColor: 'black',
-          borderWidth: 1,
-          dataVisibility: new Array(contentValueCounts.length).fill(true),
-        },
-      ],
+    const data = labels.map((label, i) => {
+      return {
+        type: label,
+        value: counts[i],
+      };
+    });
+
+    const config = {
+      data,
+      angleField: 'value',
+      colorField: 'type',
+      innerRadius: 0.3,
+      label: {
+        text: 'type',
+        position: 'outside',
+      },
+      legend: false,
+      width,
+      height: height - 20,
+      padding: 10,
     };
 
     return (
-      <div
-        className="content-chart-container"
+      <Content
         style={{
           width,
+          height,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
-        <p className="content-chart-label">
-          {(itemCount > 10 ? 'Top 10 of ' : '') +
+        <p
+          style={{
+            width,
+            height: 20,
+            margin: 0,
+            marginTop: 5,
+            fontWeight: 'bolder',
+          }}
+        >
+          {(itemCount > topN ? 'Top ' + topN + ' of ' : '') +
             splitStringAndCapitaliseFirstLetter(identifier, '_', ' ')}
         </p>
-        <Doughnut
-          data={finalData}
-          options={options}
-          fallbackContent={<p>{`No content for ${identifier}`}</p>}
-          style={{ padding: '5px' }}
-        />
-      </div>
+        <Pie {...config} />
+      </Content>
     );
-  }, [content, identifier, width]);
+  }, [content, height, identifier, width]);
 
-  return chart;
+  return useMemo(
+    () => (
+      <Content
+        style={{
+          width,
+          height,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {chart}
+      </Content>
+    ),
+    [chart, height, width],
+  );
 }
 
 export default ContentChart;

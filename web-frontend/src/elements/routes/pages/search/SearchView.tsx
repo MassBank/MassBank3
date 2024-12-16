@@ -5,19 +5,19 @@ import Peak from '../../../../types/peak/Peak';
 
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import Hit from '../../../../types/Hit';
-import Spinner from '../../../basic/Spinner';
 import SearchPanel from './searchPanel/SearchPanel';
-import Placeholder from '../../../basic/Placeholder';
-import ResultPanel from '../../../result/ResultPanel';
-import { FieldValues } from 'react-hook-form';
 import fetchData from '../../../../utils/fetchData';
-import Content from '../../../../types/Content';
 import buildSearchParams from '../../../../utils/buildSearchParams';
 import initFlags from '../../../../utils/initFlags';
 import SearchResult from '../../../../types/SearchResult';
-import BasicSearchFilterOptions from '../../../../types/filterOptions/basicSearchFilterOptions';
 import parsePeakListInputField from './searchPanel/utils/parsePeakListAndReferences';
 import { Molecule } from 'openchemlib';
+import SearchFields from '../../../../types/filterOptions/SearchFields';
+import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
+import { Layout, Spin } from 'antd';
+import massSpecFilterOptionsFormDataToContentMapper from '../../../../utils/massSpecFilterOptionsFormDataToContentMapper';
+import SearchAndResultPanel from '../../../result/SearchAndResultPanel';
+import { Content } from 'antd/es/layout/layout';
 
 function SearchView() {
   const ref = useRef(null);
@@ -25,25 +25,24 @@ function SearchView() {
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [reference, setReference] = useState<Peak[]>([]);
   const [hits, setHits] = useState<Hit[]>([]);
-  const [msSpecFilterOptions, setMsSpectFilterOptions] = useState<
-    Content | undefined
+  const [massSpecFilterOptions, setMassSpecFilterOptions] = useState<
+    ContentFilterOptions | undefined
   >();
-  const [collapsed, setCollapsed] = useState<boolean>(false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
   const searchPanelWidth = useMemo(
-    () => (collapsed ? 100 : Math.max(width * 0.3, 500)),
-    [collapsed, width],
+    () => (isCollapsed ? 50 : Math.max(width * 0.3, 500)),
+    [isCollapsed, width],
   );
-  const searchPanelHeight = height;
 
   const handleOnFetchContent = useCallback(async () => {
     setIsRequesting(true);
 
     const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
-    const browseContent = (await fetchData(url)) as Content;
+    const browseContent = (await fetchData(url)) as ContentFilterOptions;
 
     initFlags(browseContent);
-    setMsSpectFilterOptions(browseContent);
+    setMassSpecFilterOptions(browseContent);
     setIsRequesting(false);
   }, []);
 
@@ -51,50 +50,51 @@ function SearchView() {
     handleOnFetchContent();
   }, [handleOnFetchContent]);
 
-  const handleOnSearch = useCallback(async (formData: FieldValues) => {
-    const _msSpecFilterOptions = formData['msSpecFilterOptions'] as Content;
-    const searchParams = buildSearchParams(_msSpecFilterOptions);
+  const handleOnSearch = useCallback(async (formData: SearchFields) => {
+    const formData_content = massSpecFilterOptionsFormDataToContentMapper(
+      formData.massSpecFilterOptions,
+      undefined,
+    );
+    const searchParams = buildSearchParams(formData_content);
 
-    const similarityPeakListInputFieldData =
-      formData['similarity']['peakListInputField'];
-    if (similarityPeakListInputFieldData.trim().length > 0) {
+    const similarityPeakListInputFieldData = (
+      formData.peaks?.similarity?.peakList || ''
+    ).trim();
+
+    if (similarityPeakListInputFieldData.length > 0) {
       const peakList = parsePeakListInputField(
         similarityPeakListInputFieldData,
       );
       searchParams['peak_list'] = [
         peakList.map((p) => `${p.mz};${p.intensity}`).join(','),
       ];
-      const peakListThreshold =
-        formData['similarity']['peakListThresholdInputField'];
-      searchParams['peak_list_threshold'] = [peakListThreshold];
+      const peakListThreshold = formData.peaks?.similarity?.threshold || 0;
+      searchParams['peak_list_threshold'] = [String(peakListThreshold)];
       setReference(peakList);
     } else {
       setReference([]);
     }
 
-    const peaksSearchData = formData['peakSearch'];
-    const peaks = Object.keys(peaksSearchData)
-      .filter((key) => key.startsWith('p'))
-      .map((key) => peaksSearchData[key] as number)
-      .filter((p) => !isNaN(p));
+    const peaksSearchData = formData.peaks?.peaks || {
+      peaks: [],
+      massTolerance: 0,
+      intensity: 0,
+    };
+    const peaks = (peaksSearchData.peaks ?? []).map((p) => p.mz);
     if (peaks.length > 0) {
       searchParams['peaks'] = [peaks.join(',')];
 
-      if (
-        !isNaN(peaksSearchData['massTolerance']) &&
-        peaksSearchData['massTolerance'] > 0
-      ) {
-        searchParams['mass_tolerance'] = [peaksSearchData['massTolerance']];
+      if (peaksSearchData.massTolerance && peaksSearchData.massTolerance > 0) {
+        searchParams['mass_tolerance'] = [
+          String(peaksSearchData.massTolerance),
+        ];
       }
-      if (
-        !isNaN(peaksSearchData['intensity']) &&
-        peaksSearchData['intensity'] > 0
-      ) {
-        searchParams['intensity'] = [peaksSearchData['intensity']];
+      if (peaksSearchData.intensity && peaksSearchData.intensity > 0) {
+        searchParams['intensity'] = [String(peaksSearchData.intensity)];
       }
     }
 
-    const inchi = (formData['inchiInputField'] as string).trim();
+    const inchi = (formData.inchi || '').trim();
     if (inchi.length > 0) {
       if (inchi.startsWith('InChI=')) {
         searchParams['inchi'] = [inchi];
@@ -102,28 +102,27 @@ function SearchView() {
         searchParams['inchi_key'] = [inchi];
       }
     }
-    const splash = (formData['splashInputField'] as string).trim();
+    const splash = (formData.splash || '').trim();
     if (splash.length > 0) {
       searchParams['splash'] = [splash];
     }
 
-    const _basicSearchFilterOptions = formData[
-      'basicSearchFilterOptions'
-    ] as BasicSearchFilterOptions;
-
-    const compoundName = _basicSearchFilterOptions.compoundName.trim();
+    const compoundName = (
+      formData.basicSearchFilterOptions?.compoundName || ''
+    ).trim();
     if (compoundName.length > 0) {
       searchParams['compound_name'] = [compoundName];
     }
-    const formula = _basicSearchFilterOptions.formula.trim();
+    const formula = (formData.basicSearchFilterOptions?.formula || '').trim();
     if (formula.length > 0) {
       searchParams['formula'] = [formula];
     }
-    const exactMass = _basicSearchFilterOptions.exactMass;
+    const exactMass = formData.basicSearchFilterOptions?.exactMass || 0;
     if (exactMass > 0) {
       searchParams['exact_mass'] = [String(exactMass)];
 
-      const massTolerance = _basicSearchFilterOptions.massTolerance;
+      const massTolerance =
+        formData.basicSearchFilterOptions.massTolerance || 0;
       if (exactMass > 0) {
         searchParams['mass_tolerance'] = [String(massTolerance)];
       } else {
@@ -131,7 +130,7 @@ function SearchView() {
       }
     }
 
-    const molfile = formData['structureInputField'] as string;
+    const molfile = formData.structure;
     if (molfile && molfile.trim().length > 0) {
       const mol = Molecule.fromMolfile(molfile);
       const smiles = mol.toSmiles();
@@ -140,16 +139,22 @@ function SearchView() {
     const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/search';
     const searchResult = (await fetchData(url, searchParams)) as SearchResult;
 
-    const _hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
-    setHits(_hits);
+    let _hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
+    _hits = _hits.map((hit, i) => {
+      return {
+        ...hit,
+        index: i,
+      };
+    });
 
+    setHits(_hits);
     setIsRequesting(false);
   }, []);
 
   const handleOnSubmit = useCallback(
-    async (data: FieldValues) => {
+    async (data: SearchFields) => {
       setIsRequesting(true);
-      setCollapsed(true);
+      setIsCollapsed(true);
 
       await handleOnSearch(data);
     },
@@ -160,55 +165,60 @@ function SearchView() {
     () => (
       <SearchPanel
         width={searchPanelWidth}
-        height={searchPanelHeight}
-        collapsed={collapsed}
-        msSpecFilterOptions={msSpecFilterOptions}
-        onCollapse={(collapsed: boolean) => setCollapsed(collapsed)}
+        height={height}
+        collapsed={isCollapsed}
+        massSpecFilterOptions={massSpecFilterOptions}
+        onCollapse={(collapsed: boolean) => setIsCollapsed(collapsed)}
         onSubmit={handleOnSubmit}
       />
     ),
     [
       searchPanelWidth,
-      searchPanelHeight,
-      collapsed,
-      msSpecFilterOptions,
+      height,
+      isCollapsed,
+      massSpecFilterOptions,
       handleOnSubmit,
     ],
   );
 
-  const resultPanel = useMemo(
+  return useMemo(
     () => (
-      <ResultPanel
-        hits={hits}
-        reference={reference}
-        width={width - searchPanelWidth}
-        height={height}
-        widthOverview={width}
-        heightOverview={height - 100}
-      />
-    ),
-    [height, hits, reference, searchPanelWidth, width],
-  );
-
-  return (
-    <div ref={ref} className="search-view">
-      {searchPanel}
-      {isRequesting ? (
-        <Spinner buttonDisabled={true} />
-      ) : hits.length > 0 ? (
-        resultPanel
-      ) : (
-        <Placeholder
-          child={collapsed ? 'No results' : ''}
+      <Layout ref={ref} style={{ width: '100%', height: '100%' }}>
+        <Content
           style={{
-            width: width - searchPanelWidth,
-            height: height,
-            fontSize: 18,
-            fontWeight: 'bold',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
-        />
-      )}
-    </div>
+        >
+          {isRequesting ? (
+            <Spin size="large" />
+          ) : (
+            <SearchAndResultPanel
+              searchPanel={searchPanel}
+              width={width}
+              height={height}
+              searchPanelWidth={searchPanelWidth}
+              searchPanelHeight={height}
+              isRequesting={isRequesting}
+              reference={reference}
+              hits={hits}
+            />
+          )}
+        </Content>
+      </Layout>
+    ),
+    [
+      height,
+      hits,
+      isRequesting,
+      reference,
+      searchPanel,
+      searchPanelWidth,
+      width,
+    ],
   );
 }
 

@@ -1,19 +1,18 @@
-import Content from '../types/Content';
+import ContentFilterOptions from '../types/filterOptions/ContentFilterOtions';
 import SearchParams from '../types/SearchParams';
 import ValueCount from '../types/ValueCount';
 
-function buildSearchParams(cont: Content | undefined) {
+function buildSearchParams(cont: ContentFilterOptions | undefined) {
   const searchParams: SearchParams = {};
   if (cont) {
     Object.keys(cont)
       .filter((k) => k !== 'metadata')
       .forEach((k) => {
-        const valueCounts = cont[k] as ValueCount[];
-        const filtered = valueCounts
-          .filter((_vc) => _vc.flag === true)
-          .map((_vc) => _vc.value);
-        if (filtered.length !== valueCounts.length) {
-          searchParams[k] = [filtered.join(',')];
+        const values = (cont[k] as ValueCount[])
+          .filter((vc) => (vc.flag !== undefined ? vc.flag : true))
+          .map((vc) => vc.value);
+        if (values.length > 0) {
+          searchParams[k] = [values.join(',')];
         }
       });
   }

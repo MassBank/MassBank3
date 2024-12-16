@@ -1,51 +1,99 @@
-import './PeakSearchRow.scss';
-
 import { faLeftLong } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useCallback, useMemo } from 'react';
 import calculateMolecularMass from '../../../../../../utils/mass/calculateMolecularMass';
-import { useFormContext } from 'react-hook-form';
+import { Col, Form, Input, InputNumber, Row } from 'antd';
+import SearchFields from '../../../../../../types/filterOptions/SearchFields';
+import PeakSearchPeakType from '../../../../../../types/filterOptions/PeakSearchPeakType';
+import useFormInstance from 'antd/es/form/hooks/useFormInstance';
 
 type InputProps = {
   index: number;
 };
 
 function PeakSearchRow({ index }: InputProps) {
-  const { register, setValue } = useFormContext();
+  const formInstance = useFormInstance<SearchFields>();
+  const { getFieldValue, setFieldValue } = formInstance;
 
-  const label = `peakSearch.p${index}`;
+  const handleOnChangeMass = useCallback(() => {
+    setFieldValue(['peaks', 'peaks', 'peaks', index, 'formula'], undefined);
+  }, [index, setFieldValue]);
 
-  return (
-    <tr className="peak-search-row">
-      <td>{`${index + 1}.`}</td>
-      <td>
-        <input
-          type="number"
-          step="any"
-          {...register(label, { required: false, valueAsNumber: true, min: 0 })}
-        />
-      </td>
-      <td>
-        {<FontAwesomeIcon icon={faLeftLong} title={'Add a new m/z value'} />}
-      </td>
-      <td>
-        <input
-          type="text"
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            e.preventDefault();
-            e.stopPropagation();
+  const handleOnChangeFormula = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-            const mass = calculateMolecularMass(e.target.value);
-            if (mass > 0) {
-              setValue(label, mass);
-            } else {
-              setValue(label, undefined);
-            }
-          }}
-        />
-      </td>
-    </tr>
+      const formula = e.target.value;
+      const mass = calculateMolecularMass(formula);
+      let peaks = (getFieldValue(['peaks', 'peaks', 'peaks']) ||
+        []) as PeakSearchPeakType[];
+      const value = mass > 0 ? mass : undefined;
+      if (index >= 0 && index < peaks.length) {
+        peaks[index] = { mz: value, formula };
+      } else {
+        peaks.push({ mz: value, formula });
+      }
+      setFieldValue(['peaks', 'peaks', 'peaks'], peaks);
+    },
+    [getFieldValue, index, setFieldValue],
   );
+
+  const row = useMemo(
+    () => (
+      <Row
+        key={'peak-search-row-' + index}
+        style={{
+          width: '100%',
+          height: '100%',
+        }}
+      >
+        <Col span={6}>{index + 1}</Col>
+        <Col span={6}>
+          <Form.Item<SearchFields>
+            name={['peaks', 'peaks', 'peaks', index, 'mz']}
+            rules={[{ required: false }]}
+            style={{
+              width: '100%',
+              height: '100%',
+            }}
+          >
+            <InputNumber
+              key={`peak-search-row-${index}-mz-input`}
+              min={0}
+              step={0.01}
+              onChange={handleOnChangeMass}
+              style={{ width: '100%', height: '100%' }}
+            />
+          </Form.Item>
+        </Col>
+        <Col span={6}>
+          <FontAwesomeIcon icon={faLeftLong} />
+        </Col>
+        <Col span={6}>
+          <Form.Item<SearchFields>
+            name={['peaks', 'peaks', 'peaks', index, 'formula']}
+            rules={[{ required: false }]}
+            style={{
+              width: '100%',
+              height: '100%',
+            }}
+          >
+            <Input
+              key={`peak-search-row-${index}-formula-input`}
+              type="text"
+              onChange={handleOnChangeFormula}
+              style={{ width: '100%', height: '100%' }}
+              allowClear
+            />
+          </Form.Item>
+        </Col>
+      </Row>
+    ),
+    [handleOnChangeFormula, handleOnChangeMass, index],
+  );
+
+  return row;
 }
 
 export default PeakSearchRow;
