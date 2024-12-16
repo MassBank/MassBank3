@@ -9,7 +9,7 @@ import ContentSearchPanel from './ContentSearchPanel';
 import SearchResult from '../../../../types/SearchResult';
 import Hit from '../../../../types/Hit';
 import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
-import { Layout } from 'antd';
+import { Layout, Spin } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import SearchFields from '../../../../types/filterOptions/SearchFields';
 import massSpecFilterOptionsFormDataToContentMapper from '../../../../utils/massSpecFilterOptionsFormDataToContentMapper';
@@ -159,22 +159,36 @@ function ContentView() {
             width: '100%',
             height: '100%',
             display: 'flex',
-            flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
           }}
         >
-          {charts}
-          <SearchAndResultPanel
-            searchPanel={contentSearchPanel}
-            width={width}
-            height={heights.searchPanelHeight}
-            searchPanelWidth={searchPanelWidth}
-            searchPanelHeight={heights.searchPanelHeight}
-            isRequesting={isRequesting}
-            reference={[]}
-            hits={hits}
-          />
+          {isRequesting ? (
+            <Spin size="large" />
+          ) : (
+            <Content
+              style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              {charts}
+              <SearchAndResultPanel
+                searchPanel={contentSearchPanel}
+                width={width}
+                height={heights.searchPanelHeight}
+                searchPanelWidth={searchPanelWidth}
+                searchPanelHeight={heights.searchPanelHeight}
+                isRequesting={isRequesting}
+                reference={[]}
+                hits={hits}
+              />
+            </Content>
+          )}
         </Content>
       </Layout>
     ),

@@ -13,16 +13,19 @@ const columns = [
     title: 'mz',
     dataIndex: 'mz',
     key: 'mz',
+    align: 'center' as const,
   },
   {
     title: 'Intensity',
     dataIndex: 'intensity',
     key: 'intensity',
+    align: 'center' as const,
   },
   {
     title: 'Rel. Int.',
     dataIndex: 'rel',
     key: 'rel',
+    align: 'center' as const,
   },
 ];
 
@@ -85,13 +88,8 @@ function PeakTable({ peaks, width, height }: InputProps) {
   return useMemo(
     () => (
       <Table<PeakTableDataType>
-        style={{
-          width,
-          height,
-          userSelect: 'none',
-          overflow: 'scroll',
-          textAlign: 'center',
-        }}
+        className="peak-table"
+        style={{ width, height }}
         sticky
         columns={columns}
         dataSource={dataSource}

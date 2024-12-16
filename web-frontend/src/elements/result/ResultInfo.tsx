@@ -29,27 +29,74 @@ function ResultInfo({
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        border: '1px solid grey',
+        borderRight: '1px solid black',
       }}
     >
-      <p>{hit.accession}</p>
+      <p
+        style={{
+          width: '100%',
+          height: 20,
+          fontSize: 17,
+          color: 'brown',
+          fontWeight: 'bold',
+        }}
+      >
+        {hit.accession}
+      </p>
+      <p
+        style={{
+          marginTop: 5,
+          marginBottom: 5,
+          width: '100%',
+          height: 20,
+          fontSize: 17,
+          fontWeight: 'bolder',
+        }}
+      >
+        {hit.score ? (
+          `Score: ${hit.score}`
+        ) : (
+          <Placeholder child="" style={{ height: 20 }} />
+        )}
+      </p>
+      <Content
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {hit.record && hit.record.compound.smiles ? (
+          <StructureView
+            smiles={hit.record.compound.smiles}
+            imageWidth={imageWidth}
+            imageHeight={imageHeight}
+          />
+        ) : (
+          <Placeholder
+            child="No structure"
+            style={{ width: imageWidth, height: imageHeight }}
+          />
+        )}
+      </Content>
 
-      {hit.score && <p>Score: {hit.score}</p>}
-      {hit.record && hit.record.compound.smiles ? (
-        <StructureView
-          smiles={hit.record.compound.smiles}
-          imageWidth={imageWidth}
-          imageHeight={imageHeight}
-        />
-      ) : (
-        <Placeholder
-          child="No structure"
-          style={{ width: imageWidth, height: imageHeight }}
-        />
-      )}
-
-      <label>{hit.record.title}</label>
-      <ResultLink hit={hit} />
+      <p
+        style={{
+          width: '100%',
+          height: 600,
+          textWrap: 'pretty',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          margin: 0,
+          overflowY: 'scroll',
+        }}
+      >
+        {hit.record.title}
+      </p>
+      <ResultLink hit={hit} height={100} />
     </Content>
   );
 }

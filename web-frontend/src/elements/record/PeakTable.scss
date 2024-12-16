@@ -1,7 +1,16 @@
-.table-row-highlight {
-  background-color: lightblue;
-}
+.peak-table {
+  user-select: none;
+  overflow: scroll;
 
-.ant-table-tbody > tr.ant-table-row:hover > td {
-  background: none !important;
+  .table-row-highlight {
+    background-color: lightblue;
+  }
+
+  .ant-table-tbody > tr.ant-table-row:hover > td {
+    background: none !important;
+  }
+
+  .ant-table-thead > tr > th {
+    background-color: lightgrey !important;
+  }
 }

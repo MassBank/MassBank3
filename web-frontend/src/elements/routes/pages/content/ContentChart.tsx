@@ -18,6 +18,8 @@ type InputProps = {
 };
 
 function ContentChart({ content, identifier, width, height }: InputProps) {
+  const topN = 10;
+
   const chart = useMemo(() => {
     const filteredValueCounts = [
       ...(content[identifier] as ValueCount[]),
@@ -40,7 +42,7 @@ function ContentChart({ content, identifier, width, height }: InputProps) {
         };
       });
 
-    contentValueCounts.splice(10);
+    contentValueCounts.splice(topN);
 
     const labels = contentValueCounts.map(
       (vc) =>
@@ -93,7 +95,7 @@ function ContentChart({ content, identifier, width, height }: InputProps) {
             fontWeight: 'bolder',
           }}
         >
-          {(itemCount > 10 ? 'Top 10 of ' : '') +
+          {(itemCount > topN ? 'Top ' + topN + ' of ' : '') +
             splitStringAndCapitaliseFirstLetter(identifier, '_', ' ')}
         </p>
         <Pie {...config} />

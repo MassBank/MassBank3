@@ -36,6 +36,14 @@ function SearchAndResultPanel({
     setInnerHits(hits);
   }, [hits]);
 
+  const [wasRequesting, setWasRequesting] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (isRequesting) {
+      setWasRequesting(true);
+    }
+  }, [isRequesting]);
+
   const sortOptions = useMemo(() => {
     const _sortOptions: ResultTableSortOptionType[] = [];
     Object.keys(resultTableSortOptionValues).forEach((key: string) => {
@@ -138,6 +146,7 @@ function SearchAndResultPanel({
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
+          userSelect: 'none',
         }}
       >
         <Sider width={searchPanelWidth}>{searchPanel}</Sider>
@@ -155,7 +164,14 @@ function SearchAndResultPanel({
           ) : innerHits.length > 0 ? (
             resultPanel
           ) : (
-            <Placeholder child="" style={{ width, height }} />
+            <Placeholder
+              child={
+                wasRequesting
+                  ? 'No hits found'
+                  : "Click 'Submit' to start searching"
+              }
+              style={{ width, height, fontSize: 18, fontWeight: 'bold' }}
+            />
           )}
         </Content>
       </Content>
@@ -167,6 +183,7 @@ function SearchAndResultPanel({
       resultPanel,
       searchPanel,
       searchPanelWidth,
+      wasRequesting,
       width,
     ],
   );

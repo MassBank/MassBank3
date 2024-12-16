@@ -33,7 +33,7 @@ function SpectralHitsViewComponent({
           justifyContent: 'center',
           alignItems: 'center',
           margin: '0 auto',
-          border: '1px solid grey',
+          border: '1px solid black',
         }}
       >
         <ResultInfo
@@ -41,7 +41,7 @@ function SpectralHitsViewComponent({
           width={widthResultInfo}
           height={height}
           imageWidth={widthResultInfo - 50}
-          // imageHeight={200}
+          imageHeight={widthResultInfo - 50}
         />
         {reference && reference.length > 0 ? (
           <Resizable

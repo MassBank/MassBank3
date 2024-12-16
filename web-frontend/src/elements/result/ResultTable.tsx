@@ -7,39 +7,7 @@ import ResultTableDataType from '../../types/ResultTableDataType';
 import ResultLink from './ResultLink';
 import Chart from '../basic/Chart';
 import StructureView from '../basic/StructureView';
-
-const defaultColumns = [
-  {
-    title: 'Index',
-    dataIndex: 'index',
-    key: 'index',
-  },
-  {
-    title: 'Accession',
-    dataIndex: 'accession',
-    key: 'accession',
-  },
-  {
-    title: 'Link',
-    dataIndex: 'link',
-    key: 'link',
-  },
-  {
-    title: 'Title',
-    dataIndex: 'title',
-    key: 'title',
-  },
-  {
-    title: 'Chart',
-    dataIndex: 'chart',
-    key: 'chart',
-  },
-  {
-    title: 'Structure',
-    dataIndex: 'structure',
-    key: 'structure',
-  },
-];
+import { Content } from 'antd/es/layout/layout';
 
 type InputProps = {
   reference?: Peak[];
@@ -64,35 +32,68 @@ function ResultTable({
   const buildChart = useCallback(
     (hit: Hit) =>
       reference && reference.length > 0 ? (
-        <Chart
-          peakData={reference}
-          peakData2={(hit.record ? hit.record.peak.peak.values : []) as Peak[]}
-          width={chartWidth}
-          height={rowHeight}
-          disableZoom
-          disableLabels
-          disableOnHover
-        />
+        <Content
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          {' '}
+          <Chart
+            peakData={reference}
+            peakData2={
+              (hit.record ? hit.record.peak.peak.values : []) as Peak[]
+            }
+            width={chartWidth}
+            height={rowHeight}
+            disableZoom
+            disableLabels
+            disableOnHover
+          />
+        </Content>
       ) : (
-        <Chart
-          peakData={(hit.record ? hit.record.peak.peak.values : []) as Peak[]}
-          width={chartWidth}
-          height={rowHeight}
-          disableZoom
-          disableLabels
-          disableOnHover
-        />
+        <Content
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Chart
+            peakData={(hit.record ? hit.record.peak.peak.values : []) as Peak[]}
+            width={chartWidth}
+            height={rowHeight}
+            disableZoom
+            disableLabels
+            disableOnHover
+          />
+        </Content>
       ),
     [chartWidth, reference, rowHeight],
   );
 
   const buildStructure = useCallback(
     (smiles: string) => (
-      <StructureView
-        smiles={smiles}
-        imageWidth={imageWidth}
-        imageHeight={rowHeight}
-      />
+      <Content
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <StructureView
+          smiles={smiles}
+          imageWidth={imageWidth}
+          imageHeight={rowHeight}
+        />
+      </Content>
     ),
     [imageWidth, rowHeight],
   );
@@ -128,6 +129,45 @@ function ResultTable({
   );
 
   const columns = useMemo(() => {
+    const defaultColumns = [
+      {
+        title: 'Index',
+        dataIndex: 'index',
+        key: 'index',
+        align: 'center' as const,
+        width: 100,
+      },
+      {
+        title: 'Accession',
+        dataIndex: 'accession',
+        key: 'accession',
+        align: 'center' as const,
+      },
+      {
+        title: 'Link',
+        dataIndex: 'link',
+        key: 'link',
+        align: 'center' as const,
+        width: 70,
+      },
+      {
+        title: 'Title',
+        dataIndex: 'title',
+        key: 'title',
+        align: 'center' as const,
+      },
+      {
+        title: 'Chart',
+        dataIndex: 'chart',
+        key: 'chart',
+      },
+      {
+        title: 'Structure',
+        dataIndex: 'structure',
+        key: 'structure',
+      },
+    ];
+
     const _columns = [...defaultColumns];
 
     if (hits.find((hit) => hit.score !== undefined)) {
@@ -135,6 +175,8 @@ function ResultTable({
         title: 'Score',
         dataIndex: 'score',
         key: 'score',
+        align: 'center' as const,
+        width: 100,
       });
     }
 
@@ -147,9 +189,7 @@ function ResultTable({
         style={{
           width: '100%',
           height,
-          userSelect: 'none',
           overflow: 'scroll',
-          textAlign: 'center',
         }}
         columns={columns}
         dataSource={dataSource}

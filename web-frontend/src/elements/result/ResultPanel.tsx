@@ -10,7 +10,6 @@ import { Button, Modal, Pagination, Select, Spin } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import SpectralHitsCarouselView from '../routes/pages/search/SpectralHitsCarouselView';
 import ResultTableSortOptionType from '../../types/ResultTableSortOptionType';
-import resultTableSortOptionValues from '../../constants/resultTableSortOptionValues';
 
 type InputProps = {
   reference?: Peak[];
@@ -40,7 +39,7 @@ function ResultPanel({
   const [resultPageIndex, setResultPageIndex] = useState<number>(0);
   const [selectedSortOption, setSelectedSortOption] = useState<
     string | undefined
-  >(resultTableSortOptionValues.index);
+  >();
   const [spectralHitsCarouselView, setSpectralHitsCarouselView] = useState<
     JSX.Element | undefined
   >();
@@ -136,8 +135,8 @@ function ResultPanel({
           height={height - paginationHeight}
           onDoubleClick={handleOnDoubleClick}
           rowHeight={150}
-          chartWidth={150}
-          imageWidth={150}
+          chartWidth={250}
+          imageWidth={200}
         />,
       );
       setSpectralHitsCarouselView(
@@ -228,6 +227,7 @@ function ResultPanel({
                 textWrap: 'nowrap',
                 textAlign: 'center',
                 fontWeight: 'bold',
+                color: 'brown',
                 width: 200,
                 height: '100%',
                 display: 'flex',
@@ -241,6 +241,7 @@ function ResultPanel({
           showTitle
           showSizeChanger={false}
           showQuickJumper
+          locale={{ jump_to: 'Page', page: '' }}
           style={{
             width: '100%',
             height: '100%',
@@ -253,7 +254,7 @@ function ResultPanel({
           <Select
             defaultValue={selectedSortOption}
             style={{ width: 200 }}
-            placeholder="Search to Select"
+            placeholder="Sort by"
             optionFilterProp="label"
             filterSort={(optionA, optionB) =>
               (optionA?.label ?? '')

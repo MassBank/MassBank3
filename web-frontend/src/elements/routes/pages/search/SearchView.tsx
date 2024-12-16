@@ -14,9 +14,10 @@ import parsePeakListInputField from './searchPanel/utils/parsePeakListAndReferen
 import { Molecule } from 'openchemlib';
 import SearchFields from '../../../../types/filterOptions/SearchFields';
 import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
-import { Layout } from 'antd';
+import { Layout, Spin } from 'antd';
 import massSpecFilterOptionsFormDataToContentMapper from '../../../../utils/massSpecFilterOptionsFormDataToContentMapper';
 import SearchAndResultPanel from '../../../result/SearchAndResultPanel';
+import { Content } from 'antd/es/layout/layout';
 
 function SearchView() {
   const ref = useRef(null);
@@ -27,11 +28,11 @@ function SearchView() {
   const [massSpecFilterOptions, setMassSpecFilterOptions] = useState<
     ContentFilterOptions | undefined
   >();
-  const [collapsed, setCollapsed] = useState<boolean>(false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
   const searchPanelWidth = useMemo(
-    () => (collapsed ? 50 : Math.max(width * 0.3, 500)),
-    [collapsed, width],
+    () => (isCollapsed ? 50 : Math.max(width * 0.3, 500)),
+    [isCollapsed, width],
   );
 
   const handleOnFetchContent = useCallback(async () => {
@@ -153,7 +154,7 @@ function SearchView() {
   const handleOnSubmit = useCallback(
     async (data: SearchFields) => {
       setIsRequesting(true);
-      setCollapsed(true);
+      setIsCollapsed(true);
 
       await handleOnSearch(data);
     },
@@ -165,16 +166,16 @@ function SearchView() {
       <SearchPanel
         width={searchPanelWidth}
         height={height}
-        collapsed={collapsed}
+        collapsed={isCollapsed}
         massSpecFilterOptions={massSpecFilterOptions}
-        onCollapse={(collapsed: boolean) => setCollapsed(collapsed)}
+        onCollapse={(collapsed: boolean) => setIsCollapsed(collapsed)}
         onSubmit={handleOnSubmit}
       />
     ),
     [
       searchPanelWidth,
       height,
-      collapsed,
+      isCollapsed,
       massSpecFilterOptions,
       handleOnSubmit,
     ],
@@ -183,16 +184,30 @@ function SearchView() {
   return useMemo(
     () => (
       <Layout ref={ref} style={{ width: '100%', height: '100%' }}>
-        <SearchAndResultPanel
-          searchPanel={searchPanel}
-          width={width}
-          height={height}
-          searchPanelWidth={searchPanelWidth}
-          searchPanelHeight={height}
-          isRequesting={isRequesting}
-          reference={reference}
-          hits={hits}
-        />
+        <Content
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          {isRequesting ? (
+            <Spin size="large" />
+          ) : (
+            <SearchAndResultPanel
+              searchPanel={searchPanel}
+              width={width}
+              height={height}
+              searchPanelWidth={searchPanelWidth}
+              searchPanelHeight={height}
+              isRequesting={isRequesting}
+              reference={reference}
+              hits={hits}
+            />
+          )}
+        </Content>
       </Layout>
     ),
     [
