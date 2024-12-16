@@ -1,9 +1,6 @@
 import './AccessionView.scss';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import Input from '../../../basic/Input';
-import Spinner from '../../../basic/Spinner';
-import Button from '../../../basic/Button';
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import RecordView from '../../../record/RecordView';
 import generateID from '../../../../utils/generateID';
 import Record from '../../../../types/Record';
@@ -14,6 +11,7 @@ import {
 } from 'react-router-dom';
 import routes from '../../../../constants/routes';
 import fetchData from '../../../../utils/fetchData';
+import { Button, Input, Spin } from 'antd';
 
 function AccessionView() {
   const navigate = useNavigate();
@@ -79,43 +77,42 @@ function AccessionView() {
     }
   }, [handleOnSearch, searchParams]);
 
+  const handleOnChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setAccession(e.target.value.trim());
+  }, []);
+
   const accessionView = useMemo(
     () => (
       <div className="accession-panel">
         <div className="input-panel">
           <Input
-            type="search"
+            type="text"
             placeholder="e.g. MSBNK-AAFC-AC000114"
             value={accession && accession !== '' ? accession : undefined}
-            label="Search for accession: "
-            onChange={(acc: string) => setAccession(acc.trim())}
+            addonBefore="Search for accession: "
+            onChange={handleOnChange}
             onKeyDown={handleOnClick}
-            inputStyle={{ width: '300px' }}
+            allowClear
           />
           <Button
-            child="Search"
+            children="Search"
             onClick={handleOnClick}
             disabled={accession.trim() === ''}
-            buttonStyle={
+            style={
               accession.trim() === '' ? { color: 'grey' } : { color: 'black' }
             }
           />
         </div>
         <div className="result-panel">
-          {isRequesting ? (
-            <Spinner
-              buttonDisabled={true}
-              spinnerWidth={200}
-              spinnerHeight={200}
-            />
-          ) : (
-            recordView
-          )}
+          {isRequesting ? <Spin size="large" /> : recordView}
         </div>
       </div>
     ),
 
-    [accession, handleOnClick, isRequesting, recordView],
+    [accession, handleOnChange, handleOnClick, isRequesting, recordView],
   );
 
   return accessionView;

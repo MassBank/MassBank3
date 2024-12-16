@@ -1,6 +1,6 @@
 import ValueCount from './ValueCount';
 
-export default interface Content {
+export default interface ContentFilterOptions {
   contributor: ValueCount[];
   instrument_type: ValueCount[];
   ion_mode: ValueCount[];

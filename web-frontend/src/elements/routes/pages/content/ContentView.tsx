@@ -1,10 +1,5 @@
-import './ContentView.scss';
-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Spinner from '../../../basic/Spinner';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
-import Content from '../../../../types/Content';
-import { ArcElement, Chart, Legend, Tooltip } from 'chart.js';
 import ContentChart from './ContentChart';
 import fetchData from '../../../../utils/fetchData';
 import buildSearchParams from '../../../../utils/buildSearchParams';
@@ -13,34 +8,44 @@ import initFlags from '../../../../utils/initFlags';
 import ContentSearchPanel from './ContentSearchPanel';
 import SearchResult from '../../../../types/SearchResult';
 import Hit from '../../../../types/Hit';
-import ResultPanel from '../../../result/ResultPanel';
+import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
+import { Layout, Spin } from 'antd';
+import { Content } from 'antd/es/layout/layout';
+import SearchFields from '../../../../types/filterOptions/SearchFields';
+import massSpecFilterOptionsFormDataToContentMapper from '../../../../utils/massSpecFilterOptionsFormDataToContentMapper';
+import SearchAndResultPanel from '../../../result/SearchAndResultPanel';
 
 function ContentView() {
   const ref = useRef(null);
   const { width, height } = useContainerDimensions(ref);
 
+  const [browseContent, setBrowseContent] = useState<
+    ContentFilterOptions | undefined
+  >();
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
-  const [browseContent, setBrowseContent] = useState<Content | undefined>();
-  const [collapsed, setCollapsed] = useState<boolean>(false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
   const [hits, setHits] = useState<Hit[]>([]);
 
   const searchPanelWidth = useMemo(
-    () => (collapsed ? 175 : Math.max(width * 0.3, 500)),
-    [collapsed, width],
+    () => (isCollapsed ? 50 : Math.max(width * 0.3, 400)),
+    [isCollapsed, width],
   );
 
   const handleOnFetchContent = useCallback(
-    async (newBrowseContent: Content | undefined) => {
+    async (newBrowseContent: ContentFilterOptions | undefined) => {
       setIsRequesting(true);
 
-      let _browseContent: Content | undefined = newBrowseContent;
+      let _browseContent: ContentFilterOptions | undefined = newBrowseContent;
       if (!_browseContent) {
         const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
-        _browseContent = (await fetchData(url)) as Content;
+        _browseContent = (await fetchData(url)) as ContentFilterOptions;
       } else {
         const searchParams = buildSearchParams(_browseContent);
         const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
-        _browseContent = (await fetchData(url, searchParams)) as Content;
+        _browseContent = (await fetchData(
+          url,
+          searchParams,
+        )) as ContentFilterOptions;
       }
       initFlags(_browseContent);
       setBrowseContent(_browseContent);
@@ -48,12 +53,15 @@ function ContentView() {
       const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/search';
       const searchResult = (await fetchData(url, searchParams)) as SearchResult;
 
-      const _hits: Hit[] = searchResult.data
-        ? (searchResult.data as Hit[])
-        : [];
+      let _hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
+      _hits = _hits.map((hit, i) => {
+        return {
+          ...hit,
+          index: i,
+        };
+      });
 
       setHits(_hits);
-
       setIsRequesting(false);
     },
     [],
@@ -63,7 +71,12 @@ function ContentView() {
     handleOnFetchContent(undefined);
   }, [handleOnFetchContent]);
 
-  Chart.register(ArcElement, Tooltip, Legend);
+  const heights = useMemo(() => {
+    return {
+      chartPanelHeight: height / 4,
+      searchPanelHeight: (height / 4) * 3,
+    };
+  }, [height]);
 
   const charts = useMemo(() => {
     if (browseContent) {
@@ -75,87 +88,119 @@ function ContentView() {
           key={'chart_' + key}
           content={browseContent}
           identifier={key}
-          width={(width - searchPanelWidth) / keys.length}
+          width={width / keys.length}
+          height={heights.chartPanelHeight}
         />
       ));
 
       return (
-        <div
-          className="content-charts"
-          style={{ width: width - searchPanelWidth, height: height / 4 }}
+        <Content
+          style={{
+            width,
+            height: heights.chartPanelHeight,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+            backgroundColor: '#fcfff0',
+          }}
         >
           {_charts}
-        </div>
+        </Content>
       );
     }
 
     return undefined;
-  }, [browseContent, height, searchPanelWidth, width]);
-
-  const resultPanel = useMemo(() => {
-    return (
-      <ResultPanel
-        reference={[]}
-        hits={hits}
-        width={width - searchPanelWidth}
-        height={(height / 4) * 3}
-        widthOverview={width}
-        heightOverview={height}
-      />
-    );
-  }, [height, hits, searchPanelWidth, width]);
+  }, [browseContent, heights.chartPanelHeight, width]);
 
   const handleOnSubmit = useCallback(
-    async (newBrowseContent: Content) => {
-      setCollapsed(true);
-      await handleOnFetchContent(newBrowseContent);
+    async (formData: SearchFields) => {
+      setIsCollapsed(true);
+
+      const formData_content = massSpecFilterOptionsFormDataToContentMapper(
+        formData.massSpecFilterOptions,
+        browseContent,
+      );
+      await handleOnFetchContent(formData_content);
     },
-    [handleOnFetchContent],
+    [browseContent, handleOnFetchContent],
   );
 
   const handleOnCollapse = useCallback((_collapsed: boolean) => {
-    setCollapsed(_collapsed);
+    setIsCollapsed(_collapsed);
   }, []);
 
   const contentSearchPanel = useMemo(
     () => (
       <ContentSearchPanel
-        collapsed={collapsed}
+        collapsed={isCollapsed}
         onCollapse={handleOnCollapse}
         content={browseContent}
         onSubmit={handleOnSubmit}
-        height={height}
         width={searchPanelWidth}
-        showCounts
+        height={heights.searchPanelHeight}
       />
     ),
     [
-      collapsed,
+      isCollapsed,
       handleOnCollapse,
       browseContent,
       handleOnSubmit,
-      height,
       searchPanelWidth,
+      heights.searchPanelHeight,
     ],
   );
 
-  return (
-    <div ref={ref} className="content-view">
-      {isRequesting ? (
-        <Spinner buttonDisabled buttonStyle={{ display: 'none' }} />
-      ) : (
-        <div className="inner-content-view" style={{ width, height }}>
-          {contentSearchPanel}
-          <div
-            className="content-result-panel"
-            style={{ width: width - searchPanelWidth, height }}
-          >
-            {charts}
-            {resultPanel}
-          </div>
-        </div>
-      )}
-    </div>
+  return useMemo(
+    () => (
+      <Layout ref={ref} style={{ width: '100%', height: '100%' }}>
+        <Content
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          {isRequesting ? (
+            <Spin size="large" />
+          ) : (
+            <Content
+              style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              {charts}
+              <SearchAndResultPanel
+                searchPanel={contentSearchPanel}
+                width={width}
+                height={heights.searchPanelHeight}
+                searchPanelWidth={searchPanelWidth}
+                searchPanelHeight={heights.searchPanelHeight}
+                isRequesting={isRequesting}
+                reference={[]}
+                hits={hits}
+              />
+            </Content>
+          )}
+        </Content>
+      </Layout>
+    ),
+    [
+      charts,
+      contentSearchPanel,
+      heights.searchPanelHeight,
+      hits,
+      isRequesting,
+      searchPanelWidth,
+      width,
+    ],
   );
 }
 

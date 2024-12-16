@@ -1,23 +1,28 @@
-import './App.scss';
-
-import { BrowserRouter as Router } from 'react-router-dom';
+import React from 'react';
+import { Layout } from 'antd';
+import Header from './elements/header/Header';
+import { BrowserRouter } from 'react-router-dom';
+import { HighlightProvider } from './highlight/Index';
 import Footer from './elements/footer/Footer';
 import Body from './elements/body/Body';
-import Header from './elements/header/Header';
-import { HighlightProvider } from './highlight/Index';
 
-function App() {
+const App: React.FC = () => {
   return (
-    <div className="app">
-      <Router>
-        <HighlightProvider>
+    <BrowserRouter>
+      <HighlightProvider>
+        <Layout
+          style={{
+            width: '100vw',
+            height: '100vh',
+          }}
+        >
           <Header />
           <Body />
           <Footer />
-        </HighlightProvider>
-      </Router>
-    </div>
+        </Layout>
+      </HighlightProvider>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;

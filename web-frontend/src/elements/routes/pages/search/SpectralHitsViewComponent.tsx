@@ -1,11 +1,10 @@
-import './SpectralHitsViewComponent.scss';
-
 import Peak from '../../../../types/peak/Peak';
 import Hit from '../../../../types/Hit';
 import ResultInfo from '../../../result/ResultInfo';
 import Resizable from '../../../record/Resizable';
 import Record from '../../../../types/Record';
 import { useMemo } from 'react';
+import { Content } from 'antd/es/layout/layout';
 
 type InputProps = {
   reference?: Peak[];
@@ -20,27 +19,29 @@ function SpectralHitsViewComponent({
   width,
   height,
 }: InputProps) {
-  const spectralHitsViewComponent = useMemo(() => {
-    const widthResultInfo = width * 0.25;
+  return useMemo(() => {
+    const widthResultInfo = width / 4;
     const widthResizable = width - widthResultInfo;
 
     return (
-      <div
-        className="component-container"
+      <Content
         style={{
           width,
           height,
+          textAlign: 'center',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          margin: '0 auto',
+          border: '1px solid black',
         }}
       >
         <ResultInfo
           hit={hit}
-          imageWidth={widthResultInfo}
-          imageHeight={height}
-          style={{
-            width: widthResultInfo,
-            height,
-            backgroundColor: 'lightyellow',
-          }}
+          width={widthResultInfo}
+          height={height}
+          imageWidth={widthResultInfo - 50}
+          imageHeight={widthResultInfo - 50}
         />
         {reference && reference.length > 0 ? (
           <Resizable
@@ -56,11 +57,9 @@ function SpectralHitsViewComponent({
             height={height}
           />
         )}
-      </div>
+      </Content>
     );
   }, [height, hit, reference, width]);
-
-  return spectralHitsViewComponent;
 }
 
 export default SpectralHitsViewComponent;

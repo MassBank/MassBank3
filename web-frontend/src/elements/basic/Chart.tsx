@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { brushX, scaleLinear, select } from 'd3';
 import ChartElement from './ChartElement';
-import Button from './Button';
 import Peak from '../../types/peak/Peak';
+import { Button } from 'antd';
+import { Content } from 'antd/es/layout/layout';
 
 type InputProps = {
   peakData: Peak[];
@@ -426,76 +427,116 @@ function Chart({
     }
   }, [brushXDomains, disableZoom, handleDoubleClick, height, width, xScale]);
 
-  return (
-    <div
-      ref={wrapperRef}
-      style={{
-        width: width,
-        height: height,
-        userSelect: 'none',
-        msUserSelect: 'none',
-        MozUserSelect: 'none',
-        WebkitUserSelect: 'none',
-      }}
-    >
-      <svg
-        ref={svgRef}
-        width={width}
-        height={disableLabels ? height : height - MARGIN.button}
+  return useMemo(
+    () => (
+      <Content
+        ref={wrapperRef}
+        style={{
+          width: width,
+          height: height,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          textAlign: 'center',
+          userSelect: 'none',
+          msUserSelect: 'none',
+          MozUserSelect: 'none',
+          WebkitUserSelect: 'none',
+        }}
       >
-        <g
-          width={boundsWidth}
-          height={boundsHeight}
-          transform={`translate(${[MARGIN.left, MARGIN.top].join(',')})`}
+        <svg
+          ref={svgRef}
+          width={width}
+          height={disableLabels ? height : height - MARGIN.button}
         >
-          {disableZoom ? undefined : <g className="brush" />}
-          {chartElements}
-          {xAxis}
-          {disableLabels ? undefined : xLabels}
-          {yAxis}
-          {disableLabels ? undefined : yLabels}
-        </g>
-      </svg>
-      {disableLabels ? undefined : (
-        <div
-          style={{
-            height: MARGIN.button,
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginRight: MARGIN.right,
-          }}
-        >
-          <Button
-            child={isShowLabel ? 'Hide Labels' : 'Show Labels'}
-            onClick={() => setIsShowLabel(!isShowLabel)}
-            buttonStyle={{
-              border: '1px solid black',
-              padding: '3px',
-            }}
-          />
-          <div
+          <g
+            width={boundsWidth}
+            height={boundsHeight}
+            transform={`translate(${[MARGIN.left, MARGIN.top].join(',')})`}
+          >
+            {disableZoom ? undefined : <g className="brush" />}
+            {chartElements}
+            {xAxis}
+            {disableLabels ? undefined : xLabels}
+            {yAxis}
+            {disableLabels ? undefined : yLabels}
+          </g>
+        </svg>
+        {disableLabels ? undefined : (
+          <Content
             style={{
+              width,
               height: MARGIN.button,
               display: 'flex',
-              flexDirection: 'column',
               justifyContent: 'center',
-              justifyItems: 'center',
+              alignItems: 'center',
+              paddingRight: MARGIN.right,
             }}
           >
-            <p style={{ marginBottom: filteredPeakData2 ? 0 : undefined }}>
-              {filteredPeakData.length}/{peakData.length}
-            </p>
-            {peakData2 && filteredPeakData2 && (
-              <p style={{ marginTop: 0 }}>
-                {filteredPeakData2.length}/{peakData2.length}
+            <Content
+              style={{
+                width: '100%',
+                height: MARGIN.button,
+                display: 'flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+              }}
+            >
+              <Button
+                children={isShowLabel ? 'Hide Labels' : 'Show Labels'}
+                onClick={() => setIsShowLabel(!isShowLabel)}
+                style={{
+                  border: '1px solid black',
+                  width: 100,
+                }}
+              />
+            </Content>
+            <Content
+              style={{
+                width: 100,
+                height: MARGIN.button,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'end',
+              }}
+            >
+              <p style={{ marginBottom: filteredPeakData2 ? 0 : undefined }}>
+                {filteredPeakData.length}/{peakData.length}
               </p>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
+              {peakData2 && filteredPeakData2 && (
+                <p style={{ marginTop: 0 }}>
+                  {filteredPeakData2.length}/{peakData2.length}
+                </p>
+              )}
+            </Content>
+          </Content>
+        )}
+      </Content>
+    ),
+    [
+      MARGIN.button,
+      MARGIN.left,
+      MARGIN.right,
+      MARGIN.top,
+      boundsHeight,
+      boundsWidth,
+      chartElements,
+      disableLabels,
+      disableZoom,
+      filteredPeakData.length,
+      filteredPeakData2,
+      height,
+      isShowLabel,
+      peakData.length,
+      peakData2,
+      width,
+      xAxis,
+      xLabels,
+      yAxis,
+      yLabels,
+    ],
   );
 }
 

@@ -1,36 +1,103 @@
-import './ResultInfo.scss';
-
+import { Content } from 'antd/es/layout/layout';
 import Hit from '../../types/Hit';
 import StructureView from '../basic/StructureView';
 import ResultLink from './ResultLink';
-import { CSSProperties } from 'react';
+import Placeholder from '../basic/Placeholder';
 
 type InputProps = {
   hit: Hit;
+  width: number;
+  height: number;
   imageWidth?: number;
   imageHeight?: number;
-  style?: CSSProperties;
 };
 
-function ResultInfo({ hit, imageWidth, imageHeight, style }: InputProps) {
+function ResultInfo({
+  hit,
+  imageWidth,
+  imageHeight,
+  width,
+  height,
+}: InputProps) {
   return (
-    <div className="info-view" style={style}>
-      <p className="accession-text">{hit.accession}</p>
-      <div className="score-structure-view">
-        {hit.score && <p className="score-text">Score: {hit.score}</p>}
-        {hit.record &&
-        hit.record.compound.smiles &&
-        hit.record.compound.smiles !== '' ? (
+    <Content
+      style={{
+        width,
+        height,
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRight: '1px solid black',
+      }}
+    >
+      <p
+        style={{
+          width: '100%',
+          height: 20,
+          fontSize: 17,
+          color: 'brown',
+          fontWeight: 'bold',
+        }}
+      >
+        {hit.accession}
+      </p>
+      <p
+        style={{
+          marginTop: 5,
+          marginBottom: 5,
+          width: '100%',
+          height: 20,
+          fontSize: 17,
+          fontWeight: 'bolder',
+        }}
+      >
+        {hit.score ? (
+          `Score: ${hit.score}`
+        ) : (
+          <Placeholder child="" style={{ height: 20 }} />
+        )}
+      </p>
+      <Content
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {hit.record && hit.record.compound.smiles ? (
           <StructureView
             smiles={hit.record.compound.smiles}
             imageWidth={imageWidth}
             imageHeight={imageHeight}
           />
-        ) : undefined}
-      </div>
-      <label>{hit.record.title}</label>
-      <ResultLink hit={hit} />
-    </div>
+        ) : (
+          <Placeholder
+            child="No structure"
+            style={{ width: imageWidth, height: imageHeight }}
+          />
+        )}
+      </Content>
+
+      <p
+        style={{
+          width: '100%',
+          height: 600,
+          textWrap: 'pretty',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          margin: 0,
+          overflowY: 'scroll',
+        }}
+      >
+        {hit.record.title}
+      </p>
+      <ResultLink hit={hit} height={100} />
+    </Content>
   );
 }
 
