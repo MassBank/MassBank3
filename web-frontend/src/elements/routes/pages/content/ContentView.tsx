@@ -183,6 +183,8 @@ function ContentView() {
                 height={heights.searchPanelHeight}
                 searchPanelWidth={searchPanelWidth}
                 searchPanelHeight={heights.searchPanelHeight}
+                widthOverview={width}
+                heightOverview={height}
                 isRequesting={isRequesting}
                 reference={[]}
                 hits={hits}
@@ -195,6 +197,7 @@ function ContentView() {
     [
       charts,
       contentSearchPanel,
+      height,
       heights.searchPanelHeight,
       hits,
       isRequesting,

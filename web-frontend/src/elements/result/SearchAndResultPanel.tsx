@@ -15,6 +15,8 @@ type InputProps = {
   height: number;
   searchPanelWidth: number;
   searchPanelHeight: number;
+  widthOverview: number;
+  heightOverview: number;
   isRequesting: boolean;
   reference: Peak[];
   hits: Hit[];
@@ -26,6 +28,8 @@ function SearchAndResultPanel({
   height,
   searchPanelWidth,
   searchPanelHeight,
+  widthOverview,
+  heightOverview,
   isRequesting,
   reference,
   hits,
@@ -122,19 +126,20 @@ function SearchAndResultPanel({
         height={searchPanelHeight}
         sortOptions={sortOptions}
         onSort={handleOnSelectSort}
-        widthOverview={width}
-        heightOverview={height}
+        widthOverview={widthOverview}
+        heightOverview={heightOverview}
       />
     );
   }, [
     handleOnSelectSort,
-    height,
+    heightOverview,
     innerHits,
     reference,
     searchPanelHeight,
     searchPanelWidth,
     sortOptions,
     width,
+    widthOverview,
   ]);
 
   return useMemo(
