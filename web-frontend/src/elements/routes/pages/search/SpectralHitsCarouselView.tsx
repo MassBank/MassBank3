@@ -24,17 +24,15 @@ function SpectralHitsCarouselView({
   const _width = width - 75;
 
   const elements = useMemo(() => {
-    return hits
-      .filter((hit) => hit.record)
-      .map((hit, i) => (
-        <SpectralHitsViewComponent
-          key={'spectral-hits-view-component_' + i + '_' + hit.accession}
-          reference={reference}
-          hit={hit}
-          width={_width - 80}
-          height={height}
-        />
-      ));
+    return hits.map((hit, i) => (
+      <SpectralHitsViewComponent
+        key={'spectral-hits-view-component_' + i + '_' + hit.accession}
+        reference={reference}
+        hit={hit}
+        width={_width - 80}
+        height={height}
+      />
+    ));
   }, [_width, height, hits, reference]);
 
   return useMemo(

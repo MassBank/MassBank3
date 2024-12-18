@@ -153,6 +153,7 @@ function ResultPanel({
         width={widthOverview}
         height={heightOverview}
         centered
+        destroyOnClose
       >
         <SpectralHitsCarouselView
           reference={reference}
