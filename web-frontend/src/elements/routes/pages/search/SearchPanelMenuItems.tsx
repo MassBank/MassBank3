@@ -8,27 +8,21 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Form, Input, InputNumber } from 'antd';
-import SearchFields from '../../../../../types/filterOptions/SearchFields';
-import PeakSearch from './peakSearch/PeakSearch';
-import MassSpecFilterOptionsMenuItems from './msSpecFilter/MassSpecFilterOptionsMenuItems';
-import StructuralEditor from '../../../../basic/StructuralEditor';
-import ContentFilterOptions from '../../../../../types/filterOptions/ContentFilterOtions';
+import SearchFields from '../../../../types/filterOptions/SearchFields';
+import PeakSearch from './searchPanel/peakSearch/PeakSearch';
+import MassSpecFilterOptionsMenuItems from './searchPanel/msSpecFilter/MassSpecFilterOptionsMenuItems';
+import StructuralEditor from '../../../basic/StructuralEditor';
+import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
 
 const peakListPattern =
   /^(\d+(\.\d+)* \d+(\.\d+)*)(\n\d+(\.\d+)* \d+(\.\d+)*)*$/;
 
 type InputProps = {
   massSpecFilterOptions: ContentFilterOptions | undefined;
-  // eslint-disable-next-line no-unused-vars
-  onChangeStructure: (molfile: string) => void;
   width: number;
 };
 
-function SearchPanelMenuItems({
-  massSpecFilterOptions,
-  onChangeStructure,
-  width,
-}: InputProps) {
+function SearchPanelMenuItems({ massSpecFilterOptions, width }: InputProps) {
   return [
     {
       key: 'basicSearchMenuItem',
@@ -389,17 +383,7 @@ function SearchPanelMenuItems({
             marginLeft: 0,
             overflow: 'scroll',
           },
-          label: (
-            <Form.Item<SearchFields>
-              name="structure"
-              rules={[{ required: false }]}
-            >
-              <StructuralEditor
-                onChange={onChangeStructure}
-                width={width - 100}
-              />
-            </Form.Item>
-          ),
+          label: <StructuralEditor width={width - 100} />,
         },
       ],
     },

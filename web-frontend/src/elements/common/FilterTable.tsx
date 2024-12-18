@@ -1,9 +1,9 @@
 import { MouseEvent, useCallback, useMemo, useState } from 'react';
-import ValueCount from '../../../../../../types/ValueCount';
 import { Button, Checkbox, Form } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import useFormInstance from 'antd/es/form/hooks/useFormInstance';
-import SearchFields from '../../../../../../types/filterOptions/SearchFields';
+import ValueCount from '../../types/ValueCount';
+import SearchFields from '../../types/filterOptions/SearchFields';
 
 type InputProps = {
   filterOptions: ValueCount[];

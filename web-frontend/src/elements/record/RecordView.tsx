@@ -6,7 +6,7 @@ import { useMemo, useRef } from 'react';
 import StructureView from '../basic/StructureView';
 import AnnotationTable from './AnnotationTable';
 import SubTagTableRows from './SubTagTableRows';
-import Resizable from './Resizable';
+import Resizable from '../common/Resizable';
 
 const borderStyle = '2px solid grey';
 

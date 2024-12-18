@@ -1,43 +1,41 @@
-import { ChangeEvent, MouseEvent, useCallback, useMemo, useState } from 'react';
+import { MouseEvent, useCallback, useMemo, useState } from 'react';
 import { StructureEditor } from 'react-ocl/full';
 import { Molecule } from 'openchemlib';
 
 import { UploadOutlined } from '@ant-design/icons';
-import type { UploadProps } from 'antd';
-import { Button, Col, Divider, Input, Row, Upload } from 'antd';
+import { Form, UploadProps } from 'antd';
+import { Button, Col, Divider, Input, Row } from 'antd';
 import { RcFile } from 'antd/es/upload';
 import { Content } from 'antd/es/layout/layout';
+import SearchFields from '../../types/filterOptions/SearchFields';
+import Dragger from 'antd/es/upload/Dragger';
 
 interface InputProps {
-  // eslint-disable-next-line no-unused-vars
-  onChange: (molfile: string) => void;
   width?: number;
   height?: number;
 }
 
-function StructuralEditor({ onChange = () => {}, width, height }: InputProps) {
+function StructuralEditor({ width, height }: InputProps) {
+  const formInstance = Form.useFormInstance<SearchFields>();
+  const { getFieldValue, setFieldValue } = formInstance;
+
   const [smiles, setSmiles] = useState<string | undefined>();
   const [molfile, setMolfile] = useState<string | undefined>();
   const [structureKey, setStructureKey] = useState<number>(Math.random());
-  const [error, setError] = useState<string | undefined>();
+  const [errorSmiles, setErrorSmiles] = useState<string | undefined>();
+  const [errorMolfileImport, setErrorMolfileImport] = useState<
+    string | undefined
+  >();
 
   const handleOnChangeStructure = useCallback(
     (_molfile: string, molecule: Molecule) => {
+      const _smiles = molecule.toSmiles();
+      setSmiles(_smiles);
       setMolfile(_molfile);
-      onChange(_molfile);
-      setSmiles(molecule.toSmiles());
+      setFieldValue('structure', _smiles);
+      setErrorMolfileImport(undefined);
     },
-    [onChange],
-  );
-
-  const handleOnChangeSmilesInput = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      setSmiles(e.target.value);
-    },
-    [],
+    [setFieldValue],
   );
 
   const handleOnSetSmiles = useCallback(
@@ -45,19 +43,20 @@ function StructuralEditor({ onChange = () => {}, width, height }: InputProps) {
       e.preventDefault();
       e.stopPropagation();
 
-      if (smiles && smiles.trim().length > 0) {
+      const _smiles = getFieldValue('structure');
+      if (_smiles && _smiles.trim().length > 0) {
         try {
-          const molecule = Molecule.fromSmiles(smiles);
+          const molecule = Molecule.fromSmiles(_smiles);
           const _molfile = molecule.toMolfile();
           handleOnChangeStructure(_molfile, molecule);
           setStructureKey(Math.random());
-          setError(undefined);
+          setErrorMolfileImport(undefined);
         } catch (error) {
-          setError('Invalid SMILES');
+          /* empty */
         }
       }
     },
-    [handleOnChangeStructure, smiles],
+    [getFieldValue, handleOnChangeStructure],
   );
 
   const structureEditor = useMemo(
@@ -83,7 +82,60 @@ function StructuralEditor({ onChange = () => {}, width, height }: InputProps) {
     [handleOnChangeStructure, height, molfile, structureKey, width],
   );
 
-  const { Dragger } = Upload;
+  const input = useMemo(
+    () => (
+      <Form.Item
+        name="structure"
+        style={{
+          width: '100%',
+          height: '100%',
+        }}
+        rules={[
+          {
+            required: false,
+            validator: async (_, value) => {
+              if (value && value.trim().length > 0) {
+                try {
+                  Molecule.fromSmiles(value);
+                  setErrorSmiles(undefined);
+                } catch (err) {
+                  setErrorSmiles('Invalid SMILES');
+                  return Promise.reject(new Error('Invalid SMILES'));
+                }
+              }
+              return Promise.resolve();
+            },
+          },
+        ]}
+      >
+        <Input
+          type="text"
+          addonBefore="SMILES:"
+          addonAfter={
+            <Button
+              children={'Set'}
+              onClick={handleOnSetSmiles}
+              style={{
+                width: '100%',
+                height: 30,
+                backgroundColor: 'transparent',
+                border: 'none',
+              }}
+              disabled={errorSmiles !== undefined}
+            />
+          }
+          value={smiles}
+          placeholder='e.g. "C=O"'
+          style={{
+            width: '100%',
+            backgroundColor: 'transparent',
+          }}
+          allowClear
+        />
+      </Form.Item>
+    ),
+    [errorSmiles, handleOnSetSmiles, smiles],
+  );
 
   const onDrop = useCallback(
     (files: File[]) => {
@@ -95,11 +147,14 @@ function StructuralEditor({ onChange = () => {}, width, height }: InputProps) {
 
         try {
           const mol = Molecule.fromMolfile(_molfile);
+          if (mol.toSmiles().trim() === '') {
+            throw 'Invalid MOL or SD file';
+          }
           handleOnChangeStructure(mol.toMolfileV3(), mol);
           setStructureKey(Math.random());
-          setError(undefined);
-        } catch (error) {
-          setError('Invalid MOL file');
+          setErrorMolfileImport(undefined);
+        } catch (error: unknown) {
+          setErrorMolfileImport(error as string);
         }
       };
       reader.readAsArrayBuffer(file);
@@ -110,6 +165,10 @@ function StructuralEditor({ onChange = () => {}, width, height }: InputProps) {
   const props: UploadProps = useMemo(() => {
     return {
       name: 'file',
+      style: {
+        width: '100%',
+        height: 30,
+      },
       multiple: false,
       showUploadList: false,
       accept: '.mol,.sdf,.sd',
@@ -132,55 +191,30 @@ function StructuralEditor({ onChange = () => {}, width, height }: InputProps) {
       <Content style={{ width: '100%', height: '100%' }}>
         {structureEditor}
         <Divider style={{ borderColor: 'grey' }}>OR</Divider>
-        <Input
-          type="text"
-          addonBefore="SMILES:"
-          addonAfter={
-            <Button
-              children={'Set'}
-              onClick={handleOnSetSmiles}
-              style={{
-                width: '100%',
-                height: 30,
-                backgroundColor: 'transparent',
-                border: 'none',
-              }}
-            />
-          }
-          onChange={handleOnChangeSmilesInput}
-          value={smiles}
-          placeholder='e.g. "C=O"'
-          style={{
-            width: '100%',
-            backgroundColor: 'transparent',
-          }}
-          allowClear
-        />
+        {input}
         <Divider style={{ borderColor: 'grey' }}>OR</Divider>
-        <Dragger
-          {...props}
+        <Content
           style={{
             width: '100%',
-            height: 30,
+            height: '100%',
+            textAlign: 'center',
           }}
         >
-          <Row>
-            <Col span={4}>
-              <UploadOutlined />
-            </Col>
-            <Col span={20}>Drag & Drop a file here or click to upload</Col>
-          </Row>
-        </Dragger>
+          <Dragger {...props}>
+            <Row>
+              <Col span={4}>
+                <UploadOutlined />
+              </Col>
+              <Col span={20}>Drag & Drop a file here or click to upload</Col>
+            </Row>
+          </Dragger>
+          {errorMolfileImport && (
+            <label style={{ color: 'red' }}>{errorMolfileImport}</label>
+          )}
+        </Content>
       </Content>
     ),
-    [
-      Dragger,
-      handleOnChangeSmilesInput,
-      handleOnSetSmiles,
-      props,
-      smiles,
-      structureEditor,
-    ],
+    [errorMolfileImport, input, props, structureEditor],
   );
 }
 

@@ -1,4 +1,4 @@
-import PeakTable from './PeakTable';
+import PeakTable from '../record/PeakTable';
 import Chart from '../basic/Chart';
 
 import {

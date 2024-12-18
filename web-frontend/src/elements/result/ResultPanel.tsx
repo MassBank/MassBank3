@@ -40,9 +40,7 @@ function ResultPanel({
   const [selectedSortOption, setSelectedSortOption] = useState<
     string | undefined
   >();
-  const [spectralHitsCarouselView, setSpectralHitsCarouselView] = useState<
-    JSX.Element | undefined
-  >();
+  const [hitsWithRecords, setHitsWithRecords] = useState<Hit[] | undefined>();
 
   const pageLimit = 20;
   const paginationHeight = 50;
@@ -69,7 +67,13 @@ function ResultPanel({
     return _resultTableData;
   }, [hits]);
 
-  const fetchRecords = useCallback(async (_hits: Hit[]) => {
+  const fetchRecords = useCallback(async () => {
+    setIsRequesting(true);
+
+    const _hits =
+      resultTableData.length > 0 ? resultTableData[resultPageIndex] : [];
+
+    let _hitsWithRecords: Hit[] = [];
     if (_hits.length > 0) {
       const from = 0;
       let to = pageLimit;
@@ -103,68 +107,42 @@ function ResultPanel({
         }
       }
 
-      const _hitsWithRecords = _hits.slice(from, from + range).map((h, i) => {
+      _hitsWithRecords = _hits.slice(from, from + range).map((h, i) => {
         h.record = records[i];
         return h;
       });
-
-      return _hitsWithRecords;
     }
-  }, []);
 
-  const [resultTable, setResultTable] = useState<JSX.Element | undefined>();
+    setHitsWithRecords(_hitsWithRecords);
+    setIsRequesting(false);
+  }, [resultTableData, resultPageIndex]);
+
+  useEffect(() => {
+    fetchRecords();
+  }, [fetchRecords]);
 
   const handleOnDoubleClick = useCallback(
     (_slideIndex: number) => {
-      setSlideIndex(_slideIndex);
+      setSlideIndex(_slideIndex % pageLimit);
       setShowModal(true);
     },
     [setShowModal],
   );
 
-  const buildResultTable = useCallback(() => {
-    setIsRequesting(true);
-    const _hits =
-      resultTableData.length > 0 ? resultTableData[resultPageIndex] : [];
-
-    fetchRecords(_hits).then((_hitsWithRecords) => {
-      setResultTable(
-        <ResultTable
-          reference={reference}
-          hits={_hitsWithRecords || []}
-          height={height - paginationHeight}
-          onDoubleClick={handleOnDoubleClick}
-          rowHeight={150}
-          chartWidth={250}
-          imageWidth={250}
-        />,
-      );
-      setSpectralHitsCarouselView(
-        <SpectralHitsCarouselView
-          reference={reference}
-          hits={_hitsWithRecords || []}
-          slideIndex={slideIndex % pageLimit}
-          width={widthOverview}
-          height={heightOverview}
-        />,
-      );
-      setIsRequesting(false);
-    });
-  }, [
-    fetchRecords,
-    handleOnDoubleClick,
-    height,
-    heightOverview,
-    reference,
-    resultPageIndex,
-    resultTableData,
-    slideIndex,
-    widthOverview,
-  ]);
-
-  useEffect(() => {
-    buildResultTable();
-  }, [buildResultTable]);
+  const resultTable = useMemo(
+    () => (
+      <ResultTable
+        reference={reference}
+        hits={hitsWithRecords || []}
+        height={height - paginationHeight}
+        onDoubleClick={handleOnDoubleClick}
+        rowHeight={150}
+        chartWidth={250}
+        imageWidth={250}
+      />
+    ),
+    [reference, hitsWithRecords, height, handleOnDoubleClick],
+  );
 
   const modal = useMemo(
     () => (
@@ -176,10 +154,23 @@ function ResultPanel({
         height={heightOverview}
         centered
       >
-        {spectralHitsCarouselView}
+        <SpectralHitsCarouselView
+          reference={reference}
+          hits={hitsWithRecords || []}
+          slideIndex={slideIndex}
+          width={widthOverview}
+          height={heightOverview}
+        />
       </Modal>
     ),
-    [heightOverview, showModal, spectralHitsCarouselView, widthOverview],
+    [
+      showModal,
+      widthOverview,
+      heightOverview,
+      reference,
+      hitsWithRecords,
+      slideIndex,
+    ],
   );
 
   const handleOnSelectPage = useCallback(
@@ -319,7 +310,7 @@ function ResultPanel({
         </Content>
       ) : (
         <Placeholder
-          child="No hits found"
+          child={'No results'}
           style={{ width, height, fontSize: 18, fontWeight: 'bold' }}
         />
       ),

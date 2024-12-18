@@ -1,5 +1,5 @@
 import { Form } from 'antd';
-import FilterTable from './FilterTable';
+import FilterTable from '../../../../../common/FilterTable';
 import SearchFields from '../../../../../../types/filterOptions/SearchFields';
 import ContentFilterOptions from '../../../../../../types/filterOptions/ContentFilterOtions';
 

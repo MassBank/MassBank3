@@ -1,13 +1,11 @@
-import { Spin } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import Sider from 'antd/es/layout/Sider';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import ResultTableSortOptionType from '../../types/ResultTableSortOptionType';
 import resultTableSortOptionValues from '../../constants/resultTableSortOptionValues';
-import ResultPanel from './ResultPanel';
+import ResultPanel from '../result/ResultPanel';
 import Hit from '../../types/Hit';
 import Peak from '../../types/peak/Peak';
-import Placeholder from '../basic/Placeholder';
 
 type InputProps = {
   searchPanel: JSX.Element;
@@ -17,7 +15,6 @@ type InputProps = {
   searchPanelHeight: number;
   widthOverview: number;
   heightOverview: number;
-  isRequesting: boolean;
   reference: Peak[];
   hits: Hit[];
 };
@@ -30,7 +27,6 @@ function SearchAndResultPanel({
   searchPanelHeight,
   widthOverview,
   heightOverview,
-  isRequesting,
   reference,
   hits,
 }: InputProps) {
@@ -39,14 +35,6 @@ function SearchAndResultPanel({
   useEffect(() => {
     setInnerHits(hits);
   }, [hits]);
-
-  const [wasRequesting, setWasRequesting] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (isRequesting) {
-      setWasRequesting(true);
-    }
-  }, [isRequesting]);
 
   const sortOptions = useMemo(() => {
     const _sortOptions: ResultTableSortOptionType[] = [];
@@ -164,33 +152,11 @@ function SearchAndResultPanel({
             alignItems: 'center',
           }}
         >
-          {isRequesting ? (
-            <Spin size="large" />
-          ) : innerHits.length > 0 ? (
-            resultPanel
-          ) : (
-            <Placeholder
-              child={
-                wasRequesting
-                  ? 'No hits found'
-                  : "Click 'Submit' to start searching"
-              }
-              style={{ width, height, fontSize: 18, fontWeight: 'bold' }}
-            />
-          )}
+          {resultPanel}
         </Content>
       </Content>
     ),
-    [
-      height,
-      innerHits.length,
-      isRequesting,
-      resultPanel,
-      searchPanel,
-      searchPanelWidth,
-      wasRequesting,
-      width,
-    ],
+    [height, resultPanel, searchPanel, searchPanelWidth, width],
   );
 }
 

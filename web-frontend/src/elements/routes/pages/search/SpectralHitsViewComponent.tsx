@@ -1,7 +1,7 @@
 import Peak from '../../../../types/peak/Peak';
 import Hit from '../../../../types/Hit';
 import ResultInfo from '../../../result/ResultInfo';
-import Resizable from '../../../record/Resizable';
+import Resizable from '../../../common/Resizable';
 import Record from '../../../../types/Record';
 import { useMemo } from 'react';
 import { Content } from 'antd/es/layout/layout';
