@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import ResultTable from './ResultTable';
 import Hit from '../../types/Hit';
 import Peak from '../../types/peak/Peak';
@@ -6,10 +6,20 @@ import Record from '../../types/Record';
 import generateID from '../../utils/generateID';
 import Placeholder from '../basic/Placeholder';
 import fetchData from '../../utils/fetchData';
-import { Button, Modal, Pagination, Select, Spin } from 'antd';
+import {
+  Button,
+  Dropdown,
+  MenuProps,
+  Modal,
+  Pagination,
+  Select,
+  Spin,
+} from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import SpectralHitsCarouselView from '../routes/pages/search/SpectralHitsCarouselView';
 import ResultTableSortOptionType from '../../types/ResultTableSortOptionType';
+import axios from 'axios';
+import { saveAs } from 'file-saver';
 
 type InputProps = {
   reference?: Peak[];
@@ -187,16 +197,80 @@ function ResultPanel({
     [hits.length],
   );
 
-  const handleOnDownloadResult = useCallback(() => {
-    console.log('Download result');
-  }, []);
-
   const handleOnSelect = useCallback(
     (value: string) => {
       setSelectedSortOption(value);
       onSort(value);
     },
     [onSort],
+  );
+
+  const handleOnDownloadResult = useCallback(
+    async (format: string) => {
+      setIsRequesting(true);
+      const host = import.meta.env.VITE_EXPORT_SERVICE_HOST;
+      const port = import.meta.env.VITE_EXPORT_SERVICE_PORT;
+      const url = `http://${host}:${port}/convert`;
+
+      const resp = await axios.post(
+        url,
+        {
+          record_list: hits.map((h) => h.accession),
+          format,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/octet-stream',
+          },
+        },
+      );
+      if (resp.status === 200) {
+        const data = await resp.data;
+        const fileType = format.split('_')[1];
+        const filename = `massbank_result.${format}.${fileType}`;
+        const blob = new Blob([data], {
+          type: 'application/octet-stream',
+        });
+        saveAs(blob, filename);
+      }
+
+      setIsRequesting(false);
+    },
+    [hits],
+  );
+
+  const buildDownloadOptionLabel = useCallback(
+    (label: string, format: string) => (
+      <label
+        onClick={(e: MouseEvent<HTMLLabelElement>) => {
+          e.preventDefault();
+          handleOnDownloadResult(format);
+        }}
+        style={{
+          width: 100,
+          marginLeft: 10,
+          marginRight: 10,
+        }}
+      >
+        {label}
+      </label>
+    ),
+    [handleOnDownloadResult],
+  );
+
+  const items: MenuProps['items'] = useMemo(
+    () => [
+      {
+        key: '0_nist_msp_download',
+        label: buildDownloadOptionLabel('NIST MSP', 'nist_msp'),
+      },
+      {
+        key: '1_riken_msp_download',
+        label: buildDownloadOptionLabel('RIKEN MSP', 'riken_msp'),
+      },
+    ],
+    [buildDownloadOptionLabel],
   );
 
   const paginationContainer = useMemo(() => {
@@ -257,16 +331,18 @@ function ResultPanel({
             onSelect={handleOnSelect}
           />
         )}
-        <Button
-          children="Download"
-          onClick={() => handleOnDownloadResult()}
-          style={{
-            width: 100,
-            marginRight: 30,
-            marginLeft: 20,
-          }}
-          disabled
-        />
+
+        <Dropdown menu={{ items }} trigger={['click']}>
+          <Button
+            style={{
+              width: 100,
+              marginRight: 30,
+              marginLeft: 20,
+            }}
+          >
+            Download
+          </Button>
+        </Dropdown>
       </Content>
     );
   }, [
@@ -276,7 +352,7 @@ function ResultPanel({
     sortOptions,
     selectedSortOption,
     handleOnSelect,
-    handleOnDownloadResult,
+    items,
   ]);
 
   return useMemo(
