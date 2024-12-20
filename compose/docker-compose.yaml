@@ -64,7 +64,7 @@ services:
       - "${EXPORT_SERVICE_PORT}:8080"
     environment:
       MB_DATA_DIRECTORY: "/MassBank-data"
-      CORS_ALLOWED_ORIGINS: http://localhost:3000
+      CORS_ALLOWED_ORIGINS: "http://${MB3_FRONTEND_HOST}:${MB3_FRONTEND_PORT}"
     volumes:
       - "${EXPORT_MB_DATA_DIRECTORY}:/MassBank-data"
 
