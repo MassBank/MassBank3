@@ -1,6 +1,12 @@
-import './AccessionView.scss';
-
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import RecordView from '../../../record/RecordView';
 import generateID from '../../../../utils/generateID';
 import Record from '../../../../types/Record';
@@ -11,9 +17,13 @@ import {
 } from 'react-router-dom';
 import routes from '../../../../constants/routes';
 import fetchData from '../../../../utils/fetchData';
-import { Button, Input, Spin } from 'antd';
+import { Button, Input, Layout, Spin } from 'antd';
+import useContainerDimensions from '../../../../utils/useContainerDimensions';
+import { Content, Header } from 'antd/es/layout/layout';
 
 function AccessionView() {
+  const ref = useRef(null);
+  const { height } = useContainerDimensions(ref);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -64,7 +74,9 @@ function AccessionView() {
       record ? (
         <RecordView record={record} />
       ) : requestedAccession !== '' ? (
-        <p>No database entry found for "{requestedAccession}"!</p>
+        <p style={{ fontWeight: 'bolder', fontSize: 'larger' }}>
+          No database entry found for "{requestedAccession}"
+        </p>
       ) : undefined,
     [requestedAccession, record],
   );
@@ -84,38 +96,72 @@ function AccessionView() {
     setAccession(e.target.value.trim());
   }, []);
 
-  const accessionView = useMemo(
+  const handleOnKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        handleOnClick();
+      }
+    },
+    [handleOnClick],
+  );
+
+  const headerHeight = 50;
+
+  return useMemo(
     () => (
-      <div className="accession-panel">
-        <div className="input-panel">
+      <Layout ref={ref} style={{ width: '100%', height: '100%' }}>
+        <Header
+          style={{
+            width: '100%',
+            height: headerHeight,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+            backgroundColor: 'beige',
+          }}
+        >
           <Input
             type="text"
             placeholder="e.g. MSBNK-AAFC-AC000114"
             value={accession && accession !== '' ? accession : undefined}
-            addonBefore="Search for accession: "
+            addonBefore="Go to accession:"
             onChange={handleOnChange}
-            onKeyDown={handleOnClick}
+            onKeyDown={handleOnKeyDown}
             allowClear
+            style={{ width: 500 }}
           />
           <Button
             children="Search"
             onClick={handleOnClick}
             disabled={accession.trim() === ''}
-            style={
-              accession.trim() === '' ? { color: 'grey' } : { color: 'black' }
-            }
+            style={{ width: 100 }}
           />
-        </div>
-        <div className="result-panel">
+        </Header>
+        <Content
+          style={{
+            width: '100%',
+            height: height - headerHeight,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
           {isRequesting ? <Spin size="large" /> : recordView}
-        </div>
-      </div>
+        </Content>
+      </Layout>
     ),
 
-    [accession, handleOnChange, handleOnClick, isRequesting, recordView],
+    [
+      accession,
+      handleOnChange,
+      handleOnClick,
+      handleOnKeyDown,
+      height,
+      isRequesting,
+      recordView,
+    ],
   );
-
-  return accessionView;
 }
 
 export default AccessionView;
