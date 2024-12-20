@@ -48,7 +48,8 @@ function SearchView() {
   const { width, height } = useContainerDimensions(ref);
 
   const [reference, setReference] = useState<Peak[]>([]);
-  const [isRequesting, setIsRequesting] = useState<boolean>(false);
+  const [isFetchingContent, setIsFetchingContent] = useState<boolean>(false);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [hits, setHits] = useState<Hit[]>([]);
   const [massSpecFilterOptions, setMassSpecFilterOptions] = useState<
@@ -61,10 +62,10 @@ function SearchView() {
   );
 
   const handleOnFetchContent = useCallback(
-    async (newBrowseContent: ContentFilterOptions | undefined) => {
-      setIsRequesting(true);
+    async (formDataContent: ContentFilterOptions | undefined) => {
+      setIsFetchingContent(true);
 
-      let _browseContent: ContentFilterOptions | undefined = newBrowseContent;
+      let _browseContent: ContentFilterOptions | undefined = formDataContent;
       if (!_browseContent) {
         const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
         _browseContent = (await fetchData(url)) as ContentFilterOptions;
@@ -79,7 +80,7 @@ function SearchView() {
       initFlags(_browseContent);
       setMassSpecFilterOptions(_browseContent);
 
-      setIsRequesting(false);
+      setIsFetchingContent(false);
     },
     [],
   );
@@ -89,6 +90,8 @@ function SearchView() {
   }, [handleOnFetchContent]);
 
   const handleOnSearch = useCallback(async (formData: SearchFields) => {
+    setIsSearching(true);
+
     const formData_content = massSpecFilterOptionsFormDataToContentMapper(
       formData.massSpecFilterOptions,
       undefined,
@@ -184,26 +187,27 @@ function SearchView() {
     });
 
     setHits(_hits);
-    setIsRequesting(false);
+    setIsSearching(false);
   }, []);
 
   const handleOnSubmit = useCallback(
     async (formData: SearchFields) => {
       setIsCollapsed(true);
 
-      const formData_content = massSpecFilterOptionsFormDataToContentMapper(
-        formData.massSpecFilterOptions,
-        massSpecFilterOptions,
+      const formDataContent = massSpecFilterOptionsFormDataToContentMapper(
+        formData?.massSpecFilterOptions,
+        // massSpecFilterOptions,
+        undefined,
       );
 
       await handleOnSearch(formData);
-      await handleOnFetchContent(formData_content);
+      await handleOnFetchContent(formDataContent);
     },
-    [massSpecFilterOptions, handleOnSearch, handleOnFetchContent],
+    [handleOnSearch, handleOnFetchContent],
   );
 
-  const searchPanel = useMemo(
-    () => (
+  const searchAndResultPanel = useMemo(() => {
+    const searchPanel = (
       <CommonSearchPanel
         items={SearchPanelMenuItems({
           massSpecFilterOptions,
@@ -217,16 +221,33 @@ function SearchView() {
         onCollapse={(collapsed: boolean) => setIsCollapsed(collapsed)}
         onSubmit={handleOnSubmit}
       />
-    ),
-    [
-      massSpecFilterOptions,
-      width,
-      searchPanelWidth,
-      height,
-      isCollapsed,
-      handleOnSubmit,
-    ],
-  );
+    );
+
+    return (
+      <SearchAndResultPanel
+        searchPanel={searchPanel}
+        width={width}
+        height={height}
+        searchPanelWidth={searchPanelWidth}
+        searchPanelHeight={height}
+        widthOverview={width}
+        heightOverview={height}
+        reference={reference}
+        hits={hits}
+        isRequesting={isSearching}
+      />
+    );
+  }, [
+    massSpecFilterOptions,
+    width,
+    searchPanelWidth,
+    height,
+    isCollapsed,
+    handleOnSubmit,
+    reference,
+    hits,
+    isSearching,
+  ]);
 
   return useMemo(
     () => (
@@ -236,44 +257,25 @@ function SearchView() {
           width: '100%',
           height: '100%',
           display: 'flex',
-          flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
         }}
       >
-        <Spin size="large" spinning={isRequesting} />
+        <Spin size="large" spinning={isFetchingContent} />
         <Content
           style={{
             width: '100%',
             height: '100%',
-            display: isRequesting ? 'none' : 'flex',
+            display: isFetchingContent ? 'none' : 'flex',
             justifyContent: 'center',
             alignItems: 'center',
           }}
         >
-          <SearchAndResultPanel
-            searchPanel={searchPanel}
-            width={width}
-            height={height}
-            searchPanelWidth={searchPanelWidth}
-            searchPanelHeight={height}
-            widthOverview={width}
-            heightOverview={height}
-            reference={reference}
-            hits={hits}
-          />
+          {searchAndResultPanel}
         </Content>
       </Layout>
     ),
-    [
-      height,
-      hits,
-      isRequesting,
-      reference,
-      searchPanel,
-      searchPanelWidth,
-      width,
-    ],
+    [isFetchingContent, searchAndResultPanel],
   );
 }
 

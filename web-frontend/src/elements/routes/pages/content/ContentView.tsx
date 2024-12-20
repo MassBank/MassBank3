@@ -21,15 +21,13 @@ function ContentView() {
   const ref = useRef(null);
   const { width, height } = useContainerDimensions(ref);
 
-  const [isRequesting, setIsRequesting] = useState<boolean>(false);
+  const [isFetchingContent, setIsFetchingContent] = useState<boolean>(false);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
-  const [filterOptionsAndHits, setFilterOptionsAndHits] = useState<{
-    massSpecFilterOptions: ContentFilterOptions;
-    hits: Hit[];
-  }>({
-    massSpecFilterOptions: {} as ContentFilterOptions,
-    hits: [],
-  });
+  const [hits, setHits] = useState<Hit[]>([]);
+  const [massSpecFilterOptions, setMassSpecFilterOptions] = useState<
+    ContentFilterOptions | undefined
+  >();
 
   const searchPanelWidth = useMemo(
     () => (isCollapsed ? 50 : Math.max(width * 0.3, 400)),
@@ -37,10 +35,10 @@ function ContentView() {
   );
 
   const handleOnFetchContent = useCallback(
-    async (newBrowseContent: ContentFilterOptions | undefined) => {
-      setIsRequesting(true);
+    async (formDataContent: ContentFilterOptions | undefined) => {
+      setIsFetchingContent(true);
 
-      let _browseContent: ContentFilterOptions | undefined = newBrowseContent;
+      let _browseContent: ContentFilterOptions | undefined = formDataContent;
       if (!_browseContent) {
         const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
         _browseContent = (await fetchData(url)) as ContentFilterOptions;
@@ -54,7 +52,17 @@ function ContentView() {
       }
       initFlags(_browseContent);
 
-      const searchParams = buildSearchParams(_browseContent);
+      setMassSpecFilterOptions(_browseContent);
+      setIsFetchingContent(false);
+    },
+    [],
+  );
+
+  const handleOnSearch = useCallback(
+    async (formDataContent: ContentFilterOptions | undefined) => {
+      setIsSearching(true);
+
+      const searchParams = buildSearchParams(formDataContent);
       const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/search';
       const searchResult = (await fetchData(url, searchParams)) as SearchResult;
 
@@ -66,12 +74,8 @@ function ContentView() {
         };
       });
 
-      setFilterOptionsAndHits({
-        massSpecFilterOptions: _browseContent,
-        hits: _hits,
-      });
-
-      setIsRequesting(false);
+      setHits(_hits);
+      setIsSearching(false);
     },
     [],
   );
@@ -80,18 +84,22 @@ function ContentView() {
     async (formData: SearchFields) => {
       setIsCollapsed(true);
 
-      const formData_content = massSpecFilterOptionsFormDataToContentMapper(
-        formData.massSpecFilterOptions,
-        filterOptionsAndHits.massSpecFilterOptions,
+      const formDataContent = massSpecFilterOptionsFormDataToContentMapper(
+        formData?.massSpecFilterOptions,
+        // massSpecFilterOptions,
+        undefined,
       );
-      await handleOnFetchContent(formData_content);
+
+      await handleOnSearch(formDataContent);
+      await handleOnFetchContent(formDataContent);
     },
-    [filterOptionsAndHits.massSpecFilterOptions, handleOnFetchContent],
+    [handleOnFetchContent, handleOnSearch],
   );
 
   useEffect(() => {
     handleOnFetchContent(undefined);
-  }, [handleOnFetchContent]);
+    handleOnSearch(undefined);
+  }, [handleOnFetchContent, handleOnSearch]);
 
   const heights = useMemo(() => {
     return {
@@ -101,14 +109,14 @@ function ContentView() {
   }, [height]);
 
   const charts = useMemo(() => {
-    if (filterOptionsAndHits.massSpecFilterOptions) {
-      const keys = Object.keys(
-        filterOptionsAndHits.massSpecFilterOptions,
-      ).filter((key) => key !== 'metadata');
+    if (massSpecFilterOptions) {
+      const keys = Object.keys(massSpecFilterOptions).filter(
+        (key) => key !== 'metadata',
+      );
       const _charts = keys.map((key) => (
         <ContentChart
           key={'chart_' + key}
-          content={filterOptionsAndHits.massSpecFilterOptions}
+          content={massSpecFilterOptions}
           identifier={key}
           width={width / keys.length}
           height={heights.chartPanelHeight}
@@ -144,11 +152,7 @@ function ContentView() {
         child={'Could not render charts'}
       />
     );
-  }, [
-    filterOptionsAndHits.massSpecFilterOptions,
-    heights.chartPanelHeight,
-    width,
-  ]);
+  }, [heights.chartPanelHeight, massSpecFilterOptions, width]);
 
   const handleOnCollapse = useCallback((_collapsed: boolean) => {
     setIsCollapsed(_collapsed);
@@ -158,11 +162,11 @@ function ContentView() {
     const searchPanel = (
       <CommonSearchPanel
         items={MassSpecFilterOptionsMenuItems({
-          massSpecFilterOptions: filterOptionsAndHits.massSpecFilterOptions,
+          massSpecFilterOptions,
         })}
         collapsed={isCollapsed}
         onCollapse={handleOnCollapse}
-        massSpecFilterOptions={filterOptionsAndHits.massSpecFilterOptions}
+        massSpecFilterOptions={massSpecFilterOptions}
         onSubmit={handleOnSubmit}
         width={searchPanelWidth}
         height={heights.searchPanelHeight}
@@ -179,12 +183,12 @@ function ContentView() {
         widthOverview={width}
         heightOverview={height}
         reference={[]}
-        hits={filterOptionsAndHits.hits}
+        hits={hits}
+        isRequesting={isSearching}
       />
     );
   }, [
-    filterOptionsAndHits.massSpecFilterOptions,
-    filterOptionsAndHits.hits,
+    massSpecFilterOptions,
     isCollapsed,
     handleOnCollapse,
     handleOnSubmit,
@@ -192,6 +196,8 @@ function ContentView() {
     heights.searchPanelHeight,
     width,
     height,
+    hits,
+    isSearching,
   ]);
 
   return useMemo(
@@ -202,17 +208,16 @@ function ContentView() {
           width: '100%',
           height: '100%',
           display: 'flex',
-          flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
         }}
       >
-        <Spin size="large" spinning={isRequesting} />
+        <Spin size="large" spinning={isFetchingContent} />
         <Content
           style={{
             width: '100%',
             height: '100%',
-            display: isRequesting ? 'none' : 'flex',
+            display: isFetchingContent ? 'none' : 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
@@ -223,7 +228,7 @@ function ContentView() {
         </Content>
       </Layout>
     ),
-    [charts, isRequesting, searchAndResultPanel],
+    [charts, isFetchingContent, searchAndResultPanel],
   );
 }
 

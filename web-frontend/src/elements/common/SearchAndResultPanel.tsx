@@ -6,6 +6,7 @@ import resultTableSortOptionValues from '../../constants/resultTableSortOptionVa
 import ResultPanel from '../result/ResultPanel';
 import Hit from '../../types/Hit';
 import Peak from '../../types/peak/Peak';
+import { Spin } from 'antd';
 
 type InputProps = {
   searchPanel: JSX.Element;
@@ -17,6 +18,7 @@ type InputProps = {
   heightOverview: number;
   reference: Peak[];
   hits: Hit[];
+  isRequesting: boolean;
 };
 
 function SearchAndResultPanel({
@@ -29,6 +31,7 @@ function SearchAndResultPanel({
   heightOverview,
   reference,
   hits,
+  isRequesting,
 }: InputProps) {
   const [innerHits, setInnerHits] = useState<Hit[]>([]);
 
@@ -152,11 +155,22 @@ function SearchAndResultPanel({
             alignItems: 'center',
           }}
         >
-          {resultPanel}
+          <Spin size="large" spinning={isRequesting} />
+          <Content
+            style={{
+              width: width - searchPanelWidth,
+              height: '100%',
+              display: isRequesting ? 'none' : 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            {resultPanel}
+          </Content>
         </Content>
       </Content>
     ),
-    [height, resultPanel, searchPanel, searchPanelWidth, width],
+    [height, isRequesting, resultPanel, searchPanel, searchPanelWidth, width],
   );
 }
 
