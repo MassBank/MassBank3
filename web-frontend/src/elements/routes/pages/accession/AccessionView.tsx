@@ -135,7 +135,7 @@ function AccessionView() {
             children="Search"
             onClick={handleOnClick}
             disabled={accession.trim() === ''}
-            style={{ width: 100 }}
+            style={{ width: 100, marginLeft: 20 }}
           />
         </Header>
         <Content
