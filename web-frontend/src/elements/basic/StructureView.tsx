@@ -1,6 +1,6 @@
 import { Content } from 'antd/es/layout/layout';
 import { useMemo } from 'react';
-import { SmilesSvgRenderer } from 'react-ocl';
+import { SmilesSvgRenderer } from 'react-ocl/minimal';
 
 interface InputProps {
   smiles: string;
