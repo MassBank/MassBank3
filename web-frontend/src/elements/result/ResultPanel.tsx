@@ -208,9 +208,8 @@ function ResultPanel({
   const handleOnDownloadResult = useCallback(
     async (format: string) => {
       setIsRequesting(true);
-      const host = import.meta.env.VITE_EXPORT_SERVICE_HOST;
-      const port = import.meta.env.VITE_EXPORT_SERVICE_PORT;
-      const url = `http://${host}:${port}/convert`;
+      const host = import.meta.env.EXPORT_SERVICE_URL;
+      const url = `${host}/convert`;
 
       const resp = await axios.post(
         url,
