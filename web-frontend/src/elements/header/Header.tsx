@@ -53,7 +53,11 @@ function Header() {
           >
             <Link
               to={route.path}
-              style={route.path == location.pathname ? { color: 'blue' } : {}}
+              style={
+                route.path == location.pathname
+                  ? { color: 'blue', fontSize: 16 }
+                  : { fontSize: 16 }
+              }
             >
               {route.label}
             </Link>

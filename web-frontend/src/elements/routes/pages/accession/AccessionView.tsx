@@ -1,34 +1,21 @@
-import {
-  ChangeEvent,
-  KeyboardEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import RecordView from '../../../record/RecordView';
 import generateID from '../../../../utils/generateID';
 import Record from '../../../../types/Record';
-import {
-  createSearchParams,
-  useNavigate,
-  useSearchParams,
-} from 'react-router-dom';
-import routes from '../../../../constants/routes';
+import { useSearchParams } from 'react-router-dom';
 import fetchData from '../../../../utils/fetchData';
-import { Button, Input, Layout, Spin } from 'antd';
+import { Layout, Spin } from 'antd';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
-import { Content, Header } from 'antd/es/layout/layout';
+import { Content } from 'antd/es/layout/layout';
+import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
 
 function AccessionView() {
   const ref = useRef(null);
   const { height } = useContainerDimensions(ref);
-  const navigate = useNavigate();
+
   const [searchParams] = useSearchParams();
 
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
-  const [accession, setAccession] = useState<string>('');
   const [requestedAccession, setRequestedAccession] = useState<string>('');
   const [record, setRecord] = useState<Record | undefined>();
 
@@ -60,15 +47,6 @@ function AccessionView() {
     setIsRequesting(false);
   }, []);
 
-  const handleOnClick = useCallback(
-    () =>
-      navigate({
-        pathname: routes.accession.path,
-        search: `?${createSearchParams({ id: accession })}`,
-      }),
-    [accession, navigate],
-  );
-
   const recordView = useMemo(
     () =>
       record ? (
@@ -84,60 +62,16 @@ function AccessionView() {
   useEffect(() => {
     const id = searchParams.get('id');
     if (id) {
-      setAccession(id);
       handleOnSearch(id);
     }
   }, [handleOnSearch, searchParams]);
-
-  const handleOnChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    setAccession(e.target.value.trim());
-  }, []);
-
-  const handleOnKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter') {
-        handleOnClick();
-      }
-    },
-    [handleOnClick],
-  );
 
   const headerHeight = 50;
 
   return useMemo(
     () => (
       <Layout ref={ref} style={{ width: '100%', height: '100%' }}>
-        <Header
-          style={{
-            width: '100%',
-            height: headerHeight,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'center',
-            backgroundColor: 'beige',
-          }}
-        >
-          <Input
-            type="text"
-            placeholder="e.g. MSBNK-AAFC-AC000114"
-            value={accession && accession !== '' ? accession : undefined}
-            addonBefore="Go to accession:"
-            onChange={handleOnChange}
-            onKeyDown={handleOnKeyDown}
-            allowClear
-            style={{ width: 500 }}
-          />
-          <Button
-            children="Search"
-            onClick={handleOnClick}
-            disabled={accession.trim() === ''}
-            style={{ width: 100, marginLeft: 20 }}
-          />
-        </Header>
+        <AccessionSearchInputField width="100%" height={headerHeight} />
         <Content
           style={{
             width: '100%',
@@ -152,15 +86,7 @@ function AccessionView() {
       </Layout>
     ),
 
-    [
-      accession,
-      handleOnChange,
-      handleOnClick,
-      handleOnKeyDown,
-      height,
-      isRequesting,
-      recordView,
-    ],
+    [height, isRequesting, recordView],
   );
 }
 

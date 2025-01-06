@@ -1,8 +1,50 @@
+import Layout, { Content } from 'antd/es/layout/layout';
+import { useRef } from 'react';
+import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
+import useContainerDimensions from '../../../../utils/useContainerDimensions';
+
+const accessionSearchInputFieldHeight = 50;
+
 function HomeView() {
+  const ref = useRef(null);
+  const { height } = useContainerDimensions(ref);
+
   return (
-    <div>
-      <h2>Home View</h2>
-    </div>
+    <Layout
+      ref={ref}
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <AccessionSearchInputField
+        width="100%"
+        height={accessionSearchInputFieldHeight}
+      />
+      <Content
+        style={{
+          width: '100%',
+          height: height - accessionSearchInputFieldHeight,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <p style={{ fontWeight: 'bold', fontSize: 18 }}>
+          Welcome to MassBank Europe!
+        </p>
+        <p style={{ textAlign: 'center' }}>
+          MassBank is a community effort and you are invited to contribute.
+          Please refer to our contributor documentation and get in touch via
+          github or email.
+        </p>
+      </Content>
+    </Layout>
   );
 }
 
