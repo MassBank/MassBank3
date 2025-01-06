@@ -4,6 +4,8 @@ interface ImportMetaEnv {
   readonly VITE_MB3_API_URL: string;
   readonly VITE_MB3_FRONTEND_URL: string;
   readonly VITE_MB3_BASE_URL: string;
+  readonly VITE_MB3_VERSION: string;
+  readonly VITE_EXPORT_SERVICE_URL: string;
 }
 
 // eslint-disable-next-line no-unused-vars
