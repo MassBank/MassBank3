@@ -8,16 +8,7 @@ import { Header as HeaderAntD } from 'antd/es/layout/layout';
 function Header() {
   const location = useLocation();
 
-  const url =
-    import.meta.env.VITE_MB3_FRONTEND_URL + import.meta.env.VITE_MB3_BASE_URL;
-
-  console.log(
-    import.meta.env.VITE_MB3_FRONTEND_URL,
-    ' + ',
-    import.meta.env.VITE_MB3_BASE_URL,
-    ' -> ',
-    url,
-  );
+  const url = import.meta.env.VITE_MB3_BASE_URL;
 
   type MenuItem = Required<MenuProps>['items'][number];
 
