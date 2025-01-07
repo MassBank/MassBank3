@@ -35,9 +35,7 @@ function HomeView() {
           alignItems: 'center',
         }}
       >
-        <p style={{ fontWeight: 'bold', fontSize: 18 }}>
-          Welcome to MassBank Europe!
-        </p>
+        <p style={{ fontWeight: 'bold', fontSize: 18 }}>Welcome to MassBank!</p>
         <p style={{ textAlign: 'center' }}>
           MassBank is a community effort and you are invited to contribute.
           Please refer to our contributor documentation and get in touch via

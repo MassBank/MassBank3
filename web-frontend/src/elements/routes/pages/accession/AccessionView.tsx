@@ -12,9 +12,9 @@ import AccessionSearchInputField from '../../../common/AccessionSearchInputField
 function AccessionView() {
   const ref = useRef(null);
   const { height } = useContainerDimensions(ref);
-
   const [searchParams] = useSearchParams();
 
+  const [accession, setAccession] = useState<string>('');
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [requestedAccession, setRequestedAccession] = useState<string>('');
   const [record, setRecord] = useState<Record | undefined>();
@@ -62,6 +62,7 @@ function AccessionView() {
   useEffect(() => {
     const id = searchParams.get('id');
     if (id) {
+      setAccession(id);
       handleOnSearch(id);
     }
   }, [handleOnSearch, searchParams]);
@@ -71,7 +72,11 @@ function AccessionView() {
   return useMemo(
     () => (
       <Layout ref={ref} style={{ width: '100%', height: '100%' }}>
-        <AccessionSearchInputField width="100%" height={headerHeight} />
+        <AccessionSearchInputField
+          width="100%"
+          height={headerHeight}
+          accession={accession}
+        />
         <Content
           style={{
             width: '100%',
@@ -86,7 +91,7 @@ function AccessionView() {
       </Layout>
     ),
 
-    [height, isRequesting, recordView],
+    [accession, height, isRequesting, recordView],
   );
 }
 
