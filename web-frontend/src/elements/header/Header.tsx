@@ -11,6 +11,14 @@ function Header() {
   const url =
     import.meta.env.VITE_MB3_FRONTEND_URL + import.meta.env.VITE_MB3_BASE_URL;
 
+  console.log(
+    import.meta.env.VITE_MB3_FRONTEND_URL,
+    ' + ',
+    import.meta.env.VITE_MB3_BASE_URL,
+    ' -> ',
+    url,
+  );
+
   type MenuItem = Required<MenuProps>['items'][number];
 
   const logoLink: MenuItem = {
