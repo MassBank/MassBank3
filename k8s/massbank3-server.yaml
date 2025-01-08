@@ -35,7 +35,7 @@ spec:
       containers:
         - name: massbank3-server
           image: ipbhalle/massbank3-server:dev  # Container Image
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           envFrom:
             - configMapRef:
                 name: massbank3-server-secret

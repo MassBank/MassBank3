@@ -7,7 +7,7 @@ metadata:
     app: massbank3-frontend
 data:
   MB3_API_URL: "https://msbi.ipb-halle.de/MassBank3-api/"
-  MB3_FRONTEND_URL: "https://msbi.ipb-halle.de/"
+  MB3_FRONTEND_URL: "https://msbi.ipb-halle.de"
   MB3_FRONTEND_BASE_URL: "/MassBank3/"
   EXPORT_SERVICE_URL: "https://msbi.ipb-halle.de/MassBank3-export/"
 ---
@@ -31,6 +31,7 @@ spec:
       containers:
         - name: massbank3-frontend
           image: ipbhalle/massbank3-frontend:dev # Container Image
+          imagePullPolicy: Always
           envFrom:
             - configMapRef:
                 name:
