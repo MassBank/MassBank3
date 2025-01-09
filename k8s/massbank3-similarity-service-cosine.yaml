@@ -28,8 +28,7 @@ spec:
     spec:
       containers:
         - name: massbank3-similarity-service-cosine
-          image: quay.io/massbank/massbank3-similarity-service:latest # Container Image
-          imagePullPolicy: Always
+          image: quay.io/massbank/massbank3-similarity-service:v1.0-matchms-0.28.2 # Container Image
           envFrom:
             - configMapRef:
                 name:

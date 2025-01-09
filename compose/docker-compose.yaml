@@ -58,7 +58,7 @@ services:
       - "${MSP_LOCAL_PATH}${MSP}:${MSP}"
 
   export-service:
-    image: quay.io/massbank/massbank3-export-service:dev
+    image: quay.io/massbank/massbank3-export-service:latest
     restart: always
     ports:
       - "${EXPORT_SERVICE_PORT}:8080"
