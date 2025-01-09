@@ -56,13 +56,6 @@ func main() {
 			}
 		}
 		println("Start updating database...")
-
-		// println("Removing indexes...")
-		// err = db.RemoveIndexes()
-		// if err != nil {
-		// 	println("Could not remove indexes: " + err.Error())
-		// 	panic(err)
-		// }
 		println("Updating metadata...")
 		metaId, err := db.UpdateMetadata(versionData)
 		if err != nil {
@@ -96,6 +89,12 @@ func main() {
 	} else {
 		println("Database initialisation was skipped.")
 	}
+
+	fmt.Println("Disconnecting to database...")
+	if err = db.Disconnect(); err != nil {
+		panic(err)
+	}
+	fmt.Println("Done.")
 }
 
 func readDirectoryData(dir string) ([]*massbank.MassBank2, *massbank.MbMetaData, error) {

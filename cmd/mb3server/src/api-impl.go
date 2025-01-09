@@ -647,29 +647,6 @@ func getEnv(name string, fallback string) string {
 	return fallback
 }
 
-// func FilterBySubstructure(substructure string) (*SearchResult, error) {
-// 	if err := initDB(); err != nil {
-// 		return nil, err
-// 	}
-
-// 	result := SearchResult{}
-// 	result.Data = []SearchResultDataInner{}
-
-// 	records, err := db.GetRecordsBySubstructure(substructure)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	for _, record := range *records {
-// 		searchResultData := SearchResultDataInner{
-// 			Record: *buildSimpleMbRecord(&record),
-// 		}
-// 		result.Data = append(result.Data, searchResultData)
-// 	}
-
-// 	return &result, nil
-// }
-
 func GetSimilarity(peakList []string, referenceSpectraList []string, limit int32, threshold float64) (*SimilaritySearchResult, error) {
 	sort.Slice(peakList, func(i, j int) bool {
 		split1 := strings.Split(peakList[i], ";")
