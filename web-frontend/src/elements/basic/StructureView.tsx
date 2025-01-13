@@ -1,8 +1,8 @@
-import { message } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import { Molecule } from 'openchemlib';
 import { MouseEvent, useCallback, useMemo } from 'react';
 import { SmilesSvgRenderer } from 'react-ocl/minimal';
+import copyTextToClipboard from '../../utils/copyTextToClipboard';
 
 interface InputProps {
   smiles: string;
@@ -17,7 +17,7 @@ function StructureView({ smiles, imageWidth, imageHeight }: InputProps) {
       e.stopPropagation();
 
       const mol = Molecule.fromSmiles(smiles);
-      const svg = mol.toSVG(imageWidth, imageHeight, undefined, {
+      const svgString = mol.toSVG(imageWidth, imageHeight, undefined, {
         autoCrop: true,
         autoCropMargin: 5,
         suppressChiralText: true,
@@ -25,12 +25,7 @@ function StructureView({ smiles, imageWidth, imageHeight }: InputProps) {
         suppressESR: true,
       });
 
-      try {
-        await navigator.clipboard.writeText(svg);
-        message.success('Copied molecule SVG string to clipboard');
-      } catch (error) {
-        message.error('Failed to copy molecule SVG string to clipboard');
-      }
+      copyTextToClipboard('Structure SVG String', svgString);
     },
     [imageHeight, imageWidth, smiles],
   );
