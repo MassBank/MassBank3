@@ -15,30 +15,38 @@ import getLinkedAnnotations from '../../utils/getLinkedAnnotations';
 import LinkedPeakAnnotation from '../../types/peak/LinkedPeakAnnotation';
 import { Content } from 'antd/es/layout/layout';
 import Placeholder from '../basic/Placeholder';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
 
-const sidebarWidth = 10;
-const defaultChartWidthRatio = 0.75;
+const sidebarWidth = 7;
 
 type InputProps = {
   record: Record;
   record2?: Record;
   width: number;
   height: number;
+  minPeakTableWith?: number;
 };
 
-function Resizable({ record, record2, width, height }: InputProps) {
+function Resizable({
+  record,
+  record2,
+  width,
+  height,
+  minPeakTableWith = 300,
+}: InputProps) {
   const ref = useRef(null);
-  const [isResizing, setIsResizing] = useState(false);
-
-  const [chartWidth, setChartWidth] = useState(0);
-  const [peakTableWidth, setPeakTableWidth] = useState(0);
+  const [isResizing, setIsResizing] = useState<boolean>(false);
+  const [isHoveringSidebar, setIsHoveringSidebar] = useState<boolean>(false);
+  const [chartWidth, setChartWidth] = useState<number>(0);
+  const [peakTableWidth, setPeakTableWidth] = useState<number>(0);
 
   useEffect(() => {
-    const _chartWidth = width * defaultChartWidthRatio - sidebarWidth;
+    const _chartWidth = width - minPeakTableWith - sidebarWidth;
     setChartWidth(_chartWidth);
     const _peakTableWidth = width - _chartWidth - sidebarWidth;
     setPeakTableWidth(_peakTableWidth);
-  }, [width]);
+  }, [minPeakTableWith, width]);
 
   const [filteredPeakData, setFilteredPeakData] = useState<Peak[]>(
     record.peak.peak.values,
@@ -118,12 +126,14 @@ function Resizable({ record, record2, width, height }: InputProps) {
         ).getBoundingClientRect();
 
         const _chartWidth = e.clientX - rect.left - sidebarWidth;
-
-        setChartWidth(_chartWidth);
-        setPeakTableWidth(width - _chartWidth);
+        const _peaktTableWith = width - _chartWidth;
+        if (_peaktTableWith >= minPeakTableWith) {
+          setChartWidth(_chartWidth);
+          setPeakTableWidth(width - _chartWidth);
+        }
       }
     },
-    [isResizing, width],
+    [isResizing, minPeakTableWith, width],
   );
 
   const chart = useMemo(
@@ -139,24 +149,52 @@ function Resizable({ record, record2, width, height }: InputProps) {
     [chartWidth, handleOnZoom, height, record.peak.peak.values, record2],
   );
 
+  const handleOnMouseEnter = useCallback((e: MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setIsHoveringSidebar(true);
+  }, []);
+
+  const handleOnMouseLeave = useCallback((e: MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setIsHoveringSidebar(false);
+  }, []);
+
   const sidebar = useMemo(
     () => (
       <Content
         style={{
-          backgroundColor: isResizing ? 'lightskyblue' : 'lightgrey',
+          backgroundColor:
+            isHoveringSidebar || isResizing ? 'lightskyblue' : 'lightgrey',
         }}
+        onMouseEnter={handleOnMouseEnter}
+        onMouseLeave={handleOnMouseLeave}
+        title="Press Shift, click and move to resize the chart and peak table"
       >
         <Placeholder
-          child={''}
+          child={<FontAwesomeIcon icon={faEllipsis} />}
           style={{
             width: sidebarWidth,
             height,
-            visibility: 'hidden',
+            fontSize: 16,
+            rotate: '90deg',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         />
       </Content>
     ),
-    [height, isResizing],
+    [
+      handleOnMouseEnter,
+      handleOnMouseLeave,
+      height,
+      isHoveringSidebar,
+      isResizing,
+    ],
   );
 
   const peakTable = useMemo(
@@ -210,6 +248,7 @@ function Resizable({ record, record2, width, height }: InputProps) {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
+          backgroundColor: 'white',
         }}
         onMouseDown={startResizing}
         onMouseMove={resize}

@@ -1,58 +1,51 @@
-import './AnnotationTable.scss';
-
-import { useMemo } from 'react';
+import { CSSProperties, useMemo } from 'react';
 import PeakAnnotation from '../../types/peak/PeakAnnotation';
+import { Table } from 'antd';
 
 type InputProps = {
-  annotation: PeakAnnotation;
-  width?: number | string;
-  height?: number | string;
+  annotation: PeakAnnotation | undefined;
+  width: CSSProperties['width'];
+  height: CSSProperties['height'];
 };
 
-function AnnotationTable({
-  annotation,
-  width = '100%',
-  height = 400,
-}: InputProps) {
-  const annotationTable = useMemo(() => {
-    const numHeaders = annotation.header.length;
-    const numPeaks = annotation.values[0].length;
+function AnnotationTable({ annotation, width, height }: InputProps) {
+  return useMemo(() => {
+    if (!annotation || !annotation.header || !annotation.values) {
+      return null;
+    }
 
-    const headerContent = (
-      <tr key={'anno-header'}>
-        {annotation.header.map((h) => (
-          <th key={'anno-header-' + h}>{h.split('_').join(' ')}</th>
-        ))}
-      </tr>
-    );
+    const columns = annotation.header.map((h) => {
+      return {
+        title: h.split('_').join(' '),
+        dataIndex: h,
+        key: h,
+        align: 'center' as const,
+      };
+    });
 
-    const bodyContent: JSX.Element[] = [];
-    for (let i = 0; i < numPeaks; i++) {
-      const rows: JSX.Element[] = [];
-      for (let h = 0; h < numHeaders; h++) {
-        rows.push(
-          <td key={'anno-row-' + i + '-' + h}>{annotation.values[h][i]}</td>,
-        );
-      }
-      bodyContent.push(<tr key={'anno-row-' + i}>{rows}</tr>);
+    const dataSource: { [key: string]: string }[] = [];
+    const nValues = annotation.values[0].length;
+    for (let i = 0; i < nValues; i++) {
+      const row: { [key: string]: string } = {};
+      let key = 'key-';
+      annotation?.header.forEach((h, j) => {
+        row[h] = annotation.values[j][i];
+        key += annotation.values[j][i];
+      });
+      row.key = key;
+      dataSource.push(row);
     }
 
     return (
-      <table>
-        <thead>{headerContent}</thead>
-        <tbody>
-          {bodyContent}
-          <tr className="auto-height" />
-        </tbody>
-      </table>
+      <Table
+        style={{ width, height }}
+        sticky
+        columns={columns}
+        dataSource={dataSource}
+        pagination={false}
+      />
     );
-  }, [annotation]);
-
-  return (
-    <div className="annotation-table" style={{ width, height }}>
-      {annotationTable}
-    </div>
-  );
+  }, [annotation, height, width]);
 }
 
 export default AnnotationTable;

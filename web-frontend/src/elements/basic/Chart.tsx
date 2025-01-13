@@ -4,6 +4,9 @@ import ChartElement from './ChartElement';
 import Peak from '../../types/peak/Peak';
 import { Button } from 'antd';
 import { Content } from 'antd/es/layout/layout';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCopy, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import copyTextToClipboard from '../../utils/copyTextToClipboard';
 
 type InputProps = {
   peakData: Peak[];
@@ -423,9 +426,19 @@ function Chart({
 
       // @ts-ignore
       svg.select('.brush').call(brush).call(brush.move, undefined);
+      // @ts-ignore
       svg.on('dblclick', handleDoubleClick);
     }
   }, [brushXDomains, disableZoom, handleDoubleClick, height, width, xScale]);
+
+  const handleOnDownload = useCallback(async () => {
+    const svg = svgRef.current;
+    if (svg) {
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(svg);
+      copyTextToClipboard('Spectrum SVG String', svgString);
+    }
+  }, []);
 
   return useMemo(
     () => (
@@ -484,12 +497,26 @@ function Chart({
               }}
             >
               <Button
-                children={isShowLabel ? 'Hide Labels' : 'Show Labels'}
+                children={
+                  <FontAwesomeIcon
+                    icon={isShowLabel ? faEye : faEyeSlash}
+                    title={
+                      isShowLabel ? 'Hide peak labels' : 'Show peak labels'
+                    }
+                  />
+                }
                 onClick={() => setIsShowLabel(!isShowLabel)}
-                style={{
-                  border: '1px solid black',
-                  width: 100,
-                }}
+                style={{ width: 20, border: 'none' }}
+              />
+              <Button
+                children={
+                  <FontAwesomeIcon
+                    icon={faCopy}
+                    title="Copy spectrum SVG string to clipboard"
+                  />
+                }
+                onClick={handleOnDownload}
+                style={{ width: 20, border: 'none' }}
               />
             </Content>
             <Content
@@ -527,6 +554,7 @@ function Chart({
       disableZoom,
       filteredPeakData.length,
       filteredPeakData2,
+      handleOnDownload,
       height,
       isShowLabel,
       peakData.length,
