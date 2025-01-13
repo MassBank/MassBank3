@@ -8,8 +8,8 @@ type InputProps = {
   hit: Hit;
   width: number;
   height: number;
-  imageWidth?: number;
-  imageHeight?: number;
+  imageWidth: number;
+  imageHeight: number;
 };
 
 function ResultInfo({

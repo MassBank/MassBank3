@@ -1,4 +1,4 @@
-import Layout, { Content } from 'antd/es/layout/layout';
+import Layout, { Content, Header } from 'antd/es/layout/layout';
 import { useRef } from 'react';
 import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
@@ -21,10 +21,18 @@ function HomeView() {
         justifyContent: 'center',
       }}
     >
-      <AccessionSearchInputField
-        width="100%"
-        height={accessionSearchInputFieldHeight}
-      />
+      <Header
+        style={{
+          width: '100%',
+          height: accessionSearchInputFieldHeight,
+          padding: 0,
+        }}
+      >
+        <AccessionSearchInputField
+          width="100%"
+          height={accessionSearchInputFieldHeight}
+        />
+      </Header>
       <Content
         style={{
           width: '100%',

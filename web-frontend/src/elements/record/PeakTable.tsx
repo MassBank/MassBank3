@@ -1,12 +1,16 @@
 import './PeakTable.scss';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import Peak from '../../types/peak/Peak';
 import LinkedPeakAnnotation from '../../types/peak/LinkedPeakAnnotation';
 import PeakAnnotation from '../../types/peak/PeakAnnotation';
 import { Table } from 'antd';
 import PeakTableDataType from '../../types/PeakTableDataType';
 import { useHighlightData } from '../../highlight/Index';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCopy } from '@fortawesome/free-solid-svg-icons';
+import { Content } from 'antd/es/layout/layout';
+import copyTextToClipboard from '../../utils/copyTextToClipboard';
 
 const columns = [
   {
@@ -49,6 +53,17 @@ function PeakTable({ peaks, width, height }: InputProps) {
       setActiveKey(undefined);
     }
   }, [activeKey, highlightData.highlight.highlighted, peaks]);
+
+  const handleOnCopy = useCallback(
+    (e: MouseEvent<SVGElement>) => {
+      e.stopPropagation();
+      const text = peaks
+        .map((p) => `${p.mz} ${p.intensity} ${p.rel}`)
+        .join('\n');
+      copyTextToClipboard('Peak List', text);
+    },
+    [peaks],
+  );
 
   const dataSource = useMemo(
     () =>
@@ -94,6 +109,23 @@ function PeakTable({ peaks, width, height }: InputProps) {
         columns={columns}
         dataSource={dataSource}
         pagination={false}
+        footer={() => (
+          <Content
+            style={{
+              width: '100%',
+              height: 20,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faCopy}
+              style={{ cursor: 'pointer', height: 16 }}
+              onClick={handleOnCopy}
+            />
+          </Content>
+        )}
         onRow={(record) => {
           return {
             onMouseEnter: () => handleOnMouseEnter(record.key.toString()),
@@ -108,6 +140,7 @@ function PeakTable({ peaks, width, height }: InputProps) {
     [
       activeKey,
       dataSource,
+      handleOnCopy,
       handleOnMouseEnter,
       handleOnMouseLeave,
       height,
