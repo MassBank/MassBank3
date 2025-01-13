@@ -6,18 +6,20 @@ import { useSearchParams } from 'react-router-dom';
 import fetchData from '../../../../utils/fetchData';
 import { Layout, Spin } from 'antd';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
-import { Content } from 'antd/es/layout/layout';
+import { Content, Header } from 'antd/es/layout/layout';
 import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
 
 function AccessionView() {
   const ref = useRef(null);
-  const { height } = useContainerDimensions(ref);
+  const { width, height } = useContainerDimensions(ref);
   const [searchParams] = useSearchParams();
 
   const [accession, setAccession] = useState<string>('');
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [requestedAccession, setRequestedAccession] = useState<string>('');
   const [record, setRecord] = useState<Record | undefined>();
+
+  const headerHeight = 50;
 
   async function getRecord(id: string) {
     const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/' + id;
@@ -29,8 +31,6 @@ function AccessionView() {
     setRequestedAccession(id);
 
     const rec: Record | undefined = await getRecord(id);
-    console.log(rec);
-
     if (rec && typeof rec === 'object') {
       rec.peak.peak.values = rec.peak.peak.values.map((p) => {
         const _p = p;
@@ -50,13 +50,17 @@ function AccessionView() {
   const recordView = useMemo(
     () =>
       record ? (
-        <RecordView record={record} />
+        <RecordView
+          record={record}
+          width={width}
+          height={height - headerHeight}
+        />
       ) : requestedAccession !== '' ? (
         <p style={{ fontWeight: 'bolder', fontSize: 'larger' }}>
           No database entry found for "{requestedAccession}"
         </p>
       ) : undefined,
-    [requestedAccession, record],
+    [record, width, height, requestedAccession],
   );
 
   useEffect(() => {
@@ -67,16 +71,16 @@ function AccessionView() {
     }
   }, [handleOnSearch, searchParams]);
 
-  const headerHeight = 50;
-
   return useMemo(
     () => (
       <Layout ref={ref} style={{ width: '100%', height: '100%' }}>
-        <AccessionSearchInputField
-          width="100%"
-          height={headerHeight}
-          accession={accession}
-        />
+        <Header style={{ width: '100%', height: headerHeight, padding: 0 }}>
+          <AccessionSearchInputField
+            width="100%"
+            height={headerHeight}
+            accession={accession}
+          />
+        </Header>
         <Content
           style={{
             width: '100%',

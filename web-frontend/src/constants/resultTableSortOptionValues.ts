@@ -1,6 +1,6 @@
 const resultTableSortOptionValues = {
-  index: 'Index',
   accession: 'Accession',
+  title: 'Title',
   score: 'Score',
 };
 

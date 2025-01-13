@@ -1,5 +1,5 @@
 import { Button, Input } from 'antd';
-import { Content, Header } from 'antd/es/layout/layout';
+import { Content } from 'antd/es/layout/layout';
 import {
   ChangeEvent,
   CSSProperties,
@@ -55,35 +55,32 @@ function AccessionSearchInputField({
   );
 
   return (
-    <Content style={{ width, height }}>
-      <Header
-        style={{
-          width,
-          height,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          textAlign: 'center',
-          backgroundColor: 'beige',
-        }}
-      >
-        <Input
-          type="text"
-          placeholder="e.g. MSBNK-AAFC-AC000114"
-          value={accession && accession !== '' ? accession : undefined}
-          addonBefore="Go to accession:"
-          onChange={handleOnChange}
-          onKeyDown={handleOnKeyDown}
-          allowClear
-          style={{ width: 500 }}
-        />
-        <Button
-          children="Search"
-          onClick={handleOnClick}
-          disabled={accession.trim() === ''}
-          style={{ width: 100, marginLeft: 20 }}
-        />
-      </Header>
+    <Content
+      style={{
+        width,
+        height,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f3ece0',
+      }}
+    >
+      <Input
+        type="text"
+        placeholder="e.g. MSBNK-AAFC-AC000114"
+        value={accession && accession !== '' ? accession : undefined}
+        addonBefore="Go to accession:"
+        onChange={handleOnChange}
+        onKeyDown={handleOnKeyDown}
+        allowClear
+        style={{ width: 500 }}
+      />
+      <Button
+        children="Search"
+        onClick={handleOnClick}
+        disabled={accession.trim() === ''}
+        style={{ width: 100, marginLeft: 20 }}
+      />
     </Content>
   );
 }

@@ -151,7 +151,7 @@ function CommonSearchPanel({
                   height: submitButtonHeight,
                 }}
               >
-                Submit
+                Search
               </Button>
             </Content>
           </Form>

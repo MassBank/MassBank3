@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -590,6 +591,36 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 				result.Peak.Peak.Mz = append(result.Peak.Peak.Mz, mz)
 				result.Peak.Peak.Intensity = append(result.Peak.Peak.Intensity, intensity)
 				result.Peak.Peak.Rel = append(result.Peak.Peak.Rel, rel)
+			}
+			rows.Close()
+		} else {
+			return nil, err
+		}	
+
+		query = "SELECT subtag, value FROM peak_annotation WHERE spectrum_id = $1;"
+		stmt, err = p.database.Prepare(query)		
+		if err != nil {
+			return nil, err
+		}
+		rows, err = stmt.Query(spectrumId)
+		stmt.Close()
+		if err == nil {
+			result.Peak.Annotation = &massbank.PkAnnotation{}
+			result.Peak.Annotation.Header = []string{}
+			result.Peak.Annotation.Values = map[string][]interface{}{}		
+			for rows.Next() {
+				var subtag string
+				var value string
+				if err := rows.Scan(&subtag, &value); err != nil {
+					return nil, err
+				}
+				if !slices.Contains(result.Peak.Annotation.Header, subtag) {
+					result.Peak.Annotation.Header = append(result.Peak.Annotation.Header, subtag)
+				}
+				if _, ok := result.Peak.Annotation.Values[subtag]; !ok {
+					result.Peak.Annotation.Values[subtag] = []interface{}{}
+				}
+				result.Peak.Annotation.Values[subtag] = append(result.Peak.Annotation.Values[subtag], value)
 			}
 			rows.Close()
 		} else {
