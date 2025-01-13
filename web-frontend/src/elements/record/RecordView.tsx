@@ -561,7 +561,6 @@ function RecordView({ record, width, height }: inputProps) {
     record.compound.smiles,
     record.peak.splash,
     record.title,
-    copyTextToClipboard,
   ]);
 
   const spectrumAndPeakTable = useMemo(
