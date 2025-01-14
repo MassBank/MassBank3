@@ -32,7 +32,6 @@ function ResultLink({ hit, width = '100%', height = '100%' }: InputProps) {
           className="link"
           href={hit.accession && hit.accession !== '' ? url : '?'}
           target="_blank"
-          rel="noreferrer"
         >
           <FontAwesomeIcon icon={faExternalLink} title={hit.record.title} />
         </a>

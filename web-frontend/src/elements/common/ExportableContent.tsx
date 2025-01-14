@@ -1,8 +1,18 @@
-import { faCopy, faFileArrowDown } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCopy,
+  faFileArrowDown,
+  faMagnifyingGlass,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button } from 'antd';
 import { Content } from 'antd/es/layout/layout';
-import { CSSProperties, MouseEvent, useMemo, useState } from 'react';
+import {
+  CSSProperties,
+  MouseEvent,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 
 const defaultButtonWidth = 30;
 const defaultButtonHeight = 30;
@@ -10,23 +20,24 @@ const defaultButtonHeight = 30;
 interface InputProps {
   title: string;
   mode: 'copy' | 'download';
-  onClick: (
-    // eslint-disable-next-line no-unused-vars
-    e: MouseEvent<HTMLDivElement>,
-  ) => void;
-  width: CSSProperties['width'];
-  height: CSSProperties['height'];
+  onClick: () => void;
+  width?: CSSProperties['width'];
+  height?: CSSProperties['height'];
   component?: JSX.Element | string;
   componentStyle?: CSSProperties;
   buttonStyle?: CSSProperties;
+  permanentButton?: boolean;
+  enableSearch?: boolean;
+  searchUrl?: string;
+  searchTitle?: string;
 }
 
 function ExportableContent({
   title,
   mode,
   onClick,
-  width,
-  height,
+  width = '100%',
+  height = '100%',
   component,
   componentStyle = {},
   buttonStyle = {
@@ -35,8 +46,21 @@ function ExportableContent({
     minHeight: defaultButtonHeight,
     maxHeight: defaultButtonHeight,
   },
+  permanentButton = false,
+  enableSearch = false,
+  searchUrl = '',
+  searchTitle = '',
 }: InputProps) {
   const [showButton, setShowButton] = useState<boolean>(false);
+
+  const handleOnClick = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onClick();
+    },
+    [onClick],
+  );
 
   return useMemo(
     () => (
@@ -57,8 +81,12 @@ function ExportableContent({
           <Content
             style={{
               ...{
-                minWidth: `calc(${width} - ${buttonStyle.width}px)`,
-                maxWidth: `calc(${width} - ${buttonStyle.width}px)`,
+                minWidth: enableSearch
+                  ? `calc(${width} - ${buttonStyle.width}px - ${buttonStyle.width}px)`
+                  : `calc(${width} - ${buttonStyle.width}px)`,
+                maxWidth: enableSearch
+                  ? `calc(${width} - ${buttonStyle.width}px - ${buttonStyle.width}px)`
+                  : `calc(${width} - ${buttonStyle.width}px)`,
                 minHeight: height,
                 maxHeight: height,
                 display: 'flex',
@@ -74,10 +102,18 @@ function ExportableContent({
         <Content
           style={{
             ...{
-              minWidth: defaultButtonWidth,
-              maxWidth: defaultButtonWidth,
-              minHeight: defaultButtonHeight,
-              maxHeight: defaultButtonHeight,
+              minWidth: enableSearch
+                ? 2 * defaultButtonWidth
+                : defaultButtonWidth,
+              maxWidth: enableSearch
+                ? 2 * defaultButtonWidth
+                : defaultButtonWidth,
+              minHeight: enableSearch
+                ? 2 * defaultButtonHeight
+                : defaultButtonHeight,
+              maxHeight: enableSearch
+                ? 2 * defaultButtonHeight
+                : defaultButtonHeight,
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
@@ -87,22 +123,56 @@ function ExportableContent({
         >
           <Button
             children={
-              <FontAwesomeIcon
-                icon={mode === 'copy' ? faCopy : faFileArrowDown}
-                title={title}
-              />
+              <a>
+                <FontAwesomeIcon
+                  icon={mode === 'copy' ? faCopy : faFileArrowDown}
+                  title={title}
+                />
+              </a>
             }
-            onClick={onClick}
+            onClick={handleOnClick}
             style={{
-              width: '100%',
+              width: enableSearch ? '100%' : '50%',
               height: '100%',
               cursor: 'pointer',
               border: 'none',
               boxShadow: 'none',
               backgroundColor: 'transparent',
-              display: showButton ? undefined : 'none',
+              display: permanentButton
+                ? undefined
+                : showButton
+                  ? undefined
+                  : 'none',
             }}
           />
+          {enableSearch && (
+            <Button
+              children={
+                <a
+                  href={searchUrl && searchUrl !== '' ? searchUrl : '?'}
+                  target="_blank"
+                >
+                  <FontAwesomeIcon
+                    icon={faMagnifyingGlass}
+                    title={searchTitle}
+                  />
+                </a>
+              }
+              style={{
+                width: '50%',
+                height: '100%',
+                cursor: 'pointer',
+                border: 'none',
+                boxShadow: 'none',
+                backgroundColor: 'transparent',
+                display: permanentButton
+                  ? undefined
+                  : showButton
+                    ? undefined
+                    : 'none',
+              }}
+            />
+          )}
         </Content>
       </Content>
     ),
@@ -110,9 +180,13 @@ function ExportableContent({
       buttonStyle,
       component,
       componentStyle,
+      enableSearch,
+      handleOnClick,
       height,
       mode,
-      onClick,
+      permanentButton,
+      searchTitle,
+      searchUrl,
       showButton,
       title,
       width,

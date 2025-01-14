@@ -1,7 +1,7 @@
 import './RecordView.scss';
 
 import Record from '../../types/Record';
-import { CSSProperties, MouseEvent, useCallback, useMemo } from 'react';
+import { CSSProperties, useCallback, useMemo } from 'react';
 import StructureView from '../basic/StructureView';
 import Resizable from '../common/Resizable';
 import { Content } from 'antd/es/layout/layout';
@@ -10,6 +10,7 @@ import AnnotationTable from './AnnotationTable';
 import { Table } from 'antd';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
 import ExportableContent from '../common/ExportableContent';
+import routes from '../../constants/routes';
 
 type inputProps = {
   record: Record;
@@ -334,6 +335,17 @@ function RecordView({ record, width, height }: inputProps) {
     copyTextToClipboard(label, text);
   }, []);
 
+  const buildSearchUrl = useCallback((label: string, value: string) => {
+    const searchParams = new URLSearchParams();
+    searchParams.set(label, value);
+    const url =
+      import.meta.env.VITE_MB3_FRONTEND_URL +
+      routes.search.path +
+      `?${searchParams.toString()}`;
+
+    return url;
+  }, []);
+
   const header = useMemo(() => {
     type HeaderTableType = {
       key: string;
@@ -376,14 +388,13 @@ function RecordView({ record, width, height }: inputProps) {
               component={name}
               componentStyle={{ justifyContent: 'left' }}
               mode="copy"
-              onClick={(e: MouseEvent<HTMLDivElement>) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleOnCopy(`${i + 1}. compound name:`, name);
-              }}
+              onClick={() => handleOnCopy(`${i + 1}. compound name:`, name)}
               width="100%"
               height="100%"
               title="Copy compound name to clipboard"
+              enableSearch
+              searchTitle="Search for compound name"
+              searchUrl={buildSearchUrl('compound_name', name)}
             />
           ))}
         </Content>
@@ -397,14 +408,12 @@ function RecordView({ record, width, height }: inputProps) {
           component={record.authors.map((a) => a.name).join(', ')}
           componentStyle={{ justifyContent: 'left' }}
           mode="copy"
-          onClick={(e: MouseEvent<HTMLDivElement>) => {
-            e.preventDefault();
-            e.stopPropagation();
+          onClick={() =>
             handleOnCopy(
               'Authors',
               record.authors.map((a) => a.name).join(', '),
-            );
-          }}
+            )
+          }
           width="100%"
           height="100%"
           title="Copy authors to clipboard"
@@ -419,14 +428,13 @@ function RecordView({ record, width, height }: inputProps) {
           component={record.compound.smiles}
           componentStyle={{ justifyContent: 'left' }}
           mode="copy"
-          onClick={(e: MouseEvent<HTMLDivElement>) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleOnCopy('SMILES', record.compound.smiles);
-          }}
+          onClick={() => handleOnCopy('SMILES', record.compound.smiles)}
           width="100%"
           height="100%"
           title="Copy SMILES to clipboard"
+          enableSearch
+          searchTitle="Search for SMILES"
+          searchUrl={buildSearchUrl('substructure', record.compound.smiles)}
         />
       ),
     });
@@ -438,14 +446,13 @@ function RecordView({ record, width, height }: inputProps) {
           component={record.compound.inchi}
           componentStyle={{ justifyContent: 'left' }}
           mode="copy"
-          onClick={(e: MouseEvent<HTMLDivElement>) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleOnCopy('InChI', record.compound.inchi);
-          }}
+          onClick={() => handleOnCopy('InChI', record.compound.inchi)}
           width="100%"
           height="100%"
           title="Copy InChi to clipboard"
+          enableSearch
+          searchTitle="Search for InChI"
+          searchUrl={buildSearchUrl('inchi', record.compound.inchi)}
         />
       ),
     });
@@ -457,14 +464,13 @@ function RecordView({ record, width, height }: inputProps) {
           component={record.peak.splash}
           componentStyle={{ justifyContent: 'left' }}
           mode="copy"
-          onClick={(e: MouseEvent<HTMLDivElement>) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleOnCopy('SPLASH', record.peak.splash);
-          }}
+          onClick={() => handleOnCopy('SPLASH', record.peak.splash)}
           width="100%"
           height="100%"
           title="Copy SPLASH to clipboard"
+          enableSearch
+          searchTitle="Search for SPLASH"
+          searchUrl={buildSearchUrl('splash', record.peak.splash)}
         />
       ),
     });
@@ -493,11 +499,7 @@ function RecordView({ record, width, height }: inputProps) {
             padding: 10,
           }}
           mode="copy"
-          onClick={(e: MouseEvent<HTMLDivElement>) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleOnCopy('Title', record.title);
-          }}
+          onClick={() => handleOnCopy('Title', record.title)}
           width="100%"
           height="100%"
           title="Copy title to clipboard"
@@ -561,36 +563,41 @@ function RecordView({ record, width, height }: inputProps) {
               <label>Formula: </label>
               <ExportableContent
                 component={<MF mf={record.compound.formula} />}
-                componentStyle={{ fontWeight: 'bolder' }}
+                componentStyle={{ fontWeight: 'bolder', marginRight: 20 }}
                 mode="copy"
-                onClick={(e: MouseEvent<HTMLDivElement>) => {
-                  e.preventDefault();
-                  e.stopPropagation();
+                onClick={() =>
                   copyTextToClipboard(
                     'Molecular Formula',
                     record.compound.formula,
-                  );
-                }}
+                  )
+                }
                 width="100%"
                 height="100%"
                 title="Copy molecular formula to clipboard"
+                enableSearch
+                searchTitle="Search for molecular formula"
+                searchUrl={buildSearchUrl('formula', record.compound.formula)}
               />
               <label style={{ marginLeft: 50 }}>Mass: </label>
               <ExportableContent
                 component={record.compound.mass.toString()}
-                componentStyle={{ fontWeight: 'bolder' }}
+                componentStyle={{ fontWeight: 'bolder', marginRight: 20 }}
                 mode="copy"
-                onClick={(e: MouseEvent<HTMLDivElement>) => {
-                  e.preventDefault();
-                  e.stopPropagation();
+                onClick={() =>
                   copyTextToClipboard(
                     'Molecular Mass',
                     record.compound.mass.toString(),
-                  );
-                }}
+                  )
+                }
                 width="100%"
                 height="100%"
                 title="Copy molecular mass to clipboard"
+                enableSearch
+                searchTitle="Search for molecular mass"
+                searchUrl={buildSearchUrl(
+                  'exact_mass',
+                  record.compound.mass.toString(),
+                )}
               />
             </Content>
           </Content>
@@ -599,6 +606,7 @@ function RecordView({ record, width, height }: inputProps) {
     );
   }, [
     handleOnCopy,
+    buildSearchUrl,
     record.authors,
     record.compound.formula,
     record.compound.inchi,

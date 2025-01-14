@@ -19,10 +19,15 @@ const peakListPattern =
 
 type InputProps = {
   massSpecFilterOptions: ContentFilterOptions | undefined;
+  initialStructure: string;
   width: number;
 };
 
-function SearchPanelMenuItems({ massSpecFilterOptions, width }: InputProps) {
+function SearchPanelMenuItems({
+  massSpecFilterOptions,
+  initialStructure,
+  width,
+}: InputProps) {
   return [
     {
       key: 'basicSearchMenuItem',
@@ -383,7 +388,12 @@ function SearchPanelMenuItems({ massSpecFilterOptions, width }: InputProps) {
             marginLeft: 0,
             overflow: 'scroll',
           },
-          label: <StructuralEditor width={width - 100} />,
+          label: (
+            <StructuralEditor
+              width={width - 100}
+              initialSMILES={initialStructure}
+            />
+          ),
         },
       ],
     },

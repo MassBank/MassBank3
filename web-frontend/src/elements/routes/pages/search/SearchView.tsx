@@ -18,8 +18,9 @@ import massSpecFilterOptionsFormDataToContentMapper from '../../../../utils/mass
 import SearchAndResultPanel from '../../../common/SearchAndResultPanel';
 import { Content } from 'antd/es/layout/layout';
 import SearchPanelMenuItems from './SearchPanelMenuItems';
+import { useSearchParams } from 'react-router-dom';
 
-const initialValues: SearchFields = {
+const defaultInitialValues: SearchFields = {
   basicSearchFilterOptions: {
     compoundName: undefined,
     formula: undefined,
@@ -46,7 +47,6 @@ const initialValues: SearchFields = {
 function SearchView() {
   const ref = useRef(null);
   const { width, height } = useContainerDimensions(ref);
-
   const [reference, setReference] = useState<Peak[]>([]);
   const [isFetchingContent, setIsFetchingContent] = useState<boolean>(false);
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -54,6 +54,10 @@ function SearchView() {
   const [hits, setHits] = useState<Hit[]>([]);
   const [massSpecFilterOptions, setMassSpecFilterOptions] = useState<
     ContentFilterOptions | undefined
+  >();
+  const [searchParams] = useSearchParams();
+  const [initialValues, setInitialValues] = useState<
+    SearchFields | undefined
   >();
 
   const searchPanelWidth = useMemo(
@@ -70,11 +74,11 @@ function SearchView() {
         const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
         _browseContent = (await fetchData(url)) as ContentFilterOptions;
       } else {
-        const searchParams = buildSearchParams(_browseContent);
+        const builtSearchParams = buildSearchParams(_browseContent);
         const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
         _browseContent = (await fetchData(
           url,
-          searchParams,
+          builtSearchParams,
         )) as ContentFilterOptions;
       }
       initFlags(_browseContent);
@@ -85,10 +89,6 @@ function SearchView() {
     [],
   );
 
-  useEffect(() => {
-    handleOnFetchContent(undefined);
-  }, [handleOnFetchContent]);
-
   const handleOnSearch = useCallback(async (formData: SearchFields) => {
     setIsSearching(true);
 
@@ -96,7 +96,7 @@ function SearchView() {
       formData.massSpecFilterOptions,
       undefined,
     );
-    const searchParams = buildSearchParams(formData_content);
+    const builtSearchParams = buildSearchParams(formData_content);
 
     const similarityPeakListInputFieldData = (
       formData.peaks?.similarity?.peakList || ''
@@ -106,11 +106,11 @@ function SearchView() {
       const peakList = parsePeakListInputField(
         similarityPeakListInputFieldData,
       );
-      searchParams['peak_list'] = [
+      builtSearchParams['peak_list'] = [
         peakList.map((p) => `${p.mz};${p.intensity}`).join(','),
       ];
       const peakListThreshold = formData.peaks?.similarity?.threshold || 0;
-      searchParams['peak_list_threshold'] = [String(peakListThreshold)];
+      builtSearchParams['peak_list_threshold'] = [String(peakListThreshold)];
       setReference(peakList);
     } else {
       setReference([]);
@@ -123,60 +123,63 @@ function SearchView() {
     };
     const peaks = (peaksSearchData.peaks ?? []).map((p) => p.mz);
     if (peaks.length > 0) {
-      searchParams['peaks'] = [peaks.join(',')];
+      builtSearchParams['peaks'] = [peaks.join(',')];
 
       if (peaksSearchData.massTolerance && peaksSearchData.massTolerance > 0) {
-        searchParams['mass_tolerance'] = [
+        builtSearchParams['mass_tolerance'] = [
           String(peaksSearchData.massTolerance),
         ];
       }
       if (peaksSearchData.intensity && peaksSearchData.intensity > 0) {
-        searchParams['intensity'] = [String(peaksSearchData.intensity)];
+        builtSearchParams['intensity'] = [String(peaksSearchData.intensity)];
       }
     }
 
     const inchi = (formData.inchi || '').trim();
     if (inchi.length > 0) {
       if (inchi.startsWith('InChI=')) {
-        searchParams['inchi'] = [inchi];
+        builtSearchParams['inchi'] = [inchi];
       } else {
-        searchParams['inchi_key'] = [inchi];
+        builtSearchParams['inchi_key'] = [inchi];
       }
     }
     const splash = (formData.splash || '').trim();
     if (splash.length > 0) {
-      searchParams['splash'] = [splash];
+      builtSearchParams['splash'] = [splash];
     }
 
     const compoundName = (
       formData.basicSearchFilterOptions?.compoundName || ''
     ).trim();
     if (compoundName.length > 0) {
-      searchParams['compound_name'] = [compoundName];
+      builtSearchParams['compound_name'] = [compoundName];
     }
     const formula = (formData.basicSearchFilterOptions?.formula || '').trim();
     if (formula.length > 0) {
-      searchParams['formula'] = [formula];
+      builtSearchParams['formula'] = [formula];
     }
     const exactMass = formData.basicSearchFilterOptions?.exactMass || 0;
     if (exactMass > 0) {
-      searchParams['exact_mass'] = [String(exactMass)];
+      builtSearchParams['exact_mass'] = [String(exactMass)];
 
       const massTolerance =
         formData.basicSearchFilterOptions.massTolerance || 0;
       if (exactMass > 0) {
-        searchParams['mass_tolerance'] = [String(massTolerance)];
+        builtSearchParams['mass_tolerance'] = [String(massTolerance)];
       } else {
-        searchParams['mass_tolerance'] = ['0.0'];
+        builtSearchParams['mass_tolerance'] = ['0.0'];
       }
     }
 
     const smiles = formData.structure;
     if (smiles && smiles.trim().length > 0) {
-      searchParams['substructure'] = [smiles];
+      builtSearchParams['substructure'] = [smiles];
     }
     const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/search';
-    const searchResult = (await fetchData(url, searchParams)) as SearchResult;
+    const searchResult = (await fetchData(
+      url,
+      builtSearchParams,
+    )) as SearchResult;
 
     let _hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
     _hits = _hits.map((hit, i) => {
@@ -192,7 +195,7 @@ function SearchView() {
 
   const handleOnSubmit = useCallback(
     async (formData: SearchFields) => {
-      setIsCollapsed(true);
+      // setIsCollapsed(true);
 
       const formDataContent = massSpecFilterOptionsFormDataToContentMapper(
         formData?.massSpecFilterOptions,
@@ -200,17 +203,87 @@ function SearchView() {
         undefined,
       );
 
+      setInitialValues(formData);
       await handleOnSearch(formData);
       await handleOnFetchContent(formDataContent);
     },
     [handleOnSearch, handleOnFetchContent],
   );
 
+  useEffect(() => {
+    handleOnFetchContent(undefined);
+
+    const _initialValues = { ...defaultInitialValues };
+
+    let runSubmit = false;
+    const similarityPeakList = searchParams.get('peak_list');
+    if (similarityPeakList) {
+      const peak_list_text = similarityPeakList
+        .split(',')
+        .map((p) => {
+          const split = p.split(';');
+          return split.join(' ');
+        })
+        .join('\n');
+      const similarityPeakListThreshold = searchParams.get(
+        'peak_list_threshold',
+      );
+      const peak_list_threshold =
+        similarityPeakListThreshold !== undefined
+          ? Number(similarityPeakListThreshold)
+          : (defaultInitialValues.peaks?.similarity?.threshold ?? 0.8);
+      if (_initialValues.peaks) {
+        _initialValues.peaks.similarity = {
+          peakList: peak_list_text,
+          threshold: peak_list_threshold,
+        };
+      }
+      runSubmit = true;
+    }
+    const compound_name = searchParams.get('compound_name');
+    if (compound_name) {
+      _initialValues.basicSearchFilterOptions.compoundName = compound_name;
+      runSubmit = true;
+    }
+    const formula = searchParams.get('formula');
+    if (formula) {
+      _initialValues.basicSearchFilterOptions.formula = formula;
+      runSubmit = true;
+    }
+    const exact_mass = searchParams.get('exact_mass');
+    if (exact_mass) {
+      _initialValues.basicSearchFilterOptions.exactMass = Number(exact_mass);
+      runSubmit = true;
+    }
+    const inchi = searchParams.get('inchi');
+    if (inchi) {
+      _initialValues.inchi = inchi;
+      runSubmit = true;
+    }
+    const splash = searchParams.get('splash');
+    if (splash) {
+      _initialValues.splash = splash;
+      runSubmit = true;
+    }
+    const substructure = searchParams.get('substructure');
+    if (substructure) {
+      _initialValues.structure = substructure;
+      runSubmit = true;
+    }
+
+    if (runSubmit) {
+      handleOnSubmit(_initialValues);
+    }
+
+    setInitialValues(_initialValues);
+  }, [handleOnFetchContent, handleOnSearch, handleOnSubmit, searchParams]);
+
   const searchAndResultPanel = useMemo(() => {
     const searchPanel = (
       <CommonSearchPanel
         items={SearchPanelMenuItems({
           massSpecFilterOptions,
+          initialStructure: initialValues?.structure ?? '',
           width,
         })}
         initialValues={initialValues}
@@ -240,6 +313,7 @@ function SearchView() {
   }, [
     massSpecFilterOptions,
     width,
+    initialValues,
     searchPanelWidth,
     height,
     isCollapsed,

@@ -1,5 +1,5 @@
 import { Molecule } from 'openchemlib';
-import { MouseEvent, useCallback } from 'react';
+import { useCallback } from 'react';
 import { SmilesSvgRenderer } from 'react-ocl/minimal';
 import { saveAs } from 'file-saver';
 import ExportableContent from '../common/ExportableContent';
@@ -13,24 +13,18 @@ interface InputProps {
 function StructureView({ smiles, imageWidth, imageHeight }: InputProps) {
   const defaultButtonWidth = 30;
 
-  const handleOnDownload = useCallback(
-    (e: MouseEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      const mol = Molecule.fromSmiles(smiles);
-      const svgString = mol.toSVG(imageWidth, imageHeight, undefined, {
-        autoCrop: true,
-        autoCropMargin: 5,
-        suppressChiralText: true,
-        suppressCIPParity: true,
-        suppressESR: true,
-      });
-      const blob = new Blob([svgString], { type: 'image/svg+xml' });
-      saveAs(blob, 'structure_' + smiles + '.svg');
-    },
-    [imageHeight, imageWidth, smiles],
-  );
+  const handleOnDownload = useCallback(() => {
+    const mol = Molecule.fromSmiles(smiles);
+    const svgString = mol.toSVG(imageWidth, imageHeight, undefined, {
+      autoCrop: true,
+      autoCropMargin: 5,
+      suppressChiralText: true,
+      suppressCIPParity: true,
+      suppressESR: true,
+    });
+    const blob = new Blob([svgString], { type: 'image/svg+xml' });
+    saveAs(blob, 'structure_' + smiles + '.svg');
+  }, [imageHeight, imageWidth, smiles]);
 
   return (
     <ExportableContent

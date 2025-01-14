@@ -39,9 +39,12 @@ function CommonSearchPanel({
   onSubmit,
 }: InputProps) {
   const [form] = useForm<SearchFields>();
-  const { setFieldValue } = form;
+  const { setFieldValue, setFieldsValue } = form;
 
   useEffect(() => {
+    if (initialValues) {
+      setFieldsValue(initialValues);
+    }
     const mapper = (vcs: ValueCount[]) => {
       return vcs.filter((vc) => vc.flag === true).map((vc) => vc.value);
     };
@@ -51,14 +54,13 @@ function CommonSearchPanel({
       ms_type: mapper(massSpecFilterOptions?.ms_type || []),
       ion_mode: mapper(massSpecFilterOptions?.ion_mode || []),
     } as SearchFields['massSpecFilterOptions']);
-  }, [massSpecFilterOptions, setFieldValue]);
+  }, [initialValues, massSpecFilterOptions, setFieldValue, setFieldsValue]);
 
   const handleOnSubmit: FormProps<SearchFields>['onFinish'] = useCallback(
     (values: SearchFields) => {
-      onCollapse(true);
       onSubmit(values);
     },
-    [onCollapse, onSubmit],
+    [onSubmit],
   );
 
   const handleOnCollapse = useCallback(() => {
