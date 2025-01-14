@@ -18,24 +18,28 @@ import massSpecFilterOptionsFormDataToContentMapper from '../../../../utils/mass
 import SearchAndResultPanel from '../../../common/SearchAndResultPanel';
 import { Content } from 'antd/es/layout/layout';
 import SearchPanelMenuItems from './SearchPanelMenuItems';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
+
+const defaultMassTolerance = 0.1;
+const defaultSimilarityThreshold = 0.8;
+const defaultPeakIntensity = 50;
 
 const defaultInitialValues: SearchFields = {
   basicSearchFilterOptions: {
     compoundName: undefined,
     formula: undefined,
     exactMass: undefined,
-    massTolerance: 0.1,
+    massTolerance: defaultMassTolerance,
   },
   peaks: {
     similarity: {
       peakList: undefined,
-      threshold: 0.8,
+      threshold: defaultSimilarityThreshold,
     },
     peaks: {
       peaks: [],
-      massTolerance: 0.1,
-      intensity: 50,
+      massTolerance: defaultMassTolerance,
+      intensity: defaultPeakIntensity,
     },
   },
   inchi: undefined,
@@ -47,6 +51,8 @@ const defaultInitialValues: SearchFields = {
 function SearchView() {
   const ref = useRef(null);
   const { width, height } = useContainerDimensions(ref);
+  const location = useLocation();
+
   const [reference, setReference] = useState<Peak[]>([]);
   const [isFetchingContent, setIsFetchingContent] = useState<boolean>(false);
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -231,7 +237,8 @@ function SearchView() {
       const peak_list_threshold =
         similarityPeakListThreshold !== undefined
           ? Number(similarityPeakListThreshold)
-          : (defaultInitialValues.peaks?.similarity?.threshold ?? 0.8);
+          : (defaultInitialValues.peaks?.similarity?.threshold ??
+            defaultSimilarityThreshold);
       if (_initialValues.peaks) {
         _initialValues.peaks.similarity = {
           peakList: peak_list_text,
@@ -239,43 +246,82 @@ function SearchView() {
         };
       }
       runSubmit = true;
+    } else {
+      if (_initialValues.peaks) {
+        _initialValues.peaks.similarity = {
+          peakList: undefined,
+          threshold: defaultSimilarityThreshold,
+        };
+      }
     }
+
     const compound_name = searchParams.get('compound_name');
     if (compound_name) {
       _initialValues.basicSearchFilterOptions.compoundName = compound_name;
       runSubmit = true;
+    } else {
+      if (_initialValues.basicSearchFilterOptions) {
+        _initialValues.basicSearchFilterOptions.compoundName = undefined;
+      }
     }
+
     const formula = searchParams.get('formula');
     if (formula) {
       _initialValues.basicSearchFilterOptions.formula = formula;
       runSubmit = true;
+    } else {
+      if (_initialValues.basicSearchFilterOptions) {
+        _initialValues.basicSearchFilterOptions.formula = undefined;
+      }
     }
+
     const exact_mass = searchParams.get('exact_mass');
     if (exact_mass) {
       _initialValues.basicSearchFilterOptions.exactMass = Number(exact_mass);
       runSubmit = true;
+    } else {
+      if (_initialValues.basicSearchFilterOptions) {
+        _initialValues.basicSearchFilterOptions.exactMass = undefined;
+      }
     }
+
     const inchi = searchParams.get('inchi');
     if (inchi) {
       _initialValues.inchi = inchi;
       runSubmit = true;
+    } else {
+      if (_initialValues.inchi) {
+        _initialValues.inchi = undefined;
+      }
     }
+
     const splash = searchParams.get('splash');
     if (splash) {
       _initialValues.splash = splash;
       runSubmit = true;
+    } else {
+      if (_initialValues.splash) {
+        _initialValues.splash = undefined;
+      }
     }
+
     const substructure = searchParams.get('substructure');
     if (substructure) {
       _initialValues.structure = substructure;
       runSubmit = true;
-    }
-
-    if (runSubmit) {
-      handleOnSubmit(_initialValues);
+    } else {
+      if (_initialValues.structure) {
+        _initialValues.structure = undefined;
+      }
     }
 
     setInitialValues(_initialValues);
+
+    if (runSubmit) {
+      handleOnSubmit(_initialValues);
+    } else {
+      setHits([]);
+    }
   }, [handleOnFetchContent, handleOnSearch, handleOnSubmit, searchParams]);
 
   const searchAndResultPanel = useMemo(() => {
@@ -326,6 +372,7 @@ function SearchView() {
   return useMemo(
     () => (
       <Layout
+        key={location.key}
         ref={ref}
         style={{
           width: '100%',
@@ -349,7 +396,7 @@ function SearchView() {
         </Content>
       </Layout>
     ),
-    [isFetchingContent, searchAndResultPanel],
+    [isFetchingContent, location.key, searchAndResultPanel],
   );
 }
 
