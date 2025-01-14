@@ -1,8 +1,8 @@
-import { Content } from 'antd/es/layout/layout';
 import { Molecule } from 'openchemlib';
-import { MouseEvent, useCallback, useMemo } from 'react';
+import { MouseEvent, useCallback } from 'react';
 import { SmilesSvgRenderer } from 'react-ocl/minimal';
-import copyTextToClipboard from '../../utils/copyTextToClipboard';
+import { saveAs } from 'file-saver';
+import ExportableContent from '../common/ExportableContent';
 
 interface InputProps {
   smiles: string;
@@ -11,8 +11,10 @@ interface InputProps {
 }
 
 function StructureView({ smiles, imageWidth, imageHeight }: InputProps) {
-  const handleOnCopy = useCallback(
-    async (e: MouseEvent<HTMLDivElement>) => {
+  const defaultButtonWidth = 30;
+
+  const handleOnDownload = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
       e.preventDefault();
       e.stopPropagation();
 
@@ -24,37 +26,34 @@ function StructureView({ smiles, imageWidth, imageHeight }: InputProps) {
         suppressCIPParity: true,
         suppressESR: true,
       });
-
-      copyTextToClipboard('Structure SVG String', svgString);
+      const blob = new Blob([svgString], { type: 'image/svg+xml' });
+      saveAs(blob, 'structure_' + smiles + '.svg');
     },
     [imageHeight, imageWidth, smiles],
   );
 
-  return useMemo(
-    () => (
-      <Content
-        onDoubleClick={handleOnCopy}
-        style={{
-          minWidth: imageWidth,
-          maxWidth: imageWidth,
-          minHeight: imageHeight,
-          maxHeight: imageHeight,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          cursor: 'pointer',
-        }}
-      >
+  return (
+    <ExportableContent
+      title="Download structure as SVG"
+      component={
         <SmilesSvgRenderer
           smiles={smiles}
-          width={imageWidth}
+          width={imageWidth - defaultButtonWidth}
           height={imageHeight}
           autoCrop={true}
           autoCropMargin={5}
         />
-      </Content>
-    ),
-    [handleOnCopy, imageHeight, imageWidth, smiles],
+      }
+      mode="download"
+      onClick={handleOnDownload}
+      width={imageWidth}
+      height={imageHeight}
+      buttonStyle={{
+        minWidth: defaultButtonWidth,
+        maxWidth: defaultButtonWidth,
+        paddingRight: 30,
+      }}
+    />
   );
 }
 
