@@ -5,8 +5,12 @@ import Peak from '../../types/peak/Peak';
 import { Button } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCopy, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import copyTextToClipboard from '../../utils/copyTextToClipboard';
+import {
+  faEye,
+  faEyeSlash,
+  faFileArrowDown,
+} from '@fortawesome/free-solid-svg-icons';
+import { saveAs } from 'file-saver';
 
 type InputProps = {
   peakData: Peak[];
@@ -431,12 +435,13 @@ function Chart({
     }
   }, [brushXDomains, disableZoom, handleDoubleClick, height, width, xScale]);
 
-  const handleOnDownload = useCallback(async () => {
+  const handleOnDownload = useCallback(() => {
     const svg = svgRef.current;
     if (svg) {
       const serializer = new XMLSerializer();
       const svgString = serializer.serializeToString(svg);
-      copyTextToClipboard('Spectrum SVG String', svgString);
+      const blob = new Blob([svgString], { type: 'image/svg+xml' });
+      saveAs(blob, 'spectrum.svg');
     }
   }, []);
 
@@ -511,8 +516,8 @@ function Chart({
               <Button
                 children={
                   <FontAwesomeIcon
-                    icon={faCopy}
-                    title="Copy spectrum SVG string to clipboard"
+                    icon={faFileArrowDown}
+                    title="Download spectrum as SVG"
                   />
                 }
                 onClick={handleOnDownload}

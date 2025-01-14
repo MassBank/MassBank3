@@ -1,4 +1,4 @@
-import { MouseEvent, useCallback, useMemo, useState } from 'react';
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { StructureEditor } from 'react-ocl/full';
 import { Molecule } from 'openchemlib';
 
@@ -11,11 +11,12 @@ import SearchFields from '../../types/filterOptions/SearchFields';
 import Dragger from 'antd/es/upload/Dragger';
 
 interface InputProps {
+  initialSMILES?: string;
   width?: number;
   height?: number;
 }
 
-function StructuralEditor({ width, height }: InputProps) {
+function StructuralEditor({ initialSMILES, width, height }: InputProps) {
   const formInstance = Form.useFormInstance<SearchFields>();
   const { getFieldValue, setFieldValue } = formInstance;
 
@@ -29,7 +30,7 @@ function StructuralEditor({ width, height }: InputProps) {
 
   const handleOnChangeStructure = useCallback(
     (_molfile: string, molecule: Molecule) => {
-      const _smiles = molecule.toSmiles();
+      const _smiles = molecule.toIsomericSmiles();
       setSmiles(_smiles);
       setMolfile(_molfile);
       setFieldValue('structure', _smiles);
@@ -38,26 +39,37 @@ function StructuralEditor({ width, height }: InputProps) {
     [setFieldValue],
   );
 
-  const handleOnSetSmiles = useCallback(
+  const handleOnSetSmiles = useCallback(() => {
+    const _smiles = getFieldValue('structure');
+    if (_smiles && _smiles.trim().length > 0) {
+      try {
+        const molecule = Molecule.fromSmiles(_smiles);
+        const _molfile = molecule.toMolfileV3();
+        handleOnChangeStructure(_molfile, molecule);
+        setStructureKey(Math.random());
+        setErrorMolfileImport(undefined);
+      } catch (error) {
+        /* empty */
+      }
+    }
+  }, [getFieldValue, handleOnChangeStructure]);
+
+  const handleOnClickSetSmiles = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
 
-      const _smiles = getFieldValue('structure');
-      if (_smiles && _smiles.trim().length > 0) {
-        try {
-          const molecule = Molecule.fromSmiles(_smiles);
-          const _molfile = molecule.toMolfile();
-          handleOnChangeStructure(_molfile, molecule);
-          setStructureKey(Math.random());
-          setErrorMolfileImport(undefined);
-        } catch (error) {
-          /* empty */
-        }
-      }
+      handleOnSetSmiles();
     },
-    [getFieldValue, handleOnChangeStructure],
+    [handleOnSetSmiles],
   );
+
+  useEffect(() => {
+    if (initialSMILES) {
+      setFieldValue('structure', initialSMILES);
+      handleOnSetSmiles();
+    }
+  }, [handleOnSetSmiles, initialSMILES, setFieldValue]);
 
   const structureEditor = useMemo(
     () => (
@@ -114,7 +126,7 @@ function StructuralEditor({ width, height }: InputProps) {
           addonAfter={
             <Button
               children={'Set'}
-              onClick={handleOnSetSmiles}
+              onClick={handleOnClickSetSmiles}
               style={{
                 width: '100%',
                 height: 30,
@@ -134,7 +146,7 @@ function StructuralEditor({ width, height }: InputProps) {
         />
       </Form.Item>
     ),
-    [errorSmiles, handleOnSetSmiles, smiles],
+    [errorSmiles, handleOnClickSetSmiles, smiles],
   );
 
   const onDrop = useCallback(

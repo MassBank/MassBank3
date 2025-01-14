@@ -1,8 +1,8 @@
-import { message } from 'antd';
-import { Content } from 'antd/es/layout/layout';
 import { Molecule } from 'openchemlib';
-import { MouseEvent, useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { SmilesSvgRenderer } from 'react-ocl/minimal';
+import { saveAs } from 'file-saver';
+import ExportableContent from '../common/ExportableContent';
 
 interface InputProps {
   smiles: string;
@@ -11,55 +11,43 @@ interface InputProps {
 }
 
 function StructureView({ smiles, imageWidth, imageHeight }: InputProps) {
-  const handleOnCopy = useCallback(
-    async (e: MouseEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
+  const defaultButtonWidth = 30;
 
-      const mol = Molecule.fromSmiles(smiles);
-      const svg = mol.toSVG(imageWidth, imageHeight, undefined, {
-        autoCrop: true,
-        autoCropMargin: 5,
-        suppressChiralText: true,
-        suppressCIPParity: true,
-        suppressESR: true,
-      });
+  const handleOnDownload = useCallback(() => {
+    const mol = Molecule.fromSmiles(smiles);
+    const svgString = mol.toSVG(imageWidth, imageHeight, undefined, {
+      autoCrop: true,
+      autoCropMargin: 5,
+      suppressChiralText: true,
+      suppressCIPParity: true,
+      suppressESR: true,
+    });
+    const blob = new Blob([svgString], { type: 'image/svg+xml' });
+    saveAs(blob, 'structure_' + smiles + '.svg');
+  }, [imageHeight, imageWidth, smiles]);
 
-      try {
-        await navigator.clipboard.writeText(svg);
-        message.success('Copied molecule SVG string to clipboard');
-      } catch (error) {
-        message.error('Failed to copy molecule SVG string to clipboard');
-      }
-    },
-    [imageHeight, imageWidth, smiles],
-  );
-
-  return useMemo(
-    () => (
-      <Content
-        onDoubleClick={handleOnCopy}
-        style={{
-          minWidth: imageWidth,
-          maxWidth: imageWidth,
-          minHeight: imageHeight,
-          maxHeight: imageHeight,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          cursor: 'pointer',
-        }}
-      >
+  return (
+    <ExportableContent
+      title="Download structure as SVG"
+      component={
         <SmilesSvgRenderer
           smiles={smiles}
-          width={imageWidth}
+          width={imageWidth - defaultButtonWidth}
           height={imageHeight}
           autoCrop={true}
           autoCropMargin={5}
         />
-      </Content>
-    ),
-    [handleOnCopy, imageHeight, imageWidth, smiles],
+      }
+      mode="download"
+      onClick={handleOnDownload}
+      width={imageWidth}
+      height={imageHeight}
+      buttonStyle={{
+        minWidth: defaultButtonWidth,
+        maxWidth: defaultButtonWidth,
+        paddingRight: 30,
+      }}
+    />
   );
 }
 
