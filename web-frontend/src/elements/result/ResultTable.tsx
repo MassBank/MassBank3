@@ -106,8 +106,7 @@ function ResultTable({
         key: 'result-table-row_' + hit.index + '_' + hit.score,
         index: hit.index + 1,
         score: hit.score ? hit.score.toFixed(4) : undefined,
-        accession: hit.accession,
-        link: <ResultLink hit={hit} />,
+        accession: <ResultLink hit={hit} />,
         title: hit.record.title,
         chart: buildChart(hit),
         structure: buildStructure(hit.record.compound.smiles),
@@ -142,13 +141,6 @@ function ResultTable({
         dataIndex: 'accession',
         key: 'accession',
         align: 'center' as const,
-      },
-      {
-        title: 'Link',
-        dataIndex: 'link',
-        key: 'link',
-        align: 'center' as const,
-        width: 70,
       },
       {
         title: 'Title',
