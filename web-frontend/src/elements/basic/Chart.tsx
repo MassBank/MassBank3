@@ -504,7 +504,7 @@ function Chart({
               <Button
                 children={
                   <FontAwesomeIcon
-                    icon={isShowLabel ? faEye : faEyeSlash}
+                    icon={isShowLabel ? faEyeSlash : faEye}
                     title={
                       isShowLabel ? 'Hide peak labels' : 'Show peak labels'
                     }
