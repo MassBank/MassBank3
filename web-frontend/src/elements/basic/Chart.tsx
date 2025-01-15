@@ -11,6 +11,9 @@ import {
   faFileArrowDown,
 } from '@fortawesome/free-solid-svg-icons';
 import { saveAs } from 'file-saver';
+import ExportableContent from '../common/ExportableContent';
+import copyTextToClipboard from '../../utils/copyTextToClipboard';
+import routes from '../../constants/routes';
 
 type InputProps = {
   peakData: Peak[];
@@ -22,6 +25,7 @@ type InputProps = {
   disableLabels?: boolean;
   disableZoom?: boolean;
   disableOnHover?: boolean;
+  disableExport?: boolean;
 };
 
 function Chart({
@@ -33,6 +37,7 @@ function Chart({
   disableLabels = false,
   disableZoom = false,
   disableOnHover = false,
+  disableExport = false,
 }: InputProps) {
   const wrapperRef = useRef(null);
   const svgRef = useRef(null);
@@ -445,6 +450,25 @@ function Chart({
     }
   }, []);
 
+  const handleOnCopy = useCallback((peaks: Peak[]) => {
+    const text = peaks.map((p) => `${p.mz} ${p.intensity} ${p.rel}`).join('\n');
+    copyTextToClipboard('Peak List', text);
+  }, []);
+
+  const buildSearchUrl = useCallback((peaks: Peak[]) => {
+    const searchParams = new URLSearchParams();
+    searchParams.set(
+      'peak_list',
+      peaks.map((p) => `${p.mz};${p.rel}`).join(','),
+    );
+    const url =
+      import.meta.env.VITE_MB3_FRONTEND_URL +
+      routes.search.path +
+      `?${searchParams.toString()}`;
+
+    return url;
+  }, []);
+
   return useMemo(
     () => (
       <Content
@@ -523,6 +547,20 @@ function Chart({
                 onClick={handleOnDownload}
                 style={{ width: 20, border: 'none' }}
               />
+              {!disableExport && (
+                <ExportableContent
+                  width={30}
+                  height={30}
+                  mode="copy"
+                  title="Copy peak list to clipboard"
+                  onClick={() => handleOnCopy(filteredPeakData)}
+                  permanentButton
+                  enableSearch
+                  searchTitle="Search similar spectra"
+                  searchUrl={buildSearchUrl(filteredPeakData)}
+                  buttonStyle={{ marginLeft: 35 }}
+                />
+              )}
             </Content>
             <Content
               style={{
@@ -554,11 +592,14 @@ function Chart({
       MARGIN.top,
       boundsHeight,
       boundsWidth,
+      buildSearchUrl,
       chartElements,
+      disableExport,
       disableLabels,
       disableZoom,
-      filteredPeakData.length,
+      filteredPeakData,
       filteredPeakData2,
+      handleOnCopy,
       handleOnDownload,
       height,
       isShowLabel,

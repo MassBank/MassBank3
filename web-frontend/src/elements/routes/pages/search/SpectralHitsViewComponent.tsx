@@ -49,12 +49,14 @@ function SpectralHitsViewComponent({
             record2={hit.record}
             width={widthResizable}
             height={height}
+            disableExport
           />
         ) : (
           <Resizable
             record={hit.record}
             width={widthResizable}
             height={height}
+            disableExport
           />
         )}
       </Content>

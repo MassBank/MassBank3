@@ -26,6 +26,7 @@ type InputProps = {
   width: number;
   height: number;
   minPeakTableWith?: number;
+  disableExport?: boolean;
 };
 
 function Resizable({
@@ -34,6 +35,7 @@ function Resizable({
   width,
   height,
   minPeakTableWith = 300,
+  disableExport = false,
 }: InputProps) {
   const ref = useRef(null);
   const [isResizing, setIsResizing] = useState<boolean>(false);
@@ -144,9 +146,17 @@ function Resizable({
         onZoom={handleOnZoom}
         width={chartWidth}
         height={height}
+        disableExport={disableExport}
       />
     ),
-    [chartWidth, handleOnZoom, height, record.peak.peak.values, record2],
+    [
+      chartWidth,
+      disableExport,
+      handleOnZoom,
+      height,
+      record.peak.peak.values,
+      record2,
+    ],
   );
 
   const handleOnMouseEnter = useCallback((e: MouseEvent<HTMLDivElement>) => {

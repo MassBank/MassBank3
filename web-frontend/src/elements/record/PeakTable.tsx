@@ -7,10 +7,6 @@ import PeakAnnotation from '../../types/peak/PeakAnnotation';
 import { Table } from 'antd';
 import PeakTableDataType from '../../types/PeakTableDataType';
 import { useHighlightData } from '../../highlight/Index';
-import copyTextToClipboard from '../../utils/copyTextToClipboard';
-import ExportableContent from '../common/ExportableContent';
-import { Content } from 'antd/es/layout/layout';
-import routes from '../../constants/routes';
 
 const columns = [
   {
@@ -89,25 +85,6 @@ function PeakTable({ peaks, width, height }: InputProps) {
     [highlightData],
   );
 
-  const handleOnCopy = useCallback(() => {
-    const text = peaks.map((p) => `${p.mz} ${p.intensity} ${p.rel}`).join('\n');
-    copyTextToClipboard('Peak List', text);
-  }, [peaks]);
-
-  const buildSearchUrl = useCallback(() => {
-    const searchParams = new URLSearchParams();
-    searchParams.set(
-      'peak_list',
-      peaks.map((p) => `${p.mz};${p.rel}`).join(','),
-    );
-    const url =
-      import.meta.env.VITE_MB3_FRONTEND_URL +
-      routes.search.path +
-      `?${searchParams.toString()}`;
-
-    return url;
-  }, [peaks]);
-
   return useMemo(
     () => (
       <Table<PeakTableDataType>
@@ -117,29 +94,6 @@ function PeakTable({ peaks, width, height }: InputProps) {
         columns={columns}
         dataSource={dataSource}
         pagination={false}
-        footer={() => (
-          <Content
-            style={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <ExportableContent
-              width={30}
-              height={30}
-              mode="copy"
-              title="Copy peak list to clipboard"
-              onClick={handleOnCopy}
-              permanentButton
-              enableSearch
-              searchTitle="Search similar spectra"
-              searchUrl={buildSearchUrl()}
-            />
-          </Content>
-        )}
         onRow={(record) => {
           return {
             onMouseEnter: () => handleOnMouseEnter(record.key.toString()),
@@ -153,9 +107,7 @@ function PeakTable({ peaks, width, height }: InputProps) {
     ),
     [
       activeKey,
-      buildSearchUrl,
       dataSource,
-      handleOnCopy,
       handleOnMouseEnter,
       handleOnMouseLeave,
       height,
