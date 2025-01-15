@@ -8,6 +8,7 @@ import { Layout, Spin } from 'antd';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import { Content, Header } from 'antd/es/layout/layout';
 import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
+import axios from 'axios';
 
 function AccessionView() {
   const ref = useRef(null);
@@ -38,7 +39,7 @@ function AccessionView() {
         return _p;
       });
       if (rec.compound && rec.compound.names && rec.compound.names.length > 0) {
-        document.title = rec.compound.names[0] + ' Mass Spectrum';
+        document.title = rec.compound.names[0] + ' MassBank Record';
       }
       setRecord(rec);
     } else {
@@ -63,13 +64,44 @@ function AccessionView() {
     [record, width, height, requestedAccession],
   );
 
+  const handleOnFetchMetadata = useCallback(async (_accession: string) => {
+    const host = import.meta.env.VITE_EXPORT_SERVICE_URL;
+    const url = `${host}/metadata/${_accession}`;
+
+    const resp = await axios.get(url, {
+      headers: {
+        Accept: 'application/ld+json',
+      },
+    });
+    if (resp.status === 200) {
+      const data = await resp.data;
+      if (data) {
+        const json = JSON.stringify(data);
+        const scriptElement = document.createElement('script');
+        scriptElement.id = 'recordMetadata';
+        scriptElement.type = 'application/ld+json';
+        scriptElement.textContent = json;
+        document.head.appendChild(scriptElement);
+
+        return scriptElement;
+      }
+    }
+  }, []);
+
   useEffect(() => {
     const id = searchParams.get('id');
     if (id) {
+      handleOnFetchMetadata(id);
       setAccession(id);
       handleOnSearch(id);
     }
-  }, [handleOnSearch, searchParams]);
+    return () => {
+      const metadataElement = document.getElementById('recordMetadata');
+      if (metadataElement) {
+        document.head.removeChild(metadataElement);
+      }
+    };
+  }, [handleOnFetchMetadata, handleOnSearch, searchParams]);
 
   return useMemo(
     () => (
