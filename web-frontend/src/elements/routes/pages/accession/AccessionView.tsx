@@ -64,44 +64,57 @@ function AccessionView() {
     [record, width, height, requestedAccession],
   );
 
-  const handleOnFetchMetadata = useCallback(async (_accession: string) => {
-    const host = import.meta.env.VITE_EXPORT_SERVICE_URL;
-    const url = `${host}/metadata/${_accession}`;
-
-    const resp = await axios.get(url, {
-      headers: {
-        Accept: 'application/ld+json',
-      },
-    });
-    if (resp.status === 200) {
-      const data = await resp.data;
-      if (data) {
-        const json = JSON.stringify(data);
-        const scriptElement = document.createElement('script');
-        scriptElement.id = 'recordMetadata';
-        scriptElement.type = 'application/ld+json';
-        scriptElement.textContent = json;
-        document.head.appendChild(scriptElement);
-
-        return scriptElement;
-      }
+  const removeRecordMetadataChildNode = useCallback(() => {
+    const metadataElement = document.getElementById('recordMetadata');
+    if (metadataElement) {
+      document.head.removeChild(metadataElement);
     }
   }, []);
+
+  const addRecordMetadataChildNode = useCallback(
+    async (_accession: string) => {
+      const host = import.meta.env.VITE_EXPORT_SERVICE_URL;
+      const url = `${host}/metadata/${_accession}`;
+
+      const resp = await axios.get(url, {
+        headers: {
+          Accept: 'application/ld+json',
+        },
+      });
+      if (resp.status === 200) {
+        const data = await resp.data;
+        if (data) {
+          const json = JSON.stringify(data);
+          removeRecordMetadataChildNode();
+          const scriptElement = document.createElement('script');
+          scriptElement.id = 'recordMetadata';
+          scriptElement.type = 'application/ld+json';
+          scriptElement.textContent = json;
+          document.head.appendChild(scriptElement);
+
+          return scriptElement;
+        }
+      }
+    },
+    [removeRecordMetadataChildNode],
+  );
 
   useEffect(() => {
     const id = searchParams.get('id');
     if (id) {
-      handleOnFetchMetadata(id);
+      addRecordMetadataChildNode(id);
       setAccession(id);
       handleOnSearch(id);
     }
     return () => {
-      const metadataElement = document.getElementById('recordMetadata');
-      if (metadataElement) {
-        document.head.removeChild(metadataElement);
-      }
+      removeRecordMetadataChildNode();
     };
-  }, [handleOnFetchMetadata, handleOnSearch, searchParams]);
+  }, [
+    addRecordMetadataChildNode,
+    handleOnSearch,
+    removeRecordMetadataChildNode,
+    searchParams,
+  ]);
 
   return useMemo(
     () => (
