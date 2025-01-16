@@ -86,7 +86,9 @@ function AccessionView() {
         if (data) {
           const json =
             '[' +
-            (data as object[]).map((d) => JSON.stringify(d)).join(',\n') +
+            (data as object[])
+              .map((d) => JSON.stringify(d, null, 2))
+              .join(',\n') +
             ']';
           removeRecordMetadataChildNode();
           const scriptElement = document.createElement('script');
