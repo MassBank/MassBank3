@@ -552,11 +552,11 @@ function Chart({
                   width={30}
                   height={30}
                   mode="copy"
-                  title="Copy peak list to clipboard"
+                  title="Copy peak list of current view to clipboard"
                   onClick={() => handleOnCopy(filteredPeakData)}
                   permanentButton
                   enableSearch
-                  searchTitle="Search similar spectra"
+                  searchTitle="Search similar spectra for peaks in current view"
                   searchUrl={buildSearchUrl(filteredPeakData)}
                   buttonStyle={{ marginLeft: 35 }}
                 />
