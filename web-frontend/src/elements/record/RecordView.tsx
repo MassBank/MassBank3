@@ -327,7 +327,7 @@ function RecordView({ record, width, height }: inputProps) {
 
   const titleHeight = 50;
   const imageWidth = 500;
-  const headerHeight = 400;
+  const headerHeight = 500;
   const chartAndPeakTableHeight = 500;
   const annotationTableHeight = 300;
 
