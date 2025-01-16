@@ -32,6 +32,11 @@ const routes: ifc2 = {
     label: 'Accession',
     element: AccessionView,
   },
+  accessionMassBank2: {
+    path: base_url + 'RecordDisplay',
+    label: 'Accession',
+    element: AccessionView,
+  },
   news: { path: base_url + 'news', label: 'News', element: NewsView },
   about: { path: base_url + 'about', label: 'About', element: AboutView },
   notFound: { path: base_url + '*', label: 'Not Found', element: NotFoundView },
