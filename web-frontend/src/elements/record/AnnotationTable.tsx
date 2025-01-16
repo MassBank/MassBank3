@@ -1,3 +1,5 @@
+import './Table.scss';
+
 import { CSSProperties, useMemo } from 'react';
 import PeakAnnotation from '../../types/peak/PeakAnnotation';
 import { Table } from 'antd';
@@ -38,6 +40,7 @@ function AnnotationTable({ annotation, width, height }: InputProps) {
 
     return (
       <Table
+        className="table"
         style={{ width, height }}
         sticky
         columns={columns}

@@ -2,15 +2,15 @@
   user-select: none;
   overflow: scroll;
 
-  .table-row-highlight {
-    background-color: lightblue;
+  .ant-table-thead > tr > th {
+    background-color: rgb(230, 230, 230) !important;
   }
 
   .ant-table-tbody > tr.ant-table-row:hover > td {
     background: none !important;
   }
 
-  .ant-table-thead > tr > th {
-    background-color: rgb(230, 229, 229) !important;
+  .table-row-highlight {
+    background-color: rgb(223, 243, 250) !important;
   }
 }

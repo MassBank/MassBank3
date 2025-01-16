@@ -520,6 +520,7 @@ function Chart({
               style={{
                 width: '100%',
                 height: MARGIN.button,
+                marginLeft: 5,
                 display: 'flex',
                 justifyContent: 'flex-start',
                 alignItems: 'center',
@@ -541,7 +542,7 @@ function Chart({
                 children={
                   <FontAwesomeIcon
                     icon={faFileArrowDown}
-                    title="Download spectrum as SVG"
+                    title="Download current spectrum view as SVG"
                   />
                 }
                 onClick={handleOnDownload}
@@ -550,13 +551,13 @@ function Chart({
               {!disableExport && (
                 <ExportableContent
                   width={30}
-                  height={30}
+                  height={'100%'}
                   mode="copy"
-                  title="Copy peak list of current view to clipboard"
+                  title="Copy peak list of current spectrum view to clipboard"
                   onClick={() => handleOnCopy(filteredPeakData)}
                   permanentButton
                   enableSearch
-                  searchTitle="Search similar spectra for peaks in current view"
+                  searchTitle="Search similar spectra for peaks in current spectrum view"
                   searchUrl={buildSearchUrl(filteredPeakData)}
                   buttonStyle={{ marginLeft: 35 }}
                 />

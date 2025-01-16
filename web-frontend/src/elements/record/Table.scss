@@ -1,0 +1,10 @@
+.table {
+  .ant-table-thead > tr > th {
+    // background-color: rgb(230, 230, 230) !important;
+    background-color: rgb(238, 238, 238) !important;
+  }
+
+  .ant-table-tbody > tr.ant-table-row:hover > td {
+    background-color: rgb(223, 243, 250) !important;
+  }
+}

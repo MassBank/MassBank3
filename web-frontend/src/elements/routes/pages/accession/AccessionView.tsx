@@ -38,8 +38,8 @@ function AccessionView() {
         _p.id = generateID();
         return _p;
       });
-      if (rec.compound && rec.compound.names && rec.compound.names.length > 0) {
-        document.title = rec.compound.names[0] + ' MassBank Record';
+      if (rec.title) {
+        document.title = rec.title + ' MassBank';
       }
       setRecord(rec);
     } else {

@@ -1,22 +1,13 @@
 import PeakTable from '../record/PeakTable';
 import Chart from '../basic/Chart';
 
-import {
-  MouseEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Peak from '../../types/peak/Peak';
 import Record from '../../types/Record';
 import getLinkedAnnotations from '../../utils/getLinkedAnnotations';
 import LinkedPeakAnnotation from '../../types/peak/LinkedPeakAnnotation';
 import { Content } from 'antd/es/layout/layout';
-import Placeholder from '../basic/Placeholder';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
+import { Splitter } from 'antd';
 
 const sidebarWidth = 7;
 
@@ -25,6 +16,7 @@ type InputProps = {
   record2?: Record;
   width: number;
   height: number;
+  minChartWidth?: number;
   minPeakTableWith?: number;
   disableExport?: boolean;
 };
@@ -34,12 +26,10 @@ function Resizable({
   record2,
   width,
   height,
+  minChartWidth = 400,
   minPeakTableWith = 300,
   disableExport = false,
 }: InputProps) {
-  const ref = useRef(null);
-  const [isResizing, setIsResizing] = useState<boolean>(false);
-  const [isHoveringSidebar, setIsHoveringSidebar] = useState<boolean>(false);
   const [chartWidth, setChartWidth] = useState<number>(0);
   const [peakTableWidth, setPeakTableWidth] = useState<number>(0);
 
@@ -101,42 +91,12 @@ function Resizable({
     [record.peak.annotation, record2],
   );
 
-  const startResizing = useCallback((e: MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (e.shiftKey) {
-      setIsResizing(true);
-    }
+  const resize = useCallback((sizes: number[]) => {
+    const _chartWidth = sizes[0];
+    const _peaktTableWith = sizes[1];
+    setChartWidth(_chartWidth);
+    setPeakTableWidth(_peaktTableWith);
   }, []);
-
-  const stopResizing = useCallback((e: MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    setIsResizing(false);
-  }, []);
-
-  const resize = useCallback(
-    (e: MouseEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (e.shiftKey && isResizing && ref && ref.current) {
-        const rect: DOMRect = (
-          ref.current as HTMLDivElement
-        ).getBoundingClientRect();
-
-        const _chartWidth = e.clientX - rect.left - sidebarWidth;
-        const _peaktTableWith = width - _chartWidth;
-        if (_peaktTableWith >= minPeakTableWith) {
-          setChartWidth(_chartWidth);
-          setPeakTableWidth(width - _chartWidth);
-        }
-      }
-    },
-    [isResizing, minPeakTableWith, width],
-  );
 
   const chart = useMemo(
     () => (
@@ -156,54 +116,6 @@ function Resizable({
       height,
       record.peak.peak.values,
       record2,
-    ],
-  );
-
-  const handleOnMouseEnter = useCallback((e: MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    setIsHoveringSidebar(true);
-  }, []);
-
-  const handleOnMouseLeave = useCallback((e: MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    setIsHoveringSidebar(false);
-  }, []);
-
-  const sidebar = useMemo(
-    () => (
-      <Content
-        style={{
-          backgroundColor:
-            isHoveringSidebar || isResizing ? 'lightskyblue' : 'lightgrey',
-        }}
-        onMouseEnter={handleOnMouseEnter}
-        onMouseLeave={handleOnMouseLeave}
-        title="Press Shift, click and move to resize the chart and peak table"
-      >
-        <Placeholder
-          child={<FontAwesomeIcon icon={faEllipsis} />}
-          style={{
-            width: sidebarWidth,
-            height,
-            fontSize: 16,
-            rotate: '90deg',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        />
-      </Content>
-    ),
-    [
-      handleOnMouseEnter,
-      handleOnMouseLeave,
-      height,
-      isHoveringSidebar,
-      isResizing,
     ],
   );
 
@@ -250,44 +162,39 @@ function Resizable({
 
   const resizable = useMemo(
     () => (
-      <Content
-        ref={ref}
-        style={{
-          width,
-          height,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: 'white',
-        }}
-        onMouseDown={startResizing}
-        onMouseMove={resize}
-        onMouseUp={stopResizing}
-      >
-        {chart}
-        {sidebar}
-        <Content
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
+      <Splitter style={{ width, height }} onResize={resize}>
+        <Splitter.Panel
+          size={chartWidth}
+          min={minChartWidth}
+          style={{ overflow: 'hidden' }}
         >
-          {peakTable}
-          {peakTable2}
-        </Content>
-      </Content>
+          {chart}
+        </Splitter.Panel>
+        <Splitter.Panel size={peakTableWidth} min={minPeakTableWith}>
+          <Content
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            {peakTable}
+            {peakTable2}
+          </Content>
+        </Splitter.Panel>
+      </Splitter>
     ),
     [
       chart,
+      chartWidth,
       height,
+      minChartWidth,
+      minPeakTableWith,
       peakTable,
       peakTable2,
+      peakTableWidth,
       resize,
-      sidebar,
-      startResizing,
-      stopResizing,
       width,
     ],
   );
