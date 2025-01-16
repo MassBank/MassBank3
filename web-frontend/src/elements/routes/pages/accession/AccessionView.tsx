@@ -84,7 +84,10 @@ function AccessionView() {
       if (resp.status === 200) {
         const data = await resp.data;
         if (data) {
-          const json = JSON.stringify(data);
+          const json =
+            '[' +
+            (data as object[]).map((d) => JSON.stringify(d)).join(',\n') +
+            ']';
           removeRecordMetadataChildNode();
           const scriptElement = document.createElement('script');
           scriptElement.id = 'recordMetadata';
