@@ -270,11 +270,10 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	}
 	err = stmt.QueryRow(massbankId).Scan(&contributor); 
 	stmt.Close()
-	if err == nil {
-		result.Contributor = &contributor
-	} else {
+	if err != nil && err != sql.ErrNoRows {
 		return nil, err
-	}	
+	}
+	result.Contributor = &contributor
 	
 	// authors
 	query = "SELECT name FROM author WHERE id IN (SELECT author_id FROM accession_author WHERE massbank_id = $1);"
@@ -295,7 +294,9 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		}		
 		rows.Close()
     } else {
-		return nil, err
+		if err != sql.ErrNoRows{
+			return nil, err
+		}
 	}
     
 	// license
@@ -307,11 +308,10 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	var license string
 	err = stmt.QueryRow(massbankId).Scan(&license)
 	stmt.Close()
-    if err == nil {
-		result.License = &license
-	} else {
+	if err != nil && err != sql.ErrNoRows {
 		return nil, err
-	}
+	} 
+	result.License = &license
 
 	// publication (for now only one publication per record)
 	query = "SELECT name FROM publication WHERE id IN (SELECT publication_id FROM accession_publication WHERE massbank_id = $1);"
@@ -319,17 +319,18 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	if err != nil {
 		return nil, err
 	}	
-	var publication *string
+	var publication string
 	err = stmt.QueryRow(massbankId).Scan(&publication)
 	stmt.Close()	
-	if err != nil {
-		result.Publication = publication
+	if err != nil && err != sql.ErrNoRows {				
+		return nil, err
 	}
+	result.Publication = &publication
 	
 	// compound
 	query = "SELECT inchi, formula, smiles, mass FROM compound WHERE id IN (SELECT compound_id FROM compound_name WHERE massbank_id = $1);"
 	stmt, err = p.database.Prepare(query)
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
 	var inchi string
@@ -364,7 +365,9 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 			}			
 			rows.Close()
 		} else {
-			return nil, err
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
 		}
 		
 		// compound classes
@@ -386,7 +389,9 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 			}
 			rows.Close()
 		} else {
-			return nil, err
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
 		}
 		
 		
@@ -410,10 +415,14 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 			}			
 			rows.Close()
 		} else {
-			return nil, err
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
 		}		
 	} else {
-		return nil, err
+		if err != sql.ErrNoRows {
+			return nil, err
+		}
 	}
 
 	// acquisition
@@ -453,7 +462,9 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 			}						
 			rows.Close()
 		} else {
-			return nil, err
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
 		}
 		// acquisition chromatography
 		result.Acquisition.Chromatography = &[]massbank.SubtagProperty{}
@@ -475,7 +486,9 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 			}			
 			rows.Close()
 		} else {
-			return nil, err
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
 		}
 		
 		// acquisition general
@@ -498,10 +511,14 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 			}			
 			rows.Close()
 		} else {
-			return nil, err
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
 		}
 	} else {
-		return nil, err
+		if err != sql.ErrNoRows {
+			return nil, err
+		}
 	}
 	
 	// mass spectrometry
@@ -526,7 +543,9 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		}
 		rows.Close()
 	} else {
-		return nil, err
+		if err != sql.ErrNoRows {
+			return nil, err
+		}
 	}
 	query = "SELECT subtag, value FROM mass_spectrometry_data_processing WHERE massbank_id = $1;"
 	stmt, err = p.database.Prepare(query)
@@ -548,7 +567,9 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		}
 		rows.Close()
 	} else {
-		return nil, err
+		if err != sql.ErrNoRows {
+			return nil, err
+		}
 	}
 	
 	// peak
@@ -594,7 +615,9 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 			}
 			rows.Close()
 		} else {
-			return nil, err
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
 		}	
 
 		query = "SELECT subtag, value FROM peak_annotation WHERE spectrum_id = $1;"
@@ -624,10 +647,14 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 			}
 			rows.Close()
 		} else {
-			return nil, err
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
 		}	
 	} else {
-		return nil, err
+		if err != sql.ErrNoRows {
+			return nil, err
+		}
 	}
 
 	return &result, err
