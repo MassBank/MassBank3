@@ -39,7 +39,7 @@ function AccessionSearchInputField({
   const handleOnClick = useCallback(
     () =>
       navigate({
-        pathname: routes.accession.path,
+        pathname: routes.find((r) => r.id === 'Accession')?.path as string,
         search: `?${createSearchParams({ id: accession })}`,
       }),
     [accession, navigate],

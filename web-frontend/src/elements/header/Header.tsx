@@ -36,10 +36,9 @@ function Header() {
     ),
   };
 
-  const routeLinks: MenuItem[] = Object.keys(routes)
-    .filter((r) => r !== 'notFound' && r !== 'home')
-    .map((r) => {
-      const route = routes[r];
+  const routeLinks: MenuItem[] = routes
+    .filter((route) => route.id !== 'NotFound' && route.id !== 'Home')
+    .map((route) => {
       return {
         key: route.path,
         label: (
@@ -51,14 +50,14 @@ function Header() {
             }}
           >
             <Link
-              to={route.path}
+              to={route.path as string}
               style={
                 route.path == location.pathname
                   ? { color: 'blue', fontSize: 16 }
                   : { fontSize: 16 }
               }
             >
-              {route.label}
+              {route.id}
             </Link>
           </Button>
         ),

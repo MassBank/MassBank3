@@ -461,9 +461,10 @@ function Chart({
       'peak_list',
       peaks.map((p) => `${p.mz};${p.rel}`).join(','),
     );
+    const path = routes.find((r) => r.id === 'Search')?.path as string;
     const url =
       import.meta.env.VITE_MB3_FRONTEND_URL +
-      routes.search.path +
+      path +
       `?${searchParams.toString()}`;
 
     return url;

@@ -18,8 +18,8 @@ function LinksTable({ links, width, height }: InputProps) {
     const searchParams = new URLSearchParams();
     searchParams.set(label, value);
     const url =
-      import.meta.env.VITE_MB3_FRONTEND_URL +
-      routes.search.path +
+      ((import.meta.env.VITE_MB3_FRONTEND_URL +
+        routes.find((r) => r.id === 'Search')?.path) as string) +
       `?${searchParams.toString()}`;
 
     return url;
