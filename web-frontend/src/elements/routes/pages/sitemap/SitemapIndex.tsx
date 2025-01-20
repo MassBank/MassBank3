@@ -16,13 +16,15 @@ function SitemapIndex() {
     const searchResult = (await fetchData(url)) as SearchResult;
     const hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
 
+    const lastmod = new Date().toISOString();
+
     const urlSets: string[] = [
       '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
     ];
     const n = Math.ceil(hits.length / nRecords);
     for (let i = 0; i < n; i++) {
       urlSets.push(
-        `<sitemap><loc>${prefixUrl}sitemap/${i}.xml</loc></sitemap>`,
+        `<sitemap><loc>${prefixUrl}sitemap/${i}.xml</loc><lastmod>${lastmod}</lastmod></sitemap>`,
       );
     }
     urlSets.push('</sitemapindex>');
