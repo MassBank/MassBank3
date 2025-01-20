@@ -15,7 +15,6 @@ import {
 } from 'react';
 
 const defaultButtonWidth = 30;
-const defaultButtonHeight = 30;
 
 interface InputProps {
   title: string;
@@ -23,6 +22,7 @@ interface InputProps {
   onClick: () => void;
   width?: CSSProperties['width'];
   height?: CSSProperties['height'];
+  style?: CSSProperties;
   component?: JSX.Element | string;
   componentStyle?: CSSProperties;
   buttonStyle?: CSSProperties;
@@ -36,16 +36,12 @@ function ExportableContent({
   title,
   mode,
   onClick,
+  style = {},
   width = '100%',
   height = '100%',
   component,
   componentStyle = {},
-  buttonStyle = {
-    minWidth: defaultButtonWidth,
-    maxWidth: defaultButtonWidth,
-    minHeight: defaultButtonHeight,
-    maxHeight: defaultButtonHeight,
-  },
+  buttonStyle = {},
   permanentButton = false,
   enableSearch = false,
   searchUrl = '',
@@ -66,13 +62,16 @@ function ExportableContent({
     () => (
       <Content
         style={{
-          minWidth: width,
-          maxWidth: width,
-          minHeight: height,
-          maxHeight: height,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
+          ...{
+            minWidth: width,
+            maxWidth: width,
+            minHeight: height,
+            maxHeight: height,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          },
+          ...style,
         }}
         onMouseEnter={() => setShowButton(true)}
         onMouseLeave={() => setShowButton(false)}
@@ -81,17 +80,16 @@ function ExportableContent({
           <Content
             style={{
               ...{
-                minWidth: enableSearch
-                  ? `calc(${width} - ${buttonStyle.width}px - ${buttonStyle.width}px)`
-                  : `calc(${width} - ${buttonStyle.width}px)`,
-                maxWidth: enableSearch
-                  ? `calc(${width} - ${buttonStyle.width}px - ${buttonStyle.width}px)`
-                  : `calc(${width} - ${buttonStyle.width}px)`,
+                minWidth: width,
+                maxWidth: width,
                 minHeight: height,
                 maxHeight: height,
                 display: 'flex',
-                justifyContent: 'center',
+                justifyContent: 'left',
                 alignItems: 'center',
+                marginRight: enableSearch
+                  ? -2 * defaultButtonWidth
+                  : -defaultButtonWidth,
               },
               ...componentStyle,
             }}
@@ -108,12 +106,8 @@ function ExportableContent({
               maxWidth: enableSearch
                 ? 2 * defaultButtonWidth
                 : defaultButtonWidth,
-              minHeight: enableSearch
-                ? 2 * defaultButtonHeight
-                : defaultButtonHeight,
-              maxHeight: enableSearch
-                ? 2 * defaultButtonHeight
-                : defaultButtonHeight,
+              minHeight: height,
+              maxHeight: height,
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
@@ -188,6 +182,7 @@ function ExportableContent({
       searchTitle,
       searchUrl,
       showButton,
+      style,
       title,
       width,
     ],

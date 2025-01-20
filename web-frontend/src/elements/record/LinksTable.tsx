@@ -11,9 +11,10 @@ type InputProps = {
   links: Link[] | undefined;
   width: CSSProperties['width'];
   height: CSSProperties['height'];
+  title?: string | JSX.Element;
 };
 
-function LinksTable({ links, width, height }: InputProps) {
+function LinksTable({ links, width, height, title }: InputProps) {
   const buildSearchUrl = useCallback((label: string, value: string) => {
     const searchParams = new URLSearchParams();
     searchParams.set(label, value);
@@ -46,8 +47,9 @@ function LinksTable({ links, width, height }: InputProps) {
     ];
 
     const dataSource: { [key: string]: string | JSX.Element }[] = [];
-    links.forEach((link, i) => {
+    links.forEach((link, i) =>
       dataSource.push({
+        key: `links-key-${i}`,
         Database: link.database,
         Identifier: (
           <ExportableContent
@@ -60,9 +62,8 @@ function LinksTable({ links, width, height }: InputProps) {
             searchUrl={buildSearchUrl('inchi', link.identifier)}
           />
         ),
-        key: `links-key-${i}`,
-      });
-    });
+      }),
+    );
 
     return (
       <Table
@@ -72,9 +73,10 @@ function LinksTable({ links, width, height }: InputProps) {
         columns={columns}
         dataSource={dataSource}
         pagination={false}
+        title={title ? () => title : undefined}
       />
     );
-  }, [buildSearchUrl, height, links, width]);
+  }, [buildSearchUrl, height, links, title, width]);
 }
 
 export default LinksTable;

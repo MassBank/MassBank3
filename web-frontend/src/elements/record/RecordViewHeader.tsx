@@ -1,4 +1,4 @@
-import './RecordViewHeader.scss';
+import './Table.scss';
 
 import { Content } from 'antd/es/layout/layout';
 import ExportableContent from '../common/ExportableContent';
@@ -76,15 +76,12 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
           {record.compound.names.map((name, i) => (
             <ExportableContent
               key={'name-label-' + name}
-              component={name}
-              componentStyle={{ justifyContent: 'left' }}
+              component={<label style={{ textWrap: 'balance' }}>{name}</label>}
               mode="copy"
-              onClick={() => handleOnCopy(`${i + 1}. compound name:`, name)}
-              width="100%"
-              height="100%"
-              title="Copy compound name to clipboard"
+              onClick={() => handleOnCopy(`Compound name ${i + 1}`, name)}
+              title={`Copy compound name ${i + 1} to clipboard`}
               enableSearch
-              searchTitle="Search for compound name"
+              searchTitle={`Search for compound name ${i + 1}`}
               searchUrl={buildSearchUrl('compound_name', name)}
             />
           ))}
@@ -99,53 +96,16 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
         record.compound.classes.length === 1 &&
         record.compound.classes[0] !== 'N/A' ? (
           <ExportableContent
-            component={record.compound.classes[0]}
-            componentStyle={{ justifyContent: 'left' }}
+            component={
+              <label style={{ textWrap: 'balance' }}>
+                {record.compound.classes[0]}
+              </label>
+            }
             mode="copy"
             onClick={() =>
               handleOnCopy('Compound classes', record.compound.classes[0])
             }
-            width="100%"
-            height="100%"
             title="Copy compound classes to clipboard"
-          />
-        ) : (
-          <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
-        ),
-    });
-    dataSource.push({
-      key: 'record-view-header-table-authors',
-      label: 'Authors',
-      value: (
-        <ExportableContent
-          component={record.authors.map((a) => a.name).join(', ')}
-          componentStyle={{ justifyContent: 'left' }}
-          mode="copy"
-          onClick={() =>
-            handleOnCopy(
-              'Authors',
-              record.authors.map((a) => a.name).join(', '),
-            )
-          }
-          width="100%"
-          height="100%"
-          title="Copy authors to clipboard"
-        />
-      ),
-    });
-    dataSource.push({
-      key: 'record-view-header-table-publication',
-      label: 'Publication',
-      value:
-        record.publication && record.publication !== '' ? (
-          <ExportableContent
-            component={record.publication}
-            componentStyle={{ justifyContent: 'left' }}
-            mode="copy"
-            onClick={() => handleOnCopy('Publication', record.publication)}
-            width="100%"
-            height="100%"
-            title="Copy publication to clipboard"
           />
         ) : (
           <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
@@ -156,12 +116,13 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
       label: 'SMILES',
       value: (
         <ExportableContent
-          component={record.compound.smiles}
-          componentStyle={{ justifyContent: 'left' }}
+          component={
+            <label style={{ textWrap: 'balance' }}>
+              {record.compound.smiles}
+            </label>
+          }
           mode="copy"
           onClick={() => handleOnCopy('SMILES', record.compound.smiles)}
-          width="100%"
-          height="100%"
           title="Copy SMILES to clipboard"
           enableSearch
           searchTitle="Search for SMILES"
@@ -174,12 +135,13 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
       label: 'InChI',
       value: (
         <ExportableContent
-          component={record.compound.inchi}
-          componentStyle={{ justifyContent: 'left' }}
+          component={
+            <label style={{ textWrap: 'balance' }}>
+              {record.compound.inchi}
+            </label>
+          }
           mode="copy"
           onClick={() => handleOnCopy('InChI', record.compound.inchi)}
-          width="100%"
-          height="100%"
           title="Copy InChi to clipboard"
           enableSearch
           searchTitle="Search for InChI"
@@ -193,11 +155,8 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
       value: (
         <ExportableContent
           component={record.peak.splash}
-          componentStyle={{ justifyContent: 'left' }}
           mode="copy"
           onClick={() => handleOnCopy('SPLASH', record.peak.splash)}
-          width="100%"
-          height="100%"
           title="Copy SPLASH to clipboard"
           enableSearch
           searchTitle="Search for SPLASH"
@@ -229,12 +188,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
           }}
           mode="copy"
           onClick={() => handleOnCopy('Title', record.title)}
-          width="100%"
-          height="100%"
           title="Copy title to clipboard"
-          buttonStyle={{
-            fontSize: undefined,
-          }}
         />
         <Content
           style={{
@@ -252,7 +206,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
               maxWidth: `calc(100% - ${imageWidth})`,
               height: '100%',
             }}
-            className="record-view-header-table"
+            className="table"
             sticky
             pagination={false}
             showHeader={false}
@@ -283,16 +237,18 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
                 width: imageWidth,
                 height: `calc(100% - ${height} - ${titleHeight} - 80px)`,
                 display: 'grid',
-                gridTemplateColumns: '65px auto 95px auto',
-                justifyContent: 'center',
+                gridTemplateColumns: '75px auto 55px auto',
                 alignItems: 'center',
-                padding: 10,
+                paddingTop: 10,
               }}
             >
               <label>Formula: </label>
               <ExportableContent
                 component={<MF mf={record.compound.formula} />}
-                componentStyle={{ fontWeight: 'bolder', marginRight: 20 }}
+                componentStyle={{
+                  fontWeight: 'bolder',
+                  justifyContent: 'left',
+                }}
                 mode="copy"
                 onClick={() =>
                   copyTextToClipboard(
@@ -300,17 +256,19 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
                     record.compound.formula,
                   )
                 }
-                width="100%"
-                height="100%"
                 title="Copy molecular formula to clipboard"
                 enableSearch
                 searchTitle="Search for molecular formula"
                 searchUrl={buildSearchUrl('formula', record.compound.formula)}
+                buttonStyle={{ paddingRight: 50 }}
               />
-              <label style={{ marginLeft: 50 }}>Mass: </label>
+              <label>Mass: </label>
               <ExportableContent
                 component={record.compound.mass.toString()}
-                componentStyle={{ fontWeight: 'bolder', marginRight: 20 }}
+                componentStyle={{
+                  fontWeight: 'bolder',
+                  justifyContent: 'left',
+                }}
                 mode="copy"
                 onClick={() =>
                   copyTextToClipboard(
@@ -318,8 +276,6 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
                     record.compound.mass.toString(),
                   )
                 }
-                width="100%"
-                height="100%"
                 title="Copy molecular mass to clipboard"
                 enableSearch
                 searchTitle="Search for molecular mass"
@@ -327,6 +283,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
                   'exact_mass',
                   record.compound.mass.toString(),
                 )}
+                buttonStyle={{ paddingRight: 50 }}
               />
             </Content>
           </Content>
@@ -338,7 +295,6 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
     handleOnCopy,
     height,
     imageWidth,
-    record.authors,
     record.compound.classes,
     record.compound.formula,
     record.compound.inchi,
@@ -346,7 +302,6 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
     record.compound.names,
     record.compound.smiles,
     record.peak.splash,
-    record.publication,
     record.title,
     width,
   ]);

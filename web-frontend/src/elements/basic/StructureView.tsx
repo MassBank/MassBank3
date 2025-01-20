@@ -42,10 +42,11 @@ function StructureView({ smiles, imageWidth, imageHeight }: InputProps) {
       onClick={handleOnDownload}
       width={imageWidth}
       height={imageHeight}
+      componentStyle={{ justifyContent: 'center' }}
       buttonStyle={{
         minWidth: defaultButtonWidth,
         maxWidth: defaultButtonWidth,
-        paddingRight: 30,
+        paddingRight: 50,
       }}
     />
   );
