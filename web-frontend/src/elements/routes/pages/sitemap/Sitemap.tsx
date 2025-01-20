@@ -14,30 +14,33 @@ function Sitemap() {
   const params = useParams();
   const [xml, setXml] = useState<string | null>(null);
 
-  const buildSitemap = useCallback(async (index: number) => {
-    const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/search';
-    const searchResult = (await fetchData(url)) as SearchResult;
-    const hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
+  const buildSitemap = useCallback(
+    async (index: number) => {
+      const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/search';
+      const searchResult = (await fetchData(url)) as SearchResult;
+      const hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
 
-    if (index * nRecords >= hits.length) {
-      navigate({ pathname: import.meta.env.VITE_MB3_BASE_URL + 'notFound' });
-    }
+      if (index * nRecords >= hits.length) {
+        navigate({ pathname: import.meta.env.VITE_MB3_BASE_URL + 'notFound' });
+      }
 
-    const lastmod = new Date().toISOString();
+      const lastmod = new Date().toISOString();
 
-    const xmlHeader =
-      '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-    const xmlFooter = '</urlset>';
-    const xmlContent: string[] = [xmlHeader];
-    hits.slice(index * nRecords, (index + 1) * nRecords).forEach((hit) => {
-      xmlContent.push(
-        `<url><loc>${prefixUrl}recordDisplay?id=${hit.accession}</loc><lastmod>${lastmod}</lastmod></url>`,
-      );
-    });
-    xmlContent.push(xmlFooter);
+      const xmlHeader =
+        '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+      const xmlFooter = '</urlset>';
+      const xmlContent: string[] = [xmlHeader];
+      hits.slice(index * nRecords, (index + 1) * nRecords).forEach((hit) => {
+        xmlContent.push(
+          `<url><loc>${prefixUrl}recordDisplay?id=${hit.accession}</loc><lastmod>${lastmod}</lastmod></url>`,
+        );
+      });
+      xmlContent.push(xmlFooter);
 
-    setXml(xmlFormat(xmlContent.join('')));
-  }, []);
+      setXml(xmlFormat(xmlContent.join('')));
+    },
+    [navigate],
+  );
 
   useEffect(() => {
     const index = params.index?.split('.')[0];
