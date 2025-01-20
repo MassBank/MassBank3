@@ -36,9 +36,16 @@ function Header() {
     ),
   };
 
-  const routeLinks: MenuItem[] = routes
-    .filter((route) => route.id !== 'NotFound' && route.id !== 'Home')
-    .map((route) => {
+  const routeLinks: MenuItem[] = Object.keys(routes)
+    .filter(
+      (k) =>
+        k !== routes.notFound.id &&
+        k !== routes.home.id &&
+        k !== routes.accessionPrevious.id &&
+        k !== routes.sitemap.id,
+    )
+    .map((k) => {
+      const route = routes[k];
       return {
         key: route.path,
         label: (
@@ -57,7 +64,7 @@ function Header() {
                   : { fontSize: 16 }
               }
             >
-              {route.id}
+              {route.label}
             </Link>
           </Button>
         ),

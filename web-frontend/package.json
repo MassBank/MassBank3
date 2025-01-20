@@ -42,7 +42,8 @@
     "react": "^18",
     "react-dom": "^18",
     "react-mf": "^3.0.0",
-    "react-ocl": "^7.0.2"
+    "react-ocl": "^7.0.2",
+    "xml-formatter": "^3.6.3"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.26.3",

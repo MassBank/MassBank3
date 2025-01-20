@@ -1,10 +1,8 @@
 import React from 'react';
 import { Layout } from 'antd';
-import Header from './elements/header/Header';
 import { BrowserRouter } from 'react-router-dom';
 import { HighlightProvider } from './highlight/Index';
-import Footer from './elements/footer/Footer';
-import Body from './elements/body/Body';
+import Routing from './elements/routes/Routing';
 
 const App: React.FC = () => {
   return (
@@ -16,9 +14,7 @@ const App: React.FC = () => {
             height: '100vh',
           }}
         >
-          <Header />
-          <Body />
-          <Footer />
+          <Routing />
         </Layout>
       </HighlightProvider>
     </BrowserRouter>
