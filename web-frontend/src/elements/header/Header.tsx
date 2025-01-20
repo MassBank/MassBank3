@@ -36,16 +36,15 @@ function Header() {
     ),
   };
 
-  const routeLinks: MenuItem[] = Object.keys(routes)
+  const routeLinks: MenuItem[] = Object.values(routes)
     .filter(
-      (k) =>
-        k !== routes.notFound.id &&
-        k !== routes.home.id &&
-        k !== routes.accessionPrevious.id &&
-        k !== routes.sitemap.id,
+      (route) =>
+        route.id !== routes.notFound.id &&
+        route.id !== routes.home.id &&
+        route.id !== routes.accessionPrevious.id &&
+        route.id !== routes.sitemap.id,
     )
-    .map((k) => {
-      const route = routes[k];
+    .map((route) => {
       return {
         key: route.path,
         label: (
