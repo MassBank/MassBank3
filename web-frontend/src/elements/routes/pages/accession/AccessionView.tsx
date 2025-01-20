@@ -87,11 +87,7 @@ function AccessionView() {
           const json =
             '[' +
             (data as object[])
-              .map((d) => {
-                // delete d['about'];
-                // delete d['subjectOf'];
-                return JSON.stringify(d, null, 2);
-              })
+              .map((d) => JSON.stringify(d, null, 2))
               .join(',\n') +
             ']';
           removeRecordMetadataChildNode();
