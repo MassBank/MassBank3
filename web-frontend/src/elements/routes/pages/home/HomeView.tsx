@@ -1,5 +1,5 @@
 import Layout, { Content, Header } from 'antd/es/layout/layout';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 
@@ -8,13 +8,6 @@ const accessionSearchInputFieldHeight = 50;
 function HomeView() {
   const ref = useRef(null);
   const { height } = useContainerDimensions(ref);
-
-  useEffect(() => {
-    const googleMeta = document.createElement('meta');
-    googleMeta.name = 'google-site-verification';
-    googleMeta.content = '4aoZgYg2lHeh7TlOxtyVzjHa3YJirrsEHPqwSU3luoU';
-    document.head.appendChild(googleMeta);
-  }, []);
 
   return (
     <Layout
