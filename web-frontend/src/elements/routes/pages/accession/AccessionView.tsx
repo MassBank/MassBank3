@@ -9,6 +9,7 @@ import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import { Content, Header } from 'antd/es/layout/layout';
 import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
 import axios from 'axios';
+import { Helmet } from 'react-helmet';
 
 function AccessionView() {
   const ref = useRef(null);
@@ -19,6 +20,7 @@ function AccessionView() {
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [requestedAccession, setRequestedAccession] = useState<string>('');
   const [record, setRecord] = useState<Record | undefined>();
+  const [metadata, setMetadata] = useState<string>('');
 
   const headerHeight = 50;
 
@@ -38,9 +40,6 @@ function AccessionView() {
         _p.id = generateID();
         return _p;
       });
-      if (rec.title) {
-        document.title = rec.title + ' MassBank';
-      }
       setRecord(rec);
     } else {
       setRecord(undefined);
@@ -64,88 +63,70 @@ function AccessionView() {
     [record, width, height, requestedAccession],
   );
 
-  const removeRecordMetadataChildNode = useCallback(() => {
-    const metadataElement = document.getElementById('recordMetadata');
-    if (metadataElement) {
-      document.head.removeChild(metadataElement);
+  const buildRecordMetadata = useCallback(async (_accession: string) => {
+    const host = import.meta.env.VITE_EXPORT_SERVICE_URL;
+    const url = `${host}/metadata/${_accession}`;
+
+    const resp = await axios.get(url, {
+      headers: {
+        Accept: 'application/ld+json',
+      },
+    });
+    if (resp.status === 200) {
+      const data = await resp.data;
+      if (data) {
+        const json =
+          '[' +
+          (data as object[])
+            .map((d) => JSON.stringify(d, null, 2))
+            .join(',\n') +
+          ']';
+
+        setMetadata(json);
+      }
     }
   }, []);
-
-  const addRecordMetadataChildNode = useCallback(
-    async (_accession: string) => {
-      const host = import.meta.env.VITE_EXPORT_SERVICE_URL;
-      const url = `${host}/metadata/${_accession}`;
-
-      const resp = await axios.get(url, {
-        headers: {
-          Accept: 'application/ld+json',
-        },
-      });
-      if (resp.status === 200) {
-        const data = await resp.data;
-        if (data) {
-          const json =
-            '[' +
-            (data as object[])
-              .map((d) => JSON.stringify(d, null, 2))
-              .join(',\n') +
-            ']';
-          removeRecordMetadataChildNode();
-          const scriptElement = document.createElement('script');
-          scriptElement.id = 'recordMetadata';
-          scriptElement.type = 'application/ld+json';
-          scriptElement.textContent = json;
-          document.head.appendChild(scriptElement);
-
-          return scriptElement;
-        }
-      }
-    },
-    [removeRecordMetadataChildNode],
-  );
 
   useEffect(() => {
     const id = searchParams.get('id');
     if (id) {
-      addRecordMetadataChildNode(id);
+      buildRecordMetadata(id);
       setAccession(id);
       handleOnSearch(id);
     }
-    return () => {
-      removeRecordMetadataChildNode();
-    };
-  }, [
-    addRecordMetadataChildNode,
-    handleOnSearch,
-    removeRecordMetadataChildNode,
-    searchParams,
-  ]);
+  }, [buildRecordMetadata, handleOnSearch, searchParams]);
 
   return useMemo(
     () => (
-      <Layout ref={ref} style={{ width: '100%', height: '100%' }}>
-        <Header style={{ width: '100%', height: headerHeight, padding: 0 }}>
-          <AccessionSearchInputField
-            width="100%"
-            height={headerHeight}
-            accession={accession}
-          />
-        </Header>
-        <Content
-          style={{
-            width: '100%',
-            height: height - headerHeight,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          {isRequesting ? <Spin size="large" /> : recordView}
-        </Content>
-      </Layout>
+      <>
+        <Helmet>
+          <title>{record?.title + ' MassBank Europe'}</title>
+          <script type="application/ld+json">{metadata}</script>
+        </Helmet>
+        <Layout ref={ref} style={{ width: '100%', height: '100%' }}>
+          <Header style={{ width: '100%', height: headerHeight, padding: 0 }}>
+            <AccessionSearchInputField
+              width="100%"
+              height={headerHeight}
+              accession={accession}
+            />
+          </Header>
+          <Content
+            style={{
+              width: '100%',
+              height: height - headerHeight,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            {isRequesting ? <Spin size="large" /> : recordView}
+          </Content>
+        </Layout>
+      </>
     ),
 
-    [accession, height, isRequesting, recordView],
+    [accession, height, isRequesting, metadata, recordView],
   );
 }
 
