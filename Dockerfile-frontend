@@ -11,6 +11,6 @@ RUN npm run clean-install
 # for production mode
 RUN export NODE_OPTIONS=--max-old-space-size=2048 && npm run build
 
-ENTRYPOINT sh entrypoint.sh ${MB3_API_URL} ${MB3_FRONTEND_URL} ${MB3_FRONTEND_BASE_URL} "${MB3_FRONTEND_VERSION}" "${EXPORT_SERVICE_URL}"
+ENTRYPOINT sh entrypoint.sh ${MB3_API_URL} ${MB3_FRONTEND_URL} ${MB3_FRONTEND_BASE_URL} "${MB3_FRONTEND_VERSION}" "${EXPORT_SERVICE_URL}" "${GOOGLE_SEARCH_CONSOLE_KEY}"
 
 EXPOSE 3000
