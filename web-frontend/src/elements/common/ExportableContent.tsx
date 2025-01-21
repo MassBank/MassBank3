@@ -11,10 +11,15 @@ import {
   MouseEvent,
   useCallback,
   useMemo,
+  useRef,
   useState,
 } from 'react';
+import useContainerDimensions from '../../utils/useContainerDimensions';
 
-const defaultButtonWidth = 30;
+const defaultButtonWidth = 20;
+const defaultButtonHeight = 20;
+const marginLeftButtonsContainer = 15;
+const marginLeftSearchButton = 10;
 
 interface InputProps {
   title: string;
@@ -24,8 +29,8 @@ interface InputProps {
   height?: CSSProperties['height'];
   style?: CSSProperties;
   component?: JSX.Element | string;
-  componentStyle?: CSSProperties;
-  buttonStyle?: CSSProperties;
+  componentContainerStyle?: CSSProperties;
+  buttonContainerStyle?: CSSProperties;
   permanentButton?: boolean;
   enableSearch?: boolean;
   searchUrl?: string;
@@ -40,13 +45,17 @@ function ExportableContent({
   width = '100%',
   height = '100%',
   component,
-  componentStyle = {},
-  buttonStyle = {},
+  componentContainerStyle = {},
+  buttonContainerStyle = {},
   permanentButton = false,
   enableSearch = false,
   searchUrl = '',
   searchTitle = '',
 }: InputProps) {
+  const componentContainerRef = useRef<HTMLDivElement>(null);
+  const { width: componentWidth } = useContainerDimensions(
+    componentContainerRef,
+  );
   const [showButton, setShowButton] = useState<boolean>(false);
 
   const handleOnClick = useCallback(
@@ -77,57 +86,59 @@ function ExportableContent({
         onMouseLeave={() => setShowButton(false)}
       >
         {component && (
-          <Content
+          <div
+            ref={componentContainerRef}
             style={{
               ...{
-                minWidth: width,
-                maxWidth: width,
                 minHeight: height,
                 maxHeight: height,
                 display: 'flex',
                 justifyContent: 'left',
                 alignItems: 'center',
-                marginRight: enableSearch
-                  ? -2 * defaultButtonWidth
-                  : -defaultButtonWidth,
               },
-              ...componentStyle,
+              ...componentContainerStyle,
             }}
           >
             {component}
-          </Content>
+          </div>
         )}
         <Content
           style={{
             ...{
               minWidth: enableSearch
-                ? 2 * defaultButtonWidth
-                : defaultButtonWidth,
-              maxWidth: enableSearch
-                ? 2 * defaultButtonWidth
-                : defaultButtonWidth,
-              minHeight: height,
-              maxHeight: height,
+                ? 2 * defaultButtonWidth +
+                  marginLeftSearchButton +
+                  marginLeftButtonsContainer
+                : defaultButtonWidth + marginLeftButtonsContainer,
+              maxWidth: `calc(100% - ${componentWidth})`,
+              marginLeft: marginLeftButtonsContainer,
+              minHeight: defaultButtonHeight,
+              maxHeight: defaultButtonHeight,
               display: 'flex',
-              justifyContent: 'center',
+              justifyContent: 'left',
               alignItems: 'center',
             },
-            ...buttonStyle,
+            ...buttonContainerStyle,
           }}
         >
           <Button
             children={
-              <a>
-                <FontAwesomeIcon
-                  icon={mode === 'copy' ? faCopy : faFileArrowDown}
-                  title={title}
-                />
-              </a>
+              <FontAwesomeIcon
+                icon={mode === 'copy' ? faCopy : faFileArrowDown}
+                title={title}
+                style={{
+                  width: defaultButtonWidth,
+                  padding: 0,
+                  margin: 0,
+                }}
+              />
             }
             onClick={handleOnClick}
             style={{
-              width: enableSearch ? '100%' : '50%',
-              height: '100%',
+              width: defaultButtonWidth,
+              height: defaultButtonHeight,
+              padding: 0,
+              margin: 0,
               cursor: 'pointer',
               border: 'none',
               boxShadow: 'none',
@@ -149,12 +160,20 @@ function ExportableContent({
                   <FontAwesomeIcon
                     icon={faMagnifyingGlass}
                     title={searchTitle}
+                    style={{
+                      width: defaultButtonWidth,
+                      padding: 0,
+                      margin: 0,
+                    }}
                   />
                 </a>
               }
               style={{
-                width: '50%',
-                height: '100%',
+                width: defaultButtonWidth,
+                height: defaultButtonHeight,
+                padding: 0,
+                margin: 0,
+                marginLeft: marginLeftSearchButton,
                 cursor: 'pointer',
                 border: 'none',
                 boxShadow: 'none',
@@ -171,9 +190,10 @@ function ExportableContent({
       </Content>
     ),
     [
-      buttonStyle,
+      buttonContainerStyle,
       component,
-      componentStyle,
+      componentContainerStyle,
+      componentWidth,
       enableSearch,
       handleOnClick,
       height,

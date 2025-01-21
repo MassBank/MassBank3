@@ -9,6 +9,7 @@ import { Table } from 'antd';
 import Record from '../../types/Record';
 import { MF } from 'react-mf';
 import StructureView from '../basic/StructureView';
+import LabelWrapper from './LabelWrapper';
 
 const titleHeight = 50;
 const labelWidth = 120;
@@ -76,7 +77,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
           {record.compound.names.map((name, i) => (
             <ExportableContent
               key={'name-label-' + name}
-              component={<label style={{ textWrap: 'balance' }}>{name}</label>}
+              component={<LabelWrapper value={name} />}
               mode="copy"
               onClick={() => handleOnCopy(`Compound name ${i + 1}`, name)}
               title={`Copy compound name ${i + 1} to clipboard`}
@@ -96,11 +97,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
         record.compound.classes.length === 1 &&
         record.compound.classes[0] !== 'N/A' ? (
           <ExportableContent
-            component={
-              <label style={{ textWrap: 'balance' }}>
-                {record.compound.classes[0]}
-              </label>
-            }
+            component={<LabelWrapper value={record.compound.classes[0]} />}
             mode="copy"
             onClick={() =>
               handleOnCopy('Compound classes', record.compound.classes[0])
@@ -116,11 +113,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
       label: 'SMILES',
       value: (
         <ExportableContent
-          component={
-            <label style={{ textWrap: 'balance' }}>
-              {record.compound.smiles}
-            </label>
-          }
+          component={<LabelWrapper value={record.compound.smiles} />}
           mode="copy"
           onClick={() => handleOnCopy('SMILES', record.compound.smiles)}
           title="Copy SMILES to clipboard"
@@ -135,11 +128,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
       label: 'InChI',
       value: (
         <ExportableContent
-          component={
-            <label style={{ textWrap: 'balance' }}>
-              {record.compound.inchi}
-            </label>
-          }
+          component={<LabelWrapper value={record.compound.inchi} />}
           mode="copy"
           onClick={() => handleOnCopy('InChI', record.compound.inchi)}
           title="Copy InChi to clipboard"
@@ -178,13 +167,14 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
         }}
       >
         <ExportableContent
-          component={record.title}
-          componentStyle={{
+          component={<LabelWrapper value={record.title} />}
+          componentContainerStyle={{
             minHeight: titleHeight,
             maxHeight: titleHeight,
             fontSize: 18,
             fontWeight: 'bold',
-            padding: 10,
+            width: '100%',
+            justifyContent: 'center',
           }}
           mode="copy"
           onClick={() => handleOnCopy('Title', record.title)}
@@ -245,9 +235,8 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
               <label>Formula: </label>
               <ExportableContent
                 component={<MF mf={record.compound.formula} />}
-                componentStyle={{
+                componentContainerStyle={{
                   fontWeight: 'bolder',
-                  justifyContent: 'left',
                 }}
                 mode="copy"
                 onClick={() =>
@@ -260,14 +249,12 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
                 enableSearch
                 searchTitle="Search for molecular formula"
                 searchUrl={buildSearchUrl('formula', record.compound.formula)}
-                buttonStyle={{ paddingRight: 50 }}
               />
               <label>Mass: </label>
               <ExportableContent
                 component={record.compound.mass.toString()}
-                componentStyle={{
+                componentContainerStyle={{
                   fontWeight: 'bolder',
-                  justifyContent: 'left',
                 }}
                 mode="copy"
                 onClick={() =>
@@ -283,7 +270,6 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
                   'exact_mass',
                   record.compound.mass.toString(),
                 )}
-                buttonStyle={{ paddingRight: 50 }}
               />
             </Content>
           </Content>

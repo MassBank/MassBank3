@@ -5,6 +5,7 @@ import { CSSProperties, useCallback, useMemo } from 'react';
 import Record from '../../types/Record';
 import ExportableContent from '../common/ExportableContent';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
+import LabelWrapper from './LabelWrapper';
 
 type InformationTableType = {
   key: string;
@@ -45,16 +46,15 @@ function InformationTable({ record, width, height }: InputProps) {
     ];
 
     const dataSource: InformationTableType[] = [];
-
     dataSource.push({
       key: 'record-view-general-table-authors',
       label: 'Authors',
       value: (
         <ExportableContent
           component={
-            <label style={{ textWrap: 'balance' }}>
-              {record.authors.map((a) => a.name).join(', ')}
-            </label>
+            <LabelWrapper
+              value={record.authors.map((a) => a.name).join(', ')}
+            />
           }
           mode="copy"
           onClick={() =>
@@ -73,11 +73,7 @@ function InformationTable({ record, width, height }: InputProps) {
       value:
         record.publication && record.publication !== '' ? (
           <ExportableContent
-            component={
-              <label style={{ textWrap: 'balance' }}>
-                {record.publication}
-              </label>
-            }
+            component={<LabelWrapper value={record.publication} />}
             mode="copy"
             onClick={() => handleOnCopy('Publication', record.publication)}
             title="Copy publication to clipboard"

@@ -551,7 +551,7 @@ function Chart({
               />
               {!disableExport && (
                 <ExportableContent
-                  width={30}
+                  width={80}
                   height={'100%'}
                   mode="copy"
                   title="Copy peak list of current spectrum view to clipboard"
@@ -560,7 +560,6 @@ function Chart({
                   enableSearch
                   searchTitle="Search similar spectra for peaks in current spectrum view"
                   searchUrl={buildSearchUrl(filteredPeakData)}
-                  buttonStyle={{ marginLeft: 35 }}
                 />
               )}
             </Content>
