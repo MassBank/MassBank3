@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: massbank3-export-service
-          image: quay.io/massbank/massbank3-export-service:v1.1 # Container Image
+          image: quay.io/massbank/massbank3-export-service:v1.3 # Container Image
           envFrom:
             - configMapRef:
                 name:

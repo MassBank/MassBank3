@@ -9,7 +9,9 @@ data:
   MB3_API_URL: "https://msbi.ipb-halle.de/MassBank3-api/"
   MB3_FRONTEND_URL: "https://msbi.ipb-halle.de"
   MB3_FRONTEND_BASE_URL: "/MassBank3/"
+  MB3_FRONTEND_VERSION: "0.4.0 (beta)"
   EXPORT_SERVICE_URL: "https://msbi.ipb-halle.de/MassBank3-export/"
+  GOOGLE_SEARCH_CONSOLE_KEY: ""
 ---
 apiVersion: apps/v1
 kind: Deployment
