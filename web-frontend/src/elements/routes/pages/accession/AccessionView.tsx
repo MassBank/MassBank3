@@ -126,7 +126,7 @@ function AccessionView() {
       </>
     ),
 
-    [accession, height, isRequesting, metadata, recordView],
+    [accession, height, isRequesting, metadata, record?.title, recordView],
   );
 }
 
