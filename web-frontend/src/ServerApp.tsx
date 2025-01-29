@@ -1,32 +1,24 @@
-import { renderToString } from 'react-dom/server';
-import { createCache, extractStyle, StyleProvider } from '@ant-design/cssinjs';
-import { StaticRouter } from 'react-router-dom';
-import { StrictMode } from 'react';
-import Routing from './elements/routes/Routing';
-import {
-  PropertiesContext,
-  PropertiesContextProps,
-} from './context/properties/propertiesContext';
+import { renderToString } from "react-dom/server";
+import { createCache, extractStyle, StyleProvider } from "@ant-design/cssinjs";
+import { StaticRouter } from "react-router-dom";
+import { StrictMode } from "react";
+import Routing from "./elements/routes/Routing";
 
 interface IRenderProps {
   path: string;
-  props: PropertiesContextProps;
 }
 
-export const render = ({ path, props }: IRenderProps) => {
-  console.log('render', path, props);
+export const render = ({ path }: IRenderProps) => {
   // SSR Render
   const cache = createCache();
   const html = renderToString(
     <StrictMode>
       <StyleProvider cache={cache}>
         <StaticRouter location={path}>
-          <PropertiesContext.Provider value={props ?? {}}>
-            <Routing />
-          </PropertiesContext.Provider>
+          <Routing />
         </StaticRouter>
       </StyleProvider>
-    </StrictMode>,
+    </StrictMode>
   );
 
   // Grab style from cache

@@ -1,30 +1,29 @@
-import './Header.scss';
+import "./Header.scss";
 
-import routes from '../../constants/routes';
-import { Button, Menu, MenuProps } from 'antd';
-import { Header as HeaderAntD } from 'antd/es/layout/layout';
-import { Link, useLocation } from 'react-router-dom';
-import { usePropertiesContext } from '../../context/properties/propertiesContext';
+import routes from "../../constants/routes";
+import { Button, Menu, MenuProps } from "antd";
+import { Header as HeaderAntD } from "antd/es/layout/layout";
+import { Link } from "react-router-dom";
 
 function Header() {
-  const location = useLocation();
-  const { baseUrl } = usePropertiesContext();
-  type MenuItem = Required<MenuProps>['items'][number];
+  const url = import.meta.env.VITE_MB3_BASE_URL;
+
+  type MenuItem = Required<MenuProps>["items"][number];
 
   const logoLink: MenuItem = {
-    key: 'logo-link',
+    key: "logo-link",
     label: (
       <Button
         key="logo-li"
         style={{
-          border: 'none',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          boxShadow: 'none',
+          border: "none",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          boxShadow: "none",
         }}
       >
-        <Link to={baseUrl} target="_self">
+        <Link to={url} target="_self">
           <img
             src="logos/logo.svg"
             alt="MassBank Europe"
@@ -40,7 +39,7 @@ function Header() {
       (route) =>
         route.id !== routes.notFound.id &&
         route.id !== routes.home.id &&
-        route.id !== routes.accessionPrevious.id,
+        route.id !== routes.accessionPrevious.id
     )
     .map((route) => {
       return {
@@ -48,14 +47,11 @@ function Header() {
         label: (
           <a href={route.path as string} target="_self">
             <Button
-              key={route.path + '-li'}
+              key={route.path + "-li"}
               style={{
-                border: 'none',
-                boxShadow: 'none',
-                color:
-                  baseUrl + route.path === location.pathname
-                    ? 'blue'
-                    : undefined,
+                border: "none",
+                boxShadow: "none",
+                // color: route.path == location.pathname ? "blue" : undefined,
               }}
             >
               {route.label}
@@ -70,25 +66,25 @@ function Header() {
   return (
     <HeaderAntD
       style={{
-        width: '100%',
+        width: "100%",
         height: 60,
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'white',
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "white",
       }}
     >
       <Menu
         mode="horizontal"
-        defaultSelectedKeys={['logo-link']}
+        defaultSelectedKeys={["logo-link"]}
         items={items}
         style={{
-          width: '100%',
+          width: "100%",
           height: 60,
-          display: 'flex',
-          justifyContent: 'space-evenly',
-          alignItems: 'center',
+          display: "flex",
+          justifyContent: "space-evenly",
+          alignItems: "center",
         }}
       />
     </HeaderAntD>

@@ -1,10 +1,10 @@
-import './SpectralHitsCarouselView.scss';
+import "./SpectralHitsCarouselView.scss";
 
-import { useMemo } from 'react';
-import Peak from '../../../../types/peak/Peak';
-import Hit from '../../../../types/Hit';
-import SpectralHitsViewComponent from './SpectralHitsViewComponent';
-import { Carousel } from 'antd';
+import { useMemo } from "react";
+import Peak from "../../../../types/peak/Peak";
+import Hit from "../../../../types/Hit";
+import SpectralHitsViewComponent from "./SpectralHitsViewComponent";
+import { Carousel } from "antd";
 
 type InputProps = {
   reference?: Peak[];
@@ -26,7 +26,7 @@ function SpectralHitsCarouselView({
   const elements = useMemo(() => {
     return hits.map((hit, i) => (
       <SpectralHitsViewComponent
-        key={'spectral-hits-view-component_' + i + '_' + hit.accession}
+        key={"spectral-hits-view-component_" + i + "_" + hit.accession}
         reference={reference}
         hit={hit}
         width={_width - 80}
@@ -50,7 +50,7 @@ function SpectralHitsCarouselView({
         {elements}
       </Carousel>
     ),
-    [_width, elements, height, slideIndex],
+    [_width, elements, height, slideIndex]
   );
 }
 

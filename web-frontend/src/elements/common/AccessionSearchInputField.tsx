@@ -1,19 +1,18 @@
-import { Button, Input } from 'antd';
-import { Content } from 'antd/es/layout/layout';
+import { Button, Input } from "antd";
+import { Content } from "antd/es/layout/layout";
 import {
   ChangeEvent,
   CSSProperties,
   KeyboardEvent,
   useCallback,
-  useMemo,
   useState,
-} from 'react';
-import { createSearchParams, useNavigate } from 'react-router-dom';
-import routes from '../../constants/routes';
+} from "react";
+import { createSearchParams, useNavigate } from "react-router-dom";
+import routes from "../../constants/routes";
 
 type InputProps = {
-  width: CSSProperties['width'];
-  height: CSSProperties['height'];
+  width: CSSProperties["width"];
+  height: CSSProperties["height"];
   accession?: string;
 };
 
@@ -22,7 +21,7 @@ function AccessionSearchInputField({
   height,
   accession: acc,
 }: InputProps) {
-  const [accession, setAccession] = useState<string>(acc ?? '');
+  const [accession, setAccession] = useState<string>(acc ?? "");
   const navigate = useNavigate();
 
   const handleOnChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -38,49 +37,46 @@ function AccessionSearchInputField({
         pathname: routes.accession.path,
         search: `?${createSearchParams({ id: accession })}`,
       }),
-    [accession, navigate],
+    [accession, navigate]
   );
 
   const handleOnKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter') {
+      if (e.key === "Enter") {
         handleOnClick();
       }
     },
-    [handleOnClick],
+    [handleOnClick]
   );
 
-  return useMemo(
-    () => (
-      <Content
-        style={{
-          width,
-          height,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: '#f3ece0',
-        }}
-      >
-        <Input
-          type="text"
-          placeholder="e.g. MSBNK-AAFC-AC000114"
-          value={accession && accession !== '' ? accession : undefined}
-          addonBefore="Go to accession:"
-          onChange={handleOnChange}
-          onKeyDown={handleOnKeyDown}
-          allowClear
-          style={{ width: 500 }}
-        />
-        <Button
-          children="Search"
-          onClick={handleOnClick}
-          disabled={accession.trim() === ''}
-          style={{ width: 100, marginLeft: 20 }}
-        />
-      </Content>
-    ),
-    [accession, handleOnChange, handleOnClick, handleOnKeyDown, height, width],
+  return (
+    <Content
+      style={{
+        width,
+        height,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#f3ece0",
+      }}
+    >
+      <Input
+        type="text"
+        placeholder="e.g. MSBNK-AAFC-AC000114"
+        value={accession && accession !== "" ? accession : undefined}
+        addonBefore="Go to accession:"
+        onChange={handleOnChange}
+        onKeyDown={handleOnKeyDown}
+        allowClear
+        style={{ width: 500 }}
+      />
+      <Button
+        children="Search"
+        onClick={handleOnClick}
+        disabled={accession.trim() === ""}
+        style={{ width: 100, marginLeft: 20 }}
+      />
+    </Content>
   );
 }
 

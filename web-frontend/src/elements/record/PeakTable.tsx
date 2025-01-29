@@ -6,7 +6,7 @@ import LinkedPeakAnnotation from '../../types/peak/LinkedPeakAnnotation';
 import PeakAnnotation from '../../types/peak/PeakAnnotation';
 import { Table } from 'antd';
 import PeakTableDataType from '../../types/PeakTableDataType';
-import { useHighlightData } from '../../context/highlight/Highlight';
+import { useHighlightData } from '../../highlight/Index';
 
 const columns = [
   {

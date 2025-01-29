@@ -1,16 +1,15 @@
-import './Table.scss';
+import "./Table.scss";
 
-import { Content } from 'antd/es/layout/layout';
-import ExportableContent from '../common/ExportableContent';
-import { CSSProperties, JSX, useCallback, useMemo } from 'react';
-import copyTextToClipboard from '../../utils/copyTextToClipboard';
-import routes from '../../constants/routes';
-import { Table } from 'antd';
-import Record from '../../types/Record';
-import { MF } from 'react-mf';
-import StructureView from '../basic/StructureView';
-import LabelWrapper from './LabelWrapper';
-import { usePropertiesContext } from '../../context/properties/propertiesContext';
+import { Content } from "antd/es/layout/layout";
+import ExportableContent from "../common/ExportableContent";
+import { CSSProperties, JSX, useCallback, useMemo } from "react";
+import copyTextToClipboard from "../../utils/copyTextToClipboard";
+import routes from "../../constants/routes";
+import { Table } from "antd";
+import Record from "../../types/Record";
+import { MF } from "react-mf";
+import StructureView from "../basic/StructureView";
+import LabelWrapper from "./LabelWrapper";
 
 const titleHeight = 50;
 const labelWidth = 120;
@@ -23,140 +22,134 @@ type HeaderTableType = {
 };
 const columns = [
   {
-    dataIndex: 'label',
-    key: 'record-view-header-table-label',
+    dataIndex: "label",
+    key: "record-view-header-table-label",
     width: labelWidth,
-    align: 'left' as const,
+    align: "left" as const,
   },
   {
-    dataIndex: 'value',
-    key: 'record-view-header-table-value',
+    dataIndex: "value",
+    key: "record-view-header-table-value",
     width: `calc(100% - ${labelWidth})`,
-    align: 'left' as const,
+    align: "left" as const,
   },
 ];
 
 type InputProps = {
   record: Record;
-  width: CSSProperties['width'];
-  height: CSSProperties['height'];
-  imageWidth: CSSProperties['width'];
+  width: CSSProperties["width"];
+  height: CSSProperties["height"];
+  imageWidth: CSSProperties["width"];
 };
 
 function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
-  const { baseUrl, frontendUrl } = usePropertiesContext();
-
   const handleOnCopy = useCallback((label: string, text: string) => {
     copyTextToClipboard(label, text);
   }, []);
 
-  const buildSearchUrl = useCallback(
-    (label: string, value: string) => {
-      const searchParams = new URLSearchParams();
-      searchParams.set(label, value);
-      const url =
-        frontendUrl +
-        baseUrl +
-        routes.search.path +
-        `?${searchParams.toString()}`;
+  const buildSearchUrl = useCallback((label: string, value: string) => {
+    const searchParams = new URLSearchParams();
+    searchParams.set(label, value);
+    const url =
+      import.meta.env.VITE_MB3_FRONTEND_URL +
+      routes.search.path +
+      `?${searchParams.toString()}`;
 
-      return url;
-    },
-    [baseUrl, frontendUrl],
-  );
+    return url;
+  }, []);
 
   return useMemo(() => {
     const dataSource: HeaderTableType[] = [];
     dataSource.push({
-      key: 'record-view-header-table-names',
-      label: 'Names',
+      key: "record-view-header-table-names",
+      label: "Names",
       value: (
         <Content
           style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'left',
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "left",
           }}
         >
           {record.compound.names.map((name, i) => (
             <ExportableContent
-              key={'name-label-' + name}
+              key={"name-label-" + name}
               component={<LabelWrapper value={name} />}
               mode="copy"
               onClick={() => handleOnCopy(`Compound name ${i + 1}`, name)}
               title={`Copy compound name ${i + 1} to clipboard`}
               enableSearch
               searchTitle={`Search for compound name ${i + 1}`}
-              searchUrl={buildSearchUrl('compound_name', name)}
+              searchUrl={buildSearchUrl("compound_name", name)}
             />
           ))}
         </Content>
       ),
     });
     dataSource.push({
-      key: 'record-view-header-table-classes',
-      label: 'Classes',
+      key: "record-view-header-table-classes",
+      label: "Classes",
       value:
         record.compound.classes &&
         record.compound.classes.length === 1 &&
-        record.compound.classes[0] !== 'N/A' ? (
+        record.compound.classes[0] !== "N/A" ? (
           <ExportableContent
             component={<LabelWrapper value={record.compound.classes[0]} />}
             mode="copy"
             onClick={() =>
-              handleOnCopy('Compound classes', record.compound.classes[0])
+              handleOnCopy("Compound classes", record.compound.classes[0])
             }
             title="Copy compound classes to clipboard"
           />
         ) : (
-          <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
+          <label style={{ color: "grey", fontStyle: "italic" }}>N/A</label>
         ),
     });
     dataSource.push({
-      key: 'record-view-header-table-smiles',
-      label: 'SMILES',
+      key: "record-view-header-table-smiles",
+      label: "SMILES",
       value: (
         <ExportableContent
           component={<LabelWrapper value={record.compound.smiles} />}
           mode="copy"
-          onClick={() => handleOnCopy('SMILES', record.compound.smiles)}
+          onClick={() => handleOnCopy("SMILES", record.compound.smiles)}
           title="Copy SMILES to clipboard"
           enableSearch
           searchTitle="Search for SMILES"
-          searchUrl={buildSearchUrl('substructure', record.compound.smiles)}
+          searchUrl={buildSearchUrl("substructure", record.compound.smiles)}
         />
       ),
     });
     dataSource.push({
-      key: 'record-view-header-table-inchi',
-      label: 'InChI',
+      key: "record-view-header-table-inchi",
+      label: "InChI",
       value: (
         <ExportableContent
           component={<LabelWrapper value={record.compound.inchi} />}
           mode="copy"
-          onClick={() => handleOnCopy('InChI', record.compound.inchi)}
+          onClick={() => handleOnCopy("InChI", record.compound.inchi)}
           title="Copy InChi to clipboard"
           enableSearch
           searchTitle="Search for InChI"
-          searchUrl={buildSearchUrl('inchi', record.compound.inchi)}
+          searchUrl={buildSearchUrl("inchi", record.compound.inchi)}
         />
       ),
     });
     dataSource.push({
-      key: 'record-view-header-table-splash',
-      label: 'SPLASH',
+      key: "record-view-header-table-splash",
+      label: "SPLASH",
       value: (
         <ExportableContent
           component={record.peak.splash}
           mode="copy"
-          onClick={() => handleOnCopy('SPLASH', record.peak.splash)}
+          onClick={() => handleOnCopy("SPLASH", record.peak.splash)}
           title="Copy SPLASH to clipboard"
           enableSearch
           searchTitle="Search for SPLASH"
-          searchUrl={buildSearchUrl('splash', record.peak.splash)}
+          searchUrl={buildSearchUrl("splash", record.peak.splash)}
         />
       ),
     });
@@ -166,11 +159,11 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
         style={{
           width,
           minHeight: height,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: 'white',
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "white",
         }}
       >
         <ExportableContent
@@ -179,29 +172,29 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
             minHeight: titleHeight,
             maxHeight: titleHeight,
             fontSize: 18,
-            fontWeight: 'bold',
-            width: '100%',
-            justifyContent: 'center',
+            fontWeight: "bold",
+            width: "100%",
+            justifyContent: "center",
           }}
           mode="copy"
-          onClick={() => handleOnCopy('Title', record.title)}
+          onClick={() => handleOnCopy("Title", record.title)}
           title="Copy title to clipboard"
         />
         <Content
           style={{
-            width: '100%',
+            width: "100%",
             minHeight: `calc(${height} - ${titleHeight})`,
             maxHeight: `calc(${height} - ${titleHeight})`,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
           <Table<HeaderTableType>
             style={{
               minWidth: `calc(100% - ${imageWidth})`,
               maxWidth: `calc(100% - ${imageWidth})`,
-              height: '100%',
+              height: "100%",
             }}
             className="table"
             sticky
@@ -214,14 +207,14 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
             style={{
               minWidth: imageWidth,
               maxWidth: imageWidth,
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
             }}
           >
-            {record.compound.smiles && record.compound.smiles !== '' ? (
+            {record.compound.smiles && record.compound.smiles !== "" ? (
               <StructureView
                 smiles={record.compound.smiles}
                 imageWidth={imageWidth as number}
@@ -233,9 +226,9 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
               style={{
                 width: imageWidth,
                 height: `calc(100% - ${height} - ${titleHeight} - 80px)`,
-                display: 'grid',
-                gridTemplateColumns: '75px auto 55px auto',
-                alignItems: 'center',
+                display: "grid",
+                gridTemplateColumns: "75px auto 55px auto",
+                alignItems: "center",
                 paddingTop: 10,
               }}
             >
@@ -243,39 +236,39 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
               <ExportableContent
                 component={<MF mf={record.compound.formula} />}
                 componentContainerStyle={{
-                  fontWeight: 'bolder',
+                  fontWeight: "bolder",
                 }}
                 mode="copy"
                 onClick={() =>
                   copyTextToClipboard(
-                    'Molecular Formula',
-                    record.compound.formula,
+                    "Molecular Formula",
+                    record.compound.formula
                   )
                 }
                 title="Copy molecular formula to clipboard"
                 enableSearch
                 searchTitle="Search for molecular formula"
-                searchUrl={buildSearchUrl('formula', record.compound.formula)}
+                searchUrl={buildSearchUrl("formula", record.compound.formula)}
               />
               <label>Mass: </label>
               <ExportableContent
                 component={record.compound.mass.toString()}
                 componentContainerStyle={{
-                  fontWeight: 'bolder',
+                  fontWeight: "bolder",
                 }}
                 mode="copy"
                 onClick={() =>
                   copyTextToClipboard(
-                    'Molecular Mass',
-                    record.compound.mass.toString(),
+                    "Molecular Mass",
+                    record.compound.mass.toString()
                   )
                 }
                 title="Copy molecular mass to clipboard"
                 enableSearch
                 searchTitle="Search for molecular mass"
                 searchUrl={buildSearchUrl(
-                  'exact_mass',
-                  record.compound.mass.toString(),
+                  "exact_mass",
+                  record.compound.mass.toString()
                 )}
               />
             </Content>

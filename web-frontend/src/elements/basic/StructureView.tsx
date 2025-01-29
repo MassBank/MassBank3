@@ -1,9 +1,9 @@
-import { Molecule } from 'openchemlib';
-import { useCallback } from 'react';
-import { SmilesSvgRenderer } from 'react-ocl/minimal';
-import FileSaver from 'file-saver';
+import { Molecule } from "openchemlib";
+import { useCallback } from "react";
+import { SmilesSvgRenderer } from "react-ocl/minimal";
+import FileSaver from "file-saver";
 const { saveAs } = FileSaver;
-import ExportableContent from '../common/ExportableContent';
+import ExportableContent from "../common/ExportableContent";
 
 interface InputProps {
   smiles: string;
@@ -23,8 +23,8 @@ function StructureView({ smiles, imageWidth, imageHeight }: InputProps) {
       suppressCIPParity: true,
       suppressESR: true,
     });
-    const blob = new Blob([svgString], { type: 'image/svg+xml' });
-    saveAs(blob, 'structure_' + smiles + '.svg');
+    const blob = new Blob([svgString], { type: "image/svg+xml" });
+    saveAs(blob, "structure_" + smiles + ".svg");
   }, [imageHeight, imageWidth, smiles]);
 
   return (
@@ -43,7 +43,7 @@ function StructureView({ smiles, imageWidth, imageHeight }: InputProps) {
       onClick={handleOnDownload}
       width={imageWidth}
       height={imageHeight}
-      componentContainerStyle={{ width: '100%', justifyContent: 'center' }}
+      componentContainerStyle={{ width: "100%", justifyContent: "center" }}
     />
   );
 }

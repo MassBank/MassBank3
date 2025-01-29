@@ -1,7 +1,6 @@
 import Hit from '../../types/Hit';
 import { Content } from 'antd/es/layout/layout';
 import { CSSProperties } from 'react';
-import { usePropertiesContext } from '../../context/properties/propertiesContext';
 
 type InputProps = {
   hit: Hit;
@@ -10,8 +9,11 @@ type InputProps = {
 };
 
 function ResultLink({ hit, width = '100%', height = '100%' }: InputProps) {
-  const { baseUrl, frontendUrl } = usePropertiesContext();
-  const url = frontendUrl + baseUrl + 'recordDisplay?id=' + hit.accession;
+  const url =
+    import.meta.env.VITE_MB3_FRONTEND_URL +
+    import.meta.env.VITE_MB3_BASE_URL +
+    'recordDisplay?id=' +
+    hit.accession;
 
   return (
     hit.record && (

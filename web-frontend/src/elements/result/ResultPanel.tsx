@@ -1,11 +1,11 @@
-import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import ResultTable from './ResultTable';
-import Hit from '../../types/Hit';
-import Peak from '../../types/peak/Peak';
-import Record from '../../types/Record';
-import generateID from '../../utils/generateID';
-import Placeholder from '../basic/Placeholder';
-import fetchData from '../../utils/request/fetchData';
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
+import ResultTable from "./ResultTable";
+import Hit from "../../types/Hit";
+import Peak from "../../types/peak/Peak";
+import Record from "../../types/Record";
+import generateID from "../../utils/generateID";
+import Placeholder from "../basic/Placeholder";
+import fetchData from "../../utils/request/fetchData";
 import {
   Button,
   Dropdown,
@@ -14,13 +14,12 @@ import {
   Pagination,
   Select,
   Spin,
-} from 'antd';
-import { Content } from 'antd/es/layout/layout';
-import SpectralHitsCarouselView from '../routes/pages/search/SpectralHitsCarouselView';
-import ResultTableSortOptionType from '../../types/ResultTableSortOptionType';
-import axios from 'axios';
-import FileSaver from 'file-saver';
-import { usePropertiesContext } from '../../context/properties/propertiesContext';
+} from "antd";
+import { Content } from "antd/es/layout/layout";
+import SpectralHitsCarouselView from "../routes/pages/search/SpectralHitsCarouselView";
+import ResultTableSortOptionType from "../../types/ResultTableSortOptionType";
+import axios from "axios";
+import FileSaver from "file-saver";
 const { saveAs } = FileSaver;
 
 type InputProps = {
@@ -29,7 +28,7 @@ type InputProps = {
   width: number;
   height: number;
   sortOptions?: ResultTableSortOptionType[];
-
+  // eslint-disable-next-line no-unused-vars
   onSort?: (value: string) => void;
   widthOverview?: number;
   heightOverview?: number;
@@ -45,8 +44,6 @@ function ResultPanel({
   widthOverview = width,
   heightOverview = height,
 }: InputProps) {
-  const { backendUrl, exportServiceUrl } = usePropertiesContext();
-
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [slideIndex, setSlideIndex] = useState<number>(0);
@@ -102,7 +99,11 @@ function ResultPanel({
 
       const records: (Record | undefined)[] = [];
       for (const accession of accessions) {
-        const url = backendUrl + '/v1/records/' + accession + '/simple';
+        const url =
+          import.meta.env.VITE_MB3_API_URL +
+          "/v1/records/" +
+          accession +
+          "/simple";
 
         const record = await fetchData(url);
 
@@ -125,7 +126,7 @@ function ResultPanel({
 
     setHitsWithRecords(_hitsWithRecords);
     setIsRequesting(false);
-  }, [resultTableData, resultPageIndex, backendUrl]);
+  }, [resultTableData, resultPageIndex]);
 
   useEffect(() => {
     fetchRecords();
@@ -136,7 +137,7 @@ function ResultPanel({
       setSlideIndex(_slideIndex % pageLimit);
       setShowModal(true);
     },
-    [setShowModal],
+    [setShowModal]
   );
 
   const resultTable = useMemo(
@@ -151,7 +152,7 @@ function ResultPanel({
         imageWidth={250}
       />
     ),
-    [reference, hitsWithRecords, height, handleOnDoubleClick],
+    [reference, hitsWithRecords, height, handleOnDoubleClick]
   );
 
   const modal = useMemo(
@@ -181,7 +182,7 @@ function ResultPanel({
       reference,
       hitsWithRecords,
       slideIndex,
-    ],
+    ]
   );
 
   const handleOnSelectPage = useCallback(
@@ -194,7 +195,7 @@ function ResultPanel({
         setResultPageIndex(pageIndex - 1);
       }
     },
-    [hits.length],
+    [hits.length]
   );
 
   const handleOnSelect = useCallback(
@@ -202,13 +203,13 @@ function ResultPanel({
       setSelectedSortOption(value);
       onSort(value);
     },
-    [onSort],
+    [onSort]
   );
 
   const handleOnDownloadResult = useCallback(
     async (format: string) => {
       setIsRequesting(true);
-      const host = exportServiceUrl;
+      const host = import.meta.env.VITE_EXPORT_SERVICE_URL;
       const url = `${host}/convert`;
 
       const resp = await axios.post(
@@ -219,24 +220,24 @@ function ResultPanel({
         },
         {
           headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/octet-stream',
+            "Content-Type": "application/json",
+            Accept: "application/octet-stream",
           },
-        },
+        }
       );
       if (resp.status === 200) {
         const data = await resp.data;
-        const fileType = format.split('_')[1];
+        const fileType = format.split("_")[1];
         const filename = `massbank_result.${format}.${fileType}`;
         const blob = new Blob([data], {
-          type: 'application/octet-stream',
+          type: "application/octet-stream",
         });
         saveAs(blob, filename);
       }
 
       setIsRequesting(false);
     },
-    [exportServiceUrl, hits],
+    [hits]
   );
 
   const buildDownloadOptionLabel = useCallback(
@@ -255,32 +256,32 @@ function ResultPanel({
         {label}
       </label>
     ),
-    [handleOnDownloadResult],
+    [handleOnDownloadResult]
   );
 
-  const items: MenuProps['items'] = useMemo(
+  const items: MenuProps["items"] = useMemo(
     () => [
       {
-        key: '0_nist_msp_download',
-        label: buildDownloadOptionLabel('NIST MSP', 'nist_msp'),
+        key: "0_nist_msp_download",
+        label: buildDownloadOptionLabel("NIST MSP", "nist_msp"),
       },
       {
-        key: '1_riken_msp_download',
-        label: buildDownloadOptionLabel('RIKEN MSP', 'riken_msp'),
+        key: "1_riken_msp_download",
+        label: buildDownloadOptionLabel("RIKEN MSP", "riken_msp"),
       },
     ],
-    [buildDownloadOptionLabel],
+    [buildDownloadOptionLabel]
   );
 
   const paginationContainer = useMemo(() => {
     return (
       <Content
         style={{
-          width: '100%',
+          width: "100%",
           height: paginationHeight,
-          display: 'flex',
-          justifyContent: 'space-evenly',
-          alignItems: 'center',
+          display: "flex",
+          justifyContent: "space-evenly",
+          alignItems: "center",
         }}
       >
         <Pagination
@@ -289,15 +290,15 @@ function ResultPanel({
           showTotal={(total) => (
             <Content
               style={{
-                textWrap: 'nowrap',
-                textAlign: 'center',
-                fontWeight: 'bold',
-                color: 'brown',
+                textWrap: "nowrap",
+                textAlign: "center",
+                fontWeight: "bold",
+                color: "brown",
                 width: 200,
-                height: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
+                height: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >{`${total} Results`}</Content>
           )}
@@ -306,13 +307,13 @@ function ResultPanel({
           showTitle
           showSizeChanger={false}
           showQuickJumper
-          locale={{ jump_to: 'Page', page: '' }}
+          locale={{ jump_to: "Page", page: "" }}
           style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'space-around',
-            alignItems: 'center',
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "space-around",
+            alignItems: "center",
           }}
         />
         {sortOptions.length > 0 && (
@@ -322,16 +323,16 @@ function ResultPanel({
             placeholder="Sort by"
             optionFilterProp="label"
             filterSort={(optionA, optionB) =>
-              (optionA?.label ?? '')
+              (optionA?.label ?? "")
                 .toLowerCase()
-                .localeCompare((optionB?.label ?? '').toLowerCase())
+                .localeCompare((optionB?.label ?? "").toLowerCase())
             }
             options={sortOptions}
             onSelect={handleOnSelect}
           />
         )}
 
-        <Dropdown menu={{ items }} trigger={['click']}>
+        <Dropdown menu={{ items }} trigger={["click"]}>
           <Button
             style={{
               width: 100,
@@ -361,11 +362,11 @@ function ResultPanel({
           {isRequesting ? (
             <Content
               style={{
-                width: '100%',
+                width: "100%",
                 height,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
               <Spin size="large" />
@@ -373,9 +374,9 @@ function ResultPanel({
           ) : (
             <Content
               style={{
-                width: '100%',
+                width: "100%",
                 height,
-                overflow: 'scroll',
+                overflow: "scroll",
               }}
             >
               {paginationContainer}
@@ -386,8 +387,8 @@ function ResultPanel({
         </Content>
       ) : (
         <Placeholder
-          child={'No results'}
-          style={{ width, height, fontSize: 18, fontWeight: 'bold' }}
+          child={"No results"}
+          style={{ width, height, fontSize: 18, fontWeight: "bold" }}
         />
       ),
     [
@@ -398,7 +399,7 @@ function ResultPanel({
       resultTable,
       resultTableData.length,
       width,
-    ],
+    ]
   );
 }
 

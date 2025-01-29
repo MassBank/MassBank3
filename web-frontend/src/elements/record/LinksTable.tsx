@@ -1,37 +1,30 @@
-import './Table.scss';
+import "./Table.scss";
 
-import { Table } from 'antd';
-import Link from '../../types/Link';
-import { CSSProperties, JSX, useCallback, useMemo } from 'react';
-import ExportableContent from '../common/ExportableContent';
-import copyTextToClipboard from '../../utils/copyTextToClipboard';
-import routes from '../../constants/routes';
-import { usePropertiesContext } from '../../context/properties/propertiesContext';
+import { Table } from "antd";
+import Link from "../../types/Link";
+import { CSSProperties, JSX, useCallback, useMemo } from "react";
+import ExportableContent from "../common/ExportableContent";
+import copyTextToClipboard from "../../utils/copyTextToClipboard";
+import routes from "../../constants/routes";
 
 type InputProps = {
   links: Link[] | undefined;
-  width: CSSProperties['width'];
-  height: CSSProperties['height'];
+  width: CSSProperties["width"];
+  height: CSSProperties["height"];
   title?: string | JSX.Element;
 };
 
 function LinksTable({ links, width, height, title }: InputProps) {
-  const { baseUrl, frontendUrl } = usePropertiesContext();
+  const buildSearchUrl = useCallback((label: string, value: string) => {
+    const searchParams = new URLSearchParams();
+    searchParams.set(label, value);
+    const url =
+      import.meta.env.VITE_MB3_FRONTEND_URL +
+      routes.search.path +
+      `?${searchParams.toString()}`;
 
-  const buildSearchUrl = useCallback(
-    (label: string, value: string) => {
-      const searchParams = new URLSearchParams();
-      searchParams.set(label, value);
-      const url =
-        frontendUrl +
-        baseUrl +
-        routes.search.path +
-        `?${searchParams.toString()}`;
-
-      return url;
-    },
-    [baseUrl, frontendUrl],
-  );
+    return url;
+  }, []);
 
   return useMemo(() => {
     if (!links || links.length === 0) {
@@ -40,16 +33,16 @@ function LinksTable({ links, width, height, title }: InputProps) {
 
     const columns = [
       {
-        title: 'Database',
-        dataIndex: 'Database',
-        key: 'database',
-        align: 'center' as const,
+        title: "Database",
+        dataIndex: "Database",
+        key: "database",
+        align: "center" as const,
       },
       {
-        title: 'Identifier',
-        dataIndex: 'Identifier',
-        key: 'identifier',
-        align: 'center' as const,
+        title: "Identifier",
+        dataIndex: "Identifier",
+        key: "identifier",
+        align: "center" as const,
       },
     ];
 
@@ -64,12 +57,12 @@ function LinksTable({ links, width, height, title }: InputProps) {
             title={`Copy '${link.identifier}' to clipboard`}
             component={link.identifier}
             onClick={() => copyTextToClipboard(link.database, link.identifier)}
-            enableSearch={link.database === 'INCHIKEY'}
+            enableSearch={link.database === "INCHIKEY"}
             searchTitle="Search for this InChIKey"
-            searchUrl={buildSearchUrl('inchi', link.identifier)}
+            searchUrl={buildSearchUrl("inchi", link.identifier)}
           />
         ),
-      }),
+      })
     );
 
     return (
