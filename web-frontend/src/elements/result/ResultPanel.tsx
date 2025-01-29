@@ -5,7 +5,7 @@ import Peak from '../../types/peak/Peak';
 import Record from '../../types/Record';
 import generateID from '../../utils/generateID';
 import Placeholder from '../basic/Placeholder';
-import fetchData from '../../utils/fetchData';
+import fetchData from '../../utils/request/fetchData';
 import {
   Button,
   Dropdown,
@@ -19,7 +19,8 @@ import { Content } from 'antd/es/layout/layout';
 import SpectralHitsCarouselView from '../routes/pages/search/SpectralHitsCarouselView';
 import ResultTableSortOptionType from '../../types/ResultTableSortOptionType';
 import axios from 'axios';
-import { saveAs } from 'file-saver';
+import FileSaver from 'file-saver';
+const { saveAs } = FileSaver;
 
 type InputProps = {
   reference?: Peak[];
@@ -27,7 +28,7 @@ type InputProps = {
   width: number;
   height: number;
   sortOptions?: ResultTableSortOptionType[];
-  // eslint-disable-next-line no-unused-vars
+
   onSort?: (value: string) => void;
   widthOverview?: number;
   heightOverview?: number;
@@ -99,7 +100,7 @@ function ResultPanel({
       const records: (Record | undefined)[] = [];
       for (const accession of accessions) {
         const url =
-          import.meta.env.VITE_MB3_API_URL +
+          process.env.REACT_APP_MB3_API_URL +
           '/v1/records/' +
           accession +
           '/simple';
@@ -208,7 +209,7 @@ function ResultPanel({
   const handleOnDownloadResult = useCallback(
     async (format: string) => {
       setIsRequesting(true);
-      const host = import.meta.env.VITE_EXPORT_SERVICE_URL;
+      const host = process.env.REACT_APP_EXPORT_SERVICE_URL;
       const url = `${host}/convert`;
 
       const resp = await axios.post(

@@ -2,7 +2,7 @@ import './Table.scss';
 
 import { Content } from 'antd/es/layout/layout';
 import ExportableContent from '../common/ExportableContent';
-import { CSSProperties, useCallback, useMemo } from 'react';
+import { CSSProperties, JSX, useCallback, useMemo } from 'react';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
 import routes from '../../constants/routes';
 import { Table } from 'antd';
@@ -51,7 +51,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
     const searchParams = new URLSearchParams();
     searchParams.set(label, value);
     const url =
-      import.meta.env.VITE_MB3_FRONTEND_URL +
+      process.env.REACT_APP_MB3_FRONTEND_URL +
       routes.search.path +
       `?${searchParams.toString()}`;
 

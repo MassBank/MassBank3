@@ -9,6 +9,7 @@ import { Content } from 'antd/es/layout/layout';
 import {
   CSSProperties,
   MouseEvent,
+  JSX,
   useCallback,
   useMemo,
   useRef,

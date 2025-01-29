@@ -1,7 +1,7 @@
 import './Table.scss';
 
 import { Table } from 'antd';
-import { CSSProperties, useCallback, useMemo } from 'react';
+import { CSSProperties, JSX, useCallback, useMemo } from 'react';
 import Record from '../../types/Record';
 import ExportableContent from '../common/ExportableContent';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';

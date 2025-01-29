@@ -10,7 +10,8 @@ import {
   faEyeSlash,
   faFileArrowDown,
 } from '@fortawesome/free-solid-svg-icons';
-import { saveAs } from 'file-saver';
+import FileSaver from 'file-saver';
+const { saveAs } = FileSaver;
 import ExportableContent from '../common/ExportableContent';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
 import routes from '../../constants/routes';
@@ -18,7 +19,7 @@ import routes from '../../constants/routes';
 type InputProps = {
   peakData: Peak[];
   peakData2?: Peak[];
-  // eslint-disable-next-line no-unused-vars
+
   onZoom?: (fpd1: Peak[], fpd2?: Peak[]) => void;
   width?: number;
   height?: number;
@@ -433,9 +434,9 @@ function Chart({
           }
         });
 
-      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
       svg.select('.brush').call(brush).call(brush.move, undefined);
-      // @ts-ignore
       svg.on('dblclick', handleDoubleClick);
     }
   }, [brushXDomains, disableZoom, handleDoubleClick, height, width, xScale]);
@@ -463,7 +464,7 @@ function Chart({
     );
     const path = routes.search.path;
     const url =
-      import.meta.env.VITE_MB3_FRONTEND_URL +
+      process.env.REACT_APP_MB3_FRONTEND_URL +
       path +
       `?${searchParams.toString()}`;
 

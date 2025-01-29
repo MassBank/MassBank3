@@ -48,6 +48,7 @@ function StructuralEditor({ initialSMILES, width, height }: InputProps) {
         handleOnChangeStructure(_molfile, molecule);
         setStructureKey(Math.random());
         setErrorMolfileImport(undefined);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         /* empty */
       }
@@ -110,6 +111,7 @@ function StructuralEditor({ initialSMILES, width, height }: InputProps) {
                 try {
                   Molecule.fromSmiles(value);
                   setErrorSmiles(undefined);
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 } catch (err) {
                   setErrorSmiles('Invalid SMILES');
                   return Promise.reject(new Error('Invalid SMILES'));

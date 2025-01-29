@@ -1,0 +1,37 @@
+# FROM node:23-alpine
+# # Create app directory
+# WORKDIR /app
+
+# COPY . .
+
+# # install dependencies and build
+# RUN npm run clean-install && npm run build
+
+# ENTRYPOINT sh entrypoint.sh "${MB3_API_URL}" "${MB3_FRONTEND_URL}" "${MB3_FRONTEND_BASE_URL}" "${MB3_FRONTEND_VERSION}" "${EXPORT_SERVICE_URL}" "${GOOGLE_SEARCH_CONSOLE_KEY}"
+
+# EXPOSE 3000
+
+
+
+FROM node:23-alpine AS build
+WORKDIR /app
+# Installing dependencies first can save time on rebuilds
+# We do need the full (dev) dependencies here
+COPY package.json ./
+RUN npm run clean-install
+# Then copy in the actual sources we need and build
+COPY tsconfig.json tsconfig.app.json tsconfig.node.json vite.config.ts vite-env.d.ts server.ts index.html entrypoint.sh ./
+COPY src/ ./src/
+COPY public/ ./public/
+RUN npm run build
+
+FROM node:23-alpine
+WORKDIR /app
+COPY --from=build /app/node_modules ./node_modules/
+COPY --from=build /app/dist ./dist/
+COPY --from=build /app/src ./src/
+COPY --from=build /app/public ./public/
+COPY --from=build /app/package.json /app/package-lock.json /app/server.ts /app/entrypoint.sh ./
+
+ENTRYPOINT sh entrypoint.sh "${MB3_API_URL}" "${MB3_FRONTEND_URL}" "${MB3_FRONTEND_BASE_URL}" "${MB3_FRONTEND_VERSION}" "${EXPORT_SERVICE_URL}" "${GOOGLE_SEARCH_CONSOLE_KEY}"
+EXPOSE 3000

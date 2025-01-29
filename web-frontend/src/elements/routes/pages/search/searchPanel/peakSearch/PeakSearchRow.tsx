@@ -26,7 +26,7 @@ function PeakSearchRow({ index }: InputProps) {
 
       const formula = e.target.value;
       const mass = calculateMolecularMass(formula);
-      let peaks = (getFieldValue(['peaks', 'peaks', 'peaks']) ||
+      const peaks = (getFieldValue(['peaks', 'peaks', 'peaks']) ||
         []) as PeakSearchPeakType[];
       const value = mass > 0 ? mass : undefined;
       if (index >= 0 && index < peaks.length) {

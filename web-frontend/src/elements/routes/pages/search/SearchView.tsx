@@ -6,8 +6,8 @@ import Peak from '../../../../types/peak/Peak';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import Hit from '../../../../types/Hit';
 import CommonSearchPanel from '../../../common/CommonSearchPanel';
-import fetchData from '../../../../utils/fetchData';
-import buildSearchParams from '../../../../utils/buildSearchParams';
+import fetchData from '../../../../utils/request/fetchData';
+import buildSearchParams from '../../../../utils/request/buildSearchParams';
 import initFlags from '../../../../utils/initFlags';
 import SearchResult from '../../../../types/SearchResult';
 import parsePeakListInputField from './searchPanel/utils/parsePeakListAndReferences';
@@ -77,11 +77,11 @@ function SearchView() {
 
       let _browseContent: ContentFilterOptions | undefined = formDataContent;
       if (!_browseContent) {
-        const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
+        const url = process.env.REACT_APP_MB3_API_URL + '/v1/filter/browse';
         _browseContent = (await fetchData(url)) as ContentFilterOptions;
       } else {
         const builtSearchParams = buildSearchParams(_browseContent);
-        const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
+        const url = process.env.REACT_APP_MB3_API_URL + '/v1/filter/browse';
         _browseContent = (await fetchData(
           url,
           builtSearchParams,
@@ -181,7 +181,7 @@ function SearchView() {
     if (smiles && smiles.trim().length > 0) {
       builtSearchParams['substructure'] = [smiles];
     }
-    const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/search';
+    const url = process.env.REACT_APP_MB3_API_URL + '/v1/records/search';
     const searchResult = (await fetchData(
       url,
       builtSearchParams,

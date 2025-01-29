@@ -1,7 +1,8 @@
 import { Content } from 'antd/es/layout/layout';
 import Header from '../header/Header';
 import Footer from '../footer/Footer';
-import { useMemo } from 'react';
+import { useMemo, JSX } from 'react';
+import '@ant-design/v5-patch-for-react-19';
 
 type InputProps = {
   body: JSX.Element;
@@ -12,8 +13,8 @@ function UserInterface({ body }: InputProps) {
     () => (
       <Content
         style={{
-          width: '100%',
-          height: '100%',
+          width: '100vw',
+          height: '100vh',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',

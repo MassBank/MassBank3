@@ -8,7 +8,6 @@ import PeakData from './peak/PeakData';
 
 export default interface Record {
   accession: string;
-  deprecated: {};
   title: string;
   date: Date;
   authors: [{ name: string }];

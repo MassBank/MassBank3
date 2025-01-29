@@ -70,7 +70,7 @@ services:
 
   mb3frontend:
     build:
-      context: ..
+      context: ../web-frontend
       dockerfile: Dockerfile-frontend
     environment:
       MB3_API_URL: "http://${MB3_API_HOST}:${MB3_API_PORT}"

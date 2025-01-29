@@ -1,15 +1,11 @@
 import './Header.scss';
 
 import routes from '../../constants/routes';
-import { Link, useLocation } from 'react-router-dom';
 import { Button, Menu, MenuProps } from 'antd';
 import { Header as HeaderAntD } from 'antd/es/layout/layout';
+import { Link } from 'react-router-dom';
 
 function Header() {
-  const location = useLocation();
-
-  const url = import.meta.env.VITE_MB3_BASE_URL;
-
   type MenuItem = Required<MenuProps>['items'][number];
 
   const logoLink: MenuItem = {
@@ -25,9 +21,9 @@ function Header() {
           boxShadow: 'none',
         }}
       >
-        <Link to={url} target="_self">
+        <Link to={routes.home.path} target="_self">
           <img
-            src={import.meta.env.VITE_MB3_BASE_URL + '/logos/logo.svg'}
+            src="logos/logo.svg"
             alt="MassBank Europe"
             style={{ height: 50 }}
           />
@@ -41,31 +37,24 @@ function Header() {
       (route) =>
         route.id !== routes.notFound.id &&
         route.id !== routes.home.id &&
-        route.id !== routes.accessionPrevious.id &&
-        route.id !== routes.sitemap.id,
+        route.id !== routes.accessionPrevious.id,
     )
     .map((route) => {
       return {
         key: route.path,
         label: (
-          <Button
-            key={route.path + '-li'}
-            style={{
-              border: 'none',
-              boxShadow: 'none',
-            }}
-          >
-            <Link
-              to={route.path as string}
-              style={
-                route.path == location.pathname
-                  ? { color: 'blue', fontSize: 16 }
-                  : { fontSize: 16 }
-              }
+          <a href={route.path as string} target="_self">
+            <Button
+              key={route.path + '-li'}
+              style={{
+                border: 'none',
+                boxShadow: 'none',
+                // color: route.path == location.pathname ? "blue" : undefined,
+              }}
             >
               {route.label}
-            </Link>
-          </Button>
+            </Button>
+          </a>
         ),
       } as MenuItem;
     });

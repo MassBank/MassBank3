@@ -1,6 +1,6 @@
-import ContentFilterOptions from '../types/filterOptions/ContentFilterOtions';
-import SearchParams from '../types/SearchParams';
-import ValueCount from '../types/ValueCount';
+import ContentFilterOptions from '../../types/filterOptions/ContentFilterOtions';
+import SearchParams from '../../types/SearchParams';
+import ValueCount from '../../types/ValueCount';
 
 function buildSearchParams(cont: ContentFilterOptions | undefined) {
   const searchParams: SearchParams = {};

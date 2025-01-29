@@ -2,7 +2,7 @@ import './Table.scss';
 
 import { Table } from 'antd';
 import Link from '../../types/Link';
-import { CSSProperties, useCallback, useMemo } from 'react';
+import { CSSProperties, JSX, useCallback, useMemo } from 'react';
 import ExportableContent from '../common/ExportableContent';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
 import routes from '../../constants/routes';
@@ -19,7 +19,7 @@ function LinksTable({ links, width, height, title }: InputProps) {
     const searchParams = new URLSearchParams();
     searchParams.set(label, value);
     const url =
-      import.meta.env.VITE_MB3_FRONTEND_URL +
+      process.env.REACT_APP_MB3_FRONTEND_URL +
       routes.search.path +
       `?${searchParams.toString()}`;
 

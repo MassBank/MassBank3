@@ -1,7 +1,8 @@
 import { Molecule } from 'openchemlib';
 import { useCallback } from 'react';
 import { SmilesSvgRenderer } from 'react-ocl/minimal';
-import { saveAs } from 'file-saver';
+import FileSaver from 'file-saver';
+const { saveAs } = FileSaver;
 import ExportableContent from '../common/ExportableContent';
 
 interface InputProps {

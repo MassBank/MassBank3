@@ -1,6 +1,6 @@
 import { Content } from 'antd/es/layout/layout';
 import Sider from 'antd/es/layout/Sider';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { JSX, useCallback, useEffect, useMemo, useState } from 'react';
 import ResultTableSortOptionType from '../../types/ResultTableSortOptionType';
 import resultTableSortOptionValues from '../../constants/resultTableSortOptionValues';
 import ResultPanel from '../result/ResultPanel';

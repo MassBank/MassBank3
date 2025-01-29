@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import ContentChart from './ContentChart';
-import fetchData from '../../../../utils/fetchData';
-import buildSearchParams from '../../../../utils/buildSearchParams';
+import fetchData from '../../../../utils/request/fetchData';
+import buildSearchParams from '../../../../utils/request/buildSearchParams';
 import initFlags from '../../../../utils/initFlags';
 
 import SearchResult from '../../../../types/SearchResult';
@@ -40,11 +40,11 @@ function ContentView() {
 
       let _browseContent: ContentFilterOptions | undefined = formDataContent;
       if (!_browseContent) {
-        const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
+        const url = process.env.REACT_APP_MB3_API_URL + '/v1/filter/browse';
         _browseContent = (await fetchData(url)) as ContentFilterOptions;
       } else {
         const searchParams = buildSearchParams(_browseContent);
-        const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
+        const url = process.env.REACT_APP_MB3_API_URL + '/v1/filter/browse';
         _browseContent = (await fetchData(
           url,
           searchParams,
@@ -63,7 +63,7 @@ function ContentView() {
       setIsSearching(true);
 
       const searchParams = buildSearchParams(formDataContent);
-      const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/search';
+      const url = process.env.REACT_APP_MB3_API_URL + '/v1/records/search';
       const searchResult = (await fetchData(url, searchParams)) as SearchResult;
 
       let _hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
@@ -149,7 +149,7 @@ function ContentView() {
           fontSize: 18,
           fontWeight: 'bold',
         }}
-        child={'Could not render charts'}
+        child={''}
       />
     );
   }, [heights.chartPanelHeight, massSpecFilterOptions, width]);

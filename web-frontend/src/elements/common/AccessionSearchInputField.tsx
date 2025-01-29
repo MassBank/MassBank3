@@ -5,7 +5,6 @@ import {
   CSSProperties,
   KeyboardEvent,
   useCallback,
-  useEffect,
   useState,
 } from 'react';
 import { createSearchParams, useNavigate } from 'react-router-dom';
@@ -22,12 +21,8 @@ function AccessionSearchInputField({
   height,
   accession: acc,
 }: InputProps) {
-  const [accession, setAccession] = useState<string>('');
+  const [accession, setAccession] = useState<string>(acc ?? '');
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setAccession(acc ?? '');
-  }, [acc]);
 
   const handleOnChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();

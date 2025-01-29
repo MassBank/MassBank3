@@ -3,7 +3,7 @@ import { Col, Layout, Row } from 'antd';
 const { Footer: FooterAntD } = Layout;
 
 function Footer() {
-  const version = import.meta.env.VITE_MB3_VERSION;
+  const version = process.env.REACT_APP_MB3_VERSION;
 
   return (
     <FooterAntD

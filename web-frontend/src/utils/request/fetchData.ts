@@ -1,5 +1,5 @@
 import axios from 'axios';
-import SearchParams from '../types/SearchParams';
+import SearchParams from '../../types/SearchParams';
 
 async function fetchData(url: string, searchParams?: SearchParams) {
   const params = new URLSearchParams();

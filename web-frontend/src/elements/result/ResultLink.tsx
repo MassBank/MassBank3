@@ -10,8 +10,8 @@ type InputProps = {
 
 function ResultLink({ hit, width = '100%', height = '100%' }: InputProps) {
   const url =
-    import.meta.env.VITE_MB3_FRONTEND_URL +
-    import.meta.env.VITE_MB3_BASE_URL +
+    (((process.env.REACT_APP_MB3_FRONTEND_URL as string) +
+      process.env.REACT_APP_MB3_BASE_URL) as string) +
     'recordDisplay?id=' +
     hit.accession;
 
