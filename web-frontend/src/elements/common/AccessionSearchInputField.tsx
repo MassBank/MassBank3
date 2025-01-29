@@ -5,6 +5,7 @@ import {
   CSSProperties,
   KeyboardEvent,
   useCallback,
+  useMemo,
   useState,
 } from 'react';
 import { createSearchParams, useNavigate } from 'react-router-dom';
@@ -49,34 +50,37 @@ function AccessionSearchInputField({
     [handleOnClick],
   );
 
-  return (
-    <Content
-      style={{
-        width,
-        height,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f3ece0',
-      }}
-    >
-      <Input
-        type="text"
-        placeholder="e.g. MSBNK-AAFC-AC000114"
-        value={accession && accession !== '' ? accession : undefined}
-        addonBefore="Go to accession:"
-        onChange={handleOnChange}
-        onKeyDown={handleOnKeyDown}
-        allowClear
-        style={{ width: 500 }}
-      />
-      <Button
-        children="Search"
-        onClick={handleOnClick}
-        disabled={accession.trim() === ''}
-        style={{ width: 100, marginLeft: 20 }}
-      />
-    </Content>
+  return useMemo(
+    () => (
+      <Content
+        style={{
+          width,
+          height,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: '#f3ece0',
+        }}
+      >
+        <Input
+          type="text"
+          placeholder="e.g. MSBNK-AAFC-AC000114"
+          value={accession && accession !== '' ? accession : undefined}
+          addonBefore="Go to accession:"
+          onChange={handleOnChange}
+          onKeyDown={handleOnKeyDown}
+          allowClear
+          style={{ width: 500 }}
+        />
+        <Button
+          children="Search"
+          onClick={handleOnClick}
+          disabled={accession.trim() === ''}
+          style={{ width: 100, marginLeft: 20 }}
+        />
+      </Content>
+    ),
+    [accession, handleOnChange, handleOnClick, handleOnKeyDown, height, width],
   );
 }
 

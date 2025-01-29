@@ -3,9 +3,12 @@ import './Header.scss';
 import routes from '../../constants/routes';
 import { Button, Menu, MenuProps } from 'antd';
 import { Header as HeaderAntD } from 'antd/es/layout/layout';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { usePropertiesContext } from '../../context/properties/propertiesContext';
 
 function Header() {
+  const location = useLocation();
+  const { baseUrl } = usePropertiesContext();
   type MenuItem = Required<MenuProps>['items'][number];
 
   const logoLink: MenuItem = {
@@ -21,7 +24,7 @@ function Header() {
           boxShadow: 'none',
         }}
       >
-        <Link to={routes.home.path} target="_self">
+        <Link to={baseUrl} target="_self">
           <img
             src="logos/logo.svg"
             alt="MassBank Europe"
@@ -49,7 +52,10 @@ function Header() {
               style={{
                 border: 'none',
                 boxShadow: 'none',
-                // color: route.path == location.pathname ? "blue" : undefined,
+                color:
+                  baseUrl + route.path === location.pathname
+                    ? 'blue'
+                    : undefined,
               }}
             >
               {route.label}

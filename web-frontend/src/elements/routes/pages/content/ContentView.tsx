@@ -16,10 +16,12 @@ import SearchAndResultPanel from '../../../common/SearchAndResultPanel';
 import CommonSearchPanel from '../../../common/CommonSearchPanel';
 import MassSpecFilterOptionsMenuItems from '../search/searchPanel/msSpecFilter/MassSpecFilterOptionsMenuItems';
 import Placeholder from '../../../basic/Placeholder';
+import { usePropertiesContext } from '../../../../context/properties/propertiesContext';
 
 function ContentView() {
   const ref = useRef(null);
   const { width, height } = useContainerDimensions(ref);
+  const { backendUrl } = usePropertiesContext();
 
   const [isFetchingContent, setIsFetchingContent] = useState<boolean>(false);
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -40,11 +42,11 @@ function ContentView() {
 
       let _browseContent: ContentFilterOptions | undefined = formDataContent;
       if (!_browseContent) {
-        const url = process.env.REACT_APP_MB3_API_URL + '/v1/filter/browse';
+        const url = backendUrl + '/v1/filter/browse';
         _browseContent = (await fetchData(url)) as ContentFilterOptions;
       } else {
         const searchParams = buildSearchParams(_browseContent);
-        const url = process.env.REACT_APP_MB3_API_URL + '/v1/filter/browse';
+        const url = backendUrl + '/v1/filter/browse';
         _browseContent = (await fetchData(
           url,
           searchParams,
@@ -55,7 +57,7 @@ function ContentView() {
       setMassSpecFilterOptions(_browseContent);
       setIsFetchingContent(false);
     },
-    [],
+    [backendUrl],
   );
 
   const handleOnSearch = useCallback(
@@ -63,7 +65,7 @@ function ContentView() {
       setIsSearching(true);
 
       const searchParams = buildSearchParams(formDataContent);
-      const url = process.env.REACT_APP_MB3_API_URL + '/v1/records/search';
+      const url = backendUrl + '/v1/records/search';
       const searchResult = (await fetchData(url, searchParams)) as SearchResult;
 
       let _hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
@@ -77,7 +79,7 @@ function ContentView() {
       setHits(_hits);
       setIsSearching(false);
     },
-    [],
+    [backendUrl],
   );
 
   const handleOnSubmit = useCallback(

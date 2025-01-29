@@ -7,10 +7,13 @@ import { Content, Header } from 'antd/es/layout/layout';
 import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
 import searchAccession from '../../../../utils/request/searchAccession';
 import { useSearchParams } from 'react-router-dom';
+import { usePropertiesContext } from '../../../../context/properties/propertiesContext';
 
 function AccessionView() {
   const ref = useRef(null);
   const { width, height } = useContainerDimensions(ref);
+  const { backendUrl } = usePropertiesContext();
+
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [requestedAccession, setRequestedAccession] = useState<string>('');
   const [record, setRecord] = useState<Record | undefined>();
@@ -19,14 +22,17 @@ function AccessionView() {
 
   const headerHeight = 50;
 
-  const handleOnSearch = useCallback(async (acc: string) => {
-    setIsRequesting(true);
-    setRequestedAccession(acc);
+  const handleOnSearch = useCallback(
+    async (acc: string) => {
+      setIsRequesting(true);
+      setRequestedAccession(acc);
 
-    setRecord(await searchAccession(acc));
+      setRecord(await searchAccession(acc, backendUrl));
 
-    setIsRequesting(false);
-  }, []);
+      setIsRequesting(false);
+    },
+    [backendUrl],
+  );
 
   useEffect(() => {
     if (accession) {

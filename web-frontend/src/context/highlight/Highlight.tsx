@@ -6,7 +6,7 @@ import {
   useCallback,
   useEffect,
 } from 'react';
-import Highlight from '../types/Highlight';
+import Highlight from '../../types/Highlight';
 
 type HighlightActions = 'HIDE' | 'SHOW';
 
@@ -18,7 +18,7 @@ interface HighlightState {
 
 interface HighlightContextProps {
   highlight: HighlightState;
-  // eslint-disable-next-line no-unused-vars
+
   dispatch: (props: {
     type: HighlightActions;
     payload?: {

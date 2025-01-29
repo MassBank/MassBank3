@@ -6,6 +6,7 @@ import { CSSProperties, JSX, useCallback, useMemo } from 'react';
 import ExportableContent from '../common/ExportableContent';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
 import routes from '../../constants/routes';
+import { usePropertiesContext } from '../../context/properties/propertiesContext';
 
 type InputProps = {
   links: Link[] | undefined;
@@ -15,16 +16,22 @@ type InputProps = {
 };
 
 function LinksTable({ links, width, height, title }: InputProps) {
-  const buildSearchUrl = useCallback((label: string, value: string) => {
-    const searchParams = new URLSearchParams();
-    searchParams.set(label, value);
-    const url =
-      process.env.REACT_APP_MB3_FRONTEND_URL +
-      routes.search.path +
-      `?${searchParams.toString()}`;
+  const { baseUrl, frontendUrl } = usePropertiesContext();
 
-    return url;
-  }, []);
+  const buildSearchUrl = useCallback(
+    (label: string, value: string) => {
+      const searchParams = new URLSearchParams();
+      searchParams.set(label, value);
+      const url =
+        frontendUrl +
+        baseUrl +
+        routes.search.path +
+        `?${searchParams.toString()}`;
+
+      return url;
+    },
+    [baseUrl, frontendUrl],
+  );
 
   return useMemo(() => {
     if (!links || links.length === 0) {

@@ -1,7 +1,7 @@
 import fetchData from './fetchData';
 
-async function getRecord(id: string) {
-  const url = process.env.REACT_APP_MB3_API_URL + '/v1/records/' + id;
+async function getRecord(id: string, backendUrl: string) {
+  const url = backendUrl + '/v1/records/' + id;
   return await fetchData(url);
 }
 

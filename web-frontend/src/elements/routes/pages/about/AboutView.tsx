@@ -1,10 +1,29 @@
-import './AboutView.scss';
+import { Content } from 'antd/es/layout/layout';
 
 function AboutView() {
   return (
-    <div className="about-view">
-      <h2>About View</h2>
-      <div className="documentation-container">
+    <Content
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <h2 style={{ width: '100%', height: '20%', textAlign: 'center' }}>
+        About View
+      </h2>
+      <Content
+        style={{
+          width: '100%',
+          height: '40%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <p>
           A documentation is accessible at our{' '}
           {
@@ -17,8 +36,16 @@ function AboutView() {
           }{' '}
           repository.
         </p>
-      </div>
-      <div className="download-container">
+      </Content>
+      <Content
+        style={{
+          width: '100%',
+          height: '40%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <p>
           Get the latest MassBank data from our{' '}
           {
@@ -31,8 +58,8 @@ function AboutView() {
           }{' '}
           repository.
         </p>
-      </div>
-    </div>
+      </Content>
+    </Content>
   );
 }
 

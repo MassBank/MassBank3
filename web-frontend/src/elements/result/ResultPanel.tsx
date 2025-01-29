@@ -20,6 +20,7 @@ import SpectralHitsCarouselView from '../routes/pages/search/SpectralHitsCarouse
 import ResultTableSortOptionType from '../../types/ResultTableSortOptionType';
 import axios from 'axios';
 import FileSaver from 'file-saver';
+import { usePropertiesContext } from '../../context/properties/propertiesContext';
 const { saveAs } = FileSaver;
 
 type InputProps = {
@@ -44,6 +45,8 @@ function ResultPanel({
   widthOverview = width,
   heightOverview = height,
 }: InputProps) {
+  const { backendUrl, exportServiceUrl } = usePropertiesContext();
+
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [slideIndex, setSlideIndex] = useState<number>(0);
@@ -99,11 +102,7 @@ function ResultPanel({
 
       const records: (Record | undefined)[] = [];
       for (const accession of accessions) {
-        const url =
-          process.env.REACT_APP_MB3_API_URL +
-          '/v1/records/' +
-          accession +
-          '/simple';
+        const url = backendUrl + '/v1/records/' + accession + '/simple';
 
         const record = await fetchData(url);
 
@@ -126,7 +125,7 @@ function ResultPanel({
 
     setHitsWithRecords(_hitsWithRecords);
     setIsRequesting(false);
-  }, [resultTableData, resultPageIndex]);
+  }, [resultTableData, resultPageIndex, backendUrl]);
 
   useEffect(() => {
     fetchRecords();
@@ -209,7 +208,7 @@ function ResultPanel({
   const handleOnDownloadResult = useCallback(
     async (format: string) => {
       setIsRequesting(true);
-      const host = process.env.REACT_APP_EXPORT_SERVICE_URL;
+      const host = exportServiceUrl;
       const url = `${host}/convert`;
 
       const resp = await axios.post(
@@ -237,7 +236,7 @@ function ResultPanel({
 
       setIsRequesting(false);
     },
-    [hits],
+    [exportServiceUrl, hits],
   );
 
   const buildDownloadOptionLabel = useCallback(

@@ -7,10 +7,6 @@ import NewsView from '../elements/routes/pages/news/NewsView';
 import NotFoundView from '../elements/routes/pages/notfound/NotFoundView';
 import SearchView from '../elements/routes/pages/search/SearchView';
 
-const baseUrl = process.env.REACT_APP_MB3_BASE_URL;
-
-console.log('baseUrl', baseUrl);
-
 type RouteType = {
   component: React.FC;
   label: string;
@@ -23,49 +19,49 @@ const routes = {
     component: HomeView,
     label: 'Home',
     id: 'home',
-    path: baseUrl,
+    path: '/',
   } as RouteType,
   search: {
     component: SearchView,
     label: 'Search',
     id: 'search',
-    path: baseUrl + 'search',
+    path: 'search',
   } as RouteType,
   content: {
     component: ContentView,
     label: 'Content',
     id: 'content',
-    path: baseUrl + 'content',
+    path: 'content',
   } as RouteType,
   accession: {
     component: AccessionView,
     label: 'Accession',
     id: 'accession',
-    path: baseUrl + 'recordDisplay',
+    path: 'recordDisplay',
   } as RouteType,
   accessionPrevious: {
     component: AccessionView,
     label: 'Previous Accession',
     id: 'accessionPrevious',
-    path: baseUrl + 'RecordDisplay',
+    path: 'RecordDisplay',
   } as RouteType,
   news: {
     component: NewsView,
     label: 'News',
     id: 'news',
-    path: baseUrl + 'news',
+    path: 'news',
   } as RouteType,
   about: {
     component: AboutView,
     label: 'About',
     id: 'about',
-    path: baseUrl + 'about',
+    path: 'about',
   } as RouteType,
   notFound: {
     component: NotFoundView,
     label: 'Not Found',
     id: 'notFound',
-    path: baseUrl + '*',
+    path: '*',
   } as RouteType,
 };
 

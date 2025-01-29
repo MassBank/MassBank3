@@ -10,6 +10,7 @@ import Record from '../../types/Record';
 import { MF } from 'react-mf';
 import StructureView from '../basic/StructureView';
 import LabelWrapper from './LabelWrapper';
+import { usePropertiesContext } from '../../context/properties/propertiesContext';
 
 const titleHeight = 50;
 const labelWidth = 120;
@@ -43,20 +44,26 @@ type InputProps = {
 };
 
 function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
+  const { baseUrl, frontendUrl } = usePropertiesContext();
+
   const handleOnCopy = useCallback((label: string, text: string) => {
     copyTextToClipboard(label, text);
   }, []);
 
-  const buildSearchUrl = useCallback((label: string, value: string) => {
-    const searchParams = new URLSearchParams();
-    searchParams.set(label, value);
-    const url =
-      process.env.REACT_APP_MB3_FRONTEND_URL +
-      routes.search.path +
-      `?${searchParams.toString()}`;
+  const buildSearchUrl = useCallback(
+    (label: string, value: string) => {
+      const searchParams = new URLSearchParams();
+      searchParams.set(label, value);
+      const url =
+        frontendUrl +
+        baseUrl +
+        routes.search.path +
+        `?${searchParams.toString()}`;
 
-    return url;
-  }, []);
+      return url;
+    },
+    [baseUrl, frontendUrl],
+  );
 
   return useMemo(() => {
     const dataSource: HeaderTableType[] = [];

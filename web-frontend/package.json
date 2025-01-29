@@ -4,7 +4,7 @@
   "version": "0.4.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --mode development --host localhost --port 3000 --strictPort --open",
+    "dev": "nodemon --exec 'node --env-file='.env' --import=tsx server'",
     "build": "rimraf dist && npm run build:client && npm run build:server",
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --outDir dist/server --ssr src/ServerApp.tsx",

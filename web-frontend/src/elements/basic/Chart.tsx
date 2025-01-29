@@ -15,6 +15,7 @@ const { saveAs } = FileSaver;
 import ExportableContent from '../common/ExportableContent';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
 import routes from '../../constants/routes';
+import { usePropertiesContext } from '../../context/properties/propertiesContext';
 
 type InputProps = {
   peakData: Peak[];
@@ -42,6 +43,7 @@ function Chart({
 }: InputProps) {
   const wrapperRef = useRef(null);
   const svgRef = useRef(null);
+  const { baseUrl, frontendUrl } = usePropertiesContext();
 
   const [isShowLabel, setIsShowLabel] = useState<boolean>(false);
 
@@ -456,20 +458,20 @@ function Chart({
     copyTextToClipboard('Peak List', text);
   }, []);
 
-  const buildSearchUrl = useCallback((peaks: Peak[]) => {
-    const searchParams = new URLSearchParams();
-    searchParams.set(
-      'peak_list',
-      peaks.map((p) => `${p.mz};${p.rel}`).join(','),
-    );
-    const path = routes.search.path;
-    const url =
-      process.env.REACT_APP_MB3_FRONTEND_URL +
-      path +
-      `?${searchParams.toString()}`;
+  const buildSearchUrl = useCallback(
+    (peaks: Peak[]) => {
+      const searchParams = new URLSearchParams();
+      searchParams.set(
+        'peak_list',
+        peaks.map((p) => `${p.mz};${p.rel}`).join(','),
+      );
+      const path = routes.search.path;
+      const url = frontendUrl + baseUrl + path + `?${searchParams.toString()}`;
 
-    return url;
-  }, []);
+      return url;
+    },
+    [baseUrl, frontendUrl],
+  );
 
   return useMemo(
     () => (
