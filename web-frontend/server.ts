@@ -3,19 +3,17 @@ import express, { Request, Response } from 'express';
 import { ViteDevServer } from 'vite';
 import axios from 'axios';
 import xmlFormat from 'xml-formatter';
+import NodeCache from 'node-cache';
 import Hit from './src/types/Hit';
 import SearchResult from './src/types/SearchResult';
 import fetchData from './src/utils/request/fetchData';
+import PropertiesContextProps from './src/types/PropertiesContextProps';
 
 // Constants
+const cache = new NodeCache({ stdTTL: 100 });
 
 const port = 3000;
 const host = '0.0.0.0';
-
-console.log(process.env.VITE_MB3_API_URL);
-console.log(process.env.VITE_MB3_FRONTEND_URL);
-console.log(process.env.VITE_EXPORT_SERVICE_URL);
-console.log(process.env.VITE_GOOGLE_SEARCH_CONSOLE_KEY);
 
 const isProduction = process.env.NODE_ENV === 'production';
 const backendUrl = process.env.VITE_MB3_API_URL ?? 'http://localhost:8081';
@@ -25,15 +23,23 @@ const baseUrl = process.env.VITE_MB3_BASE_URL ?? '/MassBank3/';
 const exportServiceUrl =
   process.env.VITE_EXPORT_SERVICE_URL ?? 'http://localhost:8083';
 const version = process.env.VITE_MB3_VERSION ?? '0.4.0 (beta)';
+const googleSearchConsoleKey = process.env.VITE_GOOGLE_SEARCH_CONSOLE_KEY ?? '';
+const backendUrlInternal =
+  process.env.VITE_MB3_API_URL_INTERNAL ?? 'http://mb3server:8080';
+const exportServiceUrlInternal =
+  process.env.VITE_EXPORT_SERVICE_URL_INTERNAL ?? 'http://export-service:8080';
 
 console.log('isProduction', process.env.NODE_ENV === 'production');
-console.log('frontendUrl', frontendUrl);
-console.log('exportServiceUrl', exportServiceUrl);
-console.log('backendUrl', backendUrl);
-console.log('version', version);
 console.log('port', port);
 console.log('host', host);
 console.log('baseUrl', baseUrl);
+console.log('frontendUrl', frontendUrl);
+console.log('version', version);
+console.log('backendUrl', backendUrl);
+console.log('backendUrlInternal', backendUrlInternal);
+console.log('exportServiceUrl', exportServiceUrl);
+console.log('exportServiceUrlInternal', exportServiceUrlInternal);
+console.log('googleSearchConsoleKey', googleSearchConsoleKey);
 
 // Create http server
 const app = express();
@@ -56,7 +62,7 @@ if (!isProduction) {
 }
 
 const buildRecordMetadata = async (_accession: string) => {
-  const url = `${exportServiceUrl}/metadata/${_accession}`;
+  const url = `${exportServiceUrlInternal}/metadata/${_accession}`;
 
   const resp = await axios.get(url, {
     headers: {
@@ -89,8 +95,13 @@ const prefixUrl = frontendUrl + baseUrl;
 baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
   console.log('/sitemap.xml');
 
+  const cacheKey = req.url;
+  if (cache.has(cacheKey)) {
+    return res.status(200).send(cache.get(cacheKey));
+  }
+
   try {
-    const url = backendUrl + '/v1/records/search';
+    const url = backendUrlInternal + '/v1/records/search';
 
     console.log('prefixUrl', prefixUrl);
     console.log('url', url);
@@ -124,10 +135,15 @@ baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
 baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
   console.log(req.originalUrl);
 
+  const cacheKey = req.url;
+  if (cache.has(cacheKey)) {
+    return res.status(200).send(cache.get(cacheKey));
+  }
+
   try {
     const index = Number(req.originalUrl.split('_')[1].split('.')[0]);
 
-    const url = backendUrl + '/v1/records/search';
+    const url = backendUrlInternal + '/v1/records/search';
     const searchResult = (await fetchData(url)) as SearchResult;
     const hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
 
@@ -160,6 +176,11 @@ baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
 
 // serve index.html for all other routes
 baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
+  const cacheKey = req.url;
+  if (cache.has(cacheKey)) {
+    return res.status(200).send(cache.get(cacheKey));
+  }
+
   try {
     console.log('url: "' + req.originalUrl + '"');
     const url = req.originalUrl; //.replace(base, "");
@@ -183,25 +204,47 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       render = (await import('./dist/server/ServerApp.js')).render;
     }
 
-    const rendered = await render({ path });
+    const props = {
+      baseUrl,
+      backendUrl,
+      frontendUrl,
+      exportServiceUrl,
+      version,
+    } as PropertiesContextProps;
+    const rendered = await render({
+      path,
+      props,
+    });
 
+    const googleSearchConsoleMeta = `<meta name="google-site-verification" content="${googleSearchConsoleKey}"></meta>`;
+    rendered.head = rendered.head
+      ? rendered.head.concat('\n').concat(googleSearchConsoleMeta)
+      : googleSearchConsoleMeta;
+
+    const pageRoute = path.replace(baseUrl, '');
     if (
-      (path === 'recordDisplay' || path === 'RecordDisplay') &&
+      (pageRoute === 'recordDisplay' || pageRoute === 'RecordDisplay') &&
       req.query.id
     ) {
       const metadata = await buildRecordMetadata(req.query.id as string);
+      const metadataScript = `<script type="application/ld+json">${metadata}</script>`;
       rendered.head = rendered.head
-        ? rendered.head.concat(
-            `<script type="application/ld+json">${metadata}</script>`,
-          )
-        : `<script type="application/ld+json">${metadata}</script>`;
+        ? rendered.head.concat('\n').concat(metadataScript)
+        : metadataScript;
     }
+
+    const initDataScript = `<script> window.__INITIAL_DATA__ = ${JSON.stringify(props)}; </script>`;
+    rendered.html = rendered.html
+      ? rendered.html.concat('\n').concat(initDataScript)
+      : initDataScript;
+
+    // console.log('rendered', rendered);
 
     const html = template
       .replace(`<!--app-head-->`, rendered.head ?? '')
       .replace(`<!--app-html-->`, rendered.html ?? '');
 
-    console.log('html', html);
+    // console.log('html', html);
 
     res.status(200).set({ 'Content-Type': 'text/html' }).send(html);
   } catch (e) {

@@ -1,6 +1,6 @@
-import "./Placeholder.scss";
+import './Placeholder.scss';
 
-import { CSSProperties, JSX } from "react";
+import { CSSProperties, JSX } from 'react';
 
 type InputProps = {
   child: string | JSX.Element;

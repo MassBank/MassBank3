@@ -22,9 +22,7 @@ type InputProps = {
   height: number;
   collapsed: boolean;
   massSpecFilterOptions: ContentFilterOptions | undefined;
-  // eslint-disable-next-line no-unused-vars
   onCollapse: (collapsed: boolean) => void;
-  // eslint-disable-next-line no-unused-vars
   onSubmit: (data: SearchFields) => void;
 };
 

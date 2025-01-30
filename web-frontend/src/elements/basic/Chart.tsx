@@ -1,25 +1,26 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { brushX, scaleLinear, select } from "d3";
-import ChartElement from "./ChartElement";
-import Peak from "../../types/peak/Peak";
-import { Button } from "antd";
-import { Content } from "antd/es/layout/layout";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { brushX, scaleLinear, select } from 'd3';
+import ChartElement from './ChartElement';
+import Peak from '../../types/peak/Peak';
+import { Button } from 'antd';
+import { Content } from 'antd/es/layout/layout';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faEye,
   faEyeSlash,
   faFileArrowDown,
-} from "@fortawesome/free-solid-svg-icons";
-import FileSaver from "file-saver";
+} from '@fortawesome/free-solid-svg-icons';
+import FileSaver from 'file-saver';
 const { saveAs } = FileSaver;
-import ExportableContent from "../common/ExportableContent";
-import copyTextToClipboard from "../../utils/copyTextToClipboard";
-import routes from "../../constants/routes";
+import ExportableContent from '../common/ExportableContent';
+import copyTextToClipboard from '../../utils/copyTextToClipboard';
+import routes from '../../constants/routes';
+import { usePropertiesContext } from '../../context/properties/properties';
 
 type InputProps = {
   peakData: Peak[];
   peakData2?: Peak[];
-  // eslint-disable-next-line no-unused-vars
+
   onZoom?: (fpd1: Peak[], fpd2?: Peak[]) => void;
   width?: number;
   height?: number;
@@ -42,6 +43,7 @@ function Chart({
 }: InputProps) {
   const wrapperRef = useRef(null);
   const svgRef = useRef(null);
+  const { baseUrl, frontendUrl } = usePropertiesContext();
 
   const [isShowLabel, setIsShowLabel] = useState<boolean>(false);
 
@@ -58,11 +60,11 @@ function Chart({
 
   const boundsWidth = useMemo(
     () => width - MARGIN.right - MARGIN.left,
-    [MARGIN.left, MARGIN.right, width]
+    [MARGIN.left, MARGIN.right, width],
   );
   const boundsHeight = useMemo(
     () => height - MARGIN.top - MARGIN.bottom - MARGIN.button,
-    [MARGIN.bottom, MARGIN.button, MARGIN.top, height]
+    [MARGIN.bottom, MARGIN.button, MARGIN.top, height],
   );
 
   const [brushXDomains, setBrushXDomains] = useState<
@@ -76,18 +78,18 @@ function Chart({
         _peakData = peakDataTemp.filter(
           (pd) =>
             pd.mz >= brushXDomains[brushXDomains.length - 1].min &&
-            pd.mz <= brushXDomains[brushXDomains.length - 1].max
+            pd.mz <= brushXDomains[brushXDomains.length - 1].max,
         );
       }
 
       return _peakData;
     },
-    [brushXDomains]
+    [brushXDomains],
   );
 
   const filteredPeakData = useMemo(
     () => getFilteredPeakData(peakData),
-    [getFilteredPeakData, peakData]
+    [getFilteredPeakData, peakData],
   );
 
   const filteredPeakData2 = useMemo(
@@ -101,7 +103,7 @@ function Chart({
             return _p;
           })
         : undefined,
-    [getFilteredPeakData, peakData2]
+    [getFilteredPeakData, peakData2],
   );
 
   const handleOnZoom = useCallback(
@@ -115,12 +117,12 @@ function Chart({
       });
       onZoom(_filteredPeakData, _filteredPeakData2_temp);
     },
-    [onZoom]
+    [onZoom],
   );
 
   useEffect(
     () => handleOnZoom(filteredPeakData, filteredPeakData2),
-    [filteredPeakData, filteredPeakData2, handleOnZoom]
+    [filteredPeakData, filteredPeakData2, handleOnZoom],
   );
 
   const xScale = useMemo(() => {
@@ -221,7 +223,7 @@ function Chart({
     }
 
     return labelValues.map((x) => (
-      <g key={"x_axis_label" + x}>
+      <g key={'x_axis_label' + x}>
         <text
           x={xScale(x)}
           y={
@@ -319,14 +321,14 @@ function Chart({
     const minY = Math.floor(
       Math.min(
         ...yScale.domain(),
-        ...(filteredPeakData2 ? yScale2.domain() : [])
-      )
+        ...(filteredPeakData2 ? yScale2.domain() : []),
+      ),
     );
     const maxY = Math.ceil(
       Math.max(
         ...yScale.domain(),
-        ...(filteredPeakData2 ? yScale2.domain() : [])
-      )
+        ...(filteredPeakData2 ? yScale2.domain() : []),
+      ),
     );
     const range: number[] = [];
     for (let i = minY; i <= maxY; i++) {
@@ -336,7 +338,7 @@ function Chart({
     return range.map(
       (y) =>
         y % 200 === 0 && (
-          <g key={"x_axis_label" + y}>
+          <g key={'x_axis_label' + y}>
             <text
               x={xScale.range()[0] - 30}
               y={y < 0 ? yScale2(y) : yScale(y)}
@@ -354,7 +356,7 @@ function Chart({
               stroke="black"
             />
           </g>
-        )
+        ),
     );
   }, [filteredPeakData2, xScale, yScale, yScale2]);
 
@@ -363,7 +365,7 @@ function Chart({
       filteredPeakData
         .map((d) => (
           <ChartElement
-            key={"chart_element" + d.mz + "_1"}
+            key={'chart_element' + d.mz + '_1'}
             pd={d}
             xScale={xScale}
             yScale={yScale}
@@ -376,7 +378,7 @@ function Chart({
           filteredPeakData2
             ? filteredPeakData2.map((d) => (
                 <ChartElement
-                  key={"chart_element" + d.mz + "_2"}
+                  key={'chart_element' + d.mz + '_2'}
                   pd={d}
                   xScale={xScale}
                   yScale={yScale2}
@@ -385,7 +387,7 @@ function Chart({
                   disableOnHover={disableOnHover}
                 />
               ))
-            : []
+            : [],
         ),
     [
       disableOnHover,
@@ -395,7 +397,7 @@ function Chart({
       xScale,
       yScale,
       yScale2,
-    ]
+    ],
   );
 
   const handleDoubleClick = useCallback(() => {
@@ -420,7 +422,7 @@ function Chart({
           [0, 0],
           [width, height],
         ])
-        .on("end", (e) => {
+        .on('end', (e) => {
           if (e.selection) {
             const inverted: number[] = e.selection.map((x) => xScale.invert(x));
             const newBrushXDomains = brushXDomains
@@ -436,8 +438,8 @@ function Chart({
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
-      svg.select(".brush").call(brush).call(brush.move, undefined);
-      svg.on("dblclick", handleDoubleClick);
+      svg.select('.brush').call(brush).call(brush.move, undefined);
+      svg.on('dblclick', handleDoubleClick);
     }
   }, [brushXDomains, disableZoom, handleDoubleClick, height, width, xScale]);
 
@@ -446,30 +448,33 @@ function Chart({
     if (svg) {
       const serializer = new XMLSerializer();
       const svgString = serializer.serializeToString(svg);
-      const blob = new Blob([svgString], { type: "image/svg+xml" });
-      saveAs(blob, "spectrum.svg");
+      const blob = new Blob([svgString], { type: 'image/svg+xml' });
+      saveAs(blob, 'spectrum.svg');
     }
   }, []);
 
   const handleOnCopy = useCallback((peaks: Peak[]) => {
-    const text = peaks.map((p) => `${p.mz} ${p.intensity} ${p.rel}`).join("\n");
-    copyTextToClipboard("Peak List", text);
+    const text = peaks.map((p) => `${p.mz} ${p.intensity} ${p.rel}`).join('\n');
+    copyTextToClipboard('Peak List', text);
   }, []);
 
-  const buildSearchUrl = useCallback((peaks: Peak[]) => {
-    const searchParams = new URLSearchParams();
-    searchParams.set(
-      "peak_list",
-      peaks.map((p) => `${p.mz};${p.rel}`).join(",")
-    );
-    const path = routes.search.path;
-    const url =
-      import.meta.env.VITE_MB3_FRONTEND_URL +
-      path +
-      `?${searchParams.toString()}`;
+  const buildSearchUrl = useCallback(
+    (peaks: Peak[]) => {
+      const searchParams = new URLSearchParams();
+      searchParams.set(
+        'peak_list',
+        peaks.map((p) => `${p.mz};${p.rel}`).join(','),
+      );
+      const url =
+        frontendUrl +
+        baseUrl +
+        routes.search.path +
+        `?${searchParams.toString()}`;
 
-    return url;
-  }, []);
+      return url;
+    },
+    [baseUrl, frontendUrl],
+  );
 
   return useMemo(
     () => (
@@ -478,15 +483,15 @@ function Chart({
         style={{
           width: width,
           height: height,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center",
-          userSelect: "none",
-          msUserSelect: "none",
-          MozUserSelect: "none",
-          WebkitUserSelect: "none",
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          textAlign: 'center',
+          userSelect: 'none',
+          msUserSelect: 'none',
+          MozUserSelect: 'none',
+          WebkitUserSelect: 'none',
         }}
       >
         <svg
@@ -497,7 +502,7 @@ function Chart({
           <g
             width={boundsWidth}
             height={boundsHeight}
-            transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}
+            transform={`translate(${[MARGIN.left, MARGIN.top].join(',')})`}
           >
             {disableZoom ? undefined : <g className="brush" />}
             {chartElements}
@@ -512,20 +517,20 @@ function Chart({
             style={{
               width,
               height: MARGIN.button,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
               paddingRight: MARGIN.right,
             }}
           >
             <Content
               style={{
-                width: "100%",
+                width: '100%',
                 height: MARGIN.button,
                 marginLeft: 5,
-                display: "flex",
-                justifyContent: "flex-start",
-                alignItems: "center",
+                display: 'flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
               }}
             >
               <Button
@@ -533,12 +538,12 @@ function Chart({
                   <FontAwesomeIcon
                     icon={isShowLabel ? faEyeSlash : faEye}
                     title={
-                      isShowLabel ? "Hide peak labels" : "Show peak labels"
+                      isShowLabel ? 'Hide peak labels' : 'Show peak labels'
                     }
                   />
                 }
                 onClick={() => setIsShowLabel(!isShowLabel)}
-                style={{ width: 20, border: "none" }}
+                style={{ width: 20, border: 'none' }}
               />
               <Button
                 children={
@@ -548,12 +553,12 @@ function Chart({
                   />
                 }
                 onClick={handleOnDownload}
-                style={{ width: 20, border: "none" }}
+                style={{ width: 20, border: 'none' }}
               />
               {!disableExport && (
                 <ExportableContent
                   width={80}
-                  height={"100%"}
+                  height={'100%'}
                   mode="copy"
                   title="Copy peak list of current spectrum view to clipboard"
                   onClick={() => handleOnCopy(filteredPeakData)}
@@ -568,10 +573,10 @@ function Chart({
               style={{
                 width: 100,
                 height: MARGIN.button,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "end",
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'end',
               }}
             >
               <p style={{ marginBottom: filteredPeakData2 ? 0 : undefined }}>
@@ -612,7 +617,7 @@ function Chart({
       xLabels,
       yAxis,
       yLabels,
-    ]
+    ],
   );
 }
 

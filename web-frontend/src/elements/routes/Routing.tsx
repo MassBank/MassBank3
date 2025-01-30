@@ -1,17 +1,21 @@
-import { Routes, Route } from "react-router-dom";
-import routes from "../../constants/routes";
-import UserInterface from "./UserInterface";
+import { Routes, Route } from 'react-router-dom';
+import routes from '../../constants/routes';
+import UserInterface from './UserInterface';
+import { usePropertiesContext } from '../../context/properties/properties';
 
 function Routing() {
+  const { baseUrl } = usePropertiesContext();
   return (
     <Routes>
-      {Object.values(routes).map((route) => (
-        <Route
-          key={"routing-key-" + route.id}
-          path={route.path}
-          element={<UserInterface body={<route.component />} />}
-        />
-      ))}
+      {Object.values(routes).map((route) => {
+        return (
+          <Route
+            key={'routing-key-' + route.id}
+            path={baseUrl + route.path}
+            element={<UserInterface body={<route.component />} />}
+          />
+        );
+      })}
     </Routes>
   );
 }

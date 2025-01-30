@@ -1,9 +1,10 @@
 import { Col, Layout, Row } from 'antd';
+import { usePropertiesContext } from '../../context/properties/properties';
 
 const { Footer: FooterAntD } = Layout;
 
 function Footer() {
-  const version = import.meta.env.VITE_MB3_VERSION;
+  const { version } = usePropertiesContext();
 
   return (
     <FooterAntD

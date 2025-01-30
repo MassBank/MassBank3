@@ -1,8 +1,8 @@
-import { Content } from "antd/es/layout/layout";
-import Header from "../header/Header";
-import Footer from "../footer/Footer";
-import { useMemo, JSX } from "react";
-import "@ant-design/v5-patch-for-react-19";
+import { Content } from 'antd/es/layout/layout';
+import Header from '../header/Header';
+import Footer from '../footer/Footer';
+import { useMemo, JSX } from 'react';
+import '@ant-design/v5-patch-for-react-19';
 
 type InputProps = {
   body: JSX.Element;
@@ -13,12 +13,12 @@ function UserInterface({ body }: InputProps) {
     () => (
       <Content
         style={{
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
+          width: '100vw',
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
         <Header />
@@ -26,7 +26,7 @@ function UserInterface({ body }: InputProps) {
         <Footer />
       </Content>
     ),
-    [body]
+    [body],
   );
 }
 

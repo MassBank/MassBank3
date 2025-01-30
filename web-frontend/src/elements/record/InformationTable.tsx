@@ -1,11 +1,11 @@
-import "./Table.scss";
+import './Table.scss';
 
-import { Table } from "antd";
-import { CSSProperties, JSX, useCallback, useMemo } from "react";
-import Record from "../../types/Record";
-import ExportableContent from "../common/ExportableContent";
-import copyTextToClipboard from "../../utils/copyTextToClipboard";
-import LabelWrapper from "./LabelWrapper";
+import { Table } from 'antd';
+import { CSSProperties, JSX, useCallback, useMemo } from 'react';
+import Record from '../../types/Record';
+import ExportableContent from '../common/ExportableContent';
+import copyTextToClipboard from '../../utils/copyTextToClipboard';
+import LabelWrapper from './LabelWrapper';
 
 type InformationTableType = {
   key: string;
@@ -14,12 +14,12 @@ type InformationTableType = {
   copyButton?: JSX.Element;
 };
 
-const labelWidth = "300px";
+const labelWidth = '300px';
 
 type InputProps = {
   record: Record;
-  width: CSSProperties["width"];
-  height: CSSProperties["height"];
+  width: CSSProperties['width'];
+  height: CSSProperties['height'];
 };
 
 function InformationTable({ record, width, height }: InputProps) {
@@ -30,37 +30,37 @@ function InformationTable({ record, width, height }: InputProps) {
   return useMemo(() => {
     const columns = [
       {
-        title: "Label",
-        dataIndex: "label",
-        key: "record-view-header-table-label",
+        title: 'Label',
+        dataIndex: 'label',
+        key: 'record-view-header-table-label',
         width: labelWidth,
-        align: "left" as const,
+        align: 'left' as const,
       },
       {
-        title: "Value",
-        dataIndex: "value",
-        key: "record-view-header-table-value",
+        title: 'Value',
+        dataIndex: 'value',
+        key: 'record-view-header-table-value',
         width: `calc(100% - ${labelWidth})`,
-        align: "left" as const,
+        align: 'left' as const,
       },
     ];
 
     const dataSource: InformationTableType[] = [];
     dataSource.push({
-      key: "record-view-general-table-authors",
-      label: "Authors",
+      key: 'record-view-general-table-authors',
+      label: 'Authors',
       value: (
         <ExportableContent
           component={
             <LabelWrapper
-              value={record.authors.map((a) => a.name).join(", ")}
+              value={record.authors.map((a) => a.name).join(', ')}
             />
           }
           mode="copy"
           onClick={() =>
             handleOnCopy(
-              "Authors",
-              record.authors.map((a) => a.name).join(", ")
+              'Authors',
+              record.authors.map((a) => a.name).join(', '),
             )
           }
           title="Copy authors to clipboard"
@@ -68,76 +68,76 @@ function InformationTable({ record, width, height }: InputProps) {
       ),
     });
     dataSource.push({
-      key: "record-view-general-table-publication",
-      label: "Publication",
+      key: 'record-view-general-table-publication',
+      label: 'Publication',
       value:
-        record.publication && record.publication !== "" ? (
+        record.publication && record.publication !== '' ? (
           <ExportableContent
             component={<LabelWrapper value={record.publication} />}
             mode="copy"
-            onClick={() => handleOnCopy("Publication", record.publication)}
+            onClick={() => handleOnCopy('Publication', record.publication)}
             title="Copy publication to clipboard"
           />
         ) : (
-          <label style={{ color: "grey", fontStyle: "italic" }}>N/A</label>
+          <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
         ),
     });
     dataSource.push({
-      key: "record-view-general-table-license",
-      label: "License",
+      key: 'record-view-general-table-license',
+      label: 'License',
       value:
-        record.license && record.license !== "" ? (
+        record.license && record.license !== '' ? (
           <ExportableContent
             component={record.license}
             mode="copy"
-            onClick={() => handleOnCopy("License", record.license)}
+            onClick={() => handleOnCopy('License', record.license)}
             title="Copy license to clipboard"
           />
         ) : (
-          <label style={{ color: "grey", fontStyle: "italic" }}>N/A</label>
+          <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
         ),
     });
     dataSource.push({
-      key: "record-view-general-table-copyright",
-      label: "Copyright",
+      key: 'record-view-general-table-copyright',
+      label: 'Copyright',
       value:
-        record.copyright && record.copyright !== "" ? (
+        record.copyright && record.copyright !== '' ? (
           <ExportableContent
             component={record.copyright}
             mode="copy"
-            onClick={() => handleOnCopy("Copyright", record.copyright)}
+            onClick={() => handleOnCopy('Copyright', record.copyright)}
             title="Copy copyright to clipboard"
           />
         ) : (
-          <label style={{ color: "grey", fontStyle: "italic" }}>N/A</label>
+          <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
         ),
     });
     dataSource.push({
-      key: "record-view-general-table-date-created",
-      label: "Date (created)",
+      key: 'record-view-general-table-date-created',
+      label: 'Date (created)',
       value: record.date ? (
         <ExportableContent
           component={record.date.created}
           mode="copy"
-          onClick={() => handleOnCopy("Date (created)", record.date.created)}
+          onClick={() => handleOnCopy('Date (created)', record.date.created)}
           title="Copy date (created) to clipboard"
         />
       ) : (
-        <label style={{ color: "grey", fontStyle: "italic" }}>N/A</label>
+        <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
       ),
     });
     dataSource.push({
-      key: "record-view-general-table-date-modified",
-      label: "Date (modified)",
+      key: 'record-view-general-table-date-modified',
+      label: 'Date (modified)',
       value: record.date ? (
         <ExportableContent
           component={record.date.modified}
           mode="copy"
-          onClick={() => handleOnCopy("Date (modified)", record.date.modified)}
+          onClick={() => handleOnCopy('Date (modified)', record.date.modified)}
           title="Copy date (modified) to clipboard"
         />
       ) : (
-        <label style={{ color: "grey", fontStyle: "italic" }}>N/A</label>
+        <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
       ),
     });
 

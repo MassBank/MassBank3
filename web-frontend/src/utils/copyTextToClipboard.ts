@@ -1,4 +1,4 @@
-import { message } from "antd";
+import { message } from 'antd';
 
 async function copyTextToClipboard(label: string, value: string) {
   try {
@@ -6,7 +6,7 @@ async function copyTextToClipboard(label: string, value: string) {
     return message.success('Copied "' + label + '" to clipboard!');
   } catch (error) {
     return message.error(
-      'Failed to copy "' + label + '" to clipboard: ' + error
+      'Failed to copy "' + label + '" to clipboard: ' + error,
     );
   }
 }

@@ -13,7 +13,6 @@ type InputProps = {
   reference?: Peak[];
   hits: Hit[];
   height: number;
-  // eslint-disable-next-line no-unused-vars
   onDoubleClick: (slideIndex: number) => void;
   rowHeight?: number;
   chartWidth?: number;

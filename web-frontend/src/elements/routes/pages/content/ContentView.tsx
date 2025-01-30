@@ -1,25 +1,27 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import useContainerDimensions from "../../../../utils/useContainerDimensions";
-import ContentChart from "./ContentChart";
-import fetchData from "../../../../utils/request/fetchData";
-import buildSearchParams from "../../../../utils/request/buildSearchParams";
-import initFlags from "../../../../utils/initFlags";
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import useContainerDimensions from '../../../../utils/useContainerDimensions';
+import ContentChart from './ContentChart';
+import fetchData from '../../../../utils/request/fetchData';
+import buildSearchParams from '../../../../utils/request/buildSearchParams';
+import initFlags from '../../../../utils/initFlags';
 
-import SearchResult from "../../../../types/SearchResult";
-import Hit from "../../../../types/Hit";
-import ContentFilterOptions from "../../../../types/filterOptions/ContentFilterOtions";
-import { Layout, Spin } from "antd";
-import { Content } from "antd/es/layout/layout";
-import SearchFields from "../../../../types/filterOptions/SearchFields";
-import massSpecFilterOptionsFormDataToContentMapper from "../../../../utils/massSpecFilterOptionsFormDataToContentMapper";
-import SearchAndResultPanel from "../../../common/SearchAndResultPanel";
-import CommonSearchPanel from "../../../common/CommonSearchPanel";
-import MassSpecFilterOptionsMenuItems from "../search/searchPanel/msSpecFilter/MassSpecFilterOptionsMenuItems";
-import Placeholder from "../../../basic/Placeholder";
+import SearchResult from '../../../../types/SearchResult';
+import Hit from '../../../../types/Hit';
+import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
+import { Layout, Spin } from 'antd';
+import { Content } from 'antd/es/layout/layout';
+import SearchFields from '../../../../types/filterOptions/SearchFields';
+import massSpecFilterOptionsFormDataToContentMapper from '../../../../utils/massSpecFilterOptionsFormDataToContentMapper';
+import SearchAndResultPanel from '../../../common/SearchAndResultPanel';
+import CommonSearchPanel from '../../../common/CommonSearchPanel';
+import MassSpecFilterOptionsMenuItems from '../search/searchPanel/msSpecFilter/MassSpecFilterOptionsMenuItems';
+import Placeholder from '../../../basic/Placeholder';
+import { usePropertiesContext } from '../../../../context/properties/properties';
 
 function ContentView() {
   const ref = useRef(null);
   const { width, height } = useContainerDimensions(ref);
+  const { backendUrl } = usePropertiesContext();
 
   const [isFetchingContent, setIsFetchingContent] = useState<boolean>(false);
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -31,7 +33,7 @@ function ContentView() {
 
   const searchPanelWidth = useMemo(
     () => (isCollapsed ? 50 : Math.max(width * 0.3, 400)),
-    [isCollapsed, width]
+    [isCollapsed, width],
   );
 
   const handleOnFetchContent = useCallback(
@@ -40,14 +42,14 @@ function ContentView() {
 
       let _browseContent: ContentFilterOptions | undefined = formDataContent;
       if (!_browseContent) {
-        const url = import.meta.env.VITE_MB3_API_URL + "/v1/filter/browse";
+        const url = backendUrl + '/v1/filter/browse';
         _browseContent = (await fetchData(url)) as ContentFilterOptions;
       } else {
         const searchParams = buildSearchParams(_browseContent);
-        const url = import.meta.env.VITE_MB3_API_URL + "/v1/filter/browse";
+        const url = backendUrl + '/v1/filter/browse';
         _browseContent = (await fetchData(
           url,
-          searchParams
+          searchParams,
         )) as ContentFilterOptions;
       }
       initFlags(_browseContent);
@@ -55,7 +57,7 @@ function ContentView() {
       setMassSpecFilterOptions(_browseContent);
       setIsFetchingContent(false);
     },
-    []
+    [backendUrl],
   );
 
   const handleOnSearch = useCallback(
@@ -63,7 +65,7 @@ function ContentView() {
       setIsSearching(true);
 
       const searchParams = buildSearchParams(formDataContent);
-      const url = import.meta.env.VITE_MB3_API_URL + "/v1/records/search";
+      const url = backendUrl + '/v1/records/search';
       const searchResult = (await fetchData(url, searchParams)) as SearchResult;
 
       let _hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
@@ -77,7 +79,7 @@ function ContentView() {
       setHits(_hits);
       setIsSearching(false);
     },
-    []
+    [backendUrl],
   );
 
   const handleOnSubmit = useCallback(
@@ -87,13 +89,13 @@ function ContentView() {
       const formDataContent = massSpecFilterOptionsFormDataToContentMapper(
         formData?.massSpecFilterOptions,
         // massSpecFilterOptions,
-        undefined
+        undefined,
       );
 
       await handleOnSearch(formDataContent);
       await handleOnFetchContent(formDataContent);
     },
-    [handleOnFetchContent, handleOnSearch]
+    [handleOnFetchContent, handleOnSearch],
   );
 
   useEffect(() => {
@@ -111,11 +113,11 @@ function ContentView() {
   const charts = useMemo(() => {
     if (massSpecFilterOptions) {
       const keys = Object.keys(massSpecFilterOptions).filter(
-        (key) => key !== "metadata"
+        (key) => key !== 'metadata',
       );
       const _charts = keys.map((key) => (
         <ContentChart
-          key={"chart_" + key}
+          key={'chart_' + key}
           content={massSpecFilterOptions}
           identifier={key}
           width={width / keys.length}
@@ -128,11 +130,11 @@ function ContentView() {
           style={{
             width,
             height: heights.chartPanelHeight,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            textAlign: "center",
-            backgroundColor: "#fcfff0",
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+            backgroundColor: '#fcfff0',
           }}
         >
           {_charts}
@@ -145,11 +147,11 @@ function ContentView() {
         style={{
           width,
           height: heights.chartPanelHeight,
-          color: "red",
+          color: 'red',
           fontSize: 18,
-          fontWeight: "bold",
+          fontWeight: 'bold',
         }}
-        child={""}
+        child={''}
       />
     );
   }, [heights.chartPanelHeight, massSpecFilterOptions, width]);
@@ -205,22 +207,22 @@ function ContentView() {
       <Layout
         ref={ref}
         style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
         <Spin size="large" spinning={isFetchingContent} />
         <Content
           style={{
-            width: "100%",
-            height: "100%",
-            display: isFetchingContent ? "none" : "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
+            width: '100%',
+            height: '100%',
+            display: isFetchingContent ? 'none' : 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
           {charts}
@@ -228,7 +230,7 @@ function ContentView() {
         </Content>
       </Layout>
     ),
-    [charts, isFetchingContent, searchAndResultPanel]
+    [charts, isFetchingContent, searchAndResultPanel],
   );
 }
 

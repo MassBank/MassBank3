@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 export default interface Highlight {
   isActive: boolean;
   onHover: {
