@@ -2,13 +2,14 @@ import { Content } from 'antd/es/layout/layout';
 import Header from '../header/Header';
 import Footer from '../footer/Footer';
 import { useMemo, JSX } from 'react';
+import { HighlightProvider } from '../../context/highlight/HighlightProvider';
 
 type InputProps = {
   body: JSX.Element;
 };
 
 function UserInterface({ body }: InputProps) {
-  return useMemo(
+  const userInterface = useMemo(
     () => (
       <Content
         style={{
@@ -27,6 +28,8 @@ function UserInterface({ body }: InputProps) {
     ),
     [body],
   );
+
+  return <HighlightProvider>{userInterface}</HighlightProvider>;
 }
 
 export default UserInterface;

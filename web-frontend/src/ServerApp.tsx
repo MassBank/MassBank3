@@ -5,7 +5,6 @@ import { StrictMode } from 'react';
 import Routing from './elements/routes/Routing';
 import { propertiesContext } from './context/properties/properties';
 import PropertiesContextProps from './types/PropertiesContextProps';
-import { HighlightProvider } from './context/highlight/HighlightProvider';
 
 interface IRenderProps {
   path: string;
@@ -19,11 +18,9 @@ export const render = ({ path, props }: IRenderProps) => {
     <StrictMode>
       <StyleProvider cache={cache}>
         <propertiesContext.Provider value={props ?? {}}>
-          <HighlightProvider>
-            <StaticRouter location={path}>
-              <Routing />
-            </StaticRouter>
-          </HighlightProvider>
+          <StaticRouter location={path}>
+            <Routing />
+          </StaticRouter>
         </propertiesContext.Provider>
       </StyleProvider>
     </StrictMode>,
