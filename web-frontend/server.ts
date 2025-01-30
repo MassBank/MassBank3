@@ -3,16 +3,12 @@ import express, { Request, Response } from 'express';
 import { ViteDevServer } from 'vite';
 import axios from 'axios';
 import xmlFormat from 'xml-formatter';
-import NodeCache from 'node-cache';
 import Hit from './src/types/Hit';
 import SearchResult from './src/types/SearchResult';
 import fetchData from './src/utils/request/fetchData';
 import PropertiesContextProps from './src/types/PropertiesContextProps';
 
 // Constants
-// const cache = new NodeCache({ stdTTL: 60, checkperiod: 120 });
-const cache = new NodeCache();
-
 const port = 3000;
 const host = '0.0.0.0';
 
@@ -30,6 +26,7 @@ const backendUrlInternal =
 const exportServiceUrlInternal =
   process.env.VITE_EXPORT_SERVICE_URL_INTERNAL ?? 'http://export-service:8080';
 
+console.log('\n');
 console.log('isProduction', process.env.NODE_ENV === 'production');
 console.log('port', port);
 console.log('host', host);
@@ -41,6 +38,7 @@ console.log('backendUrlInternal', backendUrlInternal);
 console.log('exportServiceUrl', exportServiceUrl);
 console.log('exportServiceUrlInternal', exportServiceUrlInternal);
 console.log('googleSearchConsoleKey', googleSearchConsoleKey);
+console.log('\n');
 
 // Create http server
 const app = express();
@@ -94,19 +92,8 @@ const prefixUrl = frontendUrl + baseUrl;
 
 // serve sitemap index for search engines
 baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
-  console.log('/sitemap.xml');
-
-  const cacheKey = req.url;
-  if (cache.has(cacheKey)) {
-    return res.status(200).send(cache.get(cacheKey));
-  }
-
   try {
     const url = backendUrlInternal + '/v1/records/search';
-
-    console.log('prefixUrl', prefixUrl);
-    console.log('url', url);
-
     const searchResult = (await fetchData(url)) as SearchResult;
     const hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
 
@@ -124,8 +111,6 @@ baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
     urlSets.push('</sitemapindex>');
     const xml = xmlFormat(urlSets.join(''));
 
-    cache.set(cacheKey, xml);
-
     res.status(200).set({ 'Content-Type': 'application/xml' }).send(xml);
   } catch (e) {
     vite?.ssrFixStacktrace(e);
@@ -136,13 +121,6 @@ baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
 
 // serve individual sitemaps for search engines
 baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
-  console.log(req.originalUrl);
-
-  const cacheKey = req.url;
-  if (cache.has(cacheKey)) {
-    return res.status(200).send(cache.get(cacheKey));
-  }
-
   try {
     const index = Number(req.originalUrl.split('_')[1].split('.')[0]);
 
@@ -169,8 +147,6 @@ baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
     xmlContent.push(xmlFooter);
     const xml = xmlFormat(xmlContent.join(''));
 
-    cache.set(cacheKey, xml);
-
     res.status(200).set({ 'Content-Type': 'application/xml' }).send(xml);
   } catch (e) {
     vite?.ssrFixStacktrace(e);
@@ -181,17 +157,9 @@ baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
 
 // serve index.html for all other routes
 baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
-  const cacheKey = req.url;
-  if (cache.has(cacheKey)) {
-    return res.status(200).send(cache.get(cacheKey));
-  }
-
   try {
-    console.log('url: "' + req.originalUrl + '"');
     const url = req.originalUrl; //.replace(base, "");
-    console.log('subst. url: "' + url + '"');
     const path = req.originalUrl.split('?')[0];
-    console.log('path: "' + path + '"');
 
     let template: string;
     let render;
@@ -250,8 +218,6 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       .replace(`<!--app-html-->`, rendered.html ?? '');
 
     // console.log('html', html);
-
-    cache.set(cacheKey, html);
 
     res.status(200).set({ 'Content-Type': 'text/html' }).send(html);
   } catch (e) {

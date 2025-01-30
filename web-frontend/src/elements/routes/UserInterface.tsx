@@ -2,7 +2,6 @@ import { Content } from 'antd/es/layout/layout';
 import Header from '../header/Header';
 import Footer from '../footer/Footer';
 import { useMemo, JSX } from 'react';
-import '@ant-design/v5-patch-for-react-19';
 
 type InputProps = {
   body: JSX.Element;
