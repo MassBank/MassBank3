@@ -28,7 +28,7 @@ function Footer() {
           alignItems: 'center',
         }}
       >
-        <Col span={8}>&copy; 2024 MassBank 3</Col>
+        <Col span={8}>&copy; 2025 MassBank Team</Col>
         <Col span={8}>Version: {version}</Col>
         <Col span={8}>
           <a href="https://github.com/MassBank/MassBank3" target="_blank">
