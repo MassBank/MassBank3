@@ -10,7 +10,8 @@ import fetchData from './src/utils/request/fetchData';
 import PropertiesContextProps from './src/types/PropertiesContextProps';
 
 // Constants
-const cache = new NodeCache({ stdTTL: 100 });
+// const cache = new NodeCache({ stdTTL: 60, checkperiod: 120 });
+const cache = new NodeCache();
 
 const port = 3000;
 const host = '0.0.0.0';
@@ -123,6 +124,8 @@ baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
     urlSets.push('</sitemapindex>');
     const xml = xmlFormat(urlSets.join(''));
 
+    cache.set(cacheKey, xml);
+
     res.status(200).set({ 'Content-Type': 'application/xml' }).send(xml);
   } catch (e) {
     vite?.ssrFixStacktrace(e);
@@ -165,6 +168,8 @@ baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
     });
     xmlContent.push(xmlFooter);
     const xml = xmlFormat(xmlContent.join(''));
+
+    cache.set(cacheKey, xml);
 
     res.status(200).set({ 'Content-Type': 'application/xml' }).send(xml);
   } catch (e) {
@@ -245,6 +250,8 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       .replace(`<!--app-html-->`, rendered.html ?? '');
 
     // console.log('html', html);
+
+    cache.set(cacheKey, html);
 
     res.status(200).set({ 'Content-Type': 'text/html' }).send(html);
   } catch (e) {

@@ -8,6 +8,9 @@ import PropertiesContextProps from './types/PropertiesContextProps';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const props = (window as any).__INITIAL_DATA__ as PropertiesContextProps;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+delete (window as any).__INITIAL_DATA__;
+
 hydrateRoot(
   document.getElementById('root') as HTMLElement,
   <StrictMode>
