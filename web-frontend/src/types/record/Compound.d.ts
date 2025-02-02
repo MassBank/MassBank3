@@ -8,5 +8,4 @@ export default interface Compound {
   smiles: string;
   inchi: string;
   link: Link[];
-  atomcount: number;
 }

@@ -418,7 +418,6 @@ func buildSimpleMbRecord(record *massbank.MassBank2) (*MbRecord){
 		Title:      *record.RecordTitle,
 		Compound: MbRecordCompound{
 			Smiles:    *record.Compound.Smiles,
-			Atomcount: int32(*record.Compound.AtomCount),
 		},
 		Peak: MbRecordPeak{
 			Peak: MbRecordPeakPeak{
