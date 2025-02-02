@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import RecordView from '../../../record/RecordView';
-import Record from '../../../../types/Record';
+import Record from '../../../../types/record/Record';
 import { Layout, Spin } from 'antd';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import { Content, Header } from 'antd/es/layout/layout';

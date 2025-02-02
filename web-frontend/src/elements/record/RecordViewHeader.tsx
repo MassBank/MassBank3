@@ -6,7 +6,7 @@ import { CSSProperties, JSX, useCallback, useMemo } from 'react';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
 import routes from '../../constants/routes';
 import { Table } from 'antd';
-import Record from '../../types/Record';
+import Record from '../../types/record/Record';
 import { MF } from 'react-mf';
 import StructureView from '../basic/StructureView';
 import LabelWrapper from './LabelWrapper';

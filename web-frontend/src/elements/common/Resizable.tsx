@@ -3,7 +3,7 @@ import Chart from '../basic/Chart';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Peak from '../../types/peak/Peak';
-import Record from '../../types/Record';
+import Record from '../../types/record/Record';
 import getLinkedAnnotations from '../../utils/getLinkedAnnotations';
 import LinkedPeakAnnotation from '../../types/peak/LinkedPeakAnnotation';
 import { Content } from 'antd/es/layout/layout';

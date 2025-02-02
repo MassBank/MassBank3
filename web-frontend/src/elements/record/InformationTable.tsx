@@ -2,7 +2,7 @@ import './Table.scss';
 
 import { Table } from 'antd';
 import { CSSProperties, JSX, useCallback, useMemo } from 'react';
-import Record from '../../types/Record';
+import Record from '../../types/record/Record';
 import ExportableContent from '../common/ExportableContent';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
 import LabelWrapper from './LabelWrapper';

@@ -1,4 +1,4 @@
-import Record from '../../types/Record';
+import Record from '../../types/record/Record';
 import { CSSProperties, useCallback, useMemo } from 'react';
 import Resizable from '../common/Resizable';
 import { Content } from 'antd/es/layout/layout';

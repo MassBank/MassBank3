@@ -1,4 +1,4 @@
-import Record from '../../types/Record';
+import Record from '../../types/record/Record';
 import generateID from '../generateID';
 
 import getRecord from './fetchRecord';
