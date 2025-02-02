@@ -91,6 +91,7 @@ function ResultTable({
           smiles={smiles}
           imageWidth={imageWidth}
           imageHeight={rowHeight}
+          disableExport
         />
       </Content>
     ),

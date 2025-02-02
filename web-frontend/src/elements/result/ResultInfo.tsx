@@ -84,6 +84,7 @@ function ResultInfo({
             smiles={hit.record.compound.smiles}
             imageWidth={imageWidth}
             imageHeight={imageHeight}
+            disableExport
           />
         ) : (
           <Placeholder
