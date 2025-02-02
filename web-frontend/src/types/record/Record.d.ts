@@ -1,10 +1,10 @@
+import PeakData from '../peak/PeakData';
 import Acquisition from './Acquisition';
 import Compound from './Compound';
 import Date from './Date';
 import MassSpectrometry from './MassSpectrometry';
 import Species from './Species';
 import SubTag from './SubTag';
-import PeakData from './peak/PeakData';
 
 export default interface Record {
   accession: string;

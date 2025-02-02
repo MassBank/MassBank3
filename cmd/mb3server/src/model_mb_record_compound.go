@@ -32,6 +32,9 @@ type MbRecordCompound struct {
 
 	// External database name with identifier
 	Link []DatabaseObject `json:"link,omitempty"`
+
+	// Number of atoms in the compound
+	Atomcount int32 `json:"atomcount,omitempty"`
 }
 
 // AssertMbRecordCompoundRequired checks if the required fields are not zero-ed

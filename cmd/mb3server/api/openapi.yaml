@@ -554,12 +554,12 @@ components:
             - header
           peak:
             values:
-            - intensity: 5.962133916683182
-              rel: 563
-              mz: 1.4658129805029452
-            - intensity: 5.962133916683182
-              rel: 563
-              mz: 1.4658129805029452
+            - intensity: 5.637376656633329
+              rel: 230
+              mz: 5.962133916683182
+            - intensity: 5.637376656633329
+              rel: 230
+              mz: 5.962133916683182
             header:
             - header
             - header
@@ -582,6 +582,7 @@ components:
           - identifier: identifier
             database: CAS
           formula: formula
+          atomcount: 1
         license: CC0
         species:
           lineage:
@@ -698,8 +699,10 @@ components:
         data:
         - score: 0.8008281904610115
           accession: accession
+          atomcount: 1
         - score: 0.8008281904610115
           accession: accession
+          atomcount: 1
       properties:
         data:
           description: A list of records as a search result with similarity score
@@ -815,8 +818,10 @@ components:
         data:
         - score: 0.8008281904610115
           accession: accession
+          atomcount: 1
         - score: 0.8008281904610115
           accession: accession
+          atomcount: 1
       properties:
         data:
           description: A ranked list of records with similarity scores.
@@ -982,6 +987,7 @@ components:
         - identifier: identifier
           database: CAS
         formula: formula
+        atomcount: 1
       properties:
         names:
           description: Chemical names
@@ -1013,6 +1019,10 @@ components:
           items:
             $ref: '#/components/schemas/DatabaseObject'
           type: array
+        atomcount:
+          description: Number of atoms in the compound
+          minimum: 1
+          type: integer
       required:
       - classes
       - formula
@@ -1164,9 +1174,9 @@ components:
     MBRecord_peak_peak_values_inner:
       description: Values for a single peak
       example:
-        intensity: 5.962133916683182
-        rel: 563
-        mz: 1.4658129805029452
+        intensity: 5.637376656633329
+        rel: 230
+        mz: 5.962133916683182
       properties:
         mz:
           description: m/z of the peak
@@ -1186,12 +1196,12 @@ components:
       description: Peak Data
       example:
         values:
-        - intensity: 5.962133916683182
-          rel: 563
-          mz: 1.4658129805029452
-        - intensity: 5.962133916683182
-          rel: 563
-          mz: 1.4658129805029452
+        - intensity: 5.637376656633329
+          rel: 230
+          mz: 5.962133916683182
+        - intensity: 5.637376656633329
+          rel: 230
+          mz: 5.962133916683182
         header:
         - header
         - header
@@ -1220,12 +1230,12 @@ components:
           - header
         peak:
           values:
-          - intensity: 5.962133916683182
-            rel: 563
-            mz: 1.4658129805029452
-          - intensity: 5.962133916683182
-            rel: 563
-            mz: 1.4658129805029452
+          - intensity: 5.637376656633329
+            rel: 230
+            mz: 5.962133916683182
+          - intensity: 5.637376656633329
+            rel: 230
+            mz: 5.962133916683182
           header:
           - header
           - header
@@ -1252,6 +1262,7 @@ components:
       example:
         score: 0.8008281904610115
         accession: accession
+        atomcount: 1
       properties:
         accession:
           description: The accession id of the record.
@@ -1259,6 +1270,10 @@ components:
         score:
           description: Similarity score to the query spectrum.
           type: number
+        atomcount:
+          description: The number of atoms in the compound.
+          minimum: 1
+          type: integer
       type: object
     StringCount_inner:
       example:
@@ -1276,6 +1291,7 @@ components:
       example:
         score: 0.8008281904610115
         accession: accession
+        atomcount: 1
       properties:
         accession:
           description: MassBank accession id.
@@ -1283,6 +1299,10 @@ components:
         score:
           description: Similarity score to the query spectrum.
           type: number
+        atomcount:
+          description: The number of atoms in the compound.
+          minimum: 1
+          type: integer
       type: object
     Authors_inner:
       description: Name of the author or affiliation

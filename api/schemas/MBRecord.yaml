@@ -128,6 +128,10 @@ properties:
         type: array
         items:
           $ref: "./DatabaseObject.yaml"
+      atomcount:
+        description: "Number of atoms in the compound"
+        type: integer
+        minimum: 1
   species:
     description: "Information of Biological Sample"
     type: object

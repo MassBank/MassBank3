@@ -34,6 +34,7 @@ type CompoundProperties struct {
 	Smiles    *string             `mb2:"CH$SMILES" json:"smiles"`
 	InChI     *string             `mb2:"CH$IUPAC" json:"inchi"`
 	Link      *[]DatabaseProperty `mb2:"CH$LINK" optional:"true" json:"link"`
+	AtomCount *uint            	  `mb2:"CH$ATOM_COUNT" json:"atom_count"`
 }
 
 type SpeciesProperties struct {

@@ -418,6 +418,7 @@ func buildSimpleMbRecord(record *massbank.MassBank2) (*MbRecord){
 		Title:      *record.RecordTitle,
 		Compound: MbRecordCompound{
 			Smiles:    *record.Compound.Smiles,
+			Atomcount: int32(*record.Compound.AtomCount),
 		},
 		Peak: MbRecordPeak{
 			Peak: MbRecordPeakPeak{
@@ -437,6 +438,7 @@ func buildSimpleMbRecord(record *massbank.MassBank2) (*MbRecord){
 			Rel:       rels[i],
 		})
 	}
+	result.Peak.NumPeak = int32(*record.Peak.NumPeak)
 
 	return &result
 }
@@ -497,21 +499,25 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 	}
 
 	var err error
+	atomCountResultMap := make(map[string]int32)
+
 	// substructure search
 	setSubstructureSearch := mapset.NewSet[string]()
 
-	accessionsSubstructureSearch := []string{}
+	accessionsSubstructureSearch := []string{}	
 	checkSubstructure := substructure != ""
 	if(checkSubstructure) {
 		fmt.Println(" -> filter by substructure")
-		accessionsSubstructureSearch, err = db.GetAccessionsBySubstructure(substructure)
+		var atomCountsSubstructureSearch []int32
+		accessionsSubstructureSearch, atomCountsSubstructureSearch, err = db.GetAccessionsBySubstructure(substructure)
 		if err != nil {
 			return nil, err
 		}
-		for	_, accession := range accessionsSubstructureSearch {
+		for	i, accession := range accessionsSubstructureSearch {
 			setSubstructureSearch.Add(accession)
+			atomCountResultMap[accession] = atomCountsSubstructureSearch[i]
 		}
-		fmt.Println("recordsSubstructure: ", len(accessionsSubstructureSearch))
+		fmt.Println("recordsSubstructureSearch: ", len(accessionsSubstructureSearch))
 	}
 
 	// similarity search
@@ -529,6 +535,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 		for _, similarityResult := range similaritySearchResult.Data {
 			setSimilaritySearch.Add(similarityResult.Accession)
 			similarityResultMap[similarityResult.Accession] = similarityResult.Score
+			atomCountResultMap[similarityResult.Accession] = similarityResult.Atomcount
 		}
 		fmt.Println("similaritySearchResult: ", len(similaritySearchResult.Data))
 	}	
@@ -550,12 +557,14 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 	accessionsFilters := []string{}
 	if(checkFilters) {
 			fmt.Println(" -> filter by Filters")
-			accessionsFilters, err = db.GetAccessionsByFilterOptions(*filters)
+			var atomCountsFilters []int32
+			accessionsFilters, atomCountsFilters,  err = db.GetAccessionsByFilterOptions(*filters)
 			if err != nil {
 				return nil, err
 			}
-			for _, accession := range accessionsFilters {
+			for i, accession := range accessionsFilters {
 				setFilterSearch.Add(accession)
+				atomCountResultMap[accession] = atomCountsFilters[i]
 			}
 			fmt.Println("recordsFilters: ", len(accessionsFilters))
 	}
@@ -571,6 +580,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			searchResultData := SearchResultDataInner{
 				Accession: accession,
 				Score: similarityResultMap[accession],		
+				Atomcount: atomCountResultMap[accession],
 			}
 			results.Data = append(results.Data, searchResultData)
 		}
@@ -584,6 +594,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			searchResultData := SearchResultDataInner{
 				Accession: accession,
 				Score: similarityResultMap[accession],
+				Atomcount: atomCountResultMap[accession],
 			}
 			results.Data = append(results.Data, searchResultData)
 		}
@@ -596,6 +607,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 		for _, accession := range intersection.ToSlice() {			
 			searchResultData := SearchResultDataInner{
 				Accession: accession,
+				Atomcount: atomCountResultMap[accession],
 			}
 			results.Data = append(results.Data, searchResultData)
 		}
@@ -606,6 +618,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			searchResultData := SearchResultDataInner{
 				Accession: accession,
 				Score: similarityResultMap[accession],
+				Atomcount: atomCountResultMap[accession],
 			}
 			results.Data = append(results.Data, searchResultData)
 		}
@@ -615,20 +628,27 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 	} else {
 		fmt.Println("no combined results found -> single results")
 		if(checkSimilarity && !checkFilters && !checkSubstructure) {
+			fmt.Println(" -> single results (similarity)")
 			for _, similarityResult := range similaritySearchResult.Data {								
 				results.Data = append(results.Data, SearchResultDataInner(similarityResult))
 			}
 		} else if(checkFilters && !checkSimilarity && !checkSubstructure) {
+			fmt.Println(" -> single results (filters)")
 			for _, accession := range accessionsFilters {				
 				searchResultData := SearchResultDataInner{
 					Accession: accession,
+					Atomcount: atomCountResultMap[accession],
 				}
 				results.Data = append(results.Data, searchResultData)
 			}
 		} else if(checkSubstructure && !checkSimilarity && !checkFilters) {
-			for _, accession := range accessionsSubstructureSearch {				
+			fmt.Println(" -> single results (substructure)")
+			for _, accession := range accessionsSubstructureSearch {	
+				fmt.Println("accession: ", accession)
+				fmt.Println("atomCount: ", atomCountResultMap[accession])			
 				searchResultData := SearchResultDataInner{
 					Accession: accession,
+					Atomcount: atomCountResultMap[accession],
 				}
 				results.Data = append(results.Data, searchResultData)
 			}

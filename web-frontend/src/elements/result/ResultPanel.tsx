@@ -2,7 +2,7 @@ import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import ResultTable from './ResultTable';
 import Hit from '../../types/Hit';
 import Peak from '../../types/peak/Peak';
-import Record from '../../types/Record';
+import Record from '../../types/record/Record';
 import generateID from '../../utils/generateID';
 import Placeholder from '../basic/Placeholder';
 import fetchData from '../../utils/request/fetchData';
@@ -21,6 +21,7 @@ import ResultTableSortOptionType from '../../types/ResultTableSortOptionType';
 import axios from 'axios';
 import FileSaver from 'file-saver';
 import { usePropertiesContext } from '../../context/properties/properties';
+import ResultTableSortOption from '../../types/ResultTableSortOption';
 const { saveAs } = FileSaver;
 
 type InputProps = {
@@ -30,7 +31,7 @@ type InputProps = {
   height: number;
   sortOptions?: ResultTableSortOptionType[];
 
-  onSort?: (value: string) => void;
+  onSort?: (value: ResultTableSortOption) => void;
   widthOverview?: number;
   heightOverview?: number;
 };
@@ -52,7 +53,7 @@ function ResultPanel({
   const [slideIndex, setSlideIndex] = useState<number>(0);
   const [resultPageIndex, setResultPageIndex] = useState<number>(0);
   const [selectedSortOption, setSelectedSortOption] = useState<
-    string | undefined
+    ResultTableSortOption | undefined
   >();
   const [hitsWithRecords, setHitsWithRecords] = useState<Hit[] | undefined>();
 
@@ -198,7 +199,7 @@ function ResultPanel({
   );
 
   const handleOnSelect = useCallback(
-    (value: string) => {
+    (value: ResultTableSortOption) => {
       setSelectedSortOption(value);
       onSort(value);
     },

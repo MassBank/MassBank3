@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -106,6 +107,7 @@ func (db *PostgresSQLDB) GetIndexes() []Index {
 	indexes = append(indexes, Index{IndexName: "browse_options_splash_index", TableName: "browse_options", Columns: []string{"splash"}})
 	indexes = append(indexes, Index{IndexName: "browse_options_formula_index", TableName: "browse_options", Columns: []string{"formula"}})
 	indexes = append(indexes, Index{IndexName: "browse_options_mass_index", TableName: "browse_options", Columns: []string{"mass"}})
+	indexes = append(indexes, Index{IndexName: "browse_options_atomcount_index", TableName: "browse_options", Columns: []string{"atomcount"}})
 
 	return indexes
 }
@@ -673,7 +675,8 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 	var relative_intensity_vec []int32
 	var formula string
 	var mass float64
-	var query = "SELECT massbank_id, accession, title, smiles, mz_vec, intensity_vec, relative_intensity_vec, formula, mass FROM browse_options WHERE accession = $1;"
+	var atomcount uint
+	var query = "SELECT massbank_id, accession, title, smiles, mz_vec, intensity_vec, relative_intensity_vec, formula, mass, atomcount FROM browse_options WHERE accession = $1;"
 	stmt, err := p.database.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -688,6 +691,7 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 		(*pq.Int32Array)(&relative_intensity_vec),
 		&formula,
 		&mass,
+		&atomcount,
 	)
 	stmt.Close()
 	if err != nil {
@@ -699,6 +703,7 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 	result.Compound = massbank.CompoundProperties{
 		Smiles: &smiles,
 		Formula: &formula,
+		AtomCount: &atomcount,
 	}
 	
 	result.Peak = massbank.PeakProperties{}
@@ -723,7 +728,7 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*[]massbank.MassBank2, erro
 		filters.Intensity = &DefaultValues.Intensity
 	}
 
-	accessions, err := p.GetAccessionsByFilterOptions(filters)
+	accessions, _, err := p.GetAccessionsByFilterOptions(filters)
 	if err != nil {
 		return nil, err
 	}
@@ -740,31 +745,34 @@ func (p *PostgresSQLDB) GetRecords(filters Filters) (*[]massbank.MassBank2, erro
 	return &records, nil
 }
 
-func (p *PostgresSQLDB) GetAccessionsBySubstructure(substructure string) ([]string, error) {
+func (p *PostgresSQLDB) GetAccessionsBySubstructure(substructure string) ([]string, []int32, error) {
 	accessions := []string{}
-	query := "SELECT accession FROM molecules WHERE molecule @($1, '')::bingo.sub"
+	atomcounts := []int32{}
+	query := "SELECT accession, atomcount FROM molecules WHERE molecule @($1, '')::bingo.sub"
 	stmt, err := p.database.Prepare(query)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(substructure)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var accession string
-		if err := rows.Scan(&accession); err != nil {
-			return nil, err
+		var atomcount int32
+		if err := rows.Scan(&accession, &atomcount); err != nil {
+			return nil, nil, err
 		}
 		accessions = append(accessions, accession)
+		atomcounts = append(atomcounts, atomcount)
 	}
 	stmt.Close()
 
-	return accessions, nil
+	return accessions, atomcounts, nil
 }
 
 
@@ -774,7 +782,7 @@ func (p *PostgresSQLDB) GetRecordsBySubstructure(substructure string) (*[]massba
 	fmt.Println("substructure: ", substructure)
 	
 	records := []massbank.MassBank2{}
-	accessions, err := p.GetAccessionsBySubstructure(substructure)
+	accessions, _, err := p.GetAccessionsBySubstructure(substructure)
 	if err != nil {
 		return nil, err
 	}
@@ -790,7 +798,7 @@ func (p *PostgresSQLDB) GetRecordsBySubstructure(substructure string) (*[]massba
 }
 
 // GetSearchResults see [MB3Database.GetSearchResults]
-func (p *PostgresSQLDB) GetSearchResults(filters Filters) (*[]string, error) {
+func (p *PostgresSQLDB) GetSearchResults(filters Filters) (*[]string, *[]int32, error) {
 	if filters.MassEpsilon == nil {
 		filters.MassEpsilon = &DefaultValues.MassEpsilon
 	}
@@ -798,12 +806,12 @@ func (p *PostgresSQLDB) GetSearchResults(filters Filters) (*[]string, error) {
 		filters.Intensity = &DefaultValues.Intensity
 	}
 
-	accessions, err := p.GetAccessionsByFilterOptions(filters)
+	accessions, atomcounts, err := p.GetAccessionsByFilterOptions(filters)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return &accessions, nil
+	return &accessions, &atomcounts, nil
 }
 
 // BuildSearchOptionsWhere to build the where clause within the browse_options table
@@ -988,9 +996,10 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) (string, []stri
 	return query, parameters
 }
 
-func (p *PostgresSQLDB) GetAccessionsByFilterOptions(filters Filters) ([]string, error) {
+func (p *PostgresSQLDB) GetAccessionsByFilterOptions(filters Filters) ([]string, []int32, error) {
 	var accessions = []string{}
-	query := "SELECT accession FROM browse_options"
+	var atomcounts = []int32{}
+	query := "SELECT accession, atomcount FROM browse_options"
 	subQuery, parameters := p.BuildBrowseOptionsWhere(filters)
 	query = query + subQuery
 	if(filters.Mass != nil && filters.MassEpsilon != nil) {
@@ -1005,7 +1014,7 @@ func (p *PostgresSQLDB) GetAccessionsByFilterOptions(filters Filters) ([]string,
 
 	stmt, err := p.database.Prepare(query)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer stmt.Close()
 
@@ -1015,19 +1024,21 @@ func (p *PostgresSQLDB) GetAccessionsByFilterOptions(filters Filters) ([]string,
 	}
 	rows, err := stmt.Query(args...)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var accession string
-		if err := rows.Scan(&accession); err != nil {
-			return nil, err
+		var atomcount int32
+		if err := rows.Scan(&accession, &atomcount); err != nil {
+			return nil, nil, err
 		}
 		accessions = append(accessions, accession)
+		atomcounts = append(atomcounts, atomcount)
 	}
 
-	return accessions, nil
+	return accessions, atomcounts, nil
 }
 
 func (p *PostgresSQLDB) GetContributors() ([]string, error) {
@@ -1286,6 +1297,30 @@ func (p *PostgresSQLDB) AddIndexes() error {
 	}
 
 	return nil
+}
+
+func getAtomCount(formula string) int {
+  var count = 0
+  re := regexp.MustCompile(`[A-Z]\d*[a-z]{0,1}\d*`)
+  matches := re.FindAllString(formula, -1)
+
+  for _, m := range matches {
+    re2 := regexp.MustCompile(`\d*`)
+    matches2 := re2.FindAllString(m, -1)
+    valueString := matches2[len(matches2) - 1]
+    var value = 1
+    if len(valueString) > 0 {
+        i, err := strconv.Atoi(valueString)
+        if err != nil {
+            panic(err)
+        }
+        value = i
+    }
+    
+    count += value
+  }
+  
+  return count
 }
 
 // AddRecord see [MB3Database.AddRecord]
@@ -1592,7 +1627,7 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 		}
 	}
 
-	q = `INSERT INTO browse_options (massbank_id, accession, contributor, instrument_type, ms_type, ion_mode, title, smiles, mz_vec, intensity_vec, relative_intensity_vec, inchi, inchikey, splash, formula, mass) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);`
+	q = `INSERT INTO browse_options (massbank_id, accession, contributor, instrument_type, ms_type, ion_mode, title, smiles, mz_vec, intensity_vec, relative_intensity_vec, inchi, inchikey, splash, formula, mass, atomcount) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17);`
 	var msType string 
 	var ionMode string
 	for _, subProp := range *record.Acquisition.MassSpectrometry {
@@ -1605,7 +1640,8 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 			break
 		}
 	}
-	_, err = tx.Exec(q, massbankId, *record.Accession, *record.Contributor, *record.Acquisition.InstrumentType, msType, ionMode, *record.RecordTitle, *record.Compound.Smiles, pq.Array(record.Peak.Peak.Mz), pq.Array(record.Peak.Peak.Intensity), pq.Array(record.Peak.Peak.Rel), *record.Compound.InChI, inchikey, *record.Peak.Splash, *record.Compound.Formula, *record.Compound.Mass)
+	
+	_, err = tx.Exec(q, massbankId, *record.Accession, *record.Contributor, *record.Acquisition.InstrumentType, msType, ionMode, *record.RecordTitle, *record.Compound.Smiles, pq.Array(record.Peak.Peak.Mz), pq.Array(record.Peak.Peak.Intensity), pq.Array(record.Peak.Peak.Rel), *record.Compound.InChI, inchikey, *record.Peak.Splash, *record.Compound.Formula, *record.Compound.Mass, getAtomCount(*record.Compound.Formula))
 	if err != nil {
 		fmt.Println("Error: ", err)
 		if err2 := tx.Rollback(); err2 != nil {
@@ -1615,8 +1651,8 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 	}
 
 	if(record.Compound.Smiles != nil && *record.Compound.Smiles != ""){
-		q = `INSERT INTO molecules (molecule, accession) VALUES ($1, $2);`
-		_, err = tx.Exec(q, *record.Compound.Smiles, *record.Accession)
+		q = `INSERT INTO molecules (molecule, accession, atomcount) VALUES ($1, $2, $3);`
+		_, err = tx.Exec(q, *record.Compound.Smiles, *record.Accession, getAtomCount(*record.Compound.Formula))
 		if err != nil {
 			if err2 := tx.Rollback(); err2 != nil {
 				return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
@@ -1838,13 +1874,15 @@ func (p *PostgresSQLDB) Init() error {
 			inchikey TEXT NOT NULL,
 			splash TEXT NOT NULL,
 			formula TEXT NOT NULL,
-			mass FLOAT NOT NULL
+			mass FLOAT NOT NULL,
+			atomcount INT NOT NULL
 		);
 
 		CREATE TABLE IF NOT EXISTS molecules (
 			id SERIAL NOT NULL PRIMARY KEY,
 			molecule TEXT NOT NULL,
-			accession TEXT NOT NULL
+			accession TEXT NOT NULL,
+			atomcount INT NOT NULL
 		);
 
 		TRUNCATE metadata, massbank, contributor, accession_contributor, author, accession_author, license, accession_license, publication, accession_publication, compound, compound_name, compound_class, compound_link, acquisition_instrument, accession_acquisition, acquisition_mass_spectrometry, acquisition_chromatography, acquisition_general, mass_spectrometry_focused_ion, mass_spectrometry_data_processing, spectrum, peak, peak_annotation, browse_options, molecules CASCADE;

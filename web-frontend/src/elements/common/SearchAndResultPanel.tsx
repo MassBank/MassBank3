@@ -7,6 +7,8 @@ import ResultPanel from '../result/ResultPanel';
 import Hit from '../../types/Hit';
 import Peak from '../../types/peak/Peak';
 import { Spin } from 'antd';
+import sortHits from '../../utils/sortHits';
+import ResultTableSortOption from '../../types/ResultTableSortOption';
 
 type InputProps = {
   searchPanel: JSX.Element;
@@ -36,7 +38,7 @@ function SearchAndResultPanel({
   const [innerHits, setInnerHits] = useState<Hit[]>([]);
 
   useEffect(() => {
-    setInnerHits(hits);
+    setInnerHits([...hits]);
   }, [hits]);
 
   const sortOptions = useMemo(() => {
@@ -63,46 +65,8 @@ function SearchAndResultPanel({
   }, []);
 
   const handleOnSelectSort = useCallback(
-    (value: string) => {
-      const _hits = [...hits];
-      _hits.sort((a, b) => {
-        if (value === 'index') {
-          return a.index - b.index;
-        } else if (value === 'index_desc') {
-          return b.index - a.index;
-        } else if (value === 'score') {
-          return b.score !== undefined && a.score !== undefined
-            ? b.score - a.score
-            : 0;
-        } else if (value === 'score_asc') {
-          return a.score !== undefined && b.score !== undefined
-            ? a.score - b.score
-            : 0;
-        } else if (value === 'accession') {
-          return a.accession.localeCompare(b.accession, undefined, {
-            sensitivity: 'variant',
-          });
-        } else if (value === 'accession_desc') {
-          return b.accession.localeCompare(a.accession, undefined, {
-            sensitivity: 'variant',
-          });
-        } else if (value === 'title') {
-          return a.record !== undefined && b.record !== undefined
-            ? a.record.title.localeCompare(b.record.title, undefined, {
-                sensitivity: 'variant',
-              })
-            : 0;
-        } else if (value === 'title_desc') {
-          return b.record !== undefined && a.record !== undefined
-            ? b.record.title.localeCompare(a.record.title, undefined, {
-                sensitivity: 'variant',
-              })
-            : 0;
-        }
-
-        return 0;
-      });
-
+    (sortValue: ResultTableSortOption) => {
+      const _hits = sortHits(hits, sortValue);
       setInnerHits(_hits);
     },
     [hits],

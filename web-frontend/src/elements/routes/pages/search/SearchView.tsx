@@ -20,6 +20,7 @@ import { Content } from 'antd/es/layout/layout';
 import SearchPanelMenuItems from './SearchPanelMenuItems';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { usePropertiesContext } from '../../../../context/properties/properties';
+import sortHits from '../../../../utils/sortHits';
 
 const defaultMassTolerance = 0.1;
 const defaultSimilarityThreshold = 0.8;
@@ -200,6 +201,10 @@ function SearchView() {
           index: i,
         };
       });
+
+      if (smiles && smiles.trim().length > 0) {
+        _hits = sortHits(_hits, 'atom_count');
+      }
 
       setHits(_hits);
       setIsSearching(false);
