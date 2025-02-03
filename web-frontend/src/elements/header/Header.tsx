@@ -6,6 +6,7 @@ import { Header as HeaderAntD } from 'antd/es/layout/layout';
 import { Link, useLocation } from 'react-router-dom';
 import { usePropertiesContext } from '../../context/properties/properties';
 import { useMemo } from 'react';
+import logo from '../../assets/logo.svg';
 
 function Header() {
   const location = useLocation();
@@ -28,11 +29,7 @@ function Header() {
           }}
         >
           <Link to={baseUrl} target="_self">
-            <img
-              src="logos/logo.svg"
-              alt="MassBank Europe"
-              style={{ height: 50 }}
-            />
+            <img src={logo} alt="MassBank Europe" style={{ height: 50 }} />
           </Link>
         </Button>
       ),

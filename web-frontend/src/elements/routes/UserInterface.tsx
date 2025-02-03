@@ -1,7 +1,7 @@
 import { Content } from 'antd/es/layout/layout';
 import Header from '../header/Header';
 import Footer from '../footer/Footer';
-import { useMemo, JSX } from 'react';
+import { JSX } from 'react';
 import { HighlightProvider } from '../../context/highlight/HighlightProvider';
 
 type InputProps = {
@@ -9,24 +9,21 @@ type InputProps = {
 };
 
 function UserInterface({ body }: InputProps) {
-  const userInterface = useMemo(
-    () => (
-      <Content
-        style={{
-          width: '100vw',
-          height: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Header />
-        {body}
-        <Footer />
-      </Content>
-    ),
-    [body],
+  const userInterface = (
+    <Content
+      style={{
+        width: '100vw',
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Header />
+      {body}
+      <Footer />
+    </Content>
   );
 
   return <HighlightProvider>{userInterface}</HighlightProvider>;

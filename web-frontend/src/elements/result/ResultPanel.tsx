@@ -108,10 +108,13 @@ function ResultPanel({
         const record = await fetchData(url);
 
         if (record) {
-          record.peak.peak.values = record.peak.peak.values.map((p) => ({
-            ...p,
-            id: generateID(),
-          }));
+          record.peak.peak.values = record.peak.peak.values.map(
+            (p: Peak) =>
+              ({
+                ...p,
+                id: generateID(),
+              }) as Peak,
+          );
           records.push(record);
         } else {
           records.push(undefined);

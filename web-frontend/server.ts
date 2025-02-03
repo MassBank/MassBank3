@@ -158,13 +158,11 @@ baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
 // serve index.html for all other routes
 baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
   try {
-    const url = req.originalUrl; //.replace(base, "");
-    const path = req.originalUrl.split('?')[0];
-
     let template: string;
     let render;
     if (!isProduction) {
       // Always read fresh template in development
+      const url = req.originalUrl.replace(baseUrl, '');
       template = await fs.readFile('./index.html', 'utf-8');
       template = await vite.transformIndexHtml(url, template);
       render = (await vite.ssrLoadModule('./src/ServerApp.tsx')).render;
@@ -177,6 +175,7 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       render = (await import('./dist/server/ServerApp.js')).render;
     }
 
+    const path = req.originalUrl.split('?')[0];
     const props = {
       baseUrl,
       backendUrl,
