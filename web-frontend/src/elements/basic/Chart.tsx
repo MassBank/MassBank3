@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { brushX, scaleLinear, select } from 'd3';
+import { brushX, NumberValue, scaleLinear, select } from 'd3';
 import ChartElement from './ChartElement';
 import Peak from '../../types/peak/Peak';
 import { Button } from 'antd';
@@ -424,7 +424,9 @@ function Chart({
         ])
         .on('end', (e) => {
           if (e.selection) {
-            const inverted: number[] = e.selection.map((x) => xScale.invert(x));
+            const inverted: number[] = e.selection.map((x: NumberValue) =>
+              xScale.invert(x),
+            );
             const newBrushXDomains = brushXDomains
               ? [...brushXDomains].concat({
                   min: inverted[0],
