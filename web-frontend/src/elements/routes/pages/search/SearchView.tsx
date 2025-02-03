@@ -18,9 +18,15 @@ import massSpecFilterOptionsFormDataToContentMapper from '../../../../utils/mass
 import SearchAndResultPanel from '../../../common/SearchAndResultPanel';
 import { Content } from 'antd/es/layout/layout';
 import SearchPanelMenuItems from './SearchPanelMenuItems';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import {
+  createSearchParams,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
 import { usePropertiesContext } from '../../../../context/properties/properties';
 import sortHits from '../../../../utils/sortHits';
+import routes from '../../../../constants/routes';
 
 const defaultMassTolerance = 0.1;
 const defaultSimilarityThreshold = 0.8;
@@ -46,7 +52,7 @@ const defaultInitialValues: SearchFields = {
   },
   inchi: undefined,
   splash: undefined,
-  // massSpecFilterOptions,
+  massSpecFilterOptions: undefined,
   structure: undefined,
 };
 
@@ -54,7 +60,8 @@ function SearchView() {
   const ref = useRef(null);
   const { width, height } = useContainerDimensions(ref);
   const location = useLocation();
-  const { backendUrl } = usePropertiesContext();
+  const { backendUrl, baseUrl } = usePropertiesContext();
+  const navigate = useNavigate();
 
   const [reference, setReference] = useState<Peak[]>([]);
   const [isFetchingContent, setIsFetchingContent] = useState<boolean>(false);
@@ -98,10 +105,8 @@ function SearchView() {
     [backendUrl],
   );
 
-  const handleOnSearch = useCallback(
-    async (formData: SearchFields) => {
-      setIsSearching(true);
-
+  const buildSearchParamsFromFormData = useCallback(
+    (formData: SearchFields) => {
       const formData_content = massSpecFilterOptionsFormDataToContentMapper(
         formData.massSpecFilterOptions,
         undefined,
@@ -188,6 +193,137 @@ function SearchView() {
       if (smiles && smiles.trim().length > 0) {
         builtSearchParams['substructure'] = [smiles];
       }
+
+      return builtSearchParams;
+    },
+    [],
+  );
+
+  const buildContentFromSearchParams = useCallback(
+    (searchParams: URLSearchParams) => {
+      const formData = { ...defaultInitialValues };
+      let containsValues = false;
+
+      formData.massSpecFilterOptions = {
+        contributor: searchParams.get('contributor')?.split(',') ?? [],
+        instrument_type: searchParams.get('instrument_type')?.split(',') ?? [],
+        ms_type: searchParams.get('ms_type')?.split(',') ?? [],
+        ion_mode: searchParams.get('ion_mode')?.split(',') ?? [],
+      };
+      containsValues =
+        formData.massSpecFilterOptions.contributor.length > 0 ||
+        formData.massSpecFilterOptions.instrument_type.length > 0 ||
+        formData.massSpecFilterOptions.ms_type.length > 0 ||
+        formData.massSpecFilterOptions.ion_mode.length > 0;
+
+      const similarityPeakList = searchParams.get('peak_list');
+      if (similarityPeakList) {
+        const peak_list_text = similarityPeakList
+          .split(',')
+          .map((p) => {
+            const split = p.split(';');
+            return split.join(' ');
+          })
+          .join('\n');
+        const similarityPeakListThreshold = searchParams.get(
+          'peak_list_threshold',
+        );
+        const peak_list_threshold =
+          similarityPeakListThreshold !== undefined
+            ? Number(similarityPeakListThreshold)
+            : (defaultInitialValues.peaks?.similarity?.threshold ??
+              defaultSimilarityThreshold);
+        if (formData.peaks) {
+          formData.peaks.similarity = {
+            peakList: peak_list_text,
+            threshold: peak_list_threshold,
+          };
+        }
+        containsValues = true;
+      } else {
+        if (formData.peaks) {
+          formData.peaks.similarity = {
+            peakList: undefined,
+            threshold: defaultSimilarityThreshold,
+          };
+        }
+      }
+
+      const compound_name = searchParams.get('compound_name');
+      if (compound_name) {
+        formData.basicSearchFilterOptions.compoundName = compound_name;
+        containsValues = true;
+      } else {
+        if (formData.basicSearchFilterOptions) {
+          formData.basicSearchFilterOptions.compoundName = undefined;
+        }
+      }
+
+      const formula = searchParams.get('formula');
+      if (formula) {
+        formData.basicSearchFilterOptions.formula = formula;
+        containsValues = true;
+      } else {
+        if (formData.basicSearchFilterOptions) {
+          formData.basicSearchFilterOptions.formula = undefined;
+        }
+      }
+
+      const exact_mass = searchParams.get('exact_mass');
+      if (exact_mass) {
+        formData.basicSearchFilterOptions.exactMass = Number(exact_mass);
+        containsValues = true;
+      } else {
+        if (formData.basicSearchFilterOptions) {
+          formData.basicSearchFilterOptions.exactMass = undefined;
+        }
+      }
+
+      const inchi = searchParams.get('inchi');
+      if (inchi) {
+        formData.inchi = inchi;
+        containsValues = true;
+      } else {
+        if (formData.inchi) {
+          formData.inchi = undefined;
+        }
+      }
+
+      const splash = searchParams.get('splash');
+      if (splash) {
+        formData.splash = splash;
+        containsValues = true;
+      } else {
+        if (formData.splash) {
+          formData.splash = undefined;
+        }
+      }
+
+      const substructure = searchParams.get('substructure');
+      if (substructure) {
+        formData.structure = substructure;
+        containsValues = true;
+      } else {
+        if (formData.structure) {
+          formData.structure = undefined;
+        }
+      }
+
+      return { formData, containsValues };
+    },
+    [],
+  );
+
+  const handleOnSearch = useCallback(
+    async (formData: SearchFields) => {
+      setIsSearching(true);
+
+      const builtSearchParams = buildSearchParamsFromFormData(formData);
+
+      const smiles = formData.structure;
+      if (smiles && smiles.trim().length > 0) {
+        builtSearchParams['substructure'] = [smiles];
+      }
       const url = backendUrl + '/v1/records/search';
       const searchResult = (await fetchData(
         url,
@@ -209,133 +345,67 @@ function SearchView() {
       setHits(_hits);
       setIsSearching(false);
     },
-    [backendUrl],
+    [backendUrl, buildSearchParamsFromFormData],
   );
 
   const handleOnSubmit = useCallback(
-    async (formData: SearchFields) => {
+    async (formData: SearchFields, clicked: boolean) => {
       // setIsCollapsed(true);
 
-      const formDataContent = massSpecFilterOptionsFormDataToContentMapper(
-        formData?.massSpecFilterOptions,
-        // massSpecFilterOptions,
-        undefined,
-      );
+      if (clicked) {
+        let builtSearchParams = buildSearchParamsFromFormData(formData);
+        if (Object.keys(builtSearchParams).length === 0) {
+          builtSearchParams = buildSearchParamsFromFormData(
+            buildContentFromSearchParams(searchParams).formData,
+          );
+        }
+        navigate({
+          pathname: baseUrl + routes.search.path,
+          search: `?${Object.keys(builtSearchParams).length > 0 ? createSearchParams(builtSearchParams) : createSearchParams({ plain: 'true' })}`,
+        });
+      } else {
+        const formDataContent = massSpecFilterOptionsFormDataToContentMapper(
+          formData?.massSpecFilterOptions,
+          undefined,
+        );
 
-      setInitialValues(formData);
-      await handleOnSearch(formData);
-      await handleOnFetchContent(formDataContent);
+        await handleOnFetchContent(formDataContent);
+        setInitialValues(formData);
+        await handleOnSearch(formData);
+      }
     },
-    [handleOnSearch, handleOnFetchContent],
+    [
+      buildSearchParamsFromFormData,
+      navigate,
+      baseUrl,
+      buildContentFromSearchParams,
+      searchParams,
+      handleOnFetchContent,
+      handleOnSearch,
+    ],
   );
 
   useEffect(() => {
-    handleOnFetchContent(undefined);
-
-    const _initialValues = { ...defaultInitialValues };
-
-    let runSubmit = false;
-    const similarityPeakList = searchParams.get('peak_list');
-    if (similarityPeakList) {
-      const peak_list_text = similarityPeakList
-        .split(',')
-        .map((p) => {
-          const split = p.split(';');
-          return split.join(' ');
-        })
-        .join('\n');
-      const similarityPeakListThreshold = searchParams.get(
-        'peak_list_threshold',
-      );
-      const peak_list_threshold =
-        similarityPeakListThreshold !== undefined
-          ? Number(similarityPeakListThreshold)
-          : (defaultInitialValues.peaks?.similarity?.threshold ??
-            defaultSimilarityThreshold);
-      if (_initialValues.peaks) {
-        _initialValues.peaks.similarity = {
-          peakList: peak_list_text,
-          threshold: peak_list_threshold,
-        };
-      }
-      runSubmit = true;
-    } else {
-      if (_initialValues.peaks) {
-        _initialValues.peaks.similarity = {
-          peakList: undefined,
-          threshold: defaultSimilarityThreshold,
-        };
-      }
-    }
-
-    const compound_name = searchParams.get('compound_name');
-    if (compound_name) {
-      _initialValues.basicSearchFilterOptions.compoundName = compound_name;
-      runSubmit = true;
-    } else {
-      if (_initialValues.basicSearchFilterOptions) {
-        _initialValues.basicSearchFilterOptions.compoundName = undefined;
-      }
-    }
-
-    const formula = searchParams.get('formula');
-    if (formula) {
-      _initialValues.basicSearchFilterOptions.formula = formula;
-      runSubmit = true;
-    } else {
-      if (_initialValues.basicSearchFilterOptions) {
-        _initialValues.basicSearchFilterOptions.formula = undefined;
-      }
-    }
-
-    const exact_mass = searchParams.get('exact_mass');
-    if (exact_mass) {
-      _initialValues.basicSearchFilterOptions.exactMass = Number(exact_mass);
-      runSubmit = true;
-    } else {
-      if (_initialValues.basicSearchFilterOptions) {
-        _initialValues.basicSearchFilterOptions.exactMass = undefined;
-      }
-    }
-
-    const inchi = searchParams.get('inchi');
-    if (inchi) {
-      _initialValues.inchi = inchi;
-      runSubmit = true;
-    } else {
-      if (_initialValues.inchi) {
-        _initialValues.inchi = undefined;
-      }
-    }
-
-    const splash = searchParams.get('splash');
-    if (splash) {
-      _initialValues.splash = splash;
-      runSubmit = true;
-    } else {
-      if (_initialValues.splash) {
-        _initialValues.splash = undefined;
-      }
-    }
-
-    const substructure = searchParams.get('substructure');
-    if (substructure) {
-      _initialValues.structure = substructure;
-      runSubmit = true;
-    } else {
-      if (_initialValues.structure) {
-        _initialValues.structure = undefined;
-      }
-    }
-
-    setInitialValues(_initialValues);
+    const plainQuery = searchParams.get('plain');
+    const { formData, containsValues } =
+      buildContentFromSearchParams(searchParams);
+    const _initialValues = { ...defaultInitialValues, ...formData };
+    const runSubmit = plainQuery === 'true' || containsValues;
 
     if (runSubmit) {
-      handleOnSubmit(_initialValues);
+      handleOnSubmit(_initialValues, false);
     } else {
+      handleOnFetchContent(undefined);
+      setInitialValues(_initialValues);
       setHits([]);
     }
-  }, [handleOnFetchContent, handleOnSearch, handleOnSubmit, searchParams]);
+  }, [
+    buildContentFromSearchParams,
+    handleOnFetchContent,
+    handleOnSearch,
+    handleOnSubmit,
+    searchParams,
+  ]);
 
   const searchAndResultPanel = useMemo(() => {
     const searchPanel = (
@@ -351,7 +421,7 @@ function SearchView() {
         collapsed={isCollapsed}
         massSpecFilterOptions={massSpecFilterOptions}
         onCollapse={(collapsed: boolean) => setIsCollapsed(collapsed)}
-        onSubmit={handleOnSubmit}
+        onSubmit={(formData: SearchFields) => handleOnSubmit(formData, true)}
       />
     );
 
