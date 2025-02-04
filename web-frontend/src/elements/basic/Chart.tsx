@@ -456,7 +456,9 @@ function Chart({
   }, []);
 
   const handleOnCopy = useCallback((peaks: Peak[]) => {
-    const text = peaks.map((p) => `${p.mz} ${p.intensity} ${p.rel}`).join('\n');
+    const text = peaks
+      .map((p) => `${p.mz.toFixed(4)} ${p.intensity.toFixed(4)} ${p.rel}`)
+      .join('\n');
     copyTextToClipboard('Peak List', text);
   }, []);
 
@@ -467,6 +469,7 @@ function Chart({
         'peak_list',
         peaks.map((p) => `${p.mz};${p.rel}`).join(','),
       );
+      searchParams.set('peak_list_threshold', '0.8');
       const url =
         frontendUrl +
         baseUrl +

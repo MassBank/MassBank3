@@ -15,7 +15,7 @@ import StructuralEditor from '../../../basic/StructuralEditor';
 import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
 
 const peakListPattern =
-  /^(\d+(\.\d+)* \d+(\.\d+)*)(\n\d+(\.\d+)* \d+(\.\d+)*)*$/;
+  /^(\d+(\.\d+)* \d+(\.\d+) \d+(\.\d+)*)(\n\d+(\.\d+)* \d+(\.\d+) \d+(\.\d+)*)*$/;
 
 type InputProps = {
   massSpecFilterOptions: ContentFilterOptions | undefined;
