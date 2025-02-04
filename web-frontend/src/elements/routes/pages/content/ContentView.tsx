@@ -17,6 +17,7 @@ import CommonSearchPanel from '../../../common/CommonSearchPanel';
 import MassSpecFilterOptionsMenuItems from '../search/searchPanel/msSpecFilter/MassSpecFilterOptionsMenuItems';
 import Placeholder from '../../../basic/Placeholder';
 import { usePropertiesContext } from '../../../../context/properties/properties';
+import SectionDivider from '../../../basic/SectionDivider';
 
 function ContentView() {
   const ref = useRef(null);
@@ -25,7 +26,7 @@ function ContentView() {
 
   const [isFetchingContent, setIsFetchingContent] = useState<boolean>(false);
   const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [hits, setHits] = useState<Hit[]>([]);
   const [massSpecFilterOptions, setMassSpecFilterOptions] = useState<
     ContentFilterOptions | undefined
@@ -84,11 +85,10 @@ function ContentView() {
 
   const handleOnSubmit = useCallback(
     async (formData: SearchFields) => {
-      setIsCollapsed(true);
+      // setIsCollapsed(true);
 
       const formDataContent = massSpecFilterOptionsFormDataToContentMapper(
         formData?.massSpecFilterOptions,
-        // massSpecFilterOptions,
         undefined,
       );
 
@@ -103,12 +103,10 @@ function ContentView() {
     handleOnSearch(undefined);
   }, [handleOnFetchContent, handleOnSearch]);
 
-  const heights = useMemo(() => {
-    return {
-      chartPanelHeight: height / 4,
-      searchPanelHeight: (height / 4) * 3,
-    };
-  }, [height]);
+  const heights = {
+    chartPanelHeight: 600,
+    searchPanelHeight: 600,
+  };
 
   const charts = useMemo(() => {
     if (massSpecFilterOptions) {
@@ -120,8 +118,8 @@ function ContentView() {
           key={'chart_' + key}
           content={massSpecFilterOptions}
           identifier={key}
-          width={width / keys.length}
-          height={heights.chartPanelHeight}
+          width={width / 2}
+          height={heights.chartPanelHeight / 2}
         />
       ));
 
@@ -130,11 +128,12 @@ function ContentView() {
           style={{
             width,
             height: heights.chartPanelHeight,
-            display: 'flex',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
             justifyContent: 'center',
             alignItems: 'center',
             textAlign: 'center',
-            backgroundColor: '#fcfff0',
+            // backgroundColor: '#fcfff0',
           }}
         >
           {_charts}
@@ -219,14 +218,16 @@ function ContentView() {
           style={{
             width: '100%',
             height: '100%',
-            display: isFetchingContent ? 'none' : 'flex',
-            flexDirection: 'column',
+            display: isFetchingContent ? 'none' : 'block',
+            overflow: 'scroll',
             justifyContent: 'center',
             alignItems: 'center',
+            backgroundColor: 'white',
           }}
         >
-          {charts}
           {searchAndResultPanel}
+          <SectionDivider label="Statistics" />
+          {charts}
         </Content>
       </Layout>
     ),

@@ -3,13 +3,13 @@ import { CSSProperties, useCallback, useMemo } from 'react';
 import Resizable from '../common/Resizable';
 import { Content } from 'antd/es/layout/layout';
 import AnnotationTable from './AnnotationTable';
-import { Divider } from 'antd';
 import RecordViewHeader from './RecordViewHeader';
 import AcquisitionTable from './AcquisitionTable';
 import LinksTable from './LinksTable';
 import CommentsTable from './CommentsTable';
 import SpeciesTable from './SpeciesTable';
 import InformationTable from './InformationTable';
+import SectionDivider from '../basic/SectionDivider';
 
 type inputProps = {
   record: Record;
@@ -25,19 +25,7 @@ function RecordView({ record, width, height }: inputProps) {
   const chartAndPeakTableHeight = 500;
 
   const buildDivider = useCallback(
-    (label: string) => (
-      <Divider
-        style={{
-          color: 'rgb(5, 109, 220)',
-          borderColor: 'rgb(5, 109, 220)',
-          marginTop: 30,
-          marginBottom: 30,
-        }}
-        orientation="left"
-      >
-        <label style={{ fontWeight: 'bold' }}>{label}</label>
-      </Divider>
-    ),
+    (label: string) => <SectionDivider label={label} />,
     [],
   );
 

@@ -5,10 +5,16 @@ import { Button, Menu, MenuProps } from 'antd';
 import { Header as HeaderAntD } from 'antd/es/layout/layout';
 import { Link, useLocation } from 'react-router-dom';
 import { usePropertiesContext } from '../../context/properties/properties';
-import { useMemo } from 'react';
+import { CSSProperties, useMemo } from 'react';
 import logo from '../../assets/logo.svg';
 
-function Header() {
+const backgroundColor: CSSProperties['backgroundColor'] = 'white';
+
+type InputProps = {
+  height: CSSProperties['height'];
+};
+
+function Header({ height }: InputProps) {
   const location = useLocation();
   const { baseUrl } = usePropertiesContext();
 
@@ -19,22 +25,27 @@ function Header() {
       key: 'logo-link',
       label: (
         <Button
+          type="link"
           key="logo-li"
           style={{
-            border: 'none',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            boxShadow: 'none',
+            height: `calc(${height} - 5px)`,
+            backgroundColor,
           }}
         >
           <Link to={baseUrl} target="_self">
-            <img src={logo} alt="MassBank Europe" style={{ height: 50 }} />
+            <img
+              src={logo}
+              alt="MassBank Europe"
+              style={{ height: (height as number) - 5 }}
+            />
           </Link>
         </Button>
       ),
     };
-  }, [baseUrl]);
+  }, [baseUrl, height]);
 
   const routeLinks: MenuItem[] = useMemo(
     () =>
@@ -52,11 +63,12 @@ function Header() {
             label: (
               <a href={path} target="_self">
                 <Button
+                  type="link"
                   key={path + '-li'}
                   style={{
-                    border: 'none',
-                    boxShadow: 'none',
-                    color: path == location.pathname ? 'blue' : undefined,
+                    color: path == location.pathname ? 'blue' : 'black',
+                    height: `calc(${height} - 5px)`,
+                    backgroundColor,
                   }}
                 >
                   {route.label}
@@ -65,7 +77,7 @@ function Header() {
             ),
           } as MenuItem;
         }),
-    [baseUrl, location.pathname],
+    [baseUrl, height, location.pathname],
   );
 
   return useMemo(() => {
@@ -74,12 +86,13 @@ function Header() {
       <HeaderAntD
         style={{
           width: '100%',
-          height: 60,
+          height,
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: 'white',
+          backgroundColor,
+          padding: 0,
         }}
       >
         <Menu
@@ -88,15 +101,16 @@ function Header() {
           items={items}
           style={{
             width: '100%',
-            height: 60,
+            height,
             display: 'flex',
             justifyContent: 'space-evenly',
             alignItems: 'center',
+            backgroundColor,
           }}
         />
       </HeaderAntD>
     );
-  }, [logoLink, routeLinks]);
+  }, [height, logoLink, routeLinks]);
 }
 
 export default Header;

@@ -19,7 +19,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "noImplicitAny": false
   },
   "include": ["src", "vite-env.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]

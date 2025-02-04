@@ -2,7 +2,9 @@ import { Content } from 'antd/es/layout/layout';
 import Header from '../header/Header';
 import Footer from '../footer/Footer';
 import { JSX } from 'react';
-import { HighlightProvider } from '../../context/highlight/HighlightProvider';
+
+const headerHeight = 60;
+const footerHeight = 50;
 
 type InputProps = {
   body: JSX.Element;
@@ -20,13 +22,23 @@ function UserInterface({ body }: InputProps) {
         alignItems: 'center',
       }}
     >
-      <Header />
-      {body}
-      <Footer />
+      <Header height={headerHeight} />
+      <Content
+        style={{
+          width: '100%',
+          height: `calc(100% - ${headerHeight} - ${footerHeight})`,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {body}
+      </Content>
+      <Footer height={footerHeight} />
     </Content>
   );
 
-  return <HighlightProvider>{userInterface}</HighlightProvider>;
+  return userInterface;
 }
 
 export default UserInterface;

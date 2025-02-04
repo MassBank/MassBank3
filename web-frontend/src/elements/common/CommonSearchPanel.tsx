@@ -142,13 +142,14 @@ function CommonSearchPanel({
                 mode="inline"
                 items={items}
               />
-
               <Button
-                type="primary"
                 htmlType="submit"
                 style={{
                   width: 150,
-                  height: submitButtonHeight,
+                  height: submitButtonHeight - 10,
+                  marginTop: 5,
+                  marginBottom: 5,
+                  backgroundColor: 'rgb(167, 199, 254)',
                 }}
               >
                 Search
