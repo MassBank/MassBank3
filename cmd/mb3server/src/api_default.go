@@ -92,6 +92,12 @@ func (c *DefaultAPIController) Routes() Routes {
 			c.GetMetadata,
 		},
 		{
+			"GetVersion",
+			strings.ToUpper("Get"),
+			"/v1/version",
+			c.GetVersion,
+		},
+		{
 			"GetSimilarity",
 			strings.ToUpper("Get"),
 			"/v1/similarity",
@@ -244,6 +250,19 @@ func (c *DefaultAPIController) GetBrowseOptions(w http.ResponseWriter, r *http.R
 // GetMetadata - get massbank metadata
 func (c *DefaultAPIController) GetMetadata(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.GetMetadata(r.Context())
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+
+}
+
+// GetVersion - get API version
+func (c *DefaultAPIController) GetVersion(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetVersion(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

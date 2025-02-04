@@ -400,6 +400,18 @@ paths:
                 $ref: '#/components/schemas/Metadata'
           description: Metadata for database and datasets
       summary: get massbank metadata
+  /version:
+    get:
+      operationId: getVersion
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                example: "MassBank API service 0.1, 2025-01-22T14:20:57+01:00"
+                type: string
+          description: Version for MassBank API with timestamp of build
+      summary: get API version
   /similarity:
     get:
       operationId: getSimilarity

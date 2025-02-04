@@ -315,6 +315,19 @@ paths:
               schema:
                 $ref: "./schemas/FilterOptions.yaml#/components/schemas/Metadata"
 
+  /version:
+    get:
+      summary: get API version
+      operationId: getVersion
+      responses:
+        "200":
+          description: "Version for MassBank API with timestamp of build"
+          content:
+            application/json:
+              schema:
+                type: string
+                example: MassBank API service 0.1, 2025-01-22T14:20:57+01:00
+
   /similarity:
     parameters:
       - in: query

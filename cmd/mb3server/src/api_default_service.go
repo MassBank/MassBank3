@@ -74,6 +74,15 @@ func (s *DefaultAPIService) GetRecords(ctx context.Context, instrumentType []str
 	return Response(200, result), nil
 }
 
+// GetRecords - Get a list of records
+func (s *DefaultAPIService) GetVersion(ctx context.Context) (ImplResponse, error) {
+	result, err := GetVersion()
+	if err != nil {
+		return Response(http.StatusInternalServerError, nil), err
+	}
+	return Response(200, result), nil
+}
+
 // GetSimilarity implements DefaultAPIServicer.
 func (s *DefaultAPIService) GetSimilarity(ctx context.Context, peakList []string, referenceSpectraList []string, limit int32, threshold float64) (ImplResponse, error) {
 	// TODO - update GetSimilarity with the required logic for this service method.

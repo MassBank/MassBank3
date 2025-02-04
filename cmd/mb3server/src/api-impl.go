@@ -490,6 +490,11 @@ func GetRecords(instrumentType []string, splash string, msType []string, ionMode
 	return &result, nil
 }
 
+func GetVersion()(string, error){
+
+	return "test version, test timestamp", nil
+}
+
 
 
 func GetSearchResults(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, peakListThreshold float64, inchi string, inchiKey string, contributor []string, substructure string) (*SearchResult, error) {
