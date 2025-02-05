@@ -118,7 +118,7 @@ func readDirectoryData(dir string) ([]*massbank.MassBank2, *massbank.MbMetaData,
 		if err != nil {
 			println(err.Error())
 		} else {
-			mbmeta.Commit = head.Hash().String()
+			mbmeta.GitCommit = head.Hash().String()
 		}
 	}
 	var mbfiles = []*massbank.MassBank2{}
@@ -154,7 +154,7 @@ func readGitData(repo string, branch string) ([]*massbank.MassBank2, *massbank.M
 		log.Panicln(err)
 	}
 	var mbfiles = []*massbank.MassBank2{}
-	var mbmeta = massbank.MbMetaData{Commit: zReader.Comment}
+	var mbmeta = massbank.MbMetaData{GitCommit: zReader.Comment}
 	for _, zFile := range zReader.File {
 		if strings.HasSuffix(zFile.Name, "VERSION") {
 			file, err := zFile.Open()

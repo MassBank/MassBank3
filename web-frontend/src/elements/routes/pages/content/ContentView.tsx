@@ -235,7 +235,7 @@ function ContentView() {
           {searchAndResultPanel}
           <SectionDivider label="Charts (Selection)" />
           {charts}
-          <SectionDivider label="Statistics" />
+          <SectionDivider label="Information" />
           <MetadataPanel metadata={metadata} />
         </Content>
       </Layout>
