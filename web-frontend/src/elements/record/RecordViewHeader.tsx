@@ -84,6 +84,17 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
         </Content>
       ),
     });
+
+    const compoundClasses: string[] = [];
+    record.compound.classes.forEach((c) => {
+      if (c.includes(';')) {
+        c.split(';').forEach((cc) => {
+          compoundClasses.push(cc.trim());
+        });
+      } else {
+        compoundClasses.push(c.trim());
+      }
+    });
     dataSource.push({
       key: 'record-view-header-table-classes',
       label: 'Classes',
@@ -98,29 +109,27 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
             alignItems: 'left',
           }}
         >
-          {record.compound.classes[0]
-            .split(';')
-            .map((c) => c.trimStart())
-            .map((name, i) => (
-              <ExportableContent
-                key={'class-label-' + name}
-                component={<LabelWrapper value={name} />}
-                mode="copy"
-                onClick={() => handleOnCopy(`Compound class ${i + 1}`, name)}
-                title={`Copy compound class ${i + 1} to clipboard`}
-                enableSearch
-                searchTitle={`Search for compound class ${i + 1}`}
-                searchUrl={buildSearchUrl(
-                  'compound_class',
-                  name,
-                  baseUrl,
-                  frontendUrl,
-                )}
-              />
-            ))}
+          {compoundClasses.map((name, i) => (
+            <ExportableContent
+              key={'class-label-' + name}
+              component={<LabelWrapper value={name} />}
+              mode="copy"
+              onClick={() => handleOnCopy(`Compound class ${i + 1}`, name)}
+              title={`Copy compound class ${i + 1} to clipboard`}
+              enableSearch
+              searchTitle={`Search for compound class ${i + 1}`}
+              searchUrl={buildSearchUrl(
+                'compound_class',
+                name,
+                baseUrl,
+                frontendUrl,
+              )}
+            />
+          ))}
         </Content>
       ),
     });
+
     dataSource.push({
       key: 'record-view-header-table-smiles',
       label: 'SMILES',
@@ -141,6 +150,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
         />
       ),
     });
+
     dataSource.push({
       key: 'record-view-header-table-inchi',
       label: 'InChI',
@@ -161,6 +171,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
         />
       ),
     });
+
     dataSource.push({
       key: 'record-view-header-table-splash',
       label: 'SPLASH',

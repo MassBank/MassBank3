@@ -77,7 +77,7 @@ function SearchView() {
   >();
 
   const searchPanelWidth = useMemo(
-    () => (isCollapsed ? 50 : Math.max(width * 0.3, 400)),
+    () => (isCollapsed ? 50 : Math.max(width * 0.3, 450)),
     [isCollapsed, width],
   );
 
