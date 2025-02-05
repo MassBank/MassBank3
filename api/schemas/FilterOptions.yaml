@@ -80,12 +80,13 @@ components:
         compound_count:
           type: integer
           minimum: 0
-        isomer_count:
-          type: integer
-          minimum: 0
-        result_count:
-          type: integer
-          minimum: 0
-        limit:
-          type: integer
-          minimum: 1
+        compound_class:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              count:
+                type: integer
+                minimum: 1

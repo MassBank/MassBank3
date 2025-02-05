@@ -4,13 +4,13 @@ import { Content } from 'antd/es/layout/layout';
 import ExportableContent from '../common/ExportableContent';
 import { CSSProperties, JSX, useCallback, useMemo } from 'react';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
-import routes from '../../constants/routes';
 import { Table } from 'antd';
 import Record from '../../types/record/Record';
 import { MF } from 'react-mf';
 import StructureView from '../basic/StructureView';
-import LabelWrapper from './LabelWrapper';
+import LabelWrapper from '../basic/LabelWrapper';
 import { usePropertiesContext } from '../../context/properties/properties';
+import buildSearchUrl from '../../utils/buildSearchUrl';
 
 const titleHeight = 50;
 const labelWidth = 120;
@@ -19,7 +19,6 @@ type HeaderTableType = {
   key: string;
   label: string;
   value: JSX.Element;
-  copyButton?: JSX.Element;
 };
 const columns = [
   {
@@ -49,21 +48,6 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
     copyTextToClipboard(label, text);
   }, []);
 
-  const buildSearchUrl = useCallback(
-    (label: string, value: string) => {
-      const searchParams = new URLSearchParams();
-      searchParams.set(label, value);
-      const url =
-        frontendUrl +
-        baseUrl +
-        routes.search.path +
-        `?${searchParams.toString()}`;
-
-      return url;
-    },
-    [baseUrl, frontendUrl],
-  );
-
   return useMemo(() => {
     const dataSource: HeaderTableType[] = [];
     dataSource.push({
@@ -89,7 +73,12 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
               title={`Copy compound name ${i + 1} to clipboard`}
               enableSearch
               searchTitle={`Search for compound name ${i + 1}`}
-              searchUrl={buildSearchUrl('compound_name', name)}
+              searchUrl={buildSearchUrl(
+                'compound_name',
+                name,
+                baseUrl,
+                frontendUrl,
+              )}
             />
           ))}
         </Content>
@@ -125,7 +114,12 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
           title="Copy SMILES to clipboard"
           enableSearch
           searchTitle="Search for SMILES"
-          searchUrl={buildSearchUrl('substructure', record.compound.smiles)}
+          searchUrl={buildSearchUrl(
+            'substructure',
+            record.compound.smiles,
+            baseUrl,
+            frontendUrl,
+          )}
         />
       ),
     });
@@ -140,7 +134,12 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
           title="Copy InChi to clipboard"
           enableSearch
           searchTitle="Search for InChI"
-          searchUrl={buildSearchUrl('inchi', record.compound.inchi)}
+          searchUrl={buildSearchUrl(
+            'inchi',
+            record.compound.inchi,
+            baseUrl,
+            frontendUrl,
+          )}
         />
       ),
     });
@@ -155,7 +154,12 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
           title="Copy SPLASH to clipboard"
           enableSearch
           searchTitle="Search for SPLASH"
-          searchUrl={buildSearchUrl('splash', record.peak.splash)}
+          searchUrl={buildSearchUrl(
+            'splash',
+            record.peak.splash,
+            baseUrl,
+            frontendUrl,
+          )}
         />
       ),
     });
@@ -254,7 +258,12 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
                 title="Copy molecular formula to clipboard"
                 enableSearch
                 searchTitle="Search for molecular formula"
-                searchUrl={buildSearchUrl('formula', record.compound.formula)}
+                searchUrl={buildSearchUrl(
+                  'formula',
+                  record.compound.formula,
+                  baseUrl,
+                  frontendUrl,
+                )}
               />
               <label>Mass: </label>
               <ExportableContent
@@ -275,6 +284,8 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
                 searchUrl={buildSearchUrl(
                   'exact_mass',
                   record.compound.mass.toString(),
+                  baseUrl,
+                  frontendUrl,
                 )}
               />
             </Content>
@@ -283,7 +294,8 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
       </Content>
     );
   }, [
-    buildSearchUrl,
+    baseUrl,
+    frontendUrl,
     handleOnCopy,
     height,
     imageWidth,

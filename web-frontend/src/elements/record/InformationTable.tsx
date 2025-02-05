@@ -5,7 +5,7 @@ import { CSSProperties, JSX, useCallback, useMemo } from 'react';
 import Record from '../../types/record/Record';
 import ExportableContent from '../common/ExportableContent';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
-import LabelWrapper from './LabelWrapper';
+import LabelWrapper from '../basic/LabelWrapper';
 
 type InformationTableType = {
   key: string;

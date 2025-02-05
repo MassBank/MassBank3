@@ -18,6 +18,8 @@ import MassSpecFilterOptionsMenuItems from '../search/searchPanel/msSpecFilter/M
 import Placeholder from '../../../basic/Placeholder';
 import { usePropertiesContext } from '../../../../context/properties/properties';
 import SectionDivider from '../../../basic/SectionDivider';
+import MetadataPanel from './MetadataPanel';
+import Metadata from '../../../../types/Metadata';
 
 function ContentView() {
   const ref = useRef(null);
@@ -31,6 +33,7 @@ function ContentView() {
   const [massSpecFilterOptions, setMassSpecFilterOptions] = useState<
     ContentFilterOptions | undefined
   >();
+  const [metadata, setMetadata] = useState<Metadata | undefined>();
 
   const searchPanelWidth = useMemo(
     () => (isCollapsed ? 50 : Math.max(width * 0.3, 400)),
@@ -54,8 +57,12 @@ function ContentView() {
         )) as ContentFilterOptions;
       }
       initFlags(_browseContent);
-
       setMassSpecFilterOptions(_browseContent);
+
+      const url = backendUrl + '/v1/metadata';
+      const metadata = (await fetchData(url)) as Metadata;
+      setMetadata(metadata);
+
       setIsFetchingContent(false);
     },
     [backendUrl],
@@ -133,7 +140,6 @@ function ContentView() {
             justifyContent: 'center',
             alignItems: 'center',
             textAlign: 'center',
-            // backgroundColor: '#fcfff0',
           }}
         >
           {_charts}
@@ -211,6 +217,7 @@ function ContentView() {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
+          userSelect: 'none',
         }}
       >
         <Spin size="large" spinning={isFetchingContent} />
@@ -226,12 +233,14 @@ function ContentView() {
           }}
         >
           {searchAndResultPanel}
-          <SectionDivider label="Statistics" />
+          <SectionDivider label="Charts (Selection)" />
           {charts}
+          <SectionDivider label="Statistics" />
+          <MetadataPanel metadata={metadata} />
         </Content>
       </Layout>
     ),
-    [charts, isFetchingContent, searchAndResultPanel],
+    [charts, isFetchingContent, metadata, searchAndResultPanel],
   );
 }
 

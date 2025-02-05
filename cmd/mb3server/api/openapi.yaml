@@ -725,13 +725,15 @@ components:
     BrowseOptions:
       example:
         metadata:
-          isomer_count: 0
           git_commit: git_commit
           compound_count: 0
+          compound_class:
+          - name: name
+            count: 1
+          - name: name
+            count: 1
           spectra_count: 0
-          limit: 1
           version: version
-          result_count: 0
           timestamp: timestamp
         compound_start:
         - count: 0
@@ -784,13 +786,15 @@ components:
       type: object
     Metadata:
       example:
-        isomer_count: 0
         git_commit: git_commit
         compound_count: 0
+        compound_class:
+        - name: name
+          count: 1
+        - name: name
+          count: 1
         spectra_count: 0
-        limit: 1
         version: version
-        result_count: 0
         timestamp: timestamp
       properties:
         version:
@@ -805,15 +809,10 @@ components:
         compound_count:
           minimum: 0
           type: integer
-        isomer_count:
-          minimum: 0
-          type: integer
-        result_count:
-          minimum: 0
-          type: integer
-        limit:
-          minimum: 1
-          type: integer
+        compound_class:
+          items:
+            $ref: '#/components/schemas/Metadata_compound_class_inner'
+          type: array
       type: object
     StringCount:
       items:
@@ -1278,6 +1277,17 @@ components:
           type: number
         atomcount:
           description: The number of atoms in the compound.
+          minimum: 1
+          type: integer
+      type: object
+    Metadata_compound_class_inner:
+      example:
+        name: name
+        count: 1
+      properties:
+        name:
+          type: string
+        count:
           minimum: 1
           type: integer
       type: object

@@ -495,7 +495,33 @@ func GetVersion()(string, error){
 	return "test version, test timestamp", nil
 }
 
+func GetMetadata()(*Metadata, error){
+	if err := initDB(); err != nil {
+		return nil, err
+	}
+	metadata, err := db.GetMetadata()
+	if err != nil {
+		return nil, err
+	}
 
+	result := Metadata{
+		Version: 	 metadata.Version,
+		Timestamp:   metadata.Timestamp,
+		GitCommit:   metadata.GitCommit,
+		SpectraCount: int32(metadata.SpectraCount),
+		CompoundCount: int32(metadata.CompoundCount),		
+		CompoundClass: []MetadataCompoundClassInner{},
+	}
+
+	for i, compoundClass := range metadata.CompoundClass {
+		result.CompoundClass = append(result.CompoundClass, MetadataCompoundClassInner{
+			Name: compoundClass,
+			Count: int32(metadata.CompoundClassCount[i]),
+		})
+	}
+
+	return &result, nil
+}
 
 func GetSearchResults(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, peakListThreshold float64, inchi string, inchiKey string, contributor []string, substructure string) (*SearchResult, error) {
 	if err := initDB(); err != nil {

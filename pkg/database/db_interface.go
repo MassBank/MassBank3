@@ -169,7 +169,7 @@ type MB3Database interface {
 	// GetUniqueValues is used to get the values for filter frontend
 	GetUniqueValues(filters Filters) (MB3Values, error)
 
-	GetMetaData() (*MB3MetaData, error)
+	GetMetadata() (*massbank.MbMetaData, error)
 
 	// UpdateMetadata updates the metadata describing the MassBank version.
 	// Provides the database id of an existing entry if it is already in the

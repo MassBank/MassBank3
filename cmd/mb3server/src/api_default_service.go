@@ -46,22 +46,20 @@ func (s *DefaultAPIService) GetCount(ctx context.Context) (ImplResponse, error) 
 }
 
 // GetMetadata - get massbank metadata
-func (s *DefaultAPIService) GetMetadata(ctx context.Context) (ImplResponse, error) {
-	// TODO - update GetMetadata with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, Metadata{}) or use other options such as http.Ok ...
-	//return Response(200, Metadata{}), nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("GetMetadata method not implemented")
+func (s *DefaultAPIService) GetMetadata(ctx context.Context) (ImplResponse, error) {	
+	metadata, err := GetMetadata()
+	if err != nil {
+		return Response(http.StatusInternalServerError, nil), err
+	}
+	return Response(200, metadata), err
 }
 
 // GetRecord - Get a MassBank record
 func (s *DefaultAPIService) GetRecord(ctx context.Context, accession string) (ImplResponse, error) {
-	// TODO - update GetRecord with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
 	record, err := GetRecord(accession)
+	if err != nil {
+		return Response(http.StatusInternalServerError, nil), err
+	}
 	return Response(200, record), err
 }
 

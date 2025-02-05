@@ -2,11 +2,11 @@ import './Table.scss';
 
 import { Table } from 'antd';
 import Link from '../../types/Link';
-import { CSSProperties, JSX, useCallback, useMemo } from 'react';
+import { CSSProperties, JSX, useMemo } from 'react';
 import ExportableContent from '../common/ExportableContent';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
-import routes from '../../constants/routes';
 import { usePropertiesContext } from '../../context/properties/properties';
+import buildSearchUrl from '../../utils/buildSearchUrl';
 
 type InputProps = {
   links: Link[] | undefined;
@@ -17,21 +17,6 @@ type InputProps = {
 
 function LinksTable({ links, width, height, title }: InputProps) {
   const { baseUrl, frontendUrl } = usePropertiesContext();
-
-  const buildSearchUrl = useCallback(
-    (label: string, value: string) => {
-      const searchParams = new URLSearchParams();
-      searchParams.set(label, value);
-      const url =
-        frontendUrl +
-        baseUrl +
-        routes.search.path +
-        `?${searchParams.toString()}`;
-
-      return url;
-    },
-    [baseUrl, frontendUrl],
-  );
 
   return useMemo(() => {
     if (!links || links.length === 0) {
@@ -66,7 +51,12 @@ function LinksTable({ links, width, height, title }: InputProps) {
             onClick={() => copyTextToClipboard(link.database, link.identifier)}
             enableSearch={link.database === 'INCHIKEY'}
             searchTitle="Search for this InChIKey"
-            searchUrl={buildSearchUrl('inchi', link.identifier)}
+            searchUrl={buildSearchUrl(
+              'inchi',
+              link.identifier,
+              baseUrl,
+              frontendUrl,
+            )}
           />
         ),
       }),
@@ -83,7 +73,7 @@ function LinksTable({ links, width, height, title }: InputProps) {
         title={title ? () => title : undefined}
       />
     );
-  }, [buildSearchUrl, height, links, title, width]);
+  }, [baseUrl, frontendUrl, height, links, title, width]);
 }
 
 export default LinksTable;

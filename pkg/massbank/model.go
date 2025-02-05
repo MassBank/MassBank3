@@ -5,14 +5,15 @@ import (
 )
 
 type MbMetaData struct {
-	Commit        string `json:"git_commit"`
+	GitCommit        string `json:"git_commit"`
 	Version       string `json:"Version"`
 	Timestamp     string `json:"timestamp"`
 	SpectraCount  uint   `json:"spectra_count"`
 	CompoundCount uint   `json:"compound_count"`
-	ResultCount   *uint  `json:"result_count"`
-	Page          *uint  `json:"page"`
-	Limit         *uint  `json:"limit"`
+	CompoundName []string   `json:"compound_name"`
+	CompoundNameCount []uint   `json:"compound_name_count"`
+	CompoundClass []string   `json:"compound_class"`
+	CompoundClassCount []uint   `json:"compound_class_count"`
 }
 
 type SubtagProperty struct {

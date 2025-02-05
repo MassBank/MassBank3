@@ -124,11 +124,6 @@ type PostgresSQLDB struct {
 	database   *sql.DB
 }
 
-func (p *PostgresSQLDB) GetMetaData() (*MB3MetaData, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
 // NewPostgresSQLDb creates a postgres database handle implementing [MB3Database] from the configuration.
 // It does test the connection or connect to the database. This should be done by [Connect()].
 //
@@ -220,6 +215,95 @@ func (p *PostgresSQLDB) IsEmpty() (bool, error) {
 		return false, err
 	}
 	return count == 0, nil
+}
+
+func (p *PostgresSQLDB) GetMetadata() (*massbank.MbMetaData, error) {
+
+	result := &massbank.MbMetaData{}
+
+	// number of unique compounds
+	var query = "SELECT commit, timestamp, version FROM metadata;"
+	stmt, err := p.database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	var commit string
+	var timestamp string
+	var version string
+	err = stmt.QueryRow().Scan(
+		&commit,
+		&timestamp,
+		&version,
+	);
+	stmt.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	// number of unique spectra
+	query = "SELECT COUNT(DISTINCT(splash)) FROM spectrum;"
+	stmt, err = p.database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	var spectraCount uint
+	err = stmt.QueryRow().Scan(
+		&spectraCount,
+	);
+	stmt.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	// number of unique compounds
+	query = "SELECT COUNT(DISTINCT(inchi)) FROM compound WHERE inchi != 'N/A';"
+	stmt, err = p.database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	var compoundCount uint
+	err = stmt.QueryRow().Scan(
+		&compoundCount,
+	);
+	stmt.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	result.Version = version
+	result.Timestamp = timestamp
+	result.GitCommit = commit
+	result.SpectraCount = spectraCount
+	result.CompoundCount = compoundCount
+
+	// compound classes
+	query = "SELECT class, COUNT(class) as count FROM compound_class GROUP BY class ORDER BY class;"
+	stmt, err = p.database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := stmt.Query()
+	stmt.Close()
+	if err == nil {
+		result.CompoundClass = []string{}
+		result.CompoundClassCount = []uint{}
+		for rows.Next() {
+			var class string
+			var count uint
+			if err := rows.Scan(&class, &count); err != nil {
+				return nil, err
+			}
+			result.CompoundClass = append(result.CompoundClass, class)
+			result.CompoundClassCount = append(result.CompoundClassCount, count)
+		}
+		rows.Close()
+	} else {
+		if err != sql.ErrNoRows {
+			return nil, err
+		}
+	}
+
+	return result, nil
 }
 
 // GetRecord see [MB3Database.GetRecord]
@@ -1239,7 +1323,7 @@ func (p *PostgresSQLDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error
 	}
 	defer stmt.Close()
 
-	err = stmt.QueryRow(meta.Commit, meta.Timestamp, meta.Version).Scan(&id)
+	err = stmt.QueryRow(meta.GitCommit, meta.Timestamp, meta.Version).Scan(&id)
 	if err != nil {
 		return "", err
 	}
