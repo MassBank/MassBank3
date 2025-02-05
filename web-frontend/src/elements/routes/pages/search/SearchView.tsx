@@ -161,6 +161,7 @@ function SearchView() {
           builtSearchParams['inchi_key'] = [inchi];
         }
       }
+
       const splash = (formData.splash || '').trim();
       if (splash.length > 0) {
         builtSearchParams['splash'] = [splash];
@@ -172,6 +173,14 @@ function SearchView() {
       if (compoundName.length > 0) {
         builtSearchParams['compound_name'] = [compoundName];
       }
+
+      const compoundClass = (
+        formData.basicSearchFilterOptions?.compoundClass || ''
+      ).trim();
+      if (compoundClass.length > 0) {
+        builtSearchParams['compound_class'] = [compoundClass];
+      }
+
       const formula = (formData.basicSearchFilterOptions?.formula || '').trim();
       if (formula.length > 0) {
         builtSearchParams['formula'] = [formula];
@@ -259,6 +268,16 @@ function SearchView() {
         }
       }
 
+      const compound_class = searchParams.get('compound_class');
+      if (compound_class) {
+        formData.basicSearchFilterOptions.compoundClass = compound_class;
+        containsValues = true;
+      } else {
+        if (formData.basicSearchFilterOptions) {
+          formData.basicSearchFilterOptions.compoundClass = undefined;
+        }
+      }
+
       const formula = searchParams.get('formula');
       if (formula) {
         formData.basicSearchFilterOptions.formula = formula;
@@ -320,10 +339,6 @@ function SearchView() {
 
       const builtSearchParams = buildSearchParamsFromFormData(formData);
 
-      const smiles = formData.structure;
-      if (smiles && smiles.trim().length > 0) {
-        builtSearchParams['substructure'] = [smiles];
-      }
       const url = backendUrl + '/v1/records/search';
       const searchResult = (await fetchData(
         url,
@@ -338,6 +353,7 @@ function SearchView() {
         };
       });
 
+      const smiles = formData.structure;
       if (smiles && smiles.trim().length > 0) {
         _hits = sortHits(_hits, 'atom_count');
       }

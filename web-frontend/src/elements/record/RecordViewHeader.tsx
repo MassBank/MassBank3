@@ -87,21 +87,39 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
     dataSource.push({
       key: 'record-view-header-table-classes',
       label: 'Classes',
-      value:
-        record.compound.classes &&
-        record.compound.classes.length === 1 &&
-        record.compound.classes[0] !== 'N/A' ? (
-          <ExportableContent
-            component={<LabelWrapper value={record.compound.classes[0]} />}
-            mode="copy"
-            onClick={() =>
-              handleOnCopy('Compound classes', record.compound.classes[0])
-            }
-            title="Copy compound classes to clipboard"
-          />
-        ) : (
-          <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
-        ),
+      value: (
+        <Content
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'left',
+          }}
+        >
+          {record.compound.classes[0]
+            .split(';')
+            .map((c) => c.trimStart())
+            .map((name, i) => (
+              <ExportableContent
+                key={'class-label-' + name}
+                component={<LabelWrapper value={name} />}
+                mode="copy"
+                onClick={() => handleOnCopy(`Compound class ${i + 1}`, name)}
+                title={`Copy compound class ${i + 1} to clipboard`}
+                enableSearch
+                searchTitle={`Search for compound class ${i + 1}`}
+                searchUrl={buildSearchUrl(
+                  'compound_class',
+                  name,
+                  baseUrl,
+                  frontendUrl,
+                )}
+              />
+            ))}
+        </Content>
+      ),
     });
     dataSource.push({
       key: 'record-view-header-table-smiles',

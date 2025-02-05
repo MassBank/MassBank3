@@ -62,6 +62,33 @@ function SearchPanelMenuItems({
           ),
         },
         {
+          key: 'compoundClass',
+          style: {
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginLeft: 0,
+          },
+          label: (
+            <Form.Item<SearchFields>
+              label="Compound Class"
+              name={['basicSearchFilterOptions', 'compoundClass']}
+              rules={[{ required: false }]}
+              style={{
+                width: '100%',
+                height: '100%',
+              }}
+              labelAlign="left"
+              labelCol={{ span: 8 }}
+              wrapperCol={{ span: 16 }}
+            >
+              <Input type="text" placeholder="Natural Product" allowClear />
+            </Form.Item>
+          ),
+        },
+        {
           key: 'formula',
           style: {
             width: '100%',
