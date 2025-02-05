@@ -7,6 +7,7 @@ import Hit from './src/types/Hit';
 import SearchResult from './src/types/SearchResult';
 import fetchData from './src/utils/request/fetchData';
 import PropertiesContextProps from './src/types/PropertiesContextProps';
+import Metadata from './src/types/Metadata';
 
 // Constants
 const port = 3000;
@@ -83,6 +84,36 @@ const buildRecordMetadata = async (_accession: string) => {
   return '';
 };
 
+async function getLastmodDate() {
+  let url = backendUrlInternal + '/v1/metadata';
+  const searchResultMetadata: Metadata | undefined = await fetchData(url);
+  const timestampMetadata = searchResultMetadata?.timestamp;
+  url = exportServiceUrlInternal + '/version';
+  const searchResultExportServiceVersion: string | undefined =
+    await fetchData(url);
+  const timestampExportService = searchResultExportServiceVersion
+    ?.split(',')[1]
+    .trim();
+
+  const dateMetadata = timestampMetadata
+    ? new Date(timestampMetadata).toISOString()
+    : undefined;
+  const dateExportService = timestampExportService
+    ? new Date(timestampExportService).toISOString()
+    : undefined;
+
+  let lastmodDate = new Date().toISOString();
+  if (dateMetadata && dateExportService) {
+    lastmodDate =
+      dateMetadata > dateExportService ? dateMetadata : dateExportService;
+  } else if (dateMetadata) {
+    lastmodDate = dateMetadata;
+  } else if (dateExportService) {
+    lastmodDate = dateExportService;
+  }
+  return lastmodDate;
+}
+
 // Create router for base URL
 const baseRouter = express.Router();
 app.use(baseUrl, baseRouter);
@@ -93,19 +124,21 @@ const prefixUrl = frontendUrl + baseUrl;
 // serve sitemap index for search engines
 baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
   try {
-    const url = backendUrlInternal + '/v1/records/search';
-    const searchResult = (await fetchData(url)) as SearchResult;
-    const hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
+    const url: string = backendUrlInternal + '/v1/records/count';
+    const searchResultRecordCount: number | undefined = await fetchData(url);
+    const hitsCount: number = searchResultRecordCount
+      ? searchResultRecordCount
+      : 0;
 
-    const lastmod = new Date().toISOString();
+    const lastmodDate = await getLastmodDate();
 
     const urlSets: string[] = [
       '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
     ];
-    const n = Math.ceil(hits.length / nRecords);
+    const n = Math.ceil(hitsCount / nRecords);
     for (let i = 0; i < n; i++) {
       urlSets.push(
-        `<sitemap><loc>${prefixUrl}sitemap_${i}.xml</loc><lastmod>${lastmod}</lastmod></sitemap>`,
+        `<sitemap><loc>${prefixUrl}sitemap_${i}.xml</loc><lastmod>${lastmodDate}</lastmod></sitemap>`,
       );
     }
     urlSets.push('</sitemapindex>');
@@ -133,7 +166,7 @@ baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
       return;
     }
 
-    const lastmod = new Date().toISOString();
+    const lastmodDate = await getLastmodDate();
 
     const xmlHeader =
       '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
@@ -141,7 +174,7 @@ baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
     const xmlContent: string[] = [xmlHeader];
     hits.slice(index * nRecords, (index + 1) * nRecords).forEach((hit) => {
       xmlContent.push(
-        `<url><loc>${prefixUrl}recordDisplay?id=${hit.accession}</loc><lastmod>${lastmod}</lastmod></url>`,
+        `<url><loc>${prefixUrl}recordDisplay?id=${hit.accession}</loc><lastmod>${lastmodDate}</lastmod></url>`,
       );
     });
     xmlContent.push(xmlFooter);
