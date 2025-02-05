@@ -15,10 +15,11 @@ type Filters struct {
 	Splash            string
 	MsType            *[]massbank.MsType
 	IonMode           massbank.IonMode
-	CompoundName      string //regex
+	CompoundName      string 
+	CompoundClass     string
 	Mass              *float64
 	MassEpsilon       *float64
-	Formula           string // regex
+	Formula           string
 	Peaks             *[]float64
 	PeakDifferences   *[]float64
 	Inchi          	  string

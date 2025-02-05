@@ -51,6 +51,14 @@ paths:
         schema:
           $ref: '#/components/schemas/CompoundName'
         style: form
+      - description: Filter by compound class
+        explode: true
+        in: query
+        name: compound_class
+        required: false
+        schema:
+          $ref: '#/components/schemas/CompoundClass'
+        style: form
       - description: Filter by exact mass.
         explode: true
         in: query
@@ -186,6 +194,14 @@ paths:
         required: false
         schema:
           $ref: '#/components/schemas/CompoundName'
+        style: form
+      - description: Filter by compound class
+        explode: true
+        in: query
+        name: compound_class
+        required: false
+        schema:
+          $ref: '#/components/schemas/CompoundClass'
         style: form
       - description: Filter by exact mass.
         explode: true
@@ -485,6 +501,8 @@ components:
       description: "enum: [ POSITIVE, NEGATIVE ]"
       type: string
     CompoundName:
+      type: string
+    CompoundClass:
       type: string
     ExactMass:
       description: "A mass prefixed with \"and\" or \"or\" before a colon, e.g. \"\

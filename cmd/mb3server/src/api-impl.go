@@ -100,7 +100,7 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 	return &result, nil
 }
 
-func buildFilters(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, inchi string, inchiKey string, contributor []string) (*database.Filters, error) {
+func buildFilters(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, compoundClass string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, inchi string, inchiKey string, contributor []string) (*database.Filters, error) {
 	it := &instrumentType
 	if len(*it) == 0 || (len(*it) == 1 && (*it)[0] == "") {
 		it = nil
@@ -144,6 +144,7 @@ func buildFilters(instrumentType []string, splash string, msType []string, ionMo
 		MsType:            getMsTypes(msType),
 		IonMode:           getIonMode(ionMode),
 		CompoundName:      compoundName,
+		CompoundClass:      compoundClass,
 		Mass:              _exactMass,
 		MassEpsilon:       &massTolerance,
 		Formula:           formula,
@@ -468,12 +469,12 @@ func GetSimpleRecord(accession string) (*MbRecord, error) {
 	return &result, nil
 }
 
-func GetRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, inchi string, inchiKey string, contributor []string) (*[]MbRecord, error) {
+func GetRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, compoundClass string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, inchi string, inchiKey string, contributor []string) (*[]MbRecord, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
 
-	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, inchi, inchiKey, contributor)
+	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, compoundClass, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, inchi, inchiKey, contributor)
 	if err != nil {
 		return nil, err
 	}
@@ -523,7 +524,7 @@ func GetMetadata()(*Metadata, error){
 	return &result, nil
 }
 
-func GetSearchResults(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, peakListThreshold float64, inchi string, inchiKey string, contributor []string, substructure string) (*SearchResult, error) {
+func GetSearchResults(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, compoundClass string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, peakListThreshold float64, inchi string, inchiKey string, contributor []string, substructure string) (*SearchResult, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
@@ -571,13 +572,13 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 	}	
 
 	// filter search
-	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, inchi, inchiKey, contributor)	
+	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, compoundClass, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, inchi, inchiKey, contributor)	
 	if err != nil {
 		return nil, err
 	}
 	fmt.Println("filters: ", filters)	
 	
-	checkFilters := (!checkSimilarity && !checkSubstructure) || filters.CompoundName != "" || filters.Mass != nil || filters.Formula != "" || 
+	checkFilters := (!checkSimilarity && !checkSubstructure) || filters.CompoundName != "" || filters.CompoundClass != "" || filters.Mass != nil || filters.Formula != "" || 
 		filters.Peaks != nil || filters.PeakDifferences != nil || filters.Inchi != "" || 
 		filters.InchiKey != "" || filters.Splash != "" || filters.IonMode != massbank.ANY || 
 		filters.MsType != nil || filters.InstrumentType != nil || filters.Contributor != nil

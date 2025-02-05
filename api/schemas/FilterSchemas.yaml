@@ -16,6 +16,8 @@ components:
       description: "enum: [ POSITIVE, NEGATIVE ]"
     CompoundName:
       type: string
+    CompoundClass:
+      type: string
     ExactMass:
       description: 'A mass prefixed with "and" or "or" before a colon, e.g. "or:122.0".'
       type: string

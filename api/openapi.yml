@@ -36,6 +36,11 @@ paths:
         description: Filter by compound name
         schema:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/CompoundName"
+      - in: query
+        name: compound_class
+        description: Filter by compound class
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/CompoundClass"
         required: false
       - in: query
         name: exact_mass
@@ -138,6 +143,12 @@ paths:
         description: Filter by compound name
         schema:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/CompoundName"
+        required: false
+      - in: query
+        name: compound_class
+        description: Filter by compound class
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/CompoundClass"
         required: false
       - in: query
         name: exact_mass
