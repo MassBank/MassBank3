@@ -41,7 +41,7 @@ const routes = {
   } as RouteType,
   accession: {
     component: AccessionView,
-    label: 'Previous Accession',
+    label: 'Accession',
     id: 'accessionPrevious',
     path: 'RecordDisplay',
   } as RouteType,
