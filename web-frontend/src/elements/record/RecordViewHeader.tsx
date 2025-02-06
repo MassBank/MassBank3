@@ -279,10 +279,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
                 }}
                 mode="copy"
                 onClick={() =>
-                  copyTextToClipboard(
-                    'Molecular Formula',
-                    record.compound.formula,
-                  )
+                  copyTextToClipboard('Formula', record.compound.formula)
                 }
                 title="Copy molecular formula to clipboard"
                 enableSearch

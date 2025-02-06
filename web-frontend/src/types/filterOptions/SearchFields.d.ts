@@ -1,21 +1,11 @@
-import PeakSearchFilterOptions from './PeakSearchFilterOptions';
-import SimilarityFilterOptions from './SimilarityFilterOptions';
+import CompoundSearchFilterOptions from './CompoundSearchFilterOptions';
+import PropertyFilterOptions from './PropertyFilterOptions';
+import SpectralSearchFilterOptions from './SpectralSearchFilterOptions';
 
 interface SearchFields {
-  basicSearchFilterOptions?: BasicSearchFilterOptions;
-  peaks?: {
-    similarity?: SimilarityFilterOptions;
-    peaks?: PeakSearchFilterOptions;
-  };
-  inchi?: string;
-  splash?: string;
-  massSpecFilterOptions?: {
-    contributor: string[];
-    instrument_type: string[];
-    ion_mode: string[];
-    ms_type: string[];
-  };
-  structure?: string;
+  compoundSearchFilterOptions?: CompoundSearchFilterOptions;
+  spectralSearchFilterOptions?: SpectralSearchFilterOptions;
+  propertyFilterOptions?: PropertyFilterOptions;
 }
 
 export default SearchFields;

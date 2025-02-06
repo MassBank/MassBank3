@@ -51,7 +51,7 @@ function CommonSearchPanel({
       instrument_type: mapper(massSpecFilterOptions?.instrument_type || []),
       ms_type: mapper(massSpecFilterOptions?.ms_type || []),
       ion_mode: mapper(massSpecFilterOptions?.ion_mode || []),
-    } as SearchFields['massSpecFilterOptions']);
+    } as SearchFields['PropertyFilterOptions']);
   }, [initialValues, massSpecFilterOptions, setFieldValue, setFieldsValue]);
 
   const handleOnSubmit: FormProps<SearchFields>['onFinish'] = useCallback(
@@ -141,6 +141,7 @@ function CommonSearchPanel({
                 }}
                 mode="inline"
                 items={items}
+                inlineIndent={10}
               />
               <Button
                 htmlType="submit"
