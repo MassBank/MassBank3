@@ -31,7 +31,7 @@ function SearchPanelMenuItems({
   return [
     {
       key: 'basicSearchMenuItem',
-      label: 'Basic Search',
+      label: 'Compound Search',
       icon: <FontAwesomeIcon icon={faSliders} />,
       children: [
         {
@@ -46,8 +46,8 @@ function SearchPanelMenuItems({
           },
           label: (
             <Form.Item<SearchFields>
-              label="Compound Name"
-              name={['basicSearchFilterOptions', 'compoundName']}
+              label="Name"
+              name={['compoundSearchFilterOptions', 'compoundName']}
               rules={[{ required: false }]}
               style={{
                 width: '100%',
@@ -73,8 +73,8 @@ function SearchPanelMenuItems({
           },
           label: (
             <Form.Item<SearchFields>
-              label="Compound Class"
-              name={['basicSearchFilterOptions', 'compoundClass']}
+              label="Class"
+              name={['compoundSearchFilterOptions', 'compoundClass']}
               rules={[{ required: false }]}
               style={{
                 width: '100%',
@@ -100,8 +100,8 @@ function SearchPanelMenuItems({
           },
           label: (
             <Form.Item<SearchFields>
-              label="Molecular Formula"
-              name={['basicSearchFilterOptions', 'formula']}
+              label="Formula"
+              name={['compoundSearchFilterOptions', 'formula']}
               rules={[{ required: false }]}
               style={{
                 width: '100%',
@@ -128,7 +128,7 @@ function SearchPanelMenuItems({
           label: (
             <Form.Item<SearchFields>
               label="Exact Mass"
-              name={['basicSearchFilterOptions', 'exactMass']}
+              name={['compoundSearchFilterOptions', 'exactMass']}
               rules={[{ required: false }]}
               style={{
                 width: '100%',
@@ -155,7 +155,7 @@ function SearchPanelMenuItems({
           label: (
             <Form.Item<SearchFields>
               label="Mass Tolerance"
-              name={['basicSearchFilterOptions', 'massTolerance']}
+              name={['compoundSearchFilterOptions', 'massTolerance']}
               rules={[{ required: false }]}
               style={{
                 width: '100%',
@@ -169,16 +169,69 @@ function SearchPanelMenuItems({
             </Form.Item>
           ),
         },
+        {
+          key: 'inchiMenuItem',
+          label: 'InChI',
+          icon: <FontAwesomeIcon icon={faSignature} />,
+          children: [
+            {
+              key: 'inchi',
+              style: {
+                width: '100%',
+                height: '100%',
+                marginLeft: 0,
+              },
+              label: (
+                <Form.Item<SearchFields>
+                  name={['compoundSearchFilterOptions', 'inchi']}
+                  rules={[{ required: false }]}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                  }}
+                >
+                  <Input
+                    type="text"
+                    placeholder="IKGXIBQEEMLURG-NVPNHPEKSA-N"
+                    allowClear
+                  />
+                </Form.Item>
+              ),
+            },
+          ],
+        },
+        {
+          key: 'structureMenuItem',
+          label: 'Structure',
+          icon: <FontAwesomeIcon icon={faShareNodes} />,
+          children: [
+            {
+              key: 'structure',
+              style: {
+                width: '100%',
+                height: 700,
+                marginLeft: 0,
+                overflow: 'scroll',
+              },
+              label: (
+                <StructuralEditor
+                  width={width - 100}
+                  initialSMILES={initialStructure}
+                />
+              ),
+            },
+          ],
+        },
       ],
     },
     {
       key: 'peaksMenuItem',
-      label: 'Peaks',
+      label: 'Spectral Search',
       icon: <FontAwesomeIcon icon={faChartColumn} />,
       children: [
         {
           key: 'similarityMenuItem',
-          label: 'Similarity',
+          label: 'Similarity Search',
           children: [
             {
               key: 'peakList',
@@ -223,7 +276,7 @@ function SearchPanelMenuItems({
               },
               label: (
                 <Form.Item<SearchFields>
-                  label="Threshold"
+                  label="Score Threshold"
                   name={['peaks', 'similarity', 'threshold']}
                   rules={[{ required: false }]}
                   style={{
@@ -314,7 +367,7 @@ function SearchPanelMenuItems({
         },
         {
           key: 'peakDifferenceMenuItem',
-          label: 'Peak Difference',
+          label: 'Neutral Loss Search',
           children: [
             {
               key: 'peakDifference',
@@ -332,97 +385,44 @@ function SearchPanelMenuItems({
             },
           ],
         },
-      ],
-    },
-    {
-      key: 'inchiMenuItem',
-      label: 'InChI',
-      icon: <FontAwesomeIcon icon={faSignature} />,
-      children: [
         {
-          key: 'inchi',
-          style: {
-            width: '100%',
-            height: '100%',
-            marginLeft: 0,
-          },
-          label: (
-            <Form.Item<SearchFields>
-              name="inchi"
-              rules={[{ required: false }]}
-              style={{
+          key: 'splashMenuItem',
+          label: 'SPLASH',
+          icon: <FontAwesomeIcon icon={faBarcode} />,
+          children: [
+            {
+              key: 'splash',
+              style: {
                 width: '100%',
                 height: '100%',
-              }}
-            >
-              <Input
-                type="text"
-                placeholder="IKGXIBQEEMLURG-NVPNHPEKSA-N"
-                allowClear
-              />
-            </Form.Item>
-          ),
-        },
-      ],
-    },
-    {
-      key: 'splashMenuItem',
-      label: 'SPLASH',
-      icon: <FontAwesomeIcon icon={faBarcode} />,
-      children: [
-        {
-          key: 'splash',
-          style: {
-            width: '100%',
-            height: '100%',
-            marginLeft: 0,
-          },
-          label: (
-            <Form.Item<SearchFields>
-              name="splash"
-              rules={[{ required: false }]}
-              style={{
-                width: '100%',
-                height: '100%',
-              }}
-            >
-              <Input
-                type="text"
-                placeholder="splash10-0wmi-0009506000-98ca7f7c8f3072af4481"
-                allowClear
-              />
-            </Form.Item>
-          ),
+                marginLeft: 0,
+              },
+              label: (
+                <Form.Item<SearchFields>
+                  name="splash"
+                  rules={[{ required: false }]}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                  }}
+                >
+                  <Input
+                    type="text"
+                    placeholder="splash10-0wmi-0009506000-98ca7f7c8f3072af4481"
+                    allowClear
+                  />
+                </Form.Item>
+              ),
+            },
+          ],
         },
       ],
     },
     {
       key: 'massSpecMenuItem',
-      label: 'Mass Spectrometry',
+      label: 'Property Filter',
       icon: <FontAwesomeIcon icon={faFlask} />,
       children: MassSpecFilterOptionsMenuItems({ massSpecFilterOptions }),
-    },
-    {
-      key: 'structureMenuItem',
-      label: 'Structure',
-      icon: <FontAwesomeIcon icon={faShareNodes} />,
-      children: [
-        {
-          key: 'structure',
-          style: {
-            width: '100%',
-            height: 700,
-            marginLeft: 0,
-            overflow: 'scroll',
-          },
-          label: (
-            <StructuralEditor
-              width={width - 100}
-              initialSMILES={initialStructure}
-            />
-          ),
-        },
-      ],
     },
   ];
 }

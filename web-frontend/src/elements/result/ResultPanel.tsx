@@ -310,7 +310,7 @@ function ResultPanel({
           showTitle
           showSizeChanger={false}
           showQuickJumper
-          locale={{ jump_to: 'Page', page: '' }}
+          locale={{ jump_to: '', page: '' }}
           style={{
             width: '100%',
             height: '100%',

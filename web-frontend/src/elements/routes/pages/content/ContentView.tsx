@@ -95,7 +95,7 @@ function ContentView() {
       // setIsCollapsed(true);
 
       const formDataContent = massSpecFilterOptionsFormDataToContentMapper(
-        formData?.massSpecFilterOptions,
+        formData?.propertyFilterOptions,
         undefined,
       );
 

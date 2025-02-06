@@ -33,13 +33,14 @@ const defaultSimilarityThreshold = 0.8;
 const defaultPeakIntensity = 50;
 
 const defaultInitialValues: SearchFields = {
-  basicSearchFilterOptions: {
+  compoundSearchFilterOptions: {
     compoundName: undefined,
     formula: undefined,
     exactMass: undefined,
     massTolerance: defaultMassTolerance,
+    inchi: undefined,
   },
-  peaks: {
+  spectralSearchFilterOptions: {
     similarity: {
       peakList: undefined,
       threshold: defaultSimilarityThreshold,
@@ -49,10 +50,9 @@ const defaultInitialValues: SearchFields = {
       massTolerance: defaultMassTolerance,
       intensity: defaultPeakIntensity,
     },
+    splash: undefined,
   },
-  inchi: undefined,
-  splash: undefined,
-  massSpecFilterOptions: undefined,
+  propertyFilterOptions: undefined,
   structure: undefined,
 };
 
@@ -77,7 +77,7 @@ function SearchView() {
   >();
 
   const searchPanelWidth = useMemo(
-    () => (isCollapsed ? 50 : Math.max(width * 0.3, 450)),
+    () => (isCollapsed ? 50 : Math.max(width * 0.3, 400)),
     [isCollapsed, width],
   );
 
@@ -108,13 +108,13 @@ function SearchView() {
   const buildSearchParamsFromFormData = useCallback(
     (formData: SearchFields) => {
       const formData_content = massSpecFilterOptionsFormDataToContentMapper(
-        formData.massSpecFilterOptions,
+        formData.propertyFilterOptions,
         undefined,
       );
       const builtSearchParams = buildSearchParams(formData_content);
 
       const similarityPeakListInputFieldData = (
-        formData.peaks?.similarity?.peakList || ''
+        formData.spectralSearchFilterOptions?.similarity?.peakList || ''
       ).trim();
 
       if (similarityPeakListInputFieldData.length > 0) {
@@ -124,14 +124,15 @@ function SearchView() {
         builtSearchParams['peak_list'] = [
           peakList.map((p) => `${p.mz};${p.intensity}`).join(','),
         ];
-        const peakListThreshold = formData.peaks?.similarity?.threshold || 0;
+        const peakListThreshold =
+          formData.spectralSearchFilterOptions?.similarity?.threshold || 0;
         builtSearchParams['peak_list_threshold'] = [String(peakListThreshold)];
         setReference(peakList);
       } else {
         setReference([]);
       }
 
-      const peaksSearchData = formData.peaks?.peaks || {
+      const peaksSearchData = formData.spectralSearchFilterOptions?.peaks || {
         peaks: [],
         massTolerance: 0,
         intensity: 0,
@@ -167,30 +168,27 @@ function SearchView() {
         builtSearchParams['splash'] = [splash];
       }
 
-      const compoundName = (
-        formData.basicSearchFilterOptions?.compoundName || ''
-      ).trim();
+      const compoundName = (formData.compoundSearch?.compoundName || '').trim();
       if (compoundName.length > 0) {
         builtSearchParams['compound_name'] = [compoundName];
       }
 
       const compoundClass = (
-        formData.basicSearchFilterOptions?.compoundClass || ''
+        formData.compoundSearch?.compoundClass || ''
       ).trim();
       if (compoundClass.length > 0) {
         builtSearchParams['compound_class'] = [compoundClass];
       }
 
-      const formula = (formData.basicSearchFilterOptions?.formula || '').trim();
+      const formula = (formData.compoundSearch?.formula || '').trim();
       if (formula.length > 0) {
         builtSearchParams['formula'] = [formula];
       }
-      const exactMass = formData.basicSearchFilterOptions?.exactMass || 0;
+      const exactMass = formData.compoundSearch?.exactMass || 0;
       if (exactMass > 0) {
         builtSearchParams['exact_mass'] = [String(exactMass)];
 
-        const massTolerance =
-          formData.basicSearchFilterOptions.massTolerance || 0;
+        const massTolerance = formData.compoundSearch.massTolerance || 0;
         if (exactMass > 0) {
           builtSearchParams['mass_tolerance'] = [String(massTolerance)];
         } else {
@@ -213,17 +211,17 @@ function SearchView() {
       const formData = { ...defaultInitialValues };
       let containsValues = false;
 
-      formData.massSpecFilterOptions = {
+      formData.propertyFilterOptions = {
         contributor: searchParams.get('contributor')?.split(',') ?? [],
         instrument_type: searchParams.get('instrument_type')?.split(',') ?? [],
         ms_type: searchParams.get('ms_type')?.split(',') ?? [],
         ion_mode: searchParams.get('ion_mode')?.split(',') ?? [],
       };
       containsValues =
-        formData.massSpecFilterOptions.contributor.length > 0 ||
-        formData.massSpecFilterOptions.instrument_type.length > 0 ||
-        formData.massSpecFilterOptions.ms_type.length > 0 ||
-        formData.massSpecFilterOptions.ion_mode.length > 0;
+        formData.propertyFilterOptions.contributor.length > 0 ||
+        formData.propertyFilterOptions.instrument_type.length > 0 ||
+        formData.propertyFilterOptions.ms_type.length > 0 ||
+        formData.propertyFilterOptions.ion_mode.length > 0;
 
       const similarityPeakList = searchParams.get('peak_list');
       if (similarityPeakList) {
@@ -240,18 +238,18 @@ function SearchView() {
         const peak_list_threshold =
           similarityPeakListThreshold !== undefined
             ? Number(similarityPeakListThreshold)
-            : (defaultInitialValues.peaks?.similarity?.threshold ??
-              defaultSimilarityThreshold);
-        if (formData.peaks) {
-          formData.peaks.similarity = {
+            : (defaultInitialValues.spectralSearchFilterOptions?.similarity
+                ?.threshold ?? defaultSimilarityThreshold);
+        if (formData.spectralSearchFilterOptions) {
+          formData.spectralSearchFilterOptions.similarity = {
             peakList: peak_list_text,
             threshold: peak_list_threshold,
           };
         }
         containsValues = true;
       } else {
-        if (formData.peaks) {
-          formData.peaks.similarity = {
+        if (formData.spectralSearchFilterOptions) {
+          formData.spectralSearchFilterOptions.similarity = {
             peakList: undefined,
             threshold: defaultSimilarityThreshold,
           };
@@ -260,41 +258,41 @@ function SearchView() {
 
       const compound_name = searchParams.get('compound_name');
       if (compound_name) {
-        formData.basicSearchFilterOptions.compoundName = compound_name;
+        formData.compoundSearch.compoundName = compound_name;
         containsValues = true;
       } else {
-        if (formData.basicSearchFilterOptions) {
-          formData.basicSearchFilterOptions.compoundName = undefined;
+        if (formData.compoundSearch) {
+          formData.compoundSearch.compoundName = undefined;
         }
       }
 
       const compound_class = searchParams.get('compound_class');
       if (compound_class) {
-        formData.basicSearchFilterOptions.compoundClass = compound_class;
+        formData.compoundSearch.compoundClass = compound_class;
         containsValues = true;
       } else {
-        if (formData.basicSearchFilterOptions) {
-          formData.basicSearchFilterOptions.compoundClass = undefined;
+        if (formData.compoundSearch) {
+          formData.compoundSearch.compoundClass = undefined;
         }
       }
 
       const formula = searchParams.get('formula');
       if (formula) {
-        formData.basicSearchFilterOptions.formula = formula;
+        formData.compoundSearch.formula = formula;
         containsValues = true;
       } else {
-        if (formData.basicSearchFilterOptions) {
-          formData.basicSearchFilterOptions.formula = undefined;
+        if (formData.compoundSearch) {
+          formData.compoundSearch.formula = undefined;
         }
       }
 
       const exact_mass = searchParams.get('exact_mass');
       if (exact_mass) {
-        formData.basicSearchFilterOptions.exactMass = Number(exact_mass);
+        formData.compoundSearch.exactMass = Number(exact_mass);
         containsValues = true;
       } else {
-        if (formData.basicSearchFilterOptions) {
-          formData.basicSearchFilterOptions.exactMass = undefined;
+        if (formData.compoundSearch) {
+          formData.compoundSearch.exactMass = undefined;
         }
       }
 
@@ -381,7 +379,7 @@ function SearchView() {
         });
       } else {
         const formDataContent = massSpecFilterOptionsFormDataToContentMapper(
-          formData?.massSpecFilterOptions,
+          formData?.propertyFilterOptions,
           undefined,
         );
 
