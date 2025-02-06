@@ -2,8 +2,8 @@ import ContentFilterOptions from '../types/filterOptions/ContentFilterOtions';
 import SearchFields from '../types/filterOptions/SearchFields';
 import ValueCount from '../types/ValueCount';
 
-const massSpecFilterOptionsFormDataToContentMapper = (
-  formData_massSpecFilterOptions: SearchFields['massSpecFilterOptions'],
+const propertyFilterOptionsFormDataToContentMapper = (
+  formData: SearchFields['propertyFilterOptions'],
   content: ContentFilterOptions | undefined,
 ) => {
   const mapper = (
@@ -22,23 +22,14 @@ const massSpecFilterOptionsFormDataToContentMapper = (
   };
 
   return {
-    contributor: mapper(
-      formData_massSpecFilterOptions?.contributor || [],
-      content?.contributor,
-    ),
+    contributor: mapper(formData?.contributor ?? [], content?.contributor),
     instrument_type: mapper(
-      formData_massSpecFilterOptions?.instrument_type || [],
+      formData?.instrument_type ?? [],
       content?.instrument_type,
     ),
-    ms_type: mapper(
-      formData_massSpecFilterOptions?.ms_type || [],
-      content?.ms_type,
-    ),
-    ion_mode: mapper(
-      formData_massSpecFilterOptions?.ion_mode || [],
-      content?.ion_mode,
-    ),
+    ms_type: mapper(formData?.ms_type ?? [], content?.ms_type),
+    ion_mode: mapper(formData?.ion_mode ?? [], content?.ion_mode),
   } as ContentFilterOptions;
 };
 
-export default massSpecFilterOptionsFormDataToContentMapper;
+export default propertyFilterOptionsFormDataToContentMapper;

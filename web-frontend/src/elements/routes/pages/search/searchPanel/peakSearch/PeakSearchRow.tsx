@@ -16,7 +16,10 @@ function PeakSearchRow({ index }: InputProps) {
   const { getFieldValue, setFieldValue } = formInstance;
 
   const handleOnChangeMass = useCallback(() => {
-    setFieldValue(['peaks', 'peaks', 'peaks', index, 'formula'], undefined);
+    setFieldValue(
+      ['spectralSearchFilterOptions', 'peaks', 'peaks', index, 'formula'],
+      undefined,
+    );
   }, [index, setFieldValue]);
 
   const handleOnChangeFormula = useCallback(
@@ -26,15 +29,18 @@ function PeakSearchRow({ index }: InputProps) {
 
       const formula = e.target.value;
       const mass = calculateMolecularMass(formula);
-      const peaks = (getFieldValue(['peaks', 'peaks', 'peaks']) ||
-        []) as PeakSearchPeakType[];
+      const peaks = (getFieldValue([
+        'spectralSearchFilterOptions',
+        'peaks',
+        'peaks',
+      ]) || []) as PeakSearchPeakType[];
       const value = mass > 0 ? mass : undefined;
       if (index >= 0 && index < peaks.length) {
         peaks[index] = { mz: value, formula };
       } else {
         peaks.push({ mz: value, formula });
       }
-      setFieldValue(['peaks', 'peaks', 'peaks'], peaks);
+      setFieldValue(['spectralSearchFilterOptions', 'peaks', 'peaks'], peaks);
     },
     [getFieldValue, index, setFieldValue],
   );
@@ -51,7 +57,13 @@ function PeakSearchRow({ index }: InputProps) {
         <Col span={6}>{index + 1}</Col>
         <Col span={6}>
           <Form.Item<SearchFields>
-            name={['peaks', 'peaks', 'peaks', index, 'mz']}
+            name={[
+              'spectralSearchFilterOptions',
+              'peaks',
+              'peaks',
+              index,
+              'mz',
+            ]}
             rules={[{ required: false }]}
             style={{
               width: '100%',
@@ -72,7 +84,13 @@ function PeakSearchRow({ index }: InputProps) {
         </Col>
         <Col span={6}>
           <Form.Item<SearchFields>
-            name={['peaks', 'peaks', 'peaks', index, 'formula']}
+            name={[
+              'spectralSearchFilterOptions',
+              'peaks',
+              'peaks',
+              index,
+              'formula',
+            ]}
             rules={[{ required: false }]}
             style={{
               width: '100%',

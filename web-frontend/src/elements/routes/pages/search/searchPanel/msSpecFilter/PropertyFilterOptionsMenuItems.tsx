@@ -4,13 +4,13 @@ import SearchFields from '../../../../../../types/filterOptions/SearchFields';
 import ContentFilterOptions from '../../../../../../types/filterOptions/ContentFilterOtions';
 
 type InputProps = {
-  massSpecFilterOptions: ContentFilterOptions | undefined;
+  propertyFilterOptions: ContentFilterOptions | undefined;
 };
 
-function MassSpecFilterOptionsMenuItems({ massSpecFilterOptions }: InputProps) {
+function PropertyFilterOptionsMenuItems({ propertyFilterOptions }: InputProps) {
   return [
     {
-      key: 'massSpecFilterOptionsContributor',
+      key: 'propertyFilterOptionsContributor',
       label: 'Contributor',
       children: [
         {
@@ -23,8 +23,8 @@ function MassSpecFilterOptionsMenuItems({ massSpecFilterOptions }: InputProps) {
           },
           label: (
             <FilterTable
-              filterOptions={massSpecFilterOptions?.contributor || []}
-              filterName="massSpecFilterOptions"
+              filterOptions={propertyFilterOptions?.contributor || []}
+              filterName="propertyFilterOptions"
               label="contributor"
             />
           ),
@@ -32,7 +32,7 @@ function MassSpecFilterOptionsMenuItems({ massSpecFilterOptions }: InputProps) {
       ],
     },
     {
-      key: 'massSpecFilterOptionsInstrumentType',
+      key: 'propertyFilterOptionsInstrumentType',
       label: 'Instrument Type',
       children: [
         {
@@ -45,7 +45,7 @@ function MassSpecFilterOptionsMenuItems({ massSpecFilterOptions }: InputProps) {
           },
           label: (
             <Form.Item<SearchFields>
-              name={['massSpecFilterOptions', 'instrument_type']}
+              name={['propertyFilterOptions', 'instrument_type']}
               rules={[{ required: false }]}
               style={{
                 width: '100%',
@@ -53,8 +53,8 @@ function MassSpecFilterOptionsMenuItems({ massSpecFilterOptions }: InputProps) {
               }}
             >
               <FilterTable
-                filterOptions={massSpecFilterOptions?.instrument_type || []}
-                filterName="massSpecFilterOptions"
+                filterOptions={propertyFilterOptions?.instrument_type || []}
+                filterName="propertyFilterOptions"
                 label="instrument_type"
               />
             </Form.Item>
@@ -63,7 +63,7 @@ function MassSpecFilterOptionsMenuItems({ massSpecFilterOptions }: InputProps) {
       ],
     },
     {
-      key: 'massSpecFilterOptionsMsType',
+      key: 'propertyFilterOptionsMsType',
       label: 'MS Type',
       children: [
         {
@@ -76,7 +76,7 @@ function MassSpecFilterOptionsMenuItems({ massSpecFilterOptions }: InputProps) {
           },
           label: (
             <Form.Item<SearchFields>
-              name={['massSpecFilterOptions', 'ms_type']}
+              name={['propertyFilterOptions', 'ms_type']}
               rules={[{ required: false }]}
               style={{
                 width: '100%',
@@ -84,8 +84,8 @@ function MassSpecFilterOptionsMenuItems({ massSpecFilterOptions }: InputProps) {
               }}
             >
               <FilterTable
-                filterOptions={massSpecFilterOptions?.ms_type || []}
-                filterName="massSpecFilterOptions"
+                filterOptions={propertyFilterOptions?.ms_type || []}
+                filterName="propertyFilterOptions"
                 label="ms_type"
                 height={50}
               />
@@ -95,7 +95,7 @@ function MassSpecFilterOptionsMenuItems({ massSpecFilterOptions }: InputProps) {
       ],
     },
     {
-      key: 'massSpecFilterOptionsIonMode',
+      key: 'propertyFilterOptionsIonMode',
       label: 'Ion Mode',
       children: [
         {
@@ -108,7 +108,7 @@ function MassSpecFilterOptionsMenuItems({ massSpecFilterOptions }: InputProps) {
           },
           label: (
             <Form.Item<SearchFields>
-              name={['massSpecFilterOptions', 'ion_mode']}
+              name={['propertyFilterOptions', 'ion_mode']}
               rules={[{ required: false }]}
               style={{
                 width: '100%',
@@ -116,8 +116,8 @@ function MassSpecFilterOptionsMenuItems({ massSpecFilterOptions }: InputProps) {
               }}
             >
               <FilterTable
-                filterOptions={massSpecFilterOptions?.ion_mode || []}
-                filterName="massSpecFilterOptions"
+                filterOptions={propertyFilterOptions?.ion_mode || []}
+                filterName="propertyFilterOptions"
                 label="ion_mode"
                 height={30}
               />
@@ -129,4 +129,4 @@ function MassSpecFilterOptionsMenuItems({ massSpecFilterOptions }: InputProps) {
   ];
 }
 
-export default MassSpecFilterOptionsMenuItems;
+export default PropertyFilterOptionsMenuItems;

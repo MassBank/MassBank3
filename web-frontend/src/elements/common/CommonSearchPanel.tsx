@@ -17,11 +17,11 @@ const submitButtonHeight = 40;
 
 type InputProps = {
   items: ItemType<MenuItemType>[];
-  initialValues?: SearchFields | undefined;
+  initialValues: SearchFields;
   width: number;
   height: number;
   collapsed: boolean;
-  massSpecFilterOptions: ContentFilterOptions | undefined;
+  propertyFilterOptions: ContentFilterOptions | undefined;
   onCollapse: (collapsed: boolean) => void;
   onSubmit: (data: SearchFields) => void;
 };
@@ -32,7 +32,7 @@ function CommonSearchPanel({
   width,
   height,
   collapsed,
-  massSpecFilterOptions,
+  propertyFilterOptions,
   onCollapse,
   onSubmit,
 }: InputProps) {
@@ -46,13 +46,13 @@ function CommonSearchPanel({
     const mapper = (vcs: ValueCount[]) => {
       return vcs.filter((vc) => vc.flag === true).map((vc) => vc.value);
     };
-    setFieldValue('massSpecFilterOptions', {
-      contributor: mapper(massSpecFilterOptions?.contributor || []),
-      instrument_type: mapper(massSpecFilterOptions?.instrument_type || []),
-      ms_type: mapper(massSpecFilterOptions?.ms_type || []),
-      ion_mode: mapper(massSpecFilterOptions?.ion_mode || []),
-    } as SearchFields['PropertyFilterOptions']);
-  }, [initialValues, massSpecFilterOptions, setFieldValue, setFieldsValue]);
+    setFieldValue('propertyFilterOptions', {
+      contributor: mapper(propertyFilterOptions?.contributor ?? []),
+      instrument_type: mapper(propertyFilterOptions?.instrument_type ?? []),
+      ms_type: mapper(propertyFilterOptions?.ms_type ?? []),
+      ion_mode: mapper(propertyFilterOptions?.ion_mode ?? []),
+    } as SearchFields['propertyFilterOptions']);
+  }, [initialValues, propertyFilterOptions, setFieldValue, setFieldsValue]);
 
   const handleOnSubmit: FormProps<SearchFields>['onFinish'] = useCallback(
     (values: SearchFields) => {

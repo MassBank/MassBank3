@@ -18,9 +18,9 @@ type InputProps = {
   searchPanelHeight: number;
   widthOverview: number;
   heightOverview: number;
-  reference: Peak[];
   hits: Hit[];
   isRequesting: boolean;
+  reference?: Peak[];
 };
 
 function SearchAndResultPanel({
@@ -31,9 +31,9 @@ function SearchAndResultPanel({
   searchPanelHeight,
   widthOverview,
   heightOverview,
-  reference,
   hits,
   isRequesting,
+  reference = [],
 }: InputProps) {
   const [innerHits, setInnerHits] = useState<Hit[]>([]);
 

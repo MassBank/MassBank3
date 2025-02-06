@@ -20,19 +20,21 @@ function PeakSearch(): JSX.Element {
       e.stopPropagation();
 
       if (peakSearchRows.length > 1) {
-        const peaks = getFieldValue(['peaks', 'peaks', 'peaks']) as
-          | PeakSearchPeakType[]
-          | undefined;
+        const peaks = getFieldValue([
+          'spectralSearchFilterOptions',
+          'peaks',
+          'peaks',
+        ]) as PeakSearchPeakType[] | undefined;
 
         if (peaks) {
           peaks.pop();
         }
-        setFieldValue(['peaks', 'peaks', 'peaks'], peaks);
+        setFieldValue(['spectralSearchFilterOptions', 'peaks', 'peaks'], peaks);
         const _rows = [...peakSearchRows];
         _rows.pop();
         setPeakSearchRows(_rows);
       } else {
-        setFieldValue(['peaks', 'peaks', 'peaks'], []);
+        setFieldValue(['spectralSearchFilterOptions', 'peaks', 'peaks'], []);
         setPeakSearchRows([
           <PeakSearchRow index={0} key={'peak-search-row-0'} />,
         ]);

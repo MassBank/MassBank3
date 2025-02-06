@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Form, Input, InputNumber } from 'antd';
 import SearchFields from '../../../../types/filterOptions/SearchFields';
 import PeakSearch from './searchPanel/peakSearch/PeakSearch';
-import MassSpecFilterOptionsMenuItems from './searchPanel/msSpecFilter/MassSpecFilterOptionsMenuItems';
+import PropertyFilterOptionsMenuItems from './searchPanel/msSpecFilter/PropertyFilterOptionsMenuItems';
 import StructuralEditor from '../../../basic/StructuralEditor';
 import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
 
@@ -18,19 +18,19 @@ const peakListPattern =
   /^(\d+(\.\d+)* \d+(\.\d+) \d+(\.\d+)*)(\n\d+(\.\d+)* \d+(\.\d+) \d+(\.\d+)*)*$/;
 
 type InputProps = {
-  massSpecFilterOptions: ContentFilterOptions | undefined;
+  propertyFilterOptions: ContentFilterOptions | undefined;
   initialStructure: string;
   width: number;
 };
 
 function SearchPanelMenuItems({
-  massSpecFilterOptions,
+  propertyFilterOptions,
   initialStructure,
   width,
 }: InputProps) {
   return [
     {
-      key: 'basicSearchMenuItem',
+      key: 'compoundSearchMenuItem',
       label: 'Compound Search',
       icon: <FontAwesomeIcon icon={faSliders} />,
       children: [
@@ -225,12 +225,12 @@ function SearchPanelMenuItems({
       ],
     },
     {
-      key: 'peaksMenuItem',
+      key: 'spectralSearchMenuItem',
       label: 'Spectral Search',
       icon: <FontAwesomeIcon icon={faChartColumn} />,
       children: [
         {
-          key: 'similarityMenuItem',
+          key: 'similaritySearchMenuItem',
           label: 'Similarity Search',
           children: [
             {
@@ -246,7 +246,11 @@ function SearchPanelMenuItems({
               label: (
                 <Form.Item<SearchFields>
                   label="Peak List"
-                  name={['peaks', 'similarity', 'peakList']}
+                  name={[
+                    'spectralSearchFilterOptions',
+                    'similarity',
+                    'peakList',
+                  ]}
                   rules={[{ required: false, pattern: peakListPattern }]}
                   style={{
                     width: '100%',
@@ -277,7 +281,11 @@ function SearchPanelMenuItems({
               label: (
                 <Form.Item<SearchFields>
                   label="Score Threshold"
-                  name={['peaks', 'similarity', 'threshold']}
+                  name={[
+                    'spectralSearchFilterOptions',
+                    'similarity',
+                    'threshold',
+                  ]}
                   rules={[{ required: false }]}
                   style={{
                     width: '100%',
@@ -322,7 +330,11 @@ function SearchPanelMenuItems({
               label: (
                 <Form.Item<SearchFields>
                   label="Mass Tolerance"
-                  name={['peaks', 'peaks', 'massTolerance']}
+                  name={[
+                    'spectralSearchFilterOptions',
+                    'peaks',
+                    'massTolerance',
+                  ]}
                   rules={[{ required: false }]}
                   style={{
                     width: '100%',
@@ -349,7 +361,7 @@ function SearchPanelMenuItems({
               label: (
                 <Form.Item<SearchFields>
                   label="Min. Intensity"
-                  name={['peaks', 'peaks', 'intensity']}
+                  name={['spectralSearchFilterOptions', 'peaks', 'intensity']}
                   rules={[{ required: false }]}
                   style={{
                     width: '100%',
@@ -370,7 +382,7 @@ function SearchPanelMenuItems({
           label: 'Neutral Loss Search',
           children: [
             {
-              key: 'peakDifference',
+              key: 'neutralLossSearch',
               style: {
                 width: '100%',
                 height: '100%',
@@ -399,7 +411,7 @@ function SearchPanelMenuItems({
               },
               label: (
                 <Form.Item<SearchFields>
-                  name="splash"
+                  name={['spectralSearchFilterOptions', 'splash']}
                   rules={[{ required: false }]}
                   style={{
                     width: '100%',
@@ -422,7 +434,7 @@ function SearchPanelMenuItems({
       key: 'massSpecMenuItem',
       label: 'Property Filter',
       icon: <FontAwesomeIcon icon={faFlask} />,
-      children: MassSpecFilterOptionsMenuItems({ massSpecFilterOptions }),
+      children: PropertyFilterOptionsMenuItems({ propertyFilterOptions }),
     },
   ];
 }

@@ -11,10 +11,10 @@ import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterO
 import { Layout, Spin } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import SearchFields from '../../../../types/filterOptions/SearchFields';
-import massSpecFilterOptionsFormDataToContentMapper from '../../../../utils/massSpecFilterOptionsFormDataToContentMapper';
+import propertyFilterOptionsFormDataToContentMapper from '../../../../utils/propertyFilterOptionsFormDataToContentMapper';
 import SearchAndResultPanel from '../../../common/SearchAndResultPanel';
 import CommonSearchPanel from '../../../common/CommonSearchPanel';
-import MassSpecFilterOptionsMenuItems from '../search/searchPanel/msSpecFilter/MassSpecFilterOptionsMenuItems';
+import PropertyFilterOptionsMenuItems from '../search/searchPanel/msSpecFilter/PropertyFilterOptionsMenuItems';
 import Placeholder from '../../../basic/Placeholder';
 import { usePropertiesContext } from '../../../../context/properties/properties';
 import SectionDivider from '../../../basic/SectionDivider';
@@ -30,7 +30,7 @@ function ContentView() {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [hits, setHits] = useState<Hit[]>([]);
-  const [massSpecFilterOptions, setMassSpecFilterOptions] = useState<
+  const [propertyFilterOptions, setPropertyFilterOptions] = useState<
     ContentFilterOptions | undefined
   >();
   const [metadata, setMetadata] = useState<Metadata | undefined>();
@@ -57,7 +57,7 @@ function ContentView() {
         )) as ContentFilterOptions;
       }
       initFlags(_browseContent);
-      setMassSpecFilterOptions(_browseContent);
+      setPropertyFilterOptions(_browseContent);
 
       const url = backendUrl + '/v1/metadata';
       const metadata = (await fetchData(url)) as Metadata;
@@ -94,7 +94,7 @@ function ContentView() {
     async (formData: SearchFields) => {
       // setIsCollapsed(true);
 
-      const formDataContent = massSpecFilterOptionsFormDataToContentMapper(
+      const formDataContent = propertyFilterOptionsFormDataToContentMapper(
         formData?.propertyFilterOptions,
         undefined,
       );
@@ -116,14 +116,14 @@ function ContentView() {
   };
 
   const charts = useMemo(() => {
-    if (massSpecFilterOptions) {
-      const keys = Object.keys(massSpecFilterOptions).filter(
+    if (propertyFilterOptions) {
+      const keys = Object.keys(propertyFilterOptions).filter(
         (key) => key !== 'metadata',
       );
       const _charts = keys.map((key) => (
         <ContentChart
           key={'chart_' + key}
-          content={massSpecFilterOptions}
+          content={propertyFilterOptions}
           identifier={key}
           width={width / 2}
           height={heights.chartPanelHeight / 2}
@@ -159,7 +159,7 @@ function ContentView() {
         child={''}
       />
     );
-  }, [heights.chartPanelHeight, massSpecFilterOptions, width]);
+  }, [heights.chartPanelHeight, propertyFilterOptions, width]);
 
   const handleOnCollapse = useCallback((_collapsed: boolean) => {
     setIsCollapsed(_collapsed);
@@ -168,12 +168,12 @@ function ContentView() {
   const searchAndResultPanel = useMemo(() => {
     const searchPanel = (
       <CommonSearchPanel
-        items={MassSpecFilterOptionsMenuItems({
-          massSpecFilterOptions,
+        items={PropertyFilterOptionsMenuItems({
+          propertyFilterOptions: propertyFilterOptions,
         })}
         collapsed={isCollapsed}
         onCollapse={handleOnCollapse}
-        massSpecFilterOptions={massSpecFilterOptions}
+        propertyFilterOptions={propertyFilterOptions}
         onSubmit={handleOnSubmit}
         width={searchPanelWidth}
         height={heights.searchPanelHeight}
@@ -189,13 +189,12 @@ function ContentView() {
         searchPanelHeight={heights.searchPanelHeight}
         widthOverview={width}
         heightOverview={height}
-        reference={[]}
         hits={hits}
         isRequesting={isSearching}
       />
     );
   }, [
-    massSpecFilterOptions,
+    propertyFilterOptions,
     isCollapsed,
     handleOnCollapse,
     handleOnSubmit,

@@ -1,5 +1,5 @@
-import Peak from '../../../../../../types/peak/Peak';
-import generateID from '../../../../../../utils/generateID';
+import Peak from '../types/peak/Peak';
+import generateID from './generateID';
 
 function parsePeakListInputField(peakListInputFieldData: string) {
   const peakListValues: number[][] = peakListInputFieldData
