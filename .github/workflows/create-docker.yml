@@ -22,7 +22,7 @@ jobs:
           - dockerfile: ./Dockerfile-server
             image: ipbhalle/massbank3-server
             context: .
-          - dockerfile: ./Dockerfile-frontend
+          - dockerfile: ./web-frontend/Dockerfile-frontend
             image: ipbhalle/massbank3-frontend
             context: ./web-frontend
           - dockerfile: ./Dockerfile-bingo-postgres
