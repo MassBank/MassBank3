@@ -33,13 +33,13 @@ const routes = {
     id: 'content',
     path: 'content',
   } as RouteType,
-  accession: {
+  accessionNext: {
     component: AccessionView,
     label: 'Accession',
     id: 'accession',
     path: 'recordDisplay',
   } as RouteType,
-  accessionPrevious: {
+  accession: {
     component: AccessionView,
     label: 'Previous Accession',
     id: 'accessionPrevious',

@@ -2,6 +2,7 @@ import Hit from '../../types/Hit';
 import { Content } from 'antd/es/layout/layout';
 import { CSSProperties } from 'react';
 import { usePropertiesContext } from '../../context/properties/properties';
+import routes from '../../constants/routes';
 
 type InputProps = {
   hit: Hit;
@@ -12,7 +13,8 @@ type InputProps = {
 function ResultLink({ hit, width = '100%', height = '100%' }: InputProps) {
   const { baseUrl, frontendUrl } = usePropertiesContext();
 
-  const url = frontendUrl + baseUrl + 'recordDisplay?id=' + hit.accession;
+  const url =
+    frontendUrl + baseUrl + routes.accession.path + '?id=' + hit.accession;
 
   return (
     hit.record && (

@@ -174,7 +174,7 @@ baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
     const xmlContent: string[] = [xmlHeader];
     hits.slice(index * nRecords, (index + 1) * nRecords).forEach((hit) => {
       xmlContent.push(
-        `<url><loc>${prefixUrl}recordDisplay?id=${hit.accession}</loc><lastmod>${lastmodDate}</lastmod></url>`,
+        `<url><loc>${prefixUrl}RecordDisplay?id=${hit.accession}</loc><lastmod>${lastmodDate}</lastmod></url>`,
       );
     });
     xmlContent.push(xmlFooter);
