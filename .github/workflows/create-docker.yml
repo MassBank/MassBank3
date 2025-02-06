@@ -3,10 +3,10 @@ name: Create Docker Container
 on:
   push:
     branches:
-      - 'main'
-      - 'dev'
+      - "main"
+      - "dev"
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   build-and-push-images:
@@ -24,7 +24,7 @@ jobs:
             context: .
           - dockerfile: ./Dockerfile-frontend
             image: ipbhalle/massbank3-frontend
-            context: .
+            context: ./web-frontend
           - dockerfile: ./Dockerfile-bingo-postgres
             image: ipbhalle/postgres
             context: .
