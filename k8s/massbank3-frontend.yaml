@@ -6,12 +6,14 @@ metadata:
   labels:
     app: massbank3-frontend
 data:
-  MB3_API_URL: "https://msbi.ipb-halle.de/MassBank3-api/"
+  MB3_API_URL: "https://msbi.ipb-halle.de/MassBank3-api"
+  MB3_API_URL_INTERNAL: "http://massbank3-server-service:8080"
   MB3_FRONTEND_URL: "https://msbi.ipb-halle.de"
   MB3_FRONTEND_BASE_URL: "/MassBank3/"
   MB3_FRONTEND_VERSION: "0.4.0 (beta)"
-  EXPORT_SERVICE_URL: "https://msbi.ipb-halle.de/MassBank3-export/"
-  GOOGLE_SEARCH_CONSOLE_KEY: ""
+  EXPORT_SERVICE_URL: "https://msbi.ipb-halle.de/MassBank3-export"
+  EXPORT_SERVICE_URL_INTERNAL: "http://massbank3-export-service-service:8080"
+  GOOGLE_SEARCH_CONSOLE_KEY: "4aoZgYg2lHeh7TlOxtyVzjHa3YJirrsEHPqwSU3luoU"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -30,6 +32,16 @@ spec:
       labels:
         app: massbank3-frontend # Label des Pods muss/ sollte mit (*) übereinstimmen
     spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - massbank3-server
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: massbank3-frontend
           image: ipbhalle/massbank3-frontend:dev # Container Image
