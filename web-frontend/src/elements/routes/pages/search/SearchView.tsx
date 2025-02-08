@@ -128,12 +128,8 @@ function SearchView() {
       // setIsCollapsed(true);
 
       if (clicked) {
-        let builtSearchParams = buildSearchParamsFromFormData(formData);
-        if (Object.keys(builtSearchParams).length === 0) {
-          builtSearchParams = buildSearchParamsFromFormData(
-            buildFormDataFromSearchParams(searchParams).formData,
-          );
-        }
+        const builtSearchParams = buildSearchParamsFromFormData(formData);
+
         navigate({
           pathname: baseUrl + routes.search.path,
           search: `?${Object.keys(builtSearchParams).length > 0 ? createSearchParams(builtSearchParams) : createSearchParams({ plain: 'true' })}`,
@@ -149,14 +145,17 @@ function SearchView() {
         await handleOnSearch(formData);
       }
     },
-    [navigate, baseUrl, searchParams, handleOnFetchContent, handleOnSearch],
+    [navigate, baseUrl, handleOnFetchContent, handleOnSearch],
   );
 
   useEffect(() => {
     const plainQuery = searchParams.get('plain');
     const { formData, containsValues } =
       buildFormDataFromSearchParams(searchParams);
-    const _initialValues = { ...defaultSearchFieldValues, ...formData };
+    const _initialValues = {
+      ...(JSON.parse(JSON.stringify(defaultSearchFieldValues)) as SearchFields),
+      ...formData,
+    };
     const runSubmit = plainQuery === 'true' || containsValues;
 
     if (runSubmit) {
@@ -168,16 +167,18 @@ function SearchView() {
     }
   }, [handleOnFetchContent, handleOnSearch, handleOnSubmit, searchParams]);
 
-  const searchAndResultPanel = useMemo(() => {
-    const searchPanel = (
+  const searchPanel = useMemo(
+    () => (
       <CommonSearchPanel
         items={SearchPanelMenuItems({
           propertyFilterOptions,
           initialStructure:
             initialValues?.compoundSearchFilterOptions?.structure ?? '',
-          width,
         })}
-        initialValues={initialValues ?? defaultSearchFieldValues}
+        initialValues={
+          initialValues ??
+          (JSON.parse(JSON.stringify(defaultSearchFieldValues)) as SearchFields)
+        }
         width={searchPanelWidth}
         height={height}
         collapsed={isCollapsed}
@@ -185,34 +186,16 @@ function SearchView() {
         onCollapse={(collapsed: boolean) => setIsCollapsed(collapsed)}
         onSubmit={(formData: SearchFields) => handleOnSubmit(formData, true)}
       />
-    );
-
-    return (
-      <SearchAndResultPanel
-        searchPanel={searchPanel}
-        width={width}
-        height={height}
-        searchPanelWidth={searchPanelWidth}
-        searchPanelHeight={height}
-        widthOverview={width}
-        heightOverview={height}
-        reference={reference}
-        hits={hits}
-        isRequesting={isSearching}
-      />
-    );
-  }, [
-    propertyFilterOptions,
-    width,
-    initialValues,
-    searchPanelWidth,
-    height,
-    isCollapsed,
-    handleOnSubmit,
-    reference,
-    hits,
-    isSearching,
-  ]);
+    ),
+    [
+      handleOnSubmit,
+      height,
+      initialValues,
+      isCollapsed,
+      propertyFilterOptions,
+      searchPanelWidth,
+    ],
+  );
 
   return useMemo(
     () => (
@@ -228,20 +211,43 @@ function SearchView() {
         }}
       >
         <Spin size="large" spinning={isFetchingContent} />
-        <Content
-          style={{
-            width: '100%',
-            height: '100%',
-            display: isFetchingContent ? 'none' : 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          {searchAndResultPanel}
-        </Content>
+        {!isFetchingContent && (
+          <Content
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <SearchAndResultPanel
+              searchPanel={searchPanel}
+              width={width}
+              height={height}
+              searchPanelWidth={searchPanelWidth}
+              searchPanelHeight={height}
+              widthOverview={width}
+              heightOverview={height}
+              reference={reference}
+              hits={hits}
+              isRequesting={isSearching}
+            />
+          </Content>
+        )}
       </Layout>
     ),
-    [isFetchingContent, location.key, searchAndResultPanel],
+    [
+      height,
+      hits,
+      isFetchingContent,
+      isSearching,
+      location.key,
+      reference,
+      searchPanel,
+      searchPanelWidth,
+      width,
+    ],
   );
 }
 

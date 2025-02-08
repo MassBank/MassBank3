@@ -20,6 +20,7 @@ import { usePropertiesContext } from '../../../../context/properties/properties'
 import SectionDivider from '../../../basic/SectionDivider';
 import MetadataPanel from './MetadataPanel';
 import Metadata from '../../../../types/Metadata';
+import defaultSearchFieldValues from '../../../../constants/defaultSearchFieldValues';
 
 function ContentView() {
   const ref = useRef(null);
@@ -169,7 +170,7 @@ function ContentView() {
     const searchPanel = (
       <CommonSearchPanel
         items={PropertyFilterOptionsMenuItems({
-          propertyFilterOptions: propertyFilterOptions,
+          propertyFilterOptions,
         })}
         collapsed={isCollapsed}
         onCollapse={handleOnCollapse}
@@ -177,6 +178,12 @@ function ContentView() {
         onSubmit={handleOnSubmit}
         width={searchPanelWidth}
         height={heights.searchPanelHeight}
+        initialValues={{
+          ...(JSON.parse(
+            JSON.stringify(defaultSearchFieldValues),
+          ) as SearchFields),
+          propertyFilterOptions,
+        }}
       />
     );
 

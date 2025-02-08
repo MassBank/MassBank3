@@ -6,17 +6,20 @@ import propertyFilterOptionsFormDataToContentMapper from './propertyFilterOption
 import buildSearchParams from './request/buildSearchParams';
 
 function buildSearchParamsFromFormData(formData: SearchFields) {
+  const _defaultSearchFieldValues = JSON.parse(
+    JSON.stringify(defaultSearchFieldValues),
+  ) as SearchFields;
   if (!formData.compoundSearchFilterOptions) {
     formData.compoundSearchFilterOptions =
-      defaultSearchFieldValues.compoundSearchFilterOptions;
+      _defaultSearchFieldValues.compoundSearchFilterOptions;
   }
   if (!formData.spectralSearchFilterOptions) {
     formData.spectralSearchFilterOptions =
-      defaultSearchFieldValues.spectralSearchFilterOptions;
+      _defaultSearchFieldValues.spectralSearchFilterOptions;
   }
   if (!formData.propertyFilterOptions) {
     formData.propertyFilterOptions =
-      defaultSearchFieldValues.propertyFilterOptions;
+      _defaultSearchFieldValues.propertyFilterOptions;
   }
 
   const formData_content = propertyFilterOptionsFormDataToContentMapper(

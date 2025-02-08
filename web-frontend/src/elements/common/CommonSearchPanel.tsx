@@ -12,6 +12,8 @@ import { faAngleDown, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { Content } from 'antd/es/layout/layout';
 import ValueCount from '../../types/ValueCount';
 import { ItemType, MenuItemType } from 'antd/es/menu/interface';
+import getActiveKeysFromFormData from '../../utils/getActiveKeysFromFormData';
+import defaultSearchFieldValues from '../../constants/defaultSearchFieldValues';
 
 const submitButtonHeight = 40;
 
@@ -52,7 +54,24 @@ function CommonSearchPanel({
       ms_type: mapper(propertyFilterOptions?.ms_type ?? []),
       ion_mode: mapper(propertyFilterOptions?.ion_mode ?? []),
     } as SearchFields['propertyFilterOptions']);
-  }, [initialValues, propertyFilterOptions, setFieldValue, setFieldsValue]);
+
+    return () => {
+      form.setFieldsValue(
+        JSON.parse(JSON.stringify(defaultSearchFieldValues)) as SearchFields,
+      );
+    };
+  }, [
+    form,
+    initialValues,
+    propertyFilterOptions,
+    setFieldValue,
+    setFieldsValue,
+  ]);
+
+  const activeKeys = useMemo(
+    () => getActiveKeysFromFormData(initialValues),
+    [initialValues],
+  );
 
   const handleOnSubmit: FormProps<SearchFields>['onFinish'] = useCallback(
     (values: SearchFields) => {
@@ -142,6 +161,8 @@ function CommonSearchPanel({
                 mode="inline"
                 items={items}
                 inlineIndent={10}
+                defaultOpenKeys={activeKeys}
+                defaultSelectedKeys={activeKeys}
               />
               <Button
                 htmlType="submit"
@@ -161,14 +182,15 @@ function CommonSearchPanel({
       </Content>
     ),
     [
-      form,
       width,
       height,
-      initialValues,
-      handleOnSubmit,
       collapsed,
       handleOnCollapse,
+      form,
+      initialValues,
+      handleOnSubmit,
       items,
+      activeKeys,
     ],
   );
 }

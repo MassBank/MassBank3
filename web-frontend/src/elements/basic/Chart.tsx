@@ -467,7 +467,7 @@ function Chart({
       const searchParams = new URLSearchParams();
       searchParams.set(
         'peak_list',
-        peaks.map((p) => `${p.mz};${p.rel}`).join(','),
+        peaks.map((p) => `${p.mz.toFixed(4)};${p.rel}`).join(','),
       );
       searchParams.set('peak_list_threshold', '0.8');
       const url =
