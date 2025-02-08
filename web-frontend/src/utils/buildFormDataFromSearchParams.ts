@@ -1,9 +1,12 @@
 import defaultSearchFieldValues from '../constants/defaultSearchFieldValues';
 import CompoundSearchFilterOptions from '../types/filterOptions/CompoundSearchFilterOptions';
+import SearchFields from '../types/filterOptions/SearchFields';
 import SpectralSearchFilterOptions from '../types/filterOptions/SpectralSearchFilterOptions';
 
 function buildFormDataFromSearchParams(searchParams: URLSearchParams) {
-  const formData = { ...defaultSearchFieldValues };
+  const formData = JSON.parse(
+    JSON.stringify(defaultSearchFieldValues),
+  ) as SearchFields;
   let containsValues = false;
 
   formData.propertyFilterOptions = {

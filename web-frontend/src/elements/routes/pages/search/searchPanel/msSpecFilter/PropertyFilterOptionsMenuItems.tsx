@@ -10,7 +10,7 @@ type InputProps = {
 function PropertyFilterOptionsMenuItems({ propertyFilterOptions }: InputProps) {
   return [
     {
-      key: 'propertyFilterOptionsContributor',
+      key: 'propertyFilterOptions.contributor',
       label: 'Contributor',
       children: [
         {
@@ -23,7 +23,7 @@ function PropertyFilterOptionsMenuItems({ propertyFilterOptions }: InputProps) {
           },
           label: (
             <FilterTable
-              filterOptions={propertyFilterOptions?.contributor || []}
+              filterOptions={propertyFilterOptions?.contributor ?? []}
               filterName="propertyFilterOptions"
               label="contributor"
             />
@@ -32,7 +32,7 @@ function PropertyFilterOptionsMenuItems({ propertyFilterOptions }: InputProps) {
       ],
     },
     {
-      key: 'propertyFilterOptionsInstrumentType',
+      key: 'propertyFilterOptions.instrument_type',
       label: 'Instrument Type',
       children: [
         {
@@ -53,7 +53,7 @@ function PropertyFilterOptionsMenuItems({ propertyFilterOptions }: InputProps) {
               }}
             >
               <FilterTable
-                filterOptions={propertyFilterOptions?.instrument_type || []}
+                filterOptions={propertyFilterOptions?.instrument_type ?? []}
                 filterName="propertyFilterOptions"
                 label="instrument_type"
               />
@@ -63,7 +63,7 @@ function PropertyFilterOptionsMenuItems({ propertyFilterOptions }: InputProps) {
       ],
     },
     {
-      key: 'propertyFilterOptionsMsType',
+      key: 'propertyFilterOptions.ms_type',
       label: 'MS Type',
       children: [
         {
@@ -84,7 +84,7 @@ function PropertyFilterOptionsMenuItems({ propertyFilterOptions }: InputProps) {
               }}
             >
               <FilterTable
-                filterOptions={propertyFilterOptions?.ms_type || []}
+                filterOptions={propertyFilterOptions?.ms_type ?? []}
                 filterName="propertyFilterOptions"
                 label="ms_type"
                 height={50}
@@ -95,7 +95,7 @@ function PropertyFilterOptionsMenuItems({ propertyFilterOptions }: InputProps) {
       ],
     },
     {
-      key: 'propertyFilterOptionsIonMode',
+      key: 'propertyFilterOptions.ion_mode',
       label: 'Ion Mode',
       children: [
         {
@@ -116,7 +116,7 @@ function PropertyFilterOptionsMenuItems({ propertyFilterOptions }: InputProps) {
               }}
             >
               <FilterTable
-                filterOptions={propertyFilterOptions?.ion_mode || []}
+                filterOptions={propertyFilterOptions?.ion_mode ?? []}
                 filterName="propertyFilterOptions"
                 label="ion_mode"
                 height={30}

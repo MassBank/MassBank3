@@ -1,5 +1,4 @@
 import {
-  faBarcode,
   faChartColumn,
   faFlask,
   faShareNodes,
@@ -15,22 +14,20 @@ import StructuralEditor from '../../../basic/StructuralEditor';
 import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
 
 const peakListPattern =
-  /^(\d+(\.\d+)* \d+(\.\d+) \d+(\.\d+)*)(\n\d+(\.\d+)* \d+(\.\d+) \d+(\.\d+)*)*$/;
+  /^(\d+(\.\d+){0,1} \d+(\.\d+){0,1}( \d+(\.\d+){0,1}){0,1})(\n\d+(\.\d+){0,1} \d+(\.\d+){0,1}( \d+(\.\d+){0,1}){0,1})*$/;
 
 type InputProps = {
   propertyFilterOptions: ContentFilterOptions | undefined;
   initialStructure: string;
-  width: number;
 };
 
 function SearchPanelMenuItems({
   propertyFilterOptions,
   initialStructure,
-  width,
 }: InputProps) {
   return [
     {
-      key: 'compoundSearchMenuItem',
+      key: 'compoundSearchFilterOptions',
       label: 'Compound Search',
       icon: <FontAwesomeIcon icon={faSliders} />,
       children: [
@@ -170,7 +167,7 @@ function SearchPanelMenuItems({
           ),
         },
         {
-          key: 'inchiMenuItem',
+          key: 'compoundSearchFilterOptions.inchi.menuItem',
           label: 'InChI',
           icon: <FontAwesomeIcon icon={faSignature} />,
           children: [
@@ -201,7 +198,7 @@ function SearchPanelMenuItems({
           ],
         },
         {
-          key: 'structureMenuItem',
+          key: 'compoundSearchFilterOptions.structure.menuItem',
           label: 'Structure',
           icon: <FontAwesomeIcon icon={faShareNodes} />,
           children: [
@@ -213,28 +210,23 @@ function SearchPanelMenuItems({
                 marginLeft: 0,
                 overflow: 'scroll',
               },
-              label: (
-                <StructuralEditor
-                  width={width - 100}
-                  initialSMILES={initialStructure}
-                />
-              ),
+              label: <StructuralEditor initialSMILES={initialStructure} />,
             },
           ],
         },
       ],
     },
     {
-      key: 'spectralSearchMenuItem',
+      key: 'spectralSearchFilterOptions',
       label: 'Spectral Search',
       icon: <FontAwesomeIcon icon={faChartColumn} />,
       children: [
         {
-          key: 'similaritySearchMenuItem',
+          key: 'spectralSearchFilterOptions.similarity.menuItem',
           label: 'Similarity Search',
           children: [
             {
-              key: 'peakList',
+              key: 'similarityPeakList',
               style: {
                 width: '100%',
                 height: '100%',
@@ -269,7 +261,7 @@ function SearchPanelMenuItems({
               ),
             },
             {
-              key: 'threshold',
+              key: 'similarityThreshold',
               style: {
                 width: '100%',
                 height: '100%',
@@ -302,7 +294,7 @@ function SearchPanelMenuItems({
           ],
         },
         {
-          key: 'peakSearchMenuItem',
+          key: 'spectralSearchFilterOptions.peaks.menuItem',
           label: 'Peak Search',
           children: [
             {
@@ -378,7 +370,7 @@ function SearchPanelMenuItems({
           ],
         },
         {
-          key: 'peakDifferenceMenuItem',
+          key: 'neutralLoss.menuItem',
           label: 'Neutral Loss Search',
           children: [
             {
@@ -398,9 +390,8 @@ function SearchPanelMenuItems({
           ],
         },
         {
-          key: 'splashMenuItem',
+          key: 'spectralSearchFilterOptions.splash.menuItem',
           label: 'SPLASH',
-          icon: <FontAwesomeIcon icon={faBarcode} />,
           children: [
             {
               key: 'splash',
@@ -431,7 +422,7 @@ function SearchPanelMenuItems({
       ],
     },
     {
-      key: 'massSpecMenuItem',
+      key: 'propertyFilterOptions',
       label: 'Property Filter',
       icon: <FontAwesomeIcon icon={faFlask} />,
       children: PropertyFilterOptionsMenuItems({ propertyFilterOptions }),

@@ -1,4 +1,4 @@
-import { MouseEvent, useCallback, useMemo, useState } from 'react';
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import PeakSearchRow from './PeakSearchRow';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinusCircle, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
@@ -11,9 +11,28 @@ import { Content } from 'antd/es/layout/layout';
 function PeakSearch(): JSX.Element {
   const formInstance = useFormInstance<SearchFields>();
   const { getFieldValue, setFieldValue } = formInstance;
-  const [peakSearchRows, setPeakSearchRows] = useState<JSX.Element[]>([
-    <PeakSearchRow index={0} key={'peak-search-row-0'} />,
-  ]);
+  const [peakSearchRows, setPeakSearchRows] = useState<JSX.Element[]>([]);
+
+  useEffect(() => {
+    const p = getFieldValue([
+      'spectralSearchFilterOptions',
+      'peaks',
+      'peaks',
+    ]) as PeakSearchPeakType[] | undefined;
+
+    if (p && p.length > 0) {
+      setPeakSearchRows(
+        p.map((_, i) => (
+          <PeakSearchRow index={i} key={'peak-search-row-' + i} />
+        )),
+      );
+    } else {
+      setPeakSearchRows([
+        <PeakSearchRow index={0} key={'peak-search-row-0'} />,
+      ]);
+    }
+  }, [getFieldValue]);
+
   const handleOnDelete = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
@@ -26,10 +45,15 @@ function PeakSearch(): JSX.Element {
           'peaks',
         ]) as PeakSearchPeakType[] | undefined;
 
-        if (peaks) {
+        if (peaks && peakSearchRows.length === peaks.length) {
           peaks.pop();
+
+          setFieldValue(
+            ['spectralSearchFilterOptions', 'peaks', 'peaks'],
+            peaks,
+          );
         }
-        setFieldValue(['spectralSearchFilterOptions', 'peaks', 'peaks'], peaks);
+
         const _rows = [...peakSearchRows];
         _rows.pop();
         setPeakSearchRows(_rows);

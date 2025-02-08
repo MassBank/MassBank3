@@ -72,31 +72,6 @@ function SearchAndResultPanel({
     [hits],
   );
 
-  const resultPanel = useMemo(() => {
-    return (
-      <ResultPanel
-        reference={reference}
-        hits={innerHits}
-        width={width - searchPanelWidth}
-        height={searchPanelHeight}
-        sortOptions={sortOptions}
-        onSort={handleOnSelectSort}
-        widthOverview={widthOverview}
-        heightOverview={heightOverview}
-      />
-    );
-  }, [
-    handleOnSelectSort,
-    heightOverview,
-    innerHits,
-    reference,
-    searchPanelHeight,
-    searchPanelWidth,
-    sortOptions,
-    width,
-    widthOverview,
-  ]);
-
   return useMemo(
     () => (
       <Content
@@ -120,21 +95,45 @@ function SearchAndResultPanel({
           }}
         >
           <Spin size="large" spinning={isRequesting} />
-          <Content
-            style={{
-              width: width - searchPanelWidth,
-              height: '100%',
-              display: isRequesting ? 'none' : 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            {resultPanel}
-          </Content>
+          {!isRequesting && (
+            <Content
+              style={{
+                width: width - searchPanelWidth,
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <ResultPanel
+                reference={reference}
+                hits={innerHits}
+                width={width - searchPanelWidth}
+                height={searchPanelHeight}
+                sortOptions={sortOptions}
+                onSort={handleOnSelectSort}
+                widthOverview={widthOverview}
+                heightOverview={heightOverview}
+              />
+            </Content>
+          )}
         </Content>
       </Content>
     ),
-    [height, isRequesting, resultPanel, searchPanel, searchPanelWidth, width],
+    [
+      handleOnSelectSort,
+      height,
+      heightOverview,
+      innerHits,
+      isRequesting,
+      reference,
+      searchPanel,
+      searchPanelHeight,
+      searchPanelWidth,
+      sortOptions,
+      width,
+      widthOverview,
+    ],
   );
 }
 

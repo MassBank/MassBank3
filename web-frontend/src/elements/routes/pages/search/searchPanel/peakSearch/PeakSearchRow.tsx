@@ -45,7 +45,7 @@ function PeakSearchRow({ index }: InputProps) {
     [getFieldValue, index, setFieldValue],
   );
 
-  const row = useMemo(
+  return useMemo(
     () => (
       <Row
         key={'peak-search-row-' + index}
@@ -110,8 +110,6 @@ function PeakSearchRow({ index }: InputProps) {
     ),
     [handleOnChangeFormula, handleOnChangeMass, index],
   );
-
-  return row;
 }
 
 export default PeakSearchRow;
