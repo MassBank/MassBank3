@@ -39,7 +39,7 @@ function Footer({ height }: InputProps) {
             backgroundColor,
           }}
         >
-          <Col span={8}>&copy; 2024 MassBank 3</Col>
+          <Col span={8}>&copy; 2025 MassBank</Col>
           <Col span={8}>Version: {version}</Col>
           <Col span={8}>
             <a href="https://github.com/MassBank/MassBank3" target="_blank">
