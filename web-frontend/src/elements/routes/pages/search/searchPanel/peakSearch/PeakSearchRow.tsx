@@ -54,8 +54,8 @@ function PeakSearchRow({ index }: InputProps) {
           height: '100%',
         }}
       >
-        <Col span={6}>{index + 1}</Col>
-        <Col span={6}>
+        <Col span={4}>{index + 1}</Col>
+        <Col span={9}>
           <Form.Item<SearchFields>
             name={[
               'spectralSearchFilterOptions',
@@ -79,10 +79,10 @@ function PeakSearchRow({ index }: InputProps) {
             />
           </Form.Item>
         </Col>
-        <Col span={6}>
+        <Col span={4}>
           <FontAwesomeIcon icon={faLeftLong} />
         </Col>
-        <Col span={6}>
+        <Col span={7}>
           <Form.Item<SearchFields>
             name={[
               'spectralSearchFilterOptions',

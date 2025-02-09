@@ -91,8 +91,8 @@ function PeakSearch(): JSX.Element {
           alignItems: 'center',
         }}
       >
-        <Col span={6}></Col>
-        <Col span={6}>
+        <Col span={4}></Col>
+        <Col span={9}>
           <Button
             children={
               <FontAwesomeIcon
@@ -112,8 +112,8 @@ function PeakSearch(): JSX.Element {
             }}
           />
         </Col>
-        <Col span={6}></Col>
-        <Col span={6}>
+        <Col span={4}></Col>
+        <Col span={7}>
           <Button
             children={
               <FontAwesomeIcon
@@ -145,10 +145,10 @@ function PeakSearch(): JSX.Element {
         }}
       >
         <Row key="peak-search-header">
-          <Col span={6}>Peak</Col>
-          <Col span={6}>Mass</Col>
-          <Col span={6}></Col>
-          <Col span={6}>Formula</Col>
+          <Col span={4}>Peak</Col>
+          <Col span={9}>Mass</Col>
+          <Col span={4}></Col>
+          <Col span={7}>Formula</Col>
         </Row>
         {rows}
       </Content>
