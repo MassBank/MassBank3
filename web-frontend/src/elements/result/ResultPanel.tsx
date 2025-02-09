@@ -135,13 +135,10 @@ function ResultPanel({
     fetchRecords();
   }, [fetchRecords]);
 
-  const handleOnDoubleClick = useCallback(
-    (_slideIndex: number) => {
-      setSlideIndex(_slideIndex % pageLimit);
-      setShowModal(true);
-    },
-    [setShowModal],
-  );
+  const handleOnDoubleClick = useCallback((_slideIndex: number) => {
+    setSlideIndex(_slideIndex % pageLimit);
+    setShowModal(true);
+  }, []);
 
   const resultTable = useMemo(
     () => (
@@ -310,7 +307,7 @@ function ResultPanel({
           showTitle
           showSizeChanger={false}
           showQuickJumper
-          locale={{ jump_to: '', page: '' }}
+          locale={{ jump_to: 'Page', page: '' }}
           style={{
             width: '100%',
             height: '100%',

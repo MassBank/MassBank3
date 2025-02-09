@@ -1,13 +1,12 @@
 import { Content } from 'antd/es/layout/layout';
 import Sider from 'antd/es/layout/Sider';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import ResultTableSortOptionType from '../../types/ResultTableSortOptionType';
 import resultTableSortOptionValues from '../../constants/resultTableSortOptionValues';
 import ResultPanel from '../result/ResultPanel';
 import Hit from '../../types/Hit';
 import Peak from '../../types/peak/Peak';
 import { Spin } from 'antd';
-import sortHits from '../../utils/sortHits';
 import ResultTableSortOption from '../../types/ResultTableSortOption';
 
 type InputProps = {
@@ -21,6 +20,7 @@ type InputProps = {
   hits: Hit[];
   isRequesting: boolean;
   reference?: Peak[];
+  onSort: (sortValue: ResultTableSortOption) => void;
 };
 
 function SearchAndResultPanel({
@@ -34,13 +34,8 @@ function SearchAndResultPanel({
   hits,
   isRequesting,
   reference = [],
+  onSort = () => {},
 }: InputProps) {
-  const [innerHits, setInnerHits] = useState<Hit[]>([]);
-
-  useEffect(() => {
-    setInnerHits([...hits]);
-  }, [hits]);
-
   const sortOptions = useMemo(() => {
     const _sortOptions: ResultTableSortOptionType[] = [];
     Object.keys(resultTableSortOptionValues).forEach((key: string) => {
@@ -66,10 +61,9 @@ function SearchAndResultPanel({
 
   const handleOnSelectSort = useCallback(
     (sortValue: ResultTableSortOption) => {
-      const _hits = sortHits(hits, sortValue);
-      setInnerHits(_hits);
+      onSort(sortValue);
     },
-    [hits],
+    [onSort],
   );
 
   return useMemo(
@@ -107,7 +101,7 @@ function SearchAndResultPanel({
             >
               <ResultPanel
                 reference={reference}
-                hits={innerHits}
+                hits={hits}
                 width={width - searchPanelWidth}
                 height={searchPanelHeight}
                 sortOptions={sortOptions}
@@ -124,7 +118,7 @@ function SearchAndResultPanel({
       handleOnSelectSort,
       height,
       heightOverview,
-      innerHits,
+      hits,
       isRequesting,
       reference,
       searchPanel,

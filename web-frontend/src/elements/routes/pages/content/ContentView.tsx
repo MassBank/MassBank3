@@ -21,6 +21,8 @@ import SectionDivider from '../../../basic/SectionDivider';
 import MetadataPanel from './MetadataPanel';
 import Metadata from '../../../../types/Metadata';
 import defaultSearchFieldValues from '../../../../constants/defaultSearchFieldValues';
+import ResultTableSortOption from '../../../../types/ResultTableSortOption';
+import sortHits from '../../../../utils/sortHits';
 
 function ContentView() {
   const ref = useRef(null);
@@ -166,6 +168,14 @@ function ContentView() {
     setIsCollapsed(_collapsed);
   }, []);
 
+  const handleOnSelectSort = useCallback(
+    (sortValue: ResultTableSortOption) => {
+      const _hits = sortHits(hits, sortValue);
+      setHits(_hits);
+    },
+    [hits],
+  );
+
   const searchAndResultPanel = useMemo(() => {
     const searchPanel = (
       <CommonSearchPanel
@@ -198,6 +208,7 @@ function ContentView() {
         heightOverview={height}
         hits={hits}
         isRequesting={isSearching}
+        onSort={handleOnSelectSort}
       />
     );
   }, [
@@ -211,6 +222,7 @@ function ContentView() {
     height,
     hits,
     isSearching,
+    handleOnSelectSort,
   ]);
 
   return useMemo(

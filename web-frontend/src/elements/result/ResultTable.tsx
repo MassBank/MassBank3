@@ -1,7 +1,7 @@
 import Hit from '../../types/Hit';
 import Peak from '../../types/peak/Peak';
 
-import { useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { Table } from 'antd';
 import ResultTableDataType from '../../types/ResultTableDataType';
 import ResultLink from './ResultLink';
@@ -175,23 +175,20 @@ function ResultTable({
     return _columns;
   }, [hits]);
 
-  return useMemo(
-    () => (
-      <Table<ResultTableDataType>
-        style={{
-          width: '100%',
-          height,
-          overflow: 'scroll',
-        }}
-        columns={columns}
-        dataSource={dataSource}
-        pagination={false}
-        onRow={handleOnDoubleClick}
-        sticky
-      />
-    ),
-    [columns, dataSource, handleOnDoubleClick, height],
+  return (
+    <Table<ResultTableDataType>
+      style={{
+        width: '100%',
+        height,
+        overflow: 'scroll',
+      }}
+      columns={columns}
+      dataSource={dataSource}
+      pagination={false}
+      onRow={handleOnDoubleClick}
+      sticky
+    />
   );
 }
 
-export default ResultTable;
+export default memo(ResultTable);

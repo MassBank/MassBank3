@@ -30,6 +30,7 @@ import buildFormDataFromSearchParams from '../../../../utils/buildFormDataFromSe
 import buildSearchParamsFromFormData from '../../../../utils/buildSearchParamsFromFormData';
 import parsePeakListInputField from '../../../../utils/parsePeakListAndReferences';
 import defaultSearchFieldValues from '../../../../constants/defaultSearchFieldValues';
+import ResultTableSortOption from '../../../../types/ResultTableSortOption';
 
 function SearchView() {
   const ref = useRef(null);
@@ -197,6 +198,14 @@ function SearchView() {
     ],
   );
 
+  const handleOnSelectSort = useCallback(
+    (sortValue: ResultTableSortOption) => {
+      const _hits = sortHits(hits, sortValue);
+      setHits(_hits);
+    },
+    [hits],
+  );
+
   return useMemo(
     () => (
       <Layout
@@ -232,12 +241,14 @@ function SearchView() {
               reference={reference}
               hits={hits}
               isRequesting={isSearching}
+              onSort={handleOnSelectSort}
             />
           </Content>
         )}
       </Layout>
     ),
     [
+      handleOnSelectSort,
       height,
       hits,
       isFetchingContent,
