@@ -122,6 +122,19 @@ const nRecords = 40000;
 const prefixUrl = frontendUrl + baseUrl;
 
 // serve sitemap index for search engines
+baseRouter.get('/robots.txt', async (req: Request, res: Response) => {
+  try {
+    const content = `User-agent: *\nAllow: /\n\nSitemap: ${prefixUrl}sitemap.xml`;
+
+    res.status(200).set({ 'Content-Type': 'text/plain' }).send(content);
+  } catch (e) {
+    vite?.ssrFixStacktrace(e);
+    console.log(e.stack);
+    res.status(500).end(e.stack);
+  }
+});
+
+// serve sitemap index for search engines
 baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
   try {
     const url: string = backendUrlInternal + '/v1/records/count';
