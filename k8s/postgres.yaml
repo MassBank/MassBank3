@@ -59,6 +59,16 @@ spec:
       labels:
         app: massbank3-postgres  # Label des Pods muss/ sollte mit (*) übereinstimmen
     spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - massbank3-server
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: massbank3-postgres
           image: 'quay.io/massbank/postgres-bingo:v15-bingo-1.26.0'

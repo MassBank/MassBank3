@@ -85,5 +85,5 @@ spec:
                 name: massbank3-server-service
                 port:
                   number: 8080
-            path: /MassBank3-api(/|$)(.*)
+            path: /MassBank-api(/|$)(.*)
             pathType: ImplementationSpecific
