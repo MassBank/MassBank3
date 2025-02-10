@@ -17,6 +17,14 @@ import copyTextToClipboard from '../../utils/copyTextToClipboard';
 import routes from '../../constants/routes';
 import { usePropertiesContext } from '../../context/properties/properties';
 
+const toolButtonStyle = {
+  width: 20,
+  border: 'none',
+  boxShadow: 'none',
+  backgroundColor: 'rgb(225, 231, 245)',
+  marginRight: 5,
+};
+
 type InputProps = {
   peakData: Peak[];
   peakData2?: Peak[];
@@ -547,19 +555,19 @@ function Chart({
                   )
                 }
                 onClick={() => setIsShowLabel(!isShowLabel)}
-                style={{ width: 20, border: 'none', boxShadow: 'none' }}
+                style={toolButtonStyle}
               />
               <Button
                 children={
                   <DownloadOutlined title="Download current spectrum view as SVG" />
                 }
                 onClick={handleOnDownload}
-                style={{ width: 20, border: 'none', boxShadow: 'none' }}
+                style={toolButtonStyle}
               />
               {!disableExport && (
                 <Content
                   style={{
-                    width: 40,
+                    width: '100%',
                     height: MARGIN.button,
                     display: 'flex',
                     justifyContent: 'left',
@@ -571,7 +579,7 @@ function Chart({
                       <CopyOutlined title="Copy peak list of current spectrum view to clipboard" />
                     }
                     onClick={() => handleOnCopy(filteredPeakData)}
-                    style={{ width: 20, border: 'none', boxShadow: 'none' }}
+                    style={toolButtonStyle}
                   />
                   <Button
                     children={
@@ -582,7 +590,7 @@ function Chart({
                         <SearchOutlined title="Search similar spectra for peaks in current spectrum view" />
                       </a>
                     }
-                    style={{ width: 20, border: 'none', boxShadow: 'none' }}
+                    style={toolButtonStyle}
                   />
                 </Content>
               )}
