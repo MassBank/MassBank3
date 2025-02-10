@@ -25,9 +25,6 @@ jobs:
           - dockerfile: ./web-frontend/Dockerfile-frontend
             image: ipbhalle/massbank3-frontend
             context: ./web-frontend
-          - dockerfile: ./Dockerfile-bingo-postgres
-            image: ipbhalle/postgres
-            context: .
 
     steps:
       - name: Checkout
@@ -52,8 +49,6 @@ jobs:
             # set dev tag for dev branch
             # set dev tag for dev branch, but exclude ipbhalle/postgres
             type=raw,value=dev,enable=${{ github.ref == 'refs/heads/dev' && matrix.image != 'ipbhalle/postgres' }}
-            # set specific tag for postgres image
-            type=raw,value=15-bingo-1.25.0,enable=${{ matrix.image == 'ipbhalle/postgres' }}
 
       - name: Build and push
         uses: docker/build-push-action@v5

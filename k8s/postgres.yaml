@@ -61,7 +61,7 @@ spec:
     spec:
       containers:
         - name: massbank3-postgres
-          image: 'ipbhalle/postgres:15-bingo-1.25.0'
+          image: 'quay.io/massbank/postgres-bingo:v15-bingo-1.26.0'
           imagePullPolicy: Always
           ports:
             - containerPort: 5432
