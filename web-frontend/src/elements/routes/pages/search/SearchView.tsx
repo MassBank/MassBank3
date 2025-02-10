@@ -52,7 +52,7 @@ function SearchView() {
   const [initialValues, setInitialValues] = useState<
     SearchFields | undefined
   >();
-  const [searchPanelWidth, setSearchPanelWidth] = useState<number>(0);
+  const [searchPanelWidth, setSearchPanelWidth] = useState<number>(450);
 
   const handleOnFetchContent = useCallback(
     async (formDataContent: ContentFilterOptions | undefined) => {
@@ -124,6 +124,7 @@ function SearchView() {
   const handleOnSubmit = useCallback(
     async (formData: SearchFields, clicked: boolean) => {
       // setIsCollapsed(true);
+      // setSearchPanelWidth(collapseButtonWidth);
 
       if (clicked) {
         const builtSearchParams = buildSearchParamsFromFormData(formData);
@@ -147,8 +148,6 @@ function SearchView() {
   );
 
   useEffect(() => {
-    setSearchPanelWidth(isCollapsed ? collapseButtonWidth : 450);
-
     const plainQuery = searchParams.get('plain');
     const { formData, containsValues } =
       buildFormDataFromSearchParams(searchParams);
@@ -165,14 +164,7 @@ function SearchView() {
       setInitialValues(_initialValues);
       setHits([]);
     }
-  }, [
-    handleOnFetchContent,
-    handleOnSearch,
-    handleOnSubmit,
-    isCollapsed,
-    searchParams,
-    width,
-  ]);
+  }, [handleOnFetchContent, handleOnSearch, handleOnSubmit, searchParams]);
 
   const handleOnResize = useCallback(
     (_searchPanelWidth: number) => {
@@ -182,6 +174,11 @@ function SearchView() {
     },
     [isCollapsed],
   );
+
+  const handleOnCollapse = useCallback((_collapsed: boolean) => {
+    setIsCollapsed(_collapsed);
+    setSearchPanelWidth(_collapsed ? collapseButtonWidth : 450);
+  }, []);
 
   const searchPanel = useMemo(
     () => (
@@ -199,11 +196,12 @@ function SearchView() {
         height={height}
         collapsed={isCollapsed}
         propertyFilterOptions={propertyFilterOptions}
-        onCollapse={(collapsed: boolean) => setIsCollapsed(collapsed)}
+        onCollapse={handleOnCollapse}
         onSubmit={(formData: SearchFields) => handleOnSubmit(formData, true)}
       />
     ),
     [
+      handleOnCollapse,
       handleOnSubmit,
       height,
       initialValues,

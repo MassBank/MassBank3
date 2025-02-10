@@ -38,7 +38,7 @@ function ContentView() {
     ContentFilterOptions | undefined
   >();
   const [metadata, setMetadata] = useState<Metadata | undefined>();
-  const [searchPanelWidth, setSearchPanelWidth] = useState<number>(0);
+  const [searchPanelWidth, setSearchPanelWidth] = useState<number>(450);
 
   const handleOnFetchContent = useCallback(
     async (formDataContent: ContentFilterOptions | undefined) => {
@@ -93,6 +93,7 @@ function ContentView() {
   const handleOnSubmit = useCallback(
     async (formData: SearchFields) => {
       // setIsCollapsed(true);
+      // setSearchPanelWidth(collapseButtonWidth);
 
       const formDataContent = propertyFilterOptionsFormDataToContentMapper(
         formData?.propertyFilterOptions,
@@ -106,11 +107,9 @@ function ContentView() {
   );
 
   useEffect(() => {
-    setSearchPanelWidth(isCollapsed ? collapseButtonWidth : 450);
-
     handleOnFetchContent(undefined);
     handleOnSearch(undefined);
-  }, [handleOnFetchContent, handleOnSearch, isCollapsed, width]);
+  }, [handleOnFetchContent, handleOnSearch]);
 
   const heights = {
     chartPanelHeight: 600,
@@ -165,6 +164,7 @@ function ContentView() {
 
   const handleOnCollapse = useCallback((_collapsed: boolean) => {
     setIsCollapsed(_collapsed);
+    setSearchPanelWidth(_collapsed ? collapseButtonWidth : 450);
   }, []);
 
   const handleOnSelectSort = useCallback(
