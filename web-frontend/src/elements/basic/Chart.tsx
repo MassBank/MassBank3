@@ -4,15 +4,15 @@ import ChartElement from './ChartElement';
 import Peak from '../../types/peak/Peak';
 import { Button } from 'antd';
 import { Content } from 'antd/es/layout/layout';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faEye,
-  faEyeSlash,
-  faFileArrowDown,
-} from '@fortawesome/free-solid-svg-icons';
+  CopyOutlined,
+  DownloadOutlined,
+  EyeInvisibleOutlined,
+  EyeOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import FileSaver from 'file-saver';
 const { saveAs } = FileSaver;
-import ExportableContent from '../common/ExportableContent';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
 import routes from '../../constants/routes';
 import { usePropertiesContext } from '../../context/properties/properties';
@@ -540,38 +540,51 @@ function Chart({
             >
               <Button
                 children={
-                  <FontAwesomeIcon
-                    icon={isShowLabel ? faEyeSlash : faEye}
-                    title={
-                      isShowLabel ? 'Hide peak labels' : 'Show peak labels'
-                    }
-                  />
+                  isShowLabel ? (
+                    <EyeInvisibleOutlined title="Hide peak labels" />
+                  ) : (
+                    <EyeOutlined title="Show peak labels" />
+                  )
                 }
                 onClick={() => setIsShowLabel(!isShowLabel)}
-                style={{ width: 20, border: 'none' }}
+                style={{ width: 20, border: 'none', boxShadow: 'none' }}
               />
               <Button
                 children={
-                  <FontAwesomeIcon
-                    icon={faFileArrowDown}
-                    title="Download current spectrum view as SVG"
-                  />
+                  <DownloadOutlined title="Download current spectrum view as SVG" />
                 }
                 onClick={handleOnDownload}
-                style={{ width: 20, border: 'none' }}
+                style={{ width: 20, border: 'none', boxShadow: 'none' }}
               />
               {!disableExport && (
-                <ExportableContent
-                  width={80}
-                  height={'100%'}
-                  mode="copy"
-                  title="Copy peak list of current spectrum view to clipboard"
-                  onClick={() => handleOnCopy(filteredPeakData)}
-                  permanentButton
-                  enableSearch
-                  searchTitle="Search similar spectra for peaks in current spectrum view"
-                  searchUrl={buildSearchUrl(filteredPeakData)}
-                />
+                <Content
+                  style={{
+                    width: 40,
+                    height: MARGIN.button,
+                    display: 'flex',
+                    justifyContent: 'left',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Button
+                    children={
+                      <CopyOutlined title="Copy peak list of current spectrum view to clipboard" />
+                    }
+                    onClick={() => handleOnCopy(filteredPeakData)}
+                    style={{ width: 20, border: 'none', boxShadow: 'none' }}
+                  />
+                  <Button
+                    children={
+                      <a
+                        href={buildSearchUrl(filteredPeakData)}
+                        target="_blank"
+                      >
+                        <SearchOutlined title="Search similar spectra for peaks in current spectrum view" />
+                      </a>
+                    }
+                    style={{ width: 20, border: 'none', boxShadow: 'none' }}
+                  />
+                </Content>
               )}
             </Content>
             <Content

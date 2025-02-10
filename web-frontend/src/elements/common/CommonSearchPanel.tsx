@@ -7,13 +7,13 @@ import { Button, Form, Menu } from 'antd';
 import SearchFields from '../../types/filterOptions/SearchFields';
 import ContentFilterOptions from '../../types/filterOptions/ContentFilterOtions';
 import { useForm } from 'antd/es/form/Form';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { Content } from 'antd/es/layout/layout';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import ValueCount from '../../types/ValueCount';
 import { ItemType, MenuItemType } from 'antd/es/menu/interface';
 import getActiveKeysFromFormData from '../../utils/getActiveKeysFromFormData';
 import defaultSearchFieldValues from '../../constants/defaultSearchFieldValues';
+import collapseButtonWidth from '../../constants/collapseButtonWidth';
 
 const submitButtonHeight = 40;
 
@@ -92,7 +92,6 @@ function CommonSearchPanel({
           height,
           backgroundColor: 'white',
           display: 'flex',
-          flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
           userSelect: 'none',
@@ -100,18 +99,21 @@ function CommonSearchPanel({
       >
         <Content
           style={{
-            width,
-            height: collapsed ? height : submitButtonHeight,
+            minWidth: collapseButtonWidth,
+            maxWidth: collapseButtonWidth,
+            height: '100%',
             display: 'flex',
-            justifyContent: 'left',
-            alignItems: 'start',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
           <Button
             onClick={handleOnCollapse}
+            size="large"
             style={{
-              width: 50,
-              height: submitButtonHeight,
+              minWidth: collapseButtonWidth,
+              maxWidth: collapseButtonWidth,
+              height: '100%',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
@@ -119,9 +121,8 @@ function CommonSearchPanel({
               color: 'blue',
               boxShadow: 'none',
             }}
-            size="large"
           >
-            <FontAwesomeIcon icon={collapsed ? faAngleRight : faAngleDown} />
+            {collapsed ? <RightOutlined /> : <LeftOutlined />}
           </Button>
         </Content>
         <Form.Provider>
@@ -130,8 +131,8 @@ function CommonSearchPanel({
             autoComplete="off"
             layout="inline"
             style={{
-              width,
-              height,
+              width: width - collapseButtonWidth,
+              height: '100%',
               backgroundColor: 'white',
               display: collapsed ? 'none' : 'flex',
               flexDirection: 'column',
@@ -157,6 +158,7 @@ function CommonSearchPanel({
                   width: '100%',
                   height: '100%',
                   overflow: 'scroll',
+                  border: 'none',
                 }}
                 mode="inline"
                 items={items}
@@ -184,13 +186,13 @@ function CommonSearchPanel({
     [
       width,
       height,
-      collapsed,
-      handleOnCollapse,
       form,
+      collapsed,
       initialValues,
       handleOnSubmit,
       items,
       activeKeys,
+      handleOnCollapse,
     ],
   );
 }

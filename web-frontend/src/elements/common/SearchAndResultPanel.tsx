@@ -1,26 +1,26 @@
 import { Content } from 'antd/es/layout/layout';
-import Sider from 'antd/es/layout/Sider';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import ResultTableSortOptionType from '../../types/ResultTableSortOptionType';
 import resultTableSortOptionValues from '../../constants/resultTableSortOptionValues';
 import ResultPanel from '../result/ResultPanel';
 import Hit from '../../types/Hit';
 import Peak from '../../types/peak/Peak';
-import { Spin } from 'antd';
+import { Spin, Splitter } from 'antd';
 import ResultTableSortOption from '../../types/ResultTableSortOption';
+import collapseButtonWidth from '../../constants/collapseButtonWidth';
 
 type InputProps = {
   searchPanel: JSX.Element;
   width: number;
   height: number;
   searchPanelWidth: number;
-  searchPanelHeight: number;
   widthOverview: number;
   heightOverview: number;
   hits: Hit[];
   isRequesting: boolean;
   reference?: Peak[];
   onSort: (sortValue: ResultTableSortOption) => void;
+  onResize: (searchPanelWidth: number) => void;
 };
 
 function SearchAndResultPanel({
@@ -28,14 +28,26 @@ function SearchAndResultPanel({
   width,
   height,
   searchPanelWidth,
-  searchPanelHeight,
   widthOverview,
   heightOverview,
   hits,
   isRequesting,
   reference = [],
-  onSort = () => {},
+  onSort,
+  onResize,
 }: InputProps) {
+  const [panelWidths, setPanelWidths] = useState<{
+    searchPanel: number;
+    resultPanel: number;
+  }>({ searchPanel: 0, resultPanel: 0 });
+
+  useEffect(() => {
+    setPanelWidths({
+      searchPanel: searchPanelWidth,
+      resultPanel: width - searchPanelWidth,
+    });
+  }, [searchPanelWidth, width]);
+
   const sortOptions = useMemo(() => {
     const _sortOptions: ResultTableSortOptionType[] = [];
     Object.keys(resultTableSortOptionValues).forEach((key: string) => {
@@ -66,6 +78,14 @@ function SearchAndResultPanel({
     [onSort],
   );
 
+  const handleOnResize = useCallback(
+    (sizes: number[]) => {
+      const _searchPanelWidth = sizes[0];
+      onResize(_searchPanelWidth);
+    },
+    [onResize],
+  );
+
   return useMemo(
     () => (
       <Content
@@ -78,55 +98,72 @@ function SearchAndResultPanel({
           userSelect: 'none',
         }}
       >
-        <Sider width={searchPanelWidth}>{searchPanel}</Sider>
-        <Content
-          style={{
-            width: width - searchPanelWidth,
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Spin size="large" spinning={isRequesting} />
-          {!isRequesting && (
+        <Splitter style={{ width, height }} onResize={handleOnResize}>
+          <Splitter.Panel
+            size={panelWidths.searchPanel}
+            min={200 + collapseButtonWidth}
+            max={500}
+          >
+            {searchPanel}
+          </Splitter.Panel>
+          <Splitter.Panel
+            size={panelWidths.resultPanel}
+            min={500}
+            resizable={panelWidths.searchPanel !== collapseButtonWidth}
+          >
             <Content
               style={{
-                width: width - searchPanelWidth,
+                width: panelWidths.resultPanel,
                 height: '100%',
                 display: 'flex',
+                flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
             >
-              <ResultPanel
-                reference={reference}
-                hits={hits}
-                width={width - searchPanelWidth}
-                height={searchPanelHeight}
-                sortOptions={sortOptions}
-                onSort={handleOnSelectSort}
-                widthOverview={widthOverview}
-                heightOverview={heightOverview}
-              />
+              <Spin size="large" spinning={isRequesting} />
+              {!isRequesting && (
+                <Content
+                  style={{
+                    width: width - searchPanelWidth,
+                    height: '100%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <ResultPanel
+                    reference={reference}
+                    hits={hits}
+                    width={width - searchPanelWidth}
+                    height={height}
+                    sortOptions={sortOptions}
+                    onSort={handleOnSelectSort}
+                    widthOverview={widthOverview}
+                    heightOverview={heightOverview}
+                  />
+                </Content>
+              )}
             </Content>
-          )}
-        </Content>
+          </Splitter.Panel>
+        </Splitter>
       </Content>
     ),
     [
-      handleOnSelectSort,
-      height,
-      heightOverview,
-      hits,
-      isRequesting,
-      reference,
-      searchPanel,
-      searchPanelHeight,
-      searchPanelWidth,
-      sortOptions,
       width,
+      height,
+      handleOnResize,
+      panelWidths.searchPanel,
+      panelWidths.resultPanel,
+      searchPanel,
+      isRequesting,
+      searchPanelWidth,
+      reference,
+      hits,
+      sortOptions,
+      handleOnSelectSort,
       widthOverview,
+      heightOverview,
     ],
   );
 }

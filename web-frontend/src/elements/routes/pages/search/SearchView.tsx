@@ -31,6 +31,7 @@ import buildSearchParamsFromFormData from '../../../../utils/buildSearchParamsFr
 import parsePeakListInputField from '../../../../utils/parsePeakListAndReferences';
 import defaultSearchFieldValues from '../../../../constants/defaultSearchFieldValues';
 import ResultTableSortOption from '../../../../types/ResultTableSortOption';
+import collapseButtonWidth from '../../../../constants/collapseButtonWidth';
 
 function SearchView() {
   const ref = useRef(null);
@@ -51,11 +52,7 @@ function SearchView() {
   const [initialValues, setInitialValues] = useState<
     SearchFields | undefined
   >();
-
-  const searchPanelWidth = useMemo(
-    () => (isCollapsed ? 50 : Math.max(width * 0.3, 400)),
-    [isCollapsed, width],
-  );
+  const [searchPanelWidth, setSearchPanelWidth] = useState<number>(0);
 
   const handleOnFetchContent = useCallback(
     async (formDataContent: ContentFilterOptions | undefined) => {
@@ -150,6 +147,8 @@ function SearchView() {
   );
 
   useEffect(() => {
+    setSearchPanelWidth(isCollapsed ? collapseButtonWidth : 450);
+
     const plainQuery = searchParams.get('plain');
     const { formData, containsValues } =
       buildFormDataFromSearchParams(searchParams);
@@ -166,7 +165,23 @@ function SearchView() {
       setInitialValues(_initialValues);
       setHits([]);
     }
-  }, [handleOnFetchContent, handleOnSearch, handleOnSubmit, searchParams]);
+  }, [
+    handleOnFetchContent,
+    handleOnSearch,
+    handleOnSubmit,
+    isCollapsed,
+    searchParams,
+    width,
+  ]);
+
+  const handleOnResize = useCallback(
+    (_searchPanelWidth: number) => {
+      if (!isCollapsed) {
+        setSearchPanelWidth(_searchPanelWidth);
+      }
+    },
+    [isCollapsed],
+  );
 
   const searchPanel = useMemo(
     () => (
@@ -235,19 +250,20 @@ function SearchView() {
               width={width}
               height={height}
               searchPanelWidth={searchPanelWidth}
-              searchPanelHeight={height}
               widthOverview={width}
               heightOverview={height}
               reference={reference}
               hits={hits}
               isRequesting={isSearching}
               onSort={handleOnSelectSort}
+              onResize={handleOnResize}
             />
           </Content>
         )}
       </Layout>
     ),
     [
+      handleOnResize,
       handleOnSelectSort,
       height,
       hits,

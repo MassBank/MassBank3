@@ -1,12 +1,12 @@
-import {
-  faChartColumn,
-  faFlask,
-  faShareNodes,
-  faSignature,
-  faSliders,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Form, Input, InputNumber } from 'antd';
+import {
+  BarChartOutlined,
+  BarcodeOutlined,
+  DatabaseOutlined,
+  ShareAltOutlined,
+  SignatureOutlined,
+  SlidersOutlined,
+} from '@ant-design/icons';
 import SearchFields from '../../../../types/filterOptions/SearchFields';
 import PeakSearch from './searchPanel/peakSearch/PeakSearch';
 import PropertyFilterOptionsMenuItems from './searchPanel/msSpecFilter/PropertyFilterOptionsMenuItems';
@@ -29,7 +29,7 @@ function SearchPanelMenuItems({
     {
       key: 'compoundSearchFilterOptions',
       label: 'Compound Search',
-      icon: <FontAwesomeIcon icon={faSliders} />,
+      icon: <SlidersOutlined />,
       children: [
         {
           key: 'compoundName',
@@ -169,7 +169,7 @@ function SearchPanelMenuItems({
         {
           key: 'compoundSearchFilterOptions.inchi.menuItem',
           label: 'InChI',
-          icon: <FontAwesomeIcon icon={faSignature} />,
+          icon: <SignatureOutlined />,
           children: [
             {
               key: 'inchi',
@@ -200,7 +200,7 @@ function SearchPanelMenuItems({
         {
           key: 'compoundSearchFilterOptions.structure.menuItem',
           label: 'Structure',
-          icon: <FontAwesomeIcon icon={faShareNodes} />,
+          icon: <ShareAltOutlined />,
           children: [
             {
               key: 'structure',
@@ -219,7 +219,7 @@ function SearchPanelMenuItems({
     {
       key: 'spectralSearchFilterOptions',
       label: 'Spectral Search',
-      icon: <FontAwesomeIcon icon={faChartColumn} />,
+      icon: <BarChartOutlined />,
       children: [
         {
           key: 'spectralSearchFilterOptions.similarity.menuItem',
@@ -379,9 +379,6 @@ function SearchPanelMenuItems({
                 width: '100%',
                 height: '100%',
                 marginLeft: 0,
-                // display: 'flex',
-                // justifyContent: 'center',
-                // alignItems: 'center',
                 textAlign: 'center',
                 color: 'orange',
               },
@@ -392,6 +389,7 @@ function SearchPanelMenuItems({
         {
           key: 'spectralSearchFilterOptions.splash.menuItem',
           label: 'SPLASH',
+          icon: <BarcodeOutlined />,
           children: [
             {
               key: 'splash',
@@ -424,7 +422,7 @@ function SearchPanelMenuItems({
     {
       key: 'propertyFilterOptions',
       label: 'Property Filter',
-      icon: <FontAwesomeIcon icon={faFlask} />,
+      icon: <DatabaseOutlined />,
       children: PropertyFilterOptionsMenuItems({ propertyFilterOptions }),
     },
   ];

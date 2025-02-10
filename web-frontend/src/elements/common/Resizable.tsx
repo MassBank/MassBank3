@@ -160,7 +160,7 @@ function Resizable({
     ],
   );
 
-  const resizable = useMemo(
+  return useMemo(
     () => (
       <Splitter style={{ width, height }} onResize={resize}>
         <Splitter.Panel
@@ -198,8 +198,6 @@ function Resizable({
       width,
     ],
   );
-
-  return resizable;
 }
 
 export default Resizable;

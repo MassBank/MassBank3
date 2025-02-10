@@ -222,7 +222,7 @@ function StructuralEditor({ initialSMILES, width, height }: InputProps) {
               <Col span={4}>
                 <UploadOutlined />
               </Col>
-              <Col span={20}>MOL/SDF upload (Drag&Drop or click)</Col>
+              <Col span={20}>Upload MOL/SDF (Drag&Drop or Click)</Col>
             </Row>
           </Dragger>
           {errorMolfileImport && (

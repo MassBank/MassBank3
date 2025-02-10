@@ -1,8 +1,7 @@
 import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import PeakSearchRow from './PeakSearchRow';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMinusCircle, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { Button, Col, Row } from 'antd';
+import { MinusCircleFilled, PlusCircleFilled } from '@ant-design/icons';
 import SearchFields from '../../../../../../types/filterOptions/SearchFields';
 import PeakSearchPeakType from '../../../../../../types/filterOptions/PeakSearchPeakType';
 import useFormInstance from 'antd/es/form/hooks/useFormInstance';
@@ -95,11 +94,9 @@ function PeakSearch(): JSX.Element {
         <Col span={9}>
           <Button
             children={
-              <FontAwesomeIcon
-                icon={faPlusCircle}
+              <PlusCircleFilled
                 title={'Add a new m/z value'}
-                color="green"
-                size="lg"
+                style={{ color: 'green' }}
               />
             }
             onClick={handleOnAdd}
@@ -116,11 +113,9 @@ function PeakSearch(): JSX.Element {
         <Col span={7}>
           <Button
             children={
-              <FontAwesomeIcon
-                icon={faMinusCircle}
+              <MinusCircleFilled
                 title={'Remove last m/z value'}
-                color="red"
-                size="lg"
+                style={{ color: 'red' }}
               />
             }
             onClick={handleOnDelete}

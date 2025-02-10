@@ -1,11 +1,10 @@
-import {
-  faCopy,
-  faFileArrowDown,
-  faMagnifyingGlass,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button } from 'antd';
 import { Content } from 'antd/es/layout/layout';
+import {
+  CopyFilled,
+  DownloadOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import {
   CSSProperties,
   MouseEvent,
@@ -123,15 +122,25 @@ function ExportableContent({
         >
           <Button
             children={
-              <FontAwesomeIcon
-                icon={mode === 'copy' ? faCopy : faFileArrowDown}
-                title={title}
-                style={{
-                  width: defaultButtonWidth,
-                  padding: 0,
-                  margin: 0,
-                }}
-              />
+              mode === 'copy' ? (
+                <CopyFilled
+                  title={title}
+                  style={{
+                    width: defaultButtonWidth,
+                    padding: 0,
+                    margin: 0,
+                  }}
+                />
+              ) : (
+                <DownloadOutlined
+                  title={title}
+                  style={{
+                    width: defaultButtonWidth,
+                    padding: 0,
+                    margin: 0,
+                  }}
+                />
+              )
             }
             onClick={handleOnClick}
             style={{
@@ -157,8 +166,7 @@ function ExportableContent({
                   href={searchUrl && searchUrl !== '' ? searchUrl : '?'}
                   target="_blank"
                 >
-                  <FontAwesomeIcon
-                    icon={faMagnifyingGlass}
+                  <SearchOutlined
                     title={searchTitle}
                     style={{
                       width: defaultButtonWidth,

@@ -1,8 +1,7 @@
-import { faLeftLong } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ChangeEvent, useCallback, useMemo } from 'react';
 import calculateMolecularMass from '../../../../../../utils/mass/calculateMolecularMass';
 import { Col, Form, Input, InputNumber, Row } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import SearchFields from '../../../../../../types/filterOptions/SearchFields';
 import PeakSearchPeakType from '../../../../../../types/filterOptions/PeakSearchPeakType';
 import useFormInstance from 'antd/es/form/hooks/useFormInstance';
@@ -52,6 +51,9 @@ function PeakSearchRow({ index }: InputProps) {
         style={{
           width: '100%',
           height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
         <Col span={4}>{index + 1}</Col>
@@ -80,7 +82,7 @@ function PeakSearchRow({ index }: InputProps) {
           </Form.Item>
         </Col>
         <Col span={4}>
-          <FontAwesomeIcon icon={faLeftLong} />
+          <ArrowLeftOutlined />
         </Col>
         <Col span={7}>
           <Form.Item<SearchFields>

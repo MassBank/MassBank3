@@ -23,6 +23,7 @@ import Metadata from '../../../../types/Metadata';
 import defaultSearchFieldValues from '../../../../constants/defaultSearchFieldValues';
 import ResultTableSortOption from '../../../../types/ResultTableSortOption';
 import sortHits from '../../../../utils/sortHits';
+import collapseButtonWidth from '../../../../constants/collapseButtonWidth';
 
 function ContentView() {
   const ref = useRef(null);
@@ -37,11 +38,7 @@ function ContentView() {
     ContentFilterOptions | undefined
   >();
   const [metadata, setMetadata] = useState<Metadata | undefined>();
-
-  const searchPanelWidth = useMemo(
-    () => (isCollapsed ? 50 : Math.max(width * 0.3, 400)),
-    [isCollapsed, width],
-  );
+  const [searchPanelWidth, setSearchPanelWidth] = useState<number>(0);
 
   const handleOnFetchContent = useCallback(
     async (formDataContent: ContentFilterOptions | undefined) => {
@@ -109,9 +106,11 @@ function ContentView() {
   );
 
   useEffect(() => {
+    setSearchPanelWidth(isCollapsed ? collapseButtonWidth : 450);
+
     handleOnFetchContent(undefined);
     handleOnSearch(undefined);
-  }, [handleOnFetchContent, handleOnSearch]);
+  }, [handleOnFetchContent, handleOnSearch, isCollapsed, width]);
 
   const heights = {
     chartPanelHeight: 600,
@@ -176,6 +175,15 @@ function ContentView() {
     [hits],
   );
 
+  const handleOnResize = useCallback(
+    (_searchPanelWidth: number) => {
+      if (!isCollapsed) {
+        setSearchPanelWidth(_searchPanelWidth);
+      }
+    },
+    [isCollapsed],
+  );
+
   const searchAndResultPanel = useMemo(() => {
     const searchPanel = (
       <CommonSearchPanel
@@ -203,12 +211,12 @@ function ContentView() {
         width={width}
         height={heights.searchPanelHeight}
         searchPanelWidth={searchPanelWidth}
-        searchPanelHeight={heights.searchPanelHeight}
         widthOverview={width}
         heightOverview={height}
         hits={hits}
         isRequesting={isSearching}
         onSort={handleOnSelectSort}
+        onResize={handleOnResize}
       />
     );
   }, [
@@ -223,6 +231,7 @@ function ContentView() {
     hits,
     isSearching,
     handleOnSelectSort,
+    handleOnResize,
   ]);
 
   return useMemo(
