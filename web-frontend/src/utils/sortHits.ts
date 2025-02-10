@@ -31,6 +31,10 @@ function sortHits(hits: Hit[], sortValue: ResultTableSortOption): Hit[] {
     return 0;
   });
 
+  _hits.forEach((hit, i) => {
+    hit.index = i;
+  });
+
   return _hits;
 }
 
