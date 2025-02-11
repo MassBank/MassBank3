@@ -118,7 +118,7 @@ async function getLastmodDate() {
 const baseRouter = express.Router();
 app.use(baseUrl, baseRouter);
 
-const nRecords = 40000;
+const nRecords = 10000;
 const prefixUrl = frontendUrl + baseUrl;
 
 // serve sitemap index for search engines
