@@ -50,7 +50,7 @@ function LinksTable({ links, width, height, title }: InputProps) {
             component={link.identifier}
             onClick={() => copyTextToClipboard(link.database, link.identifier)}
             enableSearch={link.database === 'INCHIKEY'}
-            searchTitle="Search for this InChIKey"
+            searchTitle="Search for InChIKey"
             searchUrl={buildSearchUrl(
               'inchi',
               link.identifier,

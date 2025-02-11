@@ -1,11 +1,13 @@
 import './Table.scss';
 
 import { Table } from 'antd';
-import Acquisition from '../../types/Acquisition';
 import { CSSProperties, useMemo } from 'react';
 import { splitStringAndCapitaliseFirstLetter } from '../../utils/stringUtils';
 import ExportableContent from '../common/ExportableContent';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
+import Acquisition from '../../types/record/Acquisition';
+import buildSearchUrl from '../../utils/buildSearchUrl';
+import { usePropertiesContext } from '../../context/properties/properties';
 
 type InputProps = {
   acquisition: Acquisition | undefined;
@@ -14,6 +16,8 @@ type InputProps = {
 };
 
 function AcquisitionTable({ acquisition, width, height }: InputProps) {
+  const { baseUrl, frontendUrl } = usePropertiesContext();
+
   return useMemo(() => {
     if (!acquisition) {
       return null;
@@ -59,6 +63,14 @@ function AcquisitionTable({ acquisition, width, height }: InputProps) {
           onClick={() =>
             copyTextToClipboard('Instrument Type', acquisition.instrument_type)
           }
+          enableSearch
+          searchTitle="Search for instrument type"
+          searchUrl={buildSearchUrl(
+            'instrument_type',
+            acquisition.instrument_type,
+            baseUrl,
+            frontendUrl,
+          )}
         />
       ),
       key: 'key-instrument-type',
@@ -76,6 +88,14 @@ function AcquisitionTable({ acquisition, width, height }: InputProps) {
               acquisition.mass_spectrometry.ms_type,
             )
           }
+          enableSearch
+          searchTitle="Search for MS type"
+          searchUrl={buildSearchUrl(
+            'ms_type',
+            acquisition.mass_spectrometry.ms_type,
+            baseUrl,
+            frontendUrl,
+          )}
         />
       ),
       key: 'key-ms-type',
@@ -93,6 +113,14 @@ function AcquisitionTable({ acquisition, width, height }: InputProps) {
               acquisition.mass_spectrometry.ion_mode,
             )
           }
+          enableSearch
+          searchTitle="Search for ion mode"
+          searchUrl={buildSearchUrl(
+            'ion_mode',
+            acquisition.mass_spectrometry.ion_mode,
+            baseUrl,
+            frontendUrl,
+          )}
         />
       ),
       key: 'key-ion-mode',
@@ -125,7 +153,7 @@ function AcquisitionTable({ acquisition, width, height }: InputProps) {
         pagination={false}
       />
     );
-  }, [acquisition, height, width]);
+  }, [acquisition, baseUrl, frontendUrl, height, width]);
 }
 
 export default AcquisitionTable;
