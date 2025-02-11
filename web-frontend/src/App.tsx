@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Routing from './elements/routes/Routing';
 import { HighlightProvider } from './context/highlight/HighlightProvider';
+import { ConfigProvider } from 'antd';
 
 function App() {
   const [hydrated, setHydrated] = useState(false);
@@ -14,9 +15,11 @@ function App() {
   }
 
   return (
-    <HighlightProvider>
-      <Routing />
-    </HighlightProvider>
+    <ConfigProvider wave={{ disabled: true }}>
+      <HighlightProvider>
+        <Routing />
+      </HighlightProvider>
+    </ConfigProvider>
   );
 }
 
