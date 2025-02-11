@@ -28,43 +28,38 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "massbank3-server.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          {{- with .Values.livenessProbe }}
           livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
           readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with .Values.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          env:
-            {{- if .Values.postgresql.enabled }}
-            - name: SPRING_PROFILE
-              value: "kyma"
-            - name: DB_HOST
-              value: "{{ .Release.Name}}-postgresql-headless"
-            - name: DB_NAME
-              value: {{ .Values.postgresql.global.postgresql.postgresqlDatabase | quote }}
-            - name: MASTER_PASSWORD
-              value: {{ .Values.postgresql.global.postgresql.postgresqlPassword | quote }}
-            - name: MASTER_USERNAME
-              value: {{ .Values.postgresql.global.postgresql.postgresqlUsername | quote }}
-            - name: DB_PORT
-              value: {{ .Values.postgresql.global.postgresql.servicePort | quote }}
-                        {{- end }}
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

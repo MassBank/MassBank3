@@ -33,14 +33,14 @@ function StructuralEditor({ initialSMILES, width, height }: InputProps) {
       const _smiles = molecule.toIsomericSmiles();
       setSmiles(_smiles);
       setMolfile(_molfile);
-      setFieldValue('structure', _smiles);
+      setFieldValue(['compoundSearchFilterOptions', 'structure'], _smiles);
       setErrorMolfileImport(undefined);
     },
     [setFieldValue],
   );
 
   const handleOnSetSmiles = useCallback(() => {
-    const _smiles = getFieldValue('structure');
+    const _smiles = getFieldValue(['compoundSearchFilterOptions', 'structure']);
     if (_smiles && _smiles.trim().length > 0) {
       try {
         const molecule = Molecule.fromSmiles(_smiles);
@@ -48,6 +48,7 @@ function StructuralEditor({ initialSMILES, width, height }: InputProps) {
         handleOnChangeStructure(_molfile, molecule);
         setStructureKey(Math.random());
         setErrorMolfileImport(undefined);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         /* empty */
       }
@@ -66,7 +67,10 @@ function StructuralEditor({ initialSMILES, width, height }: InputProps) {
 
   useEffect(() => {
     if (initialSMILES) {
-      setFieldValue('structure', initialSMILES);
+      setFieldValue(
+        ['compoundSearchFilterOptions', 'structure'],
+        initialSMILES,
+      );
       handleOnSetSmiles();
     }
   }, [handleOnSetSmiles, initialSMILES, setFieldValue]);
@@ -97,7 +101,7 @@ function StructuralEditor({ initialSMILES, width, height }: InputProps) {
   const input = useMemo(
     () => (
       <Form.Item
-        name="structure"
+        name={['compoundSearchFilterOptions', 'structure']}
         style={{
           width: '100%',
           height: '100%',
@@ -110,6 +114,7 @@ function StructuralEditor({ initialSMILES, width, height }: InputProps) {
                 try {
                   Molecule.fromSmiles(value);
                   setErrorSmiles(undefined);
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 } catch (err) {
                   setErrorSmiles('Invalid SMILES');
                   return Promise.reject(new Error('Invalid SMILES'));
@@ -217,7 +222,7 @@ function StructuralEditor({ initialSMILES, width, height }: InputProps) {
               <Col span={4}>
                 <UploadOutlined />
               </Col>
-              <Col span={20}>Drag & Drop a file here or click to upload</Col>
+              <Col span={20}>Upload MOL/SDF (Drag&Drop or Click)</Col>
             </Row>
           </Dragger>
           {errorMolfileImport && (

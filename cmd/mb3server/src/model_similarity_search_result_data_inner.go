@@ -17,6 +17,9 @@ type SimilaritySearchResultDataInner struct {
 
 	// Similarity score to the query spectrum.
 	Score float32 `json:"score,omitempty"`
+
+	// The number of atoms in the compound.
+	Atomcount int32 `json:"atomcount,omitempty"`
 }
 
 // AssertSimilaritySearchResultDataInnerRequired checks if the required fields are not zero-ed

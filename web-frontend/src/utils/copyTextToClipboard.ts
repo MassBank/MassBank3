@@ -5,7 +5,9 @@ async function copyTextToClipboard(label: string, value: string) {
     await navigator.clipboard.writeText(value);
     return message.success('Copied "' + label + '" to clipboard!');
   } catch (error) {
-    return message.error('Failed to copy "' + label + '" to clipboard');
+    return message.error(
+      'Failed to copy "' + label + '" to clipboard: ' + error,
+    );
   }
 }
 

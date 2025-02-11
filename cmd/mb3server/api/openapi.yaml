@@ -51,6 +51,14 @@ paths:
         schema:
           $ref: '#/components/schemas/CompoundName'
         style: form
+      - description: Filter by compound class
+        explode: true
+        in: query
+        name: compound_class
+        required: false
+        schema:
+          $ref: '#/components/schemas/CompoundClass'
+        style: form
       - description: Filter by exact mass.
         explode: true
         in: query
@@ -186,6 +194,14 @@ paths:
         required: false
         schema:
           $ref: '#/components/schemas/CompoundName'
+        style: form
+      - description: Filter by compound class
+        explode: true
+        in: query
+        name: compound_class
+        required: false
+        schema:
+          $ref: '#/components/schemas/CompoundClass'
         style: form
       - description: Filter by exact mass.
         explode: true
@@ -400,6 +416,18 @@ paths:
                 $ref: '#/components/schemas/Metadata'
           description: Metadata for database and datasets
       summary: get massbank metadata
+  /version:
+    get:
+      operationId: getVersion
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                example: "MassBank API service 0.1, 2025-01-22T14:20:57+01:00"
+                type: string
+          description: Version for MassBank API with timestamp of build
+      summary: get API version
   /similarity:
     get:
       operationId: getSimilarity
@@ -473,6 +501,8 @@ components:
       description: "enum: [ POSITIVE, NEGATIVE ]"
       type: string
     CompoundName:
+      type: string
+    CompoundClass:
       type: string
     ExactMass:
       description: "A mass prefixed with \"and\" or \"or\" before a colon, e.g. \"\
@@ -698,8 +728,10 @@ components:
         data:
         - score: 0.8008281904610115
           accession: accession
+          atomcount: 1
         - score: 0.8008281904610115
           accession: accession
+          atomcount: 1
       properties:
         data:
           description: A list of records as a search result with similarity score
@@ -711,13 +743,15 @@ components:
     BrowseOptions:
       example:
         metadata:
-          isomer_count: 0
           git_commit: git_commit
           compound_count: 0
+          compound_class:
+          - name: name
+            count: 1
+          - name: name
+            count: 1
           spectra_count: 0
-          limit: 1
           version: version
-          result_count: 0
           timestamp: timestamp
         compound_start:
         - count: 0
@@ -770,13 +804,15 @@ components:
       type: object
     Metadata:
       example:
-        isomer_count: 0
         git_commit: git_commit
         compound_count: 0
+        compound_class:
+        - name: name
+          count: 1
+        - name: name
+          count: 1
         spectra_count: 0
-        limit: 1
         version: version
-        result_count: 0
         timestamp: timestamp
       properties:
         version:
@@ -791,15 +827,10 @@ components:
         compound_count:
           minimum: 0
           type: integer
-        isomer_count:
-          minimum: 0
-          type: integer
-        result_count:
-          minimum: 0
-          type: integer
-        limit:
-          minimum: 1
-          type: integer
+        compound_class:
+          items:
+            $ref: '#/components/schemas/Metadata_compound_class_inner'
+          type: array
       type: object
     StringCount:
       items:
@@ -815,8 +846,10 @@ components:
         data:
         - score: 0.8008281904610115
           accession: accession
+          atomcount: 1
         - score: 0.8008281904610115
           accession: accession
+          atomcount: 1
       properties:
         data:
           description: A ranked list of records with similarity scores.
@@ -1252,6 +1285,7 @@ components:
       example:
         score: 0.8008281904610115
         accession: accession
+        atomcount: 1
       properties:
         accession:
           description: The accession id of the record.
@@ -1259,6 +1293,21 @@ components:
         score:
           description: Similarity score to the query spectrum.
           type: number
+        atomcount:
+          description: The number of atoms in the compound.
+          minimum: 1
+          type: integer
+      type: object
+    Metadata_compound_class_inner:
+      example:
+        name: name
+        count: 1
+      properties:
+        name:
+          type: string
+        count:
+          minimum: 1
+          type: integer
       type: object
     StringCount_inner:
       example:
@@ -1276,6 +1325,7 @@ components:
       example:
         score: 0.8008281904610115
         accession: accession
+        atomcount: 1
       properties:
         accession:
           description: MassBank accession id.
@@ -1283,6 +1333,10 @@ components:
         score:
           description: Similarity score to the query spectrum.
           type: number
+        atomcount:
+          description: The number of atoms in the compound.
+          minimum: 1
+          type: integer
       type: object
     Authors_inner:
       description: Name of the author or affiliation

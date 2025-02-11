@@ -7,7 +7,7 @@ metadata:
     app: massbank3-export-service
 data:
   MB_DATA_DIRECTORY: "/MassBank-data"
-  CORS_ALLOWED_ORIGINS: "https://msbi.ipb-halle.de/MassBank3/"
+  CORS_ALLOWED_ORIGINS: "https://msbi.ipb-halle.de/MassBank/"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -26,6 +26,16 @@ spec:
       labels:
         app: massbank3-export-service # Label des Pods muss/ sollte mit (*) übereinstimmen
     spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - massbank3-server
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: massbank3-export-service
           image: quay.io/massbank/massbank3-export-service:v1.3 # Container Image
@@ -87,5 +97,5 @@ spec:
                 name: massbank3-export-service-service
                 port:
                   number: 8080
-            path: /MassBank3-export(/|$)(.*)
+            path: /MassBank-export(/|$)(.*)
             pathType: ImplementationSpecific

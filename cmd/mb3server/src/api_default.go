@@ -92,6 +92,12 @@ func (c *DefaultAPIController) Routes() Routes {
 			c.GetMetadata,
 		},
 		{
+			"GetVersion",
+			strings.ToUpper("Get"),
+			"/v1/version",
+			c.GetVersion,
+		},
+		{
 			"GetSimilarity",
 			strings.ToUpper("Get"),
 			"/v1/similarity",
@@ -108,6 +114,7 @@ func (c *DefaultAPIController) GetRecords(w http.ResponseWriter, r *http.Request
 	msTypeParam := strings.Split(query.Get("ms_type"), ",")
 	ionModeParam := query.Get("ion_mode")
 	compoundNameParam := query.Get("compound_name")
+	compoundClassParam := query.Get("compound_class")
 	exactMassParam := query.Get("exact_mass")
 	massToleranceParam, err := parseFloat64Parameter(query.Get("mass_tolerance"), false)
 	if err != nil {
@@ -126,7 +133,7 @@ func (c *DefaultAPIController) GetRecords(w http.ResponseWriter, r *http.Request
 	inchiParam := query.Get("inchi")
 	inchiKeyParam := query.Get("inchi_key")
 	contributorParam := strings.Split(query.Get("contributor"), ",")
-	result, err := c.service.GetRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, inchiParam, inchiKeyParam, contributorParam)
+	result, err := c.service.GetRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, compoundClassParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, inchiParam, inchiKeyParam, contributorParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -145,6 +152,7 @@ func (c *DefaultAPIController) GetSearchResults(w http.ResponseWriter, r *http.R
 	msTypeParam := strings.Split(query.Get("ms_type"), ",")
 	ionModeParam := query.Get("ion_mode")
 	compoundNameParam := query.Get("compound_name")
+	compoundClassParam := query.Get("compound_class")
 	exactMassParam := query.Get("exact_mass")
 	massToleranceParam, err := parseFloat64Parameter(query.Get("mass_tolerance"), false)
 	if err != nil {
@@ -169,7 +177,7 @@ func (c *DefaultAPIController) GetSearchResults(w http.ResponseWriter, r *http.R
 	inchiKeyParam := query.Get("inchi_key")
 	contributorParam := strings.Split(query.Get("contributor"), ",")
 	substructureParam := query.Get("substructure")
-	result, err := c.service.GetSearchResults(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, peakListThresholdParam, inchiParam, inchiKeyParam, contributorParam, substructureParam)
+	result, err := c.service.GetSearchResults(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, compoundClassParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, peakDifferencesParam, peakListParam, peakListThresholdParam, inchiParam, inchiKeyParam, contributorParam, substructureParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -244,6 +252,19 @@ func (c *DefaultAPIController) GetBrowseOptions(w http.ResponseWriter, r *http.R
 // GetMetadata - get massbank metadata
 func (c *DefaultAPIController) GetMetadata(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.GetMetadata(r.Context())
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+
+}
+
+// GetVersion - get API version
+func (c *DefaultAPIController) GetVersion(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetVersion(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

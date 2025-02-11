@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import ContentChart from './ContentChart';
-import fetchData from '../../../../utils/fetchData';
-import buildSearchParams from '../../../../utils/buildSearchParams';
+import fetchData from '../../../../utils/request/fetchData';
+import buildSearchParams from '../../../../utils/request/buildSearchParams';
 import initFlags from '../../../../utils/initFlags';
 
 import SearchResult from '../../../../types/SearchResult';
@@ -11,28 +11,34 @@ import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterO
 import { Layout, Spin } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import SearchFields from '../../../../types/filterOptions/SearchFields';
-import massSpecFilterOptionsFormDataToContentMapper from '../../../../utils/massSpecFilterOptionsFormDataToContentMapper';
+import propertyFilterOptionsFormDataToContentMapper from '../../../../utils/propertyFilterOptionsFormDataToContentMapper';
 import SearchAndResultPanel from '../../../common/SearchAndResultPanel';
 import CommonSearchPanel from '../../../common/CommonSearchPanel';
-import MassSpecFilterOptionsMenuItems from '../search/searchPanel/msSpecFilter/MassSpecFilterOptionsMenuItems';
+import PropertyFilterOptionsMenuItems from '../search/searchPanel/msSpecFilter/PropertyFilterOptionsMenuItems';
 import Placeholder from '../../../basic/Placeholder';
+import { usePropertiesContext } from '../../../../context/properties/properties';
+import SectionDivider from '../../../basic/SectionDivider';
+import MetadataPanel from './MetadataPanel';
+import Metadata from '../../../../types/Metadata';
+import defaultSearchFieldValues from '../../../../constants/defaultSearchFieldValues';
+import ResultTableSortOption from '../../../../types/ResultTableSortOption';
+import sortHits from '../../../../utils/sortHits';
+import collapseButtonWidth from '../../../../constants/collapseButtonWidth';
 
 function ContentView() {
   const ref = useRef(null);
   const { width, height } = useContainerDimensions(ref);
+  const { backendUrl } = usePropertiesContext();
 
   const [isFetchingContent, setIsFetchingContent] = useState<boolean>(false);
   const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [hits, setHits] = useState<Hit[]>([]);
-  const [massSpecFilterOptions, setMassSpecFilterOptions] = useState<
+  const [propertyFilterOptions, setPropertyFilterOptions] = useState<
     ContentFilterOptions | undefined
   >();
-
-  const searchPanelWidth = useMemo(
-    () => (isCollapsed ? 50 : Math.max(width * 0.3, 400)),
-    [isCollapsed, width],
-  );
+  const [metadata, setMetadata] = useState<Metadata | undefined>();
+  const [searchPanelWidth, setSearchPanelWidth] = useState<number>(450);
 
   const handleOnFetchContent = useCallback(
     async (formDataContent: ContentFilterOptions | undefined) => {
@@ -40,22 +46,26 @@ function ContentView() {
 
       let _browseContent: ContentFilterOptions | undefined = formDataContent;
       if (!_browseContent) {
-        const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
+        const url = backendUrl + '/v1/filter/browse';
         _browseContent = (await fetchData(url)) as ContentFilterOptions;
       } else {
         const searchParams = buildSearchParams(_browseContent);
-        const url = import.meta.env.VITE_MB3_API_URL + '/v1/filter/browse';
+        const url = backendUrl + '/v1/filter/browse';
         _browseContent = (await fetchData(
           url,
           searchParams,
         )) as ContentFilterOptions;
       }
       initFlags(_browseContent);
+      setPropertyFilterOptions(_browseContent);
 
-      setMassSpecFilterOptions(_browseContent);
+      const url = backendUrl + '/v1/metadata';
+      const metadata = (await fetchData(url)) as Metadata;
+      setMetadata(metadata);
+
       setIsFetchingContent(false);
     },
-    [],
+    [backendUrl],
   );
 
   const handleOnSearch = useCallback(
@@ -63,7 +73,7 @@ function ContentView() {
       setIsSearching(true);
 
       const searchParams = buildSearchParams(formDataContent);
-      const url = import.meta.env.VITE_MB3_API_URL + '/v1/records/search';
+      const url = backendUrl + '/v1/records/search';
       const searchResult = (await fetchData(url, searchParams)) as SearchResult;
 
       let _hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
@@ -77,16 +87,16 @@ function ContentView() {
       setHits(_hits);
       setIsSearching(false);
     },
-    [],
+    [backendUrl],
   );
 
   const handleOnSubmit = useCallback(
     async (formData: SearchFields) => {
-      setIsCollapsed(true);
+      // setIsCollapsed(true);
+      // setSearchPanelWidth(collapseButtonWidth);
 
-      const formDataContent = massSpecFilterOptionsFormDataToContentMapper(
-        formData?.massSpecFilterOptions,
-        // massSpecFilterOptions,
+      const formDataContent = propertyFilterOptionsFormDataToContentMapper(
+        formData?.propertyFilterOptions,
         undefined,
       );
 
@@ -101,25 +111,23 @@ function ContentView() {
     handleOnSearch(undefined);
   }, [handleOnFetchContent, handleOnSearch]);
 
-  const heights = useMemo(() => {
-    return {
-      chartPanelHeight: height / 4,
-      searchPanelHeight: (height / 4) * 3,
-    };
-  }, [height]);
+  const heights = {
+    chartPanelHeight: 600,
+    searchPanelHeight: 600,
+  };
 
   const charts = useMemo(() => {
-    if (massSpecFilterOptions) {
-      const keys = Object.keys(massSpecFilterOptions).filter(
+    if (propertyFilterOptions) {
+      const keys = Object.keys(propertyFilterOptions).filter(
         (key) => key !== 'metadata',
       );
       const _charts = keys.map((key) => (
         <ContentChart
           key={'chart_' + key}
-          content={massSpecFilterOptions}
+          content={propertyFilterOptions}
           identifier={key}
-          width={width / keys.length}
-          height={heights.chartPanelHeight}
+          width={width / 2}
+          height={heights.chartPanelHeight / 2}
         />
       ));
 
@@ -128,11 +136,11 @@ function ContentView() {
           style={{
             width,
             height: heights.chartPanelHeight,
-            display: 'flex',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
             justifyContent: 'center',
             alignItems: 'center',
             textAlign: 'center',
-            backgroundColor: '#fcfff0',
           }}
         >
           {_charts}
@@ -149,27 +157,51 @@ function ContentView() {
           fontSize: 18,
           fontWeight: 'bold',
         }}
-        child={'Could not render charts'}
+        child={''}
       />
     );
-  }, [heights.chartPanelHeight, massSpecFilterOptions, width]);
+  }, [heights.chartPanelHeight, propertyFilterOptions, width]);
 
   const handleOnCollapse = useCallback((_collapsed: boolean) => {
     setIsCollapsed(_collapsed);
+    setSearchPanelWidth(_collapsed ? collapseButtonWidth : 450);
   }, []);
+
+  const handleOnSelectSort = useCallback(
+    (sortValue: ResultTableSortOption) => {
+      const _hits = sortHits(hits, sortValue);
+      setHits(_hits);
+    },
+    [hits],
+  );
+
+  const handleOnResize = useCallback(
+    (_searchPanelWidth: number) => {
+      if (!isCollapsed) {
+        setSearchPanelWidth(_searchPanelWidth);
+      }
+    },
+    [isCollapsed],
+  );
 
   const searchAndResultPanel = useMemo(() => {
     const searchPanel = (
       <CommonSearchPanel
-        items={MassSpecFilterOptionsMenuItems({
-          massSpecFilterOptions,
+        items={PropertyFilterOptionsMenuItems({
+          propertyFilterOptions,
         })}
         collapsed={isCollapsed}
         onCollapse={handleOnCollapse}
-        massSpecFilterOptions={massSpecFilterOptions}
+        propertyFilterOptions={propertyFilterOptions}
         onSubmit={handleOnSubmit}
         width={searchPanelWidth}
         height={heights.searchPanelHeight}
+        initialValues={{
+          ...(JSON.parse(
+            JSON.stringify(defaultSearchFieldValues),
+          ) as SearchFields),
+          propertyFilterOptions,
+        }}
       />
     );
 
@@ -179,16 +211,16 @@ function ContentView() {
         width={width}
         height={heights.searchPanelHeight}
         searchPanelWidth={searchPanelWidth}
-        searchPanelHeight={heights.searchPanelHeight}
         widthOverview={width}
         heightOverview={height}
-        reference={[]}
         hits={hits}
         isRequesting={isSearching}
+        onSort={handleOnSelectSort}
+        onResize={handleOnResize}
       />
     );
   }, [
-    massSpecFilterOptions,
+    propertyFilterOptions,
     isCollapsed,
     handleOnCollapse,
     handleOnSubmit,
@@ -198,6 +230,8 @@ function ContentView() {
     height,
     hits,
     isSearching,
+    handleOnSelectSort,
+    handleOnResize,
   ]);
 
   return useMemo(
@@ -210,6 +244,7 @@ function ContentView() {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
+          userSelect: 'none',
         }}
       >
         <Spin size="large" spinning={isFetchingContent} />
@@ -217,18 +252,22 @@ function ContentView() {
           style={{
             width: '100%',
             height: '100%',
-            display: isFetchingContent ? 'none' : 'flex',
-            flexDirection: 'column',
+            display: isFetchingContent ? 'none' : 'block',
+            overflow: 'scroll',
             justifyContent: 'center',
             alignItems: 'center',
+            backgroundColor: 'white',
           }}
         >
-          {charts}
           {searchAndResultPanel}
+          <SectionDivider label="Charts (Selection)" />
+          {charts}
+          <SectionDivider label="Information" />
+          <MetadataPanel metadata={metadata} />
         </Content>
       </Layout>
     ),
-    [charts, isFetchingContent, searchAndResultPanel],
+    [charts, isFetchingContent, metadata, searchAndResultPanel],
   );
 }
 

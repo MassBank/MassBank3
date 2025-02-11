@@ -1,16 +1,23 @@
 import { Molecule } from 'openchemlib';
 import { useCallback } from 'react';
 import { SmilesSvgRenderer } from 'react-ocl/minimal';
-import { saveAs } from 'file-saver';
+import FileSaver from 'file-saver';
+const { saveAs } = FileSaver;
 import ExportableContent from '../common/ExportableContent';
 
 interface InputProps {
   smiles: string;
   imageWidth: number;
   imageHeight: number;
+  disableExport?: boolean;
 }
 
-function StructureView({ smiles, imageWidth, imageHeight }: InputProps) {
+function StructureView({
+  smiles,
+  imageWidth,
+  imageHeight,
+  disableExport = false,
+}: InputProps) {
   const defaultButtonWidth = 30;
 
   const handleOnDownload = useCallback(() => {
@@ -26,18 +33,22 @@ function StructureView({ smiles, imageWidth, imageHeight }: InputProps) {
     saveAs(blob, 'structure_' + smiles + '.svg');
   }, [imageHeight, imageWidth, smiles]);
 
-  return (
+  const svgRenerer = (
+    <SmilesSvgRenderer
+      smiles={smiles}
+      width={imageWidth - defaultButtonWidth}
+      height={imageHeight}
+      autoCrop={true}
+      autoCropMargin={5}
+    />
+  );
+
+  return disableExport ? (
+    svgRenerer
+  ) : (
     <ExportableContent
       title="Download structure as SVG"
-      component={
-        <SmilesSvgRenderer
-          smiles={smiles}
-          width={imageWidth - defaultButtonWidth}
-          height={imageHeight}
-          autoCrop={true}
-          autoCropMargin={5}
-        />
-      }
+      component={svgRenerer}
       mode="download"
       onClick={handleOnDownload}
       width={imageWidth}

@@ -1,38 +1,35 @@
-import {
-  faBarcode,
-  faChartColumn,
-  faFlask,
-  faShareNodes,
-  faSignature,
-  faSliders,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Form, Input, InputNumber } from 'antd';
+import {
+  BarChartOutlined,
+  BarcodeOutlined,
+  DatabaseOutlined,
+  ShareAltOutlined,
+  SignatureOutlined,
+  SlidersOutlined,
+} from '@ant-design/icons';
 import SearchFields from '../../../../types/filterOptions/SearchFields';
 import PeakSearch from './searchPanel/peakSearch/PeakSearch';
-import MassSpecFilterOptionsMenuItems from './searchPanel/msSpecFilter/MassSpecFilterOptionsMenuItems';
+import PropertyFilterOptionsMenuItems from './searchPanel/msSpecFilter/PropertyFilterOptionsMenuItems';
 import StructuralEditor from '../../../basic/StructuralEditor';
 import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
 
 const peakListPattern =
-  /^(\d+(\.\d+)* \d+(\.\d+)*)(\n\d+(\.\d+)* \d+(\.\d+)*)*$/;
+  /^(\d+(\.\d+){0,1} \d+(\.\d+){0,1}( \d+(\.\d+){0,1}){0,1})(\n\d+(\.\d+){0,1} \d+(\.\d+){0,1}( \d+(\.\d+){0,1}){0,1})*$/;
 
 type InputProps = {
-  massSpecFilterOptions: ContentFilterOptions | undefined;
+  propertyFilterOptions: ContentFilterOptions | undefined;
   initialStructure: string;
-  width: number;
 };
 
 function SearchPanelMenuItems({
-  massSpecFilterOptions,
+  propertyFilterOptions,
   initialStructure,
-  width,
 }: InputProps) {
   return [
     {
-      key: 'basicSearchMenuItem',
-      label: 'Basic Search',
-      icon: <FontAwesomeIcon icon={faSliders} />,
+      key: 'compoundSearchFilterOptions',
+      label: 'Compound Search',
+      icon: <SlidersOutlined />,
       children: [
         {
           key: 'compoundName',
@@ -46,8 +43,8 @@ function SearchPanelMenuItems({
           },
           label: (
             <Form.Item<SearchFields>
-              label="Compound Name"
-              name={['basicSearchFilterOptions', 'compoundName']}
+              label="Name"
+              name={['compoundSearchFilterOptions', 'compoundName']}
               rules={[{ required: false }]}
               style={{
                 width: '100%',
@@ -58,6 +55,33 @@ function SearchPanelMenuItems({
               wrapperCol={{ span: 16 }}
             >
               <Input type="text" placeholder="Rutin" allowClear />
+            </Form.Item>
+          ),
+        },
+        {
+          key: 'compoundClass',
+          style: {
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginLeft: 0,
+          },
+          label: (
+            <Form.Item<SearchFields>
+              label="Class"
+              name={['compoundSearchFilterOptions', 'compoundClass']}
+              rules={[{ required: false }]}
+              style={{
+                width: '100%',
+                height: '100%',
+              }}
+              labelAlign="left"
+              labelCol={{ span: 8 }}
+              wrapperCol={{ span: 16 }}
+            >
+              <Input type="text" placeholder="Natural Product" allowClear />
             </Form.Item>
           ),
         },
@@ -73,8 +97,8 @@ function SearchPanelMenuItems({
           },
           label: (
             <Form.Item<SearchFields>
-              label="Molecular Formula"
-              name={['basicSearchFilterOptions', 'formula']}
+              label="Formula"
+              name={['compoundSearchFilterOptions', 'formula']}
               rules={[{ required: false }]}
               style={{
                 width: '100%',
@@ -101,7 +125,7 @@ function SearchPanelMenuItems({
           label: (
             <Form.Item<SearchFields>
               label="Exact Mass"
-              name={['basicSearchFilterOptions', 'exactMass']}
+              name={['compoundSearchFilterOptions', 'exactMass']}
               rules={[{ required: false }]}
               style={{
                 width: '100%',
@@ -128,7 +152,7 @@ function SearchPanelMenuItems({
           label: (
             <Form.Item<SearchFields>
               label="Mass Tolerance"
-              name={['basicSearchFilterOptions', 'massTolerance']}
+              name={['compoundSearchFilterOptions', 'massTolerance']}
               rules={[{ required: false }]}
               style={{
                 width: '100%',
@@ -142,19 +166,67 @@ function SearchPanelMenuItems({
             </Form.Item>
           ),
         },
+        {
+          key: 'compoundSearchFilterOptions.inchi.menuItem',
+          label: 'InChI',
+          icon: <SignatureOutlined />,
+          children: [
+            {
+              key: 'inchi',
+              style: {
+                width: '100%',
+                height: '100%',
+                marginLeft: 0,
+              },
+              label: (
+                <Form.Item<SearchFields>
+                  name={['compoundSearchFilterOptions', 'inchi']}
+                  rules={[{ required: false }]}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                  }}
+                >
+                  <Input
+                    type="text"
+                    placeholder="IKGXIBQEEMLURG-NVPNHPEKSA-N"
+                    allowClear
+                  />
+                </Form.Item>
+              ),
+            },
+          ],
+        },
+        {
+          key: 'compoundSearchFilterOptions.structure.menuItem',
+          label: 'Structure',
+          icon: <ShareAltOutlined />,
+          children: [
+            {
+              key: 'structure',
+              style: {
+                width: '100%',
+                height: 700,
+                marginLeft: 0,
+                overflow: 'scroll',
+              },
+              label: <StructuralEditor initialSMILES={initialStructure} />,
+            },
+          ],
+        },
       ],
     },
     {
-      key: 'peaksMenuItem',
-      label: 'Peaks',
-      icon: <FontAwesomeIcon icon={faChartColumn} />,
+      key: 'spectralSearchFilterOptions',
+      label: 'Spectral Search',
+      icon: <BarChartOutlined />,
       children: [
         {
-          key: 'similarityMenuItem',
-          label: 'Similarity',
+          key: 'spectralSearchFilterOptions.similarity.menuItem',
+          label: 'Similarity Search',
           children: [
             {
-              key: 'peakList',
+              key: 'similarityPeakList',
               style: {
                 width: '100%',
                 height: '100%',
@@ -166,7 +238,11 @@ function SearchPanelMenuItems({
               label: (
                 <Form.Item<SearchFields>
                   label="Peak List"
-                  name={['peaks', 'similarity', 'peakList']}
+                  name={[
+                    'spectralSearchFilterOptions',
+                    'similarity',
+                    'peakList',
+                  ]}
                   rules={[{ required: false, pattern: peakListPattern }]}
                   style={{
                     width: '100%',
@@ -185,7 +261,7 @@ function SearchPanelMenuItems({
               ),
             },
             {
-              key: 'threshold',
+              key: 'similarityThreshold',
               style: {
                 width: '100%',
                 height: '100%',
@@ -196,8 +272,12 @@ function SearchPanelMenuItems({
               },
               label: (
                 <Form.Item<SearchFields>
-                  label="Threshold"
-                  name={['peaks', 'similarity', 'threshold']}
+                  label="Score Threshold"
+                  name={[
+                    'spectralSearchFilterOptions',
+                    'similarity',
+                    'threshold',
+                  ]}
                   rules={[{ required: false }]}
                   style={{
                     width: '100%',
@@ -214,7 +294,7 @@ function SearchPanelMenuItems({
           ],
         },
         {
-          key: 'peakSearchMenuItem',
+          key: 'spectralSearchFilterOptions.peaks.menuItem',
           label: 'Peak Search',
           children: [
             {
@@ -242,7 +322,11 @@ function SearchPanelMenuItems({
               label: (
                 <Form.Item<SearchFields>
                   label="Mass Tolerance"
-                  name={['peaks', 'peaks', 'massTolerance']}
+                  name={[
+                    'spectralSearchFilterOptions',
+                    'peaks',
+                    'massTolerance',
+                  ]}
                   rules={[{ required: false }]}
                   style={{
                     width: '100%',
@@ -269,7 +353,7 @@ function SearchPanelMenuItems({
               label: (
                 <Form.Item<SearchFields>
                   label="Min. Intensity"
-                  name={['peaks', 'peaks', 'intensity']}
+                  name={['spectralSearchFilterOptions', 'peaks', 'intensity']}
                   rules={[{ required: false }]}
                   style={{
                     width: '100%',
@@ -286,18 +370,15 @@ function SearchPanelMenuItems({
           ],
         },
         {
-          key: 'peakDifferenceMenuItem',
-          label: 'Peak Difference',
+          key: 'neutralLoss.menuItem',
+          label: 'Neutral Loss Search',
           children: [
             {
-              key: 'peakDifference',
+              key: 'neutralLossSearch',
               style: {
                 width: '100%',
                 height: '100%',
                 marginLeft: 0,
-                // display: 'flex',
-                // justifyContent: 'center',
-                // alignItems: 'center',
                 textAlign: 'center',
                 color: 'orange',
               },
@@ -305,97 +386,44 @@ function SearchPanelMenuItems({
             },
           ],
         },
-      ],
-    },
-    {
-      key: 'inchiMenuItem',
-      label: 'InChI',
-      icon: <FontAwesomeIcon icon={faSignature} />,
-      children: [
         {
-          key: 'inchi',
-          style: {
-            width: '100%',
-            height: '100%',
-            marginLeft: 0,
-          },
-          label: (
-            <Form.Item<SearchFields>
-              name="inchi"
-              rules={[{ required: false }]}
-              style={{
+          key: 'spectralSearchFilterOptions.splash.menuItem',
+          label: 'SPLASH',
+          icon: <BarcodeOutlined />,
+          children: [
+            {
+              key: 'splash',
+              style: {
                 width: '100%',
                 height: '100%',
-              }}
-            >
-              <Input
-                type="text"
-                placeholder="IKGXIBQEEMLURG-NVPNHPEKSA-N"
-                allowClear
-              />
-            </Form.Item>
-          ),
+                marginLeft: 0,
+              },
+              label: (
+                <Form.Item<SearchFields>
+                  name={['spectralSearchFilterOptions', 'splash']}
+                  rules={[{ required: false }]}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                  }}
+                >
+                  <Input
+                    type="text"
+                    placeholder="splash10-0wmi-0009506000-98ca7f7c8f3072af4481"
+                    allowClear
+                  />
+                </Form.Item>
+              ),
+            },
+          ],
         },
       ],
     },
     {
-      key: 'splashMenuItem',
-      label: 'SPLASH',
-      icon: <FontAwesomeIcon icon={faBarcode} />,
-      children: [
-        {
-          key: 'splash',
-          style: {
-            width: '100%',
-            height: '100%',
-            marginLeft: 0,
-          },
-          label: (
-            <Form.Item<SearchFields>
-              name="splash"
-              rules={[{ required: false }]}
-              style={{
-                width: '100%',
-                height: '100%',
-              }}
-            >
-              <Input
-                type="text"
-                placeholder="splash10-0wmi-0009506000-98ca7f7c8f3072af4481"
-                allowClear
-              />
-            </Form.Item>
-          ),
-        },
-      ],
-    },
-    {
-      key: 'massSpecMenuItem',
-      label: 'Mass Spectrometry',
-      icon: <FontAwesomeIcon icon={faFlask} />,
-      children: MassSpecFilterOptionsMenuItems({ massSpecFilterOptions }),
-    },
-    {
-      key: 'structureMenuItem',
-      label: 'Structure',
-      icon: <FontAwesomeIcon icon={faShareNodes} />,
-      children: [
-        {
-          key: 'structure',
-          style: {
-            width: '100%',
-            height: 700,
-            marginLeft: 0,
-            overflow: 'scroll',
-          },
-          label: (
-            <StructuralEditor
-              width={width - 100}
-              initialSMILES={initialStructure}
-            />
-          ),
-        },
-      ],
+      key: 'propertyFilterOptions',
+      label: 'Property Filter',
+      icon: <DatabaseOutlined />,
+      children: PropertyFilterOptionsMenuItems({ propertyFilterOptions }),
     },
   ];
 }

@@ -20,6 +20,7 @@ function FilterTable({
 }: InputProps) {
   const formInstance = useFormInstance<SearchFields>();
   const { setFieldValue } = formInstance;
+  const [allSelected, setAllSelected] = useState<boolean>(true);
 
   const createOptions = useCallback((_filterOptions: ValueCount[]) => {
     return _filterOptions.map((vc) => {
@@ -35,8 +36,6 @@ function FilterTable({
     () => createOptions(filterOptions),
     [createOptions, filterOptions],
   );
-
-  const [allSelected, setAllSelected] = useState<boolean>(true);
 
   const handleOnSelectAll = useCallback(() => {
     setFieldValue(

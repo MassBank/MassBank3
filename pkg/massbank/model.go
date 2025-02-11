@@ -5,14 +5,15 @@ import (
 )
 
 type MbMetaData struct {
-	Commit        string `json:"git_commit"`
+	GitCommit        string `json:"git_commit"`
 	Version       string `json:"Version"`
 	Timestamp     string `json:"timestamp"`
 	SpectraCount  uint   `json:"spectra_count"`
 	CompoundCount uint   `json:"compound_count"`
-	ResultCount   *uint  `json:"result_count"`
-	Page          *uint  `json:"page"`
-	Limit         *uint  `json:"limit"`
+	CompoundName []string   `json:"compound_name"`
+	CompoundNameCount []uint   `json:"compound_name_count"`
+	CompoundClass []string   `json:"compound_class"`
+	CompoundClassCount []uint   `json:"compound_class_count"`
 }
 
 type SubtagProperty struct {
@@ -34,6 +35,7 @@ type CompoundProperties struct {
 	Smiles    *string             `mb2:"CH$SMILES" json:"smiles"`
 	InChI     *string             `mb2:"CH$IUPAC" json:"inchi"`
 	Link      *[]DatabaseProperty `mb2:"CH$LINK" optional:"true" json:"link"`
+	AtomCount *uint            	  `mb2:"CH$ATOM_COUNT" json:"atom_count"`
 }
 
 type SpeciesProperties struct {

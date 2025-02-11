@@ -1,24 +1,26 @@
 import { Content } from 'antd/es/layout/layout';
-import Sider from 'antd/es/layout/Sider';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import ResultTableSortOptionType from '../../types/ResultTableSortOptionType';
 import resultTableSortOptionValues from '../../constants/resultTableSortOptionValues';
 import ResultPanel from '../result/ResultPanel';
 import Hit from '../../types/Hit';
 import Peak from '../../types/peak/Peak';
-import { Spin } from 'antd';
+import { Spin, Splitter } from 'antd';
+import ResultTableSortOption from '../../types/ResultTableSortOption';
+import collapseButtonWidth from '../../constants/collapseButtonWidth';
 
 type InputProps = {
   searchPanel: JSX.Element;
   width: number;
   height: number;
   searchPanelWidth: number;
-  searchPanelHeight: number;
   widthOverview: number;
   heightOverview: number;
-  reference: Peak[];
   hits: Hit[];
   isRequesting: boolean;
+  reference?: Peak[];
+  onSort: (sortValue: ResultTableSortOption) => void;
+  onResize: (searchPanelWidth: number) => void;
 };
 
 function SearchAndResultPanel({
@@ -26,18 +28,25 @@ function SearchAndResultPanel({
   width,
   height,
   searchPanelWidth,
-  searchPanelHeight,
   widthOverview,
   heightOverview,
-  reference,
   hits,
   isRequesting,
+  reference = [],
+  onSort,
+  onResize,
 }: InputProps) {
-  const [innerHits, setInnerHits] = useState<Hit[]>([]);
+  const [panelWidths, setPanelWidths] = useState<{
+    searchPanel: number;
+    resultPanel: number;
+  }>({ searchPanel: 0, resultPanel: 0 });
 
   useEffect(() => {
-    setInnerHits(hits);
-  }, [hits]);
+    setPanelWidths({
+      searchPanel: searchPanelWidth,
+      resultPanel: width - searchPanelWidth,
+    });
+  }, [searchPanelWidth, width]);
 
   const sortOptions = useMemo(() => {
     const _sortOptions: ResultTableSortOptionType[] = [];
@@ -63,75 +72,19 @@ function SearchAndResultPanel({
   }, []);
 
   const handleOnSelectSort = useCallback(
-    (value: string) => {
-      const _hits = [...hits];
-      _hits.sort((a, b) => {
-        if (value === 'index') {
-          return a.index - b.index;
-        } else if (value === 'index_desc') {
-          return b.index - a.index;
-        } else if (value === 'score') {
-          return b.score !== undefined && a.score !== undefined
-            ? b.score - a.score
-            : 0;
-        } else if (value === 'score_asc') {
-          return a.score !== undefined && b.score !== undefined
-            ? a.score - b.score
-            : 0;
-        } else if (value === 'accession') {
-          return a.accession.localeCompare(b.accession, undefined, {
-            sensitivity: 'variant',
-          });
-        } else if (value === 'accession_desc') {
-          return b.accession.localeCompare(a.accession, undefined, {
-            sensitivity: 'variant',
-          });
-        } else if (value === 'title') {
-          return a.record !== undefined && b.record !== undefined
-            ? a.record.title.localeCompare(b.record.title, undefined, {
-                sensitivity: 'variant',
-              })
-            : 0;
-        } else if (value === 'title_desc') {
-          return b.record !== undefined && a.record !== undefined
-            ? b.record.title.localeCompare(a.record.title, undefined, {
-                sensitivity: 'variant',
-              })
-            : 0;
-        }
-
-        return 0;
-      });
-
-      setInnerHits(_hits);
+    (sortValue: ResultTableSortOption) => {
+      onSort(sortValue);
     },
-    [hits],
+    [onSort],
   );
 
-  const resultPanel = useMemo(() => {
-    return (
-      <ResultPanel
-        reference={reference}
-        hits={innerHits}
-        width={width - searchPanelWidth}
-        height={searchPanelHeight}
-        sortOptions={sortOptions}
-        onSort={handleOnSelectSort}
-        widthOverview={widthOverview}
-        heightOverview={heightOverview}
-      />
-    );
-  }, [
-    handleOnSelectSort,
-    heightOverview,
-    innerHits,
-    reference,
-    searchPanelHeight,
-    searchPanelWidth,
-    sortOptions,
-    width,
-    widthOverview,
-  ]);
+  const handleOnResize = useCallback(
+    (sizes: number[]) => {
+      const _searchPanelWidth = sizes[0];
+      onResize(_searchPanelWidth);
+    },
+    [onResize],
+  );
 
   return useMemo(
     () => (
@@ -145,32 +98,73 @@ function SearchAndResultPanel({
           userSelect: 'none',
         }}
       >
-        <Sider width={searchPanelWidth}>{searchPanel}</Sider>
-        <Content
-          style={{
-            width: width - searchPanelWidth,
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Spin size="large" spinning={isRequesting} />
-          <Content
-            style={{
-              width: width - searchPanelWidth,
-              height: '100%',
-              display: isRequesting ? 'none' : 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
+        <Splitter style={{ width, height }} onResize={handleOnResize}>
+          <Splitter.Panel
+            size={panelWidths.searchPanel}
+            min={200 + collapseButtonWidth}
+            max={500}
           >
-            {resultPanel}
-          </Content>
-        </Content>
+            {searchPanel}
+          </Splitter.Panel>
+          <Splitter.Panel
+            size={panelWidths.resultPanel}
+            min={500}
+            resizable={panelWidths.searchPanel !== collapseButtonWidth}
+          >
+            <Content
+              style={{
+                width: panelWidths.resultPanel,
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Spin size="large" spinning={isRequesting} />
+              {!isRequesting && (
+                <Content
+                  style={{
+                    width: width - searchPanelWidth,
+                    height: '100%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <ResultPanel
+                    reference={reference}
+                    hits={hits}
+                    width={width - searchPanelWidth}
+                    height={height}
+                    sortOptions={sortOptions}
+                    onSort={handleOnSelectSort}
+                    widthOverview={widthOverview}
+                    heightOverview={heightOverview}
+                  />
+                </Content>
+              )}
+            </Content>
+          </Splitter.Panel>
+        </Splitter>
       </Content>
     ),
-    [height, isRequesting, resultPanel, searchPanel, searchPanelWidth, width],
+    [
+      width,
+      height,
+      handleOnResize,
+      panelWidths.searchPanel,
+      panelWidths.resultPanel,
+      searchPanel,
+      isRequesting,
+      searchPanelWidth,
+      reference,
+      hits,
+      sortOptions,
+      handleOnSelectSort,
+      widthOverview,
+      heightOverview,
+    ],
   );
 }
 

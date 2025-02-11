@@ -2,10 +2,10 @@ import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import ResultTable from './ResultTable';
 import Hit from '../../types/Hit';
 import Peak from '../../types/peak/Peak';
-import Record from '../../types/Record';
+import Record from '../../types/record/Record';
 import generateID from '../../utils/generateID';
 import Placeholder from '../basic/Placeholder';
-import fetchData from '../../utils/fetchData';
+import fetchData from '../../utils/request/fetchData';
 import {
   Button,
   Dropdown,
@@ -19,7 +19,10 @@ import { Content } from 'antd/es/layout/layout';
 import SpectralHitsCarouselView from '../routes/pages/search/SpectralHitsCarouselView';
 import ResultTableSortOptionType from '../../types/ResultTableSortOptionType';
 import axios from 'axios';
-import { saveAs } from 'file-saver';
+import FileSaver from 'file-saver';
+import { usePropertiesContext } from '../../context/properties/properties';
+import ResultTableSortOption from '../../types/ResultTableSortOption';
+const { saveAs } = FileSaver;
 
 type InputProps = {
   reference?: Peak[];
@@ -27,8 +30,7 @@ type InputProps = {
   width: number;
   height: number;
   sortOptions?: ResultTableSortOptionType[];
-  // eslint-disable-next-line no-unused-vars
-  onSort?: (value: string) => void;
+  onSort?: (value: ResultTableSortOption) => void;
   widthOverview?: number;
   heightOverview?: number;
 };
@@ -43,12 +45,14 @@ function ResultPanel({
   widthOverview = width,
   heightOverview = height,
 }: InputProps) {
+  const { backendUrl, exportServiceUrl } = usePropertiesContext();
+
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [slideIndex, setSlideIndex] = useState<number>(0);
   const [resultPageIndex, setResultPageIndex] = useState<number>(0);
   const [selectedSortOption, setSelectedSortOption] = useState<
-    string | undefined
+    ResultTableSortOption | undefined
   >();
   const [hitsWithRecords, setHitsWithRecords] = useState<Hit[] | undefined>();
 
@@ -98,19 +102,18 @@ function ResultPanel({
 
       const records: (Record | undefined)[] = [];
       for (const accession of accessions) {
-        const url =
-          import.meta.env.VITE_MB3_API_URL +
-          '/v1/records/' +
-          accession +
-          '/simple';
+        const url = backendUrl + '/v1/records/' + accession + '/simple';
 
         const record = await fetchData(url);
 
         if (record) {
-          record.peak.peak.values = record.peak.peak.values.map((p) => ({
-            ...p,
-            id: generateID(),
-          }));
+          record.peak.peak.values = record.peak.peak.values.map(
+            (p: Peak) =>
+              ({
+                ...p,
+                id: generateID(),
+              }) as Peak,
+          );
           records.push(record);
         } else {
           records.push(undefined);
@@ -125,19 +128,16 @@ function ResultPanel({
 
     setHitsWithRecords(_hitsWithRecords);
     setIsRequesting(false);
-  }, [resultTableData, resultPageIndex]);
+  }, [resultTableData, resultPageIndex, backendUrl]);
 
   useEffect(() => {
     fetchRecords();
   }, [fetchRecords]);
 
-  const handleOnDoubleClick = useCallback(
-    (_slideIndex: number) => {
-      setSlideIndex(_slideIndex % pageLimit);
-      setShowModal(true);
-    },
-    [setShowModal],
-  );
+  const handleOnDoubleClick = useCallback((_slideIndex: number) => {
+    setSlideIndex(_slideIndex % pageLimit);
+    setShowModal(true);
+  }, []);
 
   const resultTable = useMemo(
     () => (
@@ -198,7 +198,7 @@ function ResultPanel({
   );
 
   const handleOnSelect = useCallback(
-    (value: string) => {
+    (value: ResultTableSortOption) => {
       setSelectedSortOption(value);
       onSort(value);
     },
@@ -208,7 +208,7 @@ function ResultPanel({
   const handleOnDownloadResult = useCallback(
     async (format: string) => {
       setIsRequesting(true);
-      const host = import.meta.env.VITE_EXPORT_SERVICE_URL;
+      const host = exportServiceUrl;
       const url = `${host}/convert`;
 
       const resp = await axios.post(
@@ -236,7 +236,7 @@ function ResultPanel({
 
       setIsRequesting(false);
     },
-    [hits],
+    [exportServiceUrl, hits],
   );
 
   const buildDownloadOptionLabel = useCallback(
@@ -284,6 +284,7 @@ function ResultPanel({
         }}
       >
         <Pagination
+          size="small"
           total={hits.length}
           pageSize={pageLimit}
           showTotal={(total) => (
@@ -311,12 +312,14 @@ function ResultPanel({
             width: '100%',
             height: '100%',
             display: 'flex',
-            justifyContent: 'space-around',
+            justifyContent: 'center',
             alignItems: 'center',
+            textWrap: 'nowrap',
           }}
         />
         {sortOptions.length > 0 && (
           <Select
+            size="small"
             defaultValue={selectedSortOption}
             style={{ width: 200 }}
             placeholder="Sort by"
@@ -333,6 +336,7 @@ function ResultPanel({
 
         <Dropdown menu={{ items }} trigger={['click']}>
           <Button
+            size="small"
             style={{
               width: 100,
               marginRight: 30,
@@ -362,7 +366,7 @@ function ResultPanel({
             <Content
               style={{
                 width: '100%',
-                height,
+                height: '100%',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',

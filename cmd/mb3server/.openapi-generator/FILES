@@ -29,6 +29,7 @@ src/model_mb_record_peak_peak.go
 src/model_mb_record_peak_peak_values_inner.go
 src/model_mb_record_species.go
 src/model_metadata.go
+src/model_metadata_compound_class_inner.go
 src/model_ms_data_processing_inner.go
 src/model_ms_focused_ion_inner.go
 src/model_search_result.go

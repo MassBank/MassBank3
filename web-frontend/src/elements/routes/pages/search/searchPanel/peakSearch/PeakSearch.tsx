@@ -1,8 +1,7 @@
-import { MouseEvent, useCallback, useMemo, useState } from 'react';
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import PeakSearchRow from './PeakSearchRow';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMinusCircle, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { Button, Col, Row } from 'antd';
+import { MinusCircleFilled, PlusCircleFilled } from '@ant-design/icons';
 import SearchFields from '../../../../../../types/filterOptions/SearchFields';
 import PeakSearchPeakType from '../../../../../../types/filterOptions/PeakSearchPeakType';
 import useFormInstance from 'antd/es/form/hooks/useFormInstance';
@@ -11,28 +10,54 @@ import { Content } from 'antd/es/layout/layout';
 function PeakSearch(): JSX.Element {
   const formInstance = useFormInstance<SearchFields>();
   const { getFieldValue, setFieldValue } = formInstance;
-  const [peakSearchRows, setPeakSearchRows] = useState<JSX.Element[]>([
-    <PeakSearchRow index={0} key={'peak-search-row-0'} />,
-  ]);
+  const [peakSearchRows, setPeakSearchRows] = useState<JSX.Element[]>([]);
+
+  useEffect(() => {
+    const p = getFieldValue([
+      'spectralSearchFilterOptions',
+      'peaks',
+      'peaks',
+    ]) as PeakSearchPeakType[] | undefined;
+
+    if (p && p.length > 0) {
+      setPeakSearchRows(
+        p.map((_, i) => (
+          <PeakSearchRow index={i} key={'peak-search-row-' + i} />
+        )),
+      );
+    } else {
+      setPeakSearchRows([
+        <PeakSearchRow index={0} key={'peak-search-row-0'} />,
+      ]);
+    }
+  }, [getFieldValue]);
+
   const handleOnDelete = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
 
       if (peakSearchRows.length > 1) {
-        const peaks = getFieldValue(['peaks', 'peaks', 'peaks']) as
-          | PeakSearchPeakType[]
-          | undefined;
+        const peaks = getFieldValue([
+          'spectralSearchFilterOptions',
+          'peaks',
+          'peaks',
+        ]) as PeakSearchPeakType[] | undefined;
 
-        if (peaks) {
+        if (peaks && peakSearchRows.length === peaks.length) {
           peaks.pop();
+
+          setFieldValue(
+            ['spectralSearchFilterOptions', 'peaks', 'peaks'],
+            peaks,
+          );
         }
-        setFieldValue(['peaks', 'peaks', 'peaks'], peaks);
+
         const _rows = [...peakSearchRows];
         _rows.pop();
         setPeakSearchRows(_rows);
       } else {
-        setFieldValue(['peaks', 'peaks', 'peaks'], []);
+        setFieldValue(['spectralSearchFilterOptions', 'peaks', 'peaks'], []);
         setPeakSearchRows([
           <PeakSearchRow index={0} key={'peak-search-row-0'} />,
         ]);
@@ -65,15 +90,13 @@ function PeakSearch(): JSX.Element {
           alignItems: 'center',
         }}
       >
-        <Col span={6}></Col>
-        <Col span={6}>
+        <Col span={4}></Col>
+        <Col span={9}>
           <Button
             children={
-              <FontAwesomeIcon
-                icon={faPlusCircle}
+              <PlusCircleFilled
                 title={'Add a new m/z value'}
-                color="green"
-                size="lg"
+                style={{ color: 'green' }}
               />
             }
             onClick={handleOnAdd}
@@ -86,15 +109,13 @@ function PeakSearch(): JSX.Element {
             }}
           />
         </Col>
-        <Col span={6}></Col>
-        <Col span={6}>
+        <Col span={4}></Col>
+        <Col span={7}>
           <Button
             children={
-              <FontAwesomeIcon
-                icon={faMinusCircle}
+              <MinusCircleFilled
                 title={'Remove last m/z value'}
-                color="red"
-                size="lg"
+                style={{ color: 'red' }}
               />
             }
             onClick={handleOnDelete}
@@ -119,10 +140,10 @@ function PeakSearch(): JSX.Element {
         }}
       >
         <Row key="peak-search-header">
-          <Col span={6}>Peak</Col>
-          <Col span={6}>Mass</Col>
-          <Col span={6}></Col>
-          <Col span={6}>Formula</Col>
+          <Col span={4}>Peak</Col>
+          <Col span={9}>Mass</Col>
+          <Col span={4}></Col>
+          <Col span={7}>Formula</Col>
         </Row>
         {rows}
       </Content>

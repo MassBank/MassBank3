@@ -5,11 +5,11 @@ import {
   CSSProperties,
   KeyboardEvent,
   useCallback,
-  useEffect,
   useState,
 } from 'react';
 import { createSearchParams, useNavigate } from 'react-router-dom';
 import routes from '../../constants/routes';
+import { usePropertiesContext } from '../../context/properties/properties';
 
 type InputProps = {
   width: CSSProperties['width'];
@@ -22,12 +22,9 @@ function AccessionSearchInputField({
   height,
   accession: acc,
 }: InputProps) {
-  const [accession, setAccession] = useState<string>('');
+  const [accession, setAccession] = useState<string>(acc ?? '');
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setAccession(acc ?? '');
-  }, [acc]);
+  const { baseUrl } = usePropertiesContext();
 
   const handleOnChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -39,10 +36,10 @@ function AccessionSearchInputField({
   const handleOnClick = useCallback(
     () =>
       navigate({
-        pathname: routes.accession.path,
+        pathname: baseUrl + routes.accession.path,
         search: `?${createSearchParams({ id: accession })}`,
       }),
-    [accession, navigate],
+    [accession, baseUrl, navigate],
   );
 
   const handleOnKeyDown = useCallback(

@@ -15,10 +15,11 @@ type Filters struct {
 	Splash            string
 	MsType            *[]massbank.MsType
 	IonMode           massbank.IonMode
-	CompoundName      string //regex
+	CompoundName      string 
+	CompoundClass     string
 	Mass              *float64
 	MassEpsilon       *float64
-	Formula           string // regex
+	Formula           string
 	Peaks             *[]float64
 	PeakDifferences   *[]float64
 	Inchi          	  string
@@ -152,14 +153,14 @@ type MB3Database interface {
 	// GetSimpleRecords Get an array of MassBank records by filtering
 	//
 	// Will return an empty list if the filter does not match any records.
-	GetSearchResults(filters Filters) (*[]string, error)
+	GetSearchResults(filters Filters) (*[]string, *[]int32, error)
 
 	// GetRecordsBySubstructure Get an array of MassBank accessions by filtering by substructure
 	//
 	// Will return an empty list if the filter does not match any records.
-	GetAccessionsBySubstructure(substructure string) ([]string, error)
+	GetAccessionsBySubstructure(substructure string) ([]string, []int32, error)
 
-	GetAccessionsByFilterOptions(filters Filters) ([]string, error)
+	GetAccessionsByFilterOptions(filters Filters) ([]string, []int32, error)
 
 	// GetRecordsBySubstructure Get an array of MassBank records by filtering by substructure
 	//
@@ -169,7 +170,7 @@ type MB3Database interface {
 	// GetUniqueValues is used to get the values for filter frontend
 	GetUniqueValues(filters Filters) (MB3Values, error)
 
-	GetMetaData() (*MB3MetaData, error)
+	GetMetadata() (*massbank.MbMetaData, error)
 
 	// UpdateMetadata updates the metadata describing the MassBank version.
 	// Provides the database id of an existing entry if it is already in the

@@ -1,103 +1,116 @@
 import './Header.scss';
 
 import routes from '../../constants/routes';
-import { Link, useLocation } from 'react-router-dom';
 import { Button, Menu, MenuProps } from 'antd';
 import { Header as HeaderAntD } from 'antd/es/layout/layout';
+import { Link, useLocation } from 'react-router-dom';
+import { usePropertiesContext } from '../../context/properties/properties';
+import { CSSProperties, useMemo } from 'react';
+import logo from '../../assets/logo.svg';
 
-function Header() {
+const backgroundColor: CSSProperties['backgroundColor'] = 'white';
+
+type InputProps = {
+  height: CSSProperties['height'];
+};
+
+function Header({ height }: InputProps) {
   const location = useLocation();
-
-  const url = import.meta.env.VITE_MB3_BASE_URL;
+  const { baseUrl } = usePropertiesContext();
 
   type MenuItem = Required<MenuProps>['items'][number];
 
-  const logoLink: MenuItem = {
-    key: 'logo-link',
-    label: (
-      <Button
-        key="logo-li"
-        style={{
-          border: 'none',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          boxShadow: 'none',
-        }}
-      >
-        <Link to={url} target="_self">
-          <img
-            src={import.meta.env.VITE_MB3_BASE_URL + '/logos/logo.svg'}
-            alt="MassBank Europe"
-            style={{ height: 50 }}
-          />
-        </Link>
-      </Button>
-    ),
-  };
+  const logoLink: MenuItem = useMemo(() => {
+    return {
+      key: 'logo-link',
+      label: (
+        <Button
+          type="link"
+          key="logo-li"
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: `calc(${height} - 5px)`,
+            backgroundColor,
+          }}
+        >
+          <Link to={baseUrl} target="_self">
+            <img
+              src={logo}
+              alt="MassBank Europe"
+              style={{ height: (height as number) - 5 }}
+            />
+          </Link>
+        </Button>
+      ),
+    };
+  }, [baseUrl, height]);
 
-  const routeLinks: MenuItem[] = Object.values(routes)
-    .filter(
-      (route) =>
-        route.id !== routes.notFound.id &&
-        route.id !== routes.home.id &&
-        route.id !== routes.accessionPrevious.id &&
-        route.id !== routes.sitemap.id,
-    )
-    .map((route) => {
-      return {
-        key: route.path,
-        label: (
-          <Button
-            key={route.path + '-li'}
-            style={{
-              border: 'none',
-              boxShadow: 'none',
-            }}
-          >
-            <Link
-              to={route.path as string}
-              style={
-                route.path == location.pathname
-                  ? { color: 'blue', fontSize: 16 }
-                  : { fontSize: 16 }
-              }
-            >
-              {route.label}
-            </Link>
-          </Button>
-        ),
-      } as MenuItem;
-    });
+  const routeLinks: MenuItem[] = useMemo(
+    () =>
+      Object.values(routes)
+        .filter(
+          (route) =>
+            route.id !== routes.notFound.id &&
+            route.id !== routes.home.id &&
+            route.id !== routes.accessionNext.id,
+        )
+        .map((route) => {
+          const path = baseUrl + route.path;
+          return {
+            key: path,
+            label: (
+              <a href={path} target="_self">
+                <Button
+                  type="link"
+                  key={path + '-li'}
+                  style={{
+                    color: path == location.pathname ? 'blue' : 'black',
+                    height: `calc(${height} - 5px)`,
+                    backgroundColor,
+                  }}
+                >
+                  {route.label}
+                </Button>
+              </a>
+            ),
+          } as MenuItem;
+        }),
+    [baseUrl, height, location.pathname],
+  );
 
-  const items: MenuItem[] = [logoLink, ...routeLinks];
-
-  return (
-    <HeaderAntD
-      style={{
-        width: '100%',
-        height: 60,
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'white',
-      }}
-    >
-      <Menu
-        mode="horizontal"
-        defaultSelectedKeys={['logo-link']}
-        items={items}
+  return useMemo(() => {
+    const items = [logoLink, ...routeLinks];
+    return (
+      <HeaderAntD
         style={{
           width: '100%',
-          height: 60,
+          height,
           display: 'flex',
-          justifyContent: 'space-evenly',
+          flexDirection: 'row',
+          justifyContent: 'center',
           alignItems: 'center',
+          backgroundColor,
+          padding: 0,
         }}
-      />
-    </HeaderAntD>
-  );
+      >
+        <Menu
+          mode="horizontal"
+          defaultSelectedKeys={['logo-link']}
+          items={items}
+          style={{
+            width: '100%',
+            height,
+            display: 'flex',
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+            backgroundColor,
+          }}
+        />
+      </HeaderAntD>
+    );
+  }, [height, logoLink, routeLinks]);
 }
 
 export default Header;

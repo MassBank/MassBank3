@@ -1,7 +1,7 @@
 import Layout, { Content, Header } from 'antd/es/layout/layout';
 import { useRef } from 'react';
-import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
+import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
 
 const accessionSearchInputFieldHeight = 50;
 

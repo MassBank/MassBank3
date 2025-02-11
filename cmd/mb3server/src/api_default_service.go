@@ -46,28 +46,35 @@ func (s *DefaultAPIService) GetCount(ctx context.Context) (ImplResponse, error) 
 }
 
 // GetMetadata - get massbank metadata
-func (s *DefaultAPIService) GetMetadata(ctx context.Context) (ImplResponse, error) {
-	// TODO - update GetMetadata with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, Metadata{}) or use other options such as http.Ok ...
-	//return Response(200, Metadata{}), nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("GetMetadata method not implemented")
+func (s *DefaultAPIService) GetMetadata(ctx context.Context) (ImplResponse, error) {	
+	metadata, err := GetMetadata()
+	if err != nil {
+		return Response(http.StatusInternalServerError, nil), err
+	}
+	return Response(200, metadata), err
 }
 
 // GetRecord - Get a MassBank record
 func (s *DefaultAPIService) GetRecord(ctx context.Context, accession string) (ImplResponse, error) {
-	// TODO - update GetRecord with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
 	record, err := GetRecord(accession)
+	if err != nil {
+		return Response(http.StatusInternalServerError, nil), err
+	}
 	return Response(200, record), err
 }
 
 // GetRecords - Get a list of records
-func (s *DefaultAPIService) GetRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, inchi string, inchiKey string, contributor []string) (ImplResponse, error) {
-	result, err := GetRecords(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, inchi, inchiKey, contributor)
+func (s *DefaultAPIService) GetRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, compoundClass string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, inchi string, inchiKey string, contributor []string) (ImplResponse, error) {
+	result, err := GetRecords(instrumentType, splash, msType, ionMode, compoundName, compoundClass, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, inchi, inchiKey, contributor)
+	if err != nil {
+		return Response(http.StatusInternalServerError, nil), err
+	}
+	return Response(200, result), nil
+}
+
+// GetRecords - Get a list of records
+func (s *DefaultAPIService) GetVersion(ctx context.Context) (ImplResponse, error) {
+	result, err := GetVersion()
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), err
 	}
@@ -98,8 +105,8 @@ func (s *DefaultAPIService) GetSimpleRecord(ctx context.Context, accession strin
 }
 
 // GetSimpleRecords - Get a list of records
-func (s *DefaultAPIService) GetSearchResults(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, peakListThreshold float64, inchi string, inchiKey string, contributor []string, substructure string) (ImplResponse, error) {
-	result, err := GetSearchResults(instrumentType, splash, msType, ionMode, compoundName, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, peakListThreshold, inchi, inchiKey, contributor, substructure)
+func (s *DefaultAPIService) GetSearchResults(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, compoundClass string,exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, peakListThreshold float64, inchi string, inchiKey string, contributor []string, substructure string) (ImplResponse, error) {
+	result, err := GetSearchResults(instrumentType, splash, msType, ionMode, compoundName, compoundClass, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, peakListThreshold, inchi, inchiKey, contributor, substructure)
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), err
 	}

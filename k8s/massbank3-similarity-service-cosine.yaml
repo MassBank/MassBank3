@@ -26,6 +26,16 @@ spec:
       labels:
         app: massbank3-similarity-service-cosine # Label des Pods muss/ sollte mit (*) übereinstimmen
     spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - massbank3-server
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: massbank3-similarity-service-cosine
           image: quay.io/massbank/massbank3-similarity-service:v1.0-matchms-0.28.2 # Container Image

@@ -3,7 +3,7 @@ import Chart from '../basic/Chart';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Peak from '../../types/peak/Peak';
-import Record from '../../types/Record';
+import Record from '../../types/record/Record';
 import getLinkedAnnotations from '../../utils/getLinkedAnnotations';
 import LinkedPeakAnnotation from '../../types/peak/LinkedPeakAnnotation';
 import { Content } from 'antd/es/layout/layout';
@@ -160,7 +160,7 @@ function Resizable({
     ],
   );
 
-  const resizable = useMemo(
+  return useMemo(
     () => (
       <Splitter style={{ width, height }} onResize={resize}>
         <Splitter.Panel
@@ -198,8 +198,6 @@ function Resizable({
       width,
     ],
   );
-
-  return resizable;
 }
 
 export default Resizable;

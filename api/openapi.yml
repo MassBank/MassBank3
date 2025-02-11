@@ -36,6 +36,11 @@ paths:
         description: Filter by compound name
         schema:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/CompoundName"
+      - in: query
+        name: compound_class
+        description: Filter by compound class
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/CompoundClass"
         required: false
       - in: query
         name: exact_mass
@@ -138,6 +143,12 @@ paths:
         description: Filter by compound name
         schema:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/CompoundName"
+        required: false
+      - in: query
+        name: compound_class
+        description: Filter by compound class
+        schema:
+          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/CompoundClass"
         required: false
       - in: query
         name: exact_mass
@@ -314,6 +325,19 @@ paths:
             application/json:
               schema:
                 $ref: "./schemas/FilterOptions.yaml#/components/schemas/Metadata"
+
+  /version:
+    get:
+      summary: get API version
+      operationId: getVersion
+      responses:
+        "200":
+          description: "Version for MassBank API with timestamp of build"
+          content:
+            application/json:
+              schema:
+                type: string
+                example: MassBank API service 0.1, 2025-01-22T14:20:57+01:00
 
   /similarity:
     parameters:

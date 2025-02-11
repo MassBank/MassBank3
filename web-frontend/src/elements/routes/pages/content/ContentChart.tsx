@@ -1,20 +1,30 @@
 import './ContentChart.scss';
 
-import { useMemo } from 'react';
+import { CSSProperties, useMemo } from 'react';
 import {
   splitStringAndCapitaliseFirstLetter,
   splitStringAndJoin,
 } from '../../../../utils/stringUtils';
 import ValueCount from '../../../../types/ValueCount';
 import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
-import { Pie } from '@ant-design/plots';
 import { Content } from 'antd/es/layout/layout';
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Colors,
+  Legend,
+  Title,
+  Tooltip,
+} from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
+
+ChartJS.register(ArcElement, Colors, Legend, Title, Tooltip);
 
 type InputProps = {
   content: ContentFilterOptions;
   identifier: string;
-  width: number;
-  height: number;
+  width: CSSProperties['width'];
+  height: CSSProperties['height'];
 };
 
 function ContentChart({ content, identifier, width, height }: InputProps) {
@@ -53,26 +63,13 @@ function ContentChart({ content, identifier, width, height }: InputProps) {
     );
     const counts = contentValueCounts.map((vc) => vc.count);
 
-    const data = labels.map((label, i) => {
-      return {
-        type: label,
-        value: counts[i],
-      };
-    });
-
-    const config = {
-      data,
-      angleField: 'value',
-      colorField: 'type',
-      innerRadius: 0.3,
-      label: {
-        text: 'type',
-        position: 'outside',
-      },
-      legend: false,
-      width,
-      height: height - 20,
-      padding: 10,
+    const data = {
+      labels,
+      datasets: [
+        {
+          data: labels.map((_, i) => counts[i]),
+        },
+      ],
     };
 
     return (
@@ -81,24 +78,39 @@ function ContentChart({ content, identifier, width, height }: InputProps) {
           width,
           height,
           display: 'flex',
-          flexDirection: 'column',
+          // flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
+          padding: 0,
+          margin: 0,
         }}
       >
-        <p
-          style={{
-            width,
-            height: 20,
-            margin: 0,
-            marginTop: 5,
-            fontWeight: 'bolder',
+        <Doughnut
+          data={data}
+          width={width}
+          height={height}
+          options={{
+            maintainAspectRatio: false,
+            aspectRatio: 1,
+            plugins: {
+              title: {
+                display: true,
+                text:
+                  (itemCount > topN ? 'Top ' + topN + ' of ' : '') +
+                  splitStringAndCapitaliseFirstLetter(identifier, '_', ' '),
+                fullSize: true,
+                font: {
+                  size: 18,
+                  weight: 'bold',
+                },
+              },
+              legend: {
+                display: true,
+                position: 'right',
+              },
+            },
           }}
-        >
-          {(itemCount > topN ? 'Top ' + topN + ' of ' : '') +
-            splitStringAndCapitaliseFirstLetter(identifier, '_', ' ')}
-        </p>
-        <Pie {...config} />
+        />
       </Content>
     );
   }, [content, height, identifier, width]);

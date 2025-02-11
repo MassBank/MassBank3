@@ -32,6 +32,16 @@ spec:
       labels:
         app: massbank3-server  # Label des Pods muss/ sollte mit (*) übereinstimmen
     spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - massbank3-server
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: massbank3-server
           image: ipbhalle/massbank3-server:dev  # Container Image
@@ -75,5 +85,5 @@ spec:
                 name: massbank3-server-service
                 port:
                   number: 8080
-            path: /MassBank3-api(/|$)(.*)
+            path: /MassBank-api(/|$)(.*)
             pathType: ImplementationSpecific

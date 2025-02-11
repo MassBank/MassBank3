@@ -667,7 +667,7 @@ func TestMB3Database_UpdateMetadata(t *testing.T) {
 			{
 				db.name + " insert existing",
 				args{metaData: massbank.MbMetaData{
-					Commit:    "1e112e6777e453f54d8e3b3f6cac0f193d53fa38",
+					GitCommit:    "1e112e6777e453f54d8e3b3f6cac0f193d53fa38",
 					Version:   "2022.12",
 					Timestamp: "2023-02-02T13:35:54+01:00",
 				}},
@@ -677,7 +677,7 @@ func TestMB3Database_UpdateMetadata(t *testing.T) {
 			{
 				db.name + " insert new",
 				args{metaData: massbank.MbMetaData{
-					Commit:    "1e112e6777e412344d8e3b3f6cac0f193d53fa38",
+					GitCommit:    "1e112e6777e412344d8e3b3f6cac0f193d53fa38",
 					Version:   "2023.1",
 					Timestamp: "2023-03-02T18:35:54+01:00",
 				}},

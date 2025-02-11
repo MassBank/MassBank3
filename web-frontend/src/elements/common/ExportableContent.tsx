@@ -1,11 +1,10 @@
-import {
-  faCopy,
-  faFileArrowDown,
-  faMagnifyingGlass,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button } from 'antd';
 import { Content } from 'antd/es/layout/layout';
+import {
+  CopyOutlined,
+  DownloadOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import {
   CSSProperties,
   MouseEvent,
@@ -16,10 +15,21 @@ import {
 } from 'react';
 import useContainerDimensions from '../../utils/useContainerDimensions';
 
-const defaultButtonWidth = 20;
-const defaultButtonHeight = 20;
+const defaultButtonWidth = 25;
+const defaultButtonHeight = 25;
 const marginLeftButtonsContainer = 15;
 const marginLeftSearchButton = 10;
+
+const toolButtonStyle: CSSProperties = {
+  width: defaultButtonWidth,
+  height: defaultButtonHeight,
+  padding: 0,
+  margin: 0,
+  cursor: 'pointer',
+  border: 'none',
+  boxShadow: 'none',
+  backgroundColor: 'rgb(225, 231, 245)',
+};
 
 interface InputProps {
   title: string;
@@ -123,26 +133,15 @@ function ExportableContent({
         >
           <Button
             children={
-              <FontAwesomeIcon
-                icon={mode === 'copy' ? faCopy : faFileArrowDown}
-                title={title}
-                style={{
-                  width: defaultButtonWidth,
-                  padding: 0,
-                  margin: 0,
-                }}
-              />
+              mode === 'copy' ? (
+                <CopyOutlined title={title} />
+              ) : (
+                <DownloadOutlined title={title} />
+              )
             }
             onClick={handleOnClick}
             style={{
-              width: defaultButtonWidth,
-              height: defaultButtonHeight,
-              padding: 0,
-              margin: 0,
-              cursor: 'pointer',
-              border: 'none',
-              boxShadow: 'none',
-              backgroundColor: 'transparent',
+              ...toolButtonStyle,
               display: permanentButton
                 ? undefined
                 : showButton
@@ -157,27 +156,12 @@ function ExportableContent({
                   href={searchUrl && searchUrl !== '' ? searchUrl : '?'}
                   target="_blank"
                 >
-                  <FontAwesomeIcon
-                    icon={faMagnifyingGlass}
-                    title={searchTitle}
-                    style={{
-                      width: defaultButtonWidth,
-                      padding: 0,
-                      margin: 0,
-                    }}
-                  />
+                  <SearchOutlined title={searchTitle} />
                 </a>
               }
               style={{
-                width: defaultButtonWidth,
-                height: defaultButtonHeight,
-                padding: 0,
-                margin: 0,
+                ...toolButtonStyle,
                 marginLeft: marginLeftSearchButton,
-                cursor: 'pointer',
-                border: 'none',
-                boxShadow: 'none',
-                backgroundColor: 'transparent',
                 display: permanentButton
                   ? undefined
                   : showButton

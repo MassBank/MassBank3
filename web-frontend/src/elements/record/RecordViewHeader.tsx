@@ -2,14 +2,15 @@ import './Table.scss';
 
 import { Content } from 'antd/es/layout/layout';
 import ExportableContent from '../common/ExportableContent';
-import { CSSProperties, useCallback, useMemo } from 'react';
+import { CSSProperties, JSX, useCallback, useMemo } from 'react';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
-import routes from '../../constants/routes';
 import { Table } from 'antd';
-import Record from '../../types/Record';
+import Record from '../../types/record/Record';
 import { MF } from 'react-mf';
 import StructureView from '../basic/StructureView';
-import LabelWrapper from './LabelWrapper';
+import LabelWrapper from '../basic/LabelWrapper';
+import { usePropertiesContext } from '../../context/properties/properties';
+import buildSearchUrl from '../../utils/buildSearchUrl';
 
 const titleHeight = 50;
 const labelWidth = 120;
@@ -18,7 +19,6 @@ type HeaderTableType = {
   key: string;
   label: string;
   value: JSX.Element;
-  copyButton?: JSX.Element;
 };
 const columns = [
   {
@@ -43,19 +43,9 @@ type InputProps = {
 };
 
 function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
+  const { baseUrl, frontendUrl } = usePropertiesContext();
   const handleOnCopy = useCallback((label: string, text: string) => {
     copyTextToClipboard(label, text);
-  }, []);
-
-  const buildSearchUrl = useCallback((label: string, value: string) => {
-    const searchParams = new URLSearchParams();
-    searchParams.set(label, value);
-    const url =
-      import.meta.env.VITE_MB3_FRONTEND_URL +
-      routes.search.path +
-      `?${searchParams.toString()}`;
-
-    return url;
   }, []);
 
   return useMemo(() => {
@@ -83,31 +73,63 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
               title={`Copy compound name ${i + 1} to clipboard`}
               enableSearch
               searchTitle={`Search for compound name ${i + 1}`}
-              searchUrl={buildSearchUrl('compound_name', name)}
+              searchUrl={buildSearchUrl(
+                'compound_name',
+                name,
+                baseUrl,
+                frontendUrl,
+              )}
             />
           ))}
         </Content>
       ),
     });
+
+    const compoundClasses: string[] = [];
+    record.compound.classes.forEach((c) => {
+      if (c.includes(';')) {
+        c.split(';').forEach((cc) => {
+          compoundClasses.push(cc.trim());
+        });
+      } else {
+        compoundClasses.push(c.trim());
+      }
+    });
     dataSource.push({
       key: 'record-view-header-table-classes',
       label: 'Classes',
-      value:
-        record.compound.classes &&
-        record.compound.classes.length === 1 &&
-        record.compound.classes[0] !== 'N/A' ? (
-          <ExportableContent
-            component={<LabelWrapper value={record.compound.classes[0]} />}
-            mode="copy"
-            onClick={() =>
-              handleOnCopy('Compound classes', record.compound.classes[0])
-            }
-            title="Copy compound classes to clipboard"
-          />
-        ) : (
-          <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
-        ),
+      value: (
+        <Content
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'left',
+          }}
+        >
+          {compoundClasses.map((name, i) => (
+            <ExportableContent
+              key={'class-label-' + name}
+              component={<LabelWrapper value={name} />}
+              mode="copy"
+              onClick={() => handleOnCopy(`Compound class ${i + 1}`, name)}
+              title={`Copy compound class ${i + 1} to clipboard`}
+              enableSearch
+              searchTitle={`Search for compound class ${i + 1}`}
+              searchUrl={buildSearchUrl(
+                'compound_class',
+                name,
+                baseUrl,
+                frontendUrl,
+              )}
+            />
+          ))}
+        </Content>
+      ),
     });
+
     dataSource.push({
       key: 'record-view-header-table-smiles',
       label: 'SMILES',
@@ -119,10 +141,16 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
           title="Copy SMILES to clipboard"
           enableSearch
           searchTitle="Search for SMILES"
-          searchUrl={buildSearchUrl('substructure', record.compound.smiles)}
+          searchUrl={buildSearchUrl(
+            'substructure',
+            record.compound.smiles,
+            baseUrl,
+            frontendUrl,
+          )}
         />
       ),
     });
+
     dataSource.push({
       key: 'record-view-header-table-inchi',
       label: 'InChI',
@@ -134,10 +162,16 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
           title="Copy InChi to clipboard"
           enableSearch
           searchTitle="Search for InChI"
-          searchUrl={buildSearchUrl('inchi', record.compound.inchi)}
+          searchUrl={buildSearchUrl(
+            'inchi',
+            record.compound.inchi,
+            baseUrl,
+            frontendUrl,
+          )}
         />
       ),
     });
+
     dataSource.push({
       key: 'record-view-header-table-splash',
       label: 'SPLASH',
@@ -149,7 +183,12 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
           title="Copy SPLASH to clipboard"
           enableSearch
           searchTitle="Search for SPLASH"
-          searchUrl={buildSearchUrl('splash', record.peak.splash)}
+          searchUrl={buildSearchUrl(
+            'splash',
+            record.peak.splash,
+            baseUrl,
+            frontendUrl,
+          )}
         />
       ),
     });
@@ -240,15 +279,17 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
                 }}
                 mode="copy"
                 onClick={() =>
-                  copyTextToClipboard(
-                    'Molecular Formula',
-                    record.compound.formula,
-                  )
+                  copyTextToClipboard('Formula', record.compound.formula)
                 }
                 title="Copy molecular formula to clipboard"
                 enableSearch
                 searchTitle="Search for molecular formula"
-                searchUrl={buildSearchUrl('formula', record.compound.formula)}
+                searchUrl={buildSearchUrl(
+                  'formula',
+                  record.compound.formula,
+                  baseUrl,
+                  frontendUrl,
+                )}
               />
               <label>Mass: </label>
               <ExportableContent
@@ -269,6 +310,8 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
                 searchUrl={buildSearchUrl(
                   'exact_mass',
                   record.compound.mass.toString(),
+                  baseUrl,
+                  frontendUrl,
                 )}
               />
             </Content>
@@ -277,7 +320,8 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
       </Content>
     );
   }, [
-    buildSearchUrl,
+    baseUrl,
+    frontendUrl,
     handleOnCopy,
     height,
     imageWidth,

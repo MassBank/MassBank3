@@ -1,24 +1,34 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { brushX, scaleLinear, select } from 'd3';
+import { brushX, NumberValue, scaleLinear, select } from 'd3';
 import ChartElement from './ChartElement';
 import Peak from '../../types/peak/Peak';
 import { Button } from 'antd';
 import { Content } from 'antd/es/layout/layout';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faEye,
-  faEyeSlash,
-  faFileArrowDown,
-} from '@fortawesome/free-solid-svg-icons';
-import { saveAs } from 'file-saver';
-import ExportableContent from '../common/ExportableContent';
+  CopyOutlined,
+  DownloadOutlined,
+  EyeInvisibleOutlined,
+  EyeOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
+import FileSaver from 'file-saver';
+const { saveAs } = FileSaver;
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
 import routes from '../../constants/routes';
+import { usePropertiesContext } from '../../context/properties/properties';
+
+const toolButtonStyle = {
+  width: 20,
+  border: 'none',
+  boxShadow: 'none',
+  backgroundColor: 'rgb(225, 231, 245)',
+  marginRight: 5,
+};
 
 type InputProps = {
   peakData: Peak[];
   peakData2?: Peak[];
-  // eslint-disable-next-line no-unused-vars
+
   onZoom?: (fpd1: Peak[], fpd2?: Peak[]) => void;
   width?: number;
   height?: number;
@@ -41,6 +51,7 @@ function Chart({
 }: InputProps) {
   const wrapperRef = useRef(null);
   const svgRef = useRef(null);
+  const { baseUrl, frontendUrl } = usePropertiesContext();
 
   const [isShowLabel, setIsShowLabel] = useState<boolean>(false);
 
@@ -421,7 +432,9 @@ function Chart({
         ])
         .on('end', (e) => {
           if (e.selection) {
-            const inverted: number[] = e.selection.map((x) => xScale.invert(x));
+            const inverted: number[] = e.selection.map((x: NumberValue) =>
+              xScale.invert(x),
+            );
             const newBrushXDomains = brushXDomains
               ? [...brushXDomains].concat({
                   min: inverted[0],
@@ -433,9 +446,9 @@ function Chart({
           }
         });
 
-      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
       svg.select('.brush').call(brush).call(brush.move, undefined);
-      // @ts-ignore
       svg.on('dblclick', handleDoubleClick);
     }
   }, [brushXDomains, disableZoom, handleDoubleClick, height, width, xScale]);
@@ -451,24 +464,30 @@ function Chart({
   }, []);
 
   const handleOnCopy = useCallback((peaks: Peak[]) => {
-    const text = peaks.map((p) => `${p.mz} ${p.intensity} ${p.rel}`).join('\n');
+    const text = peaks
+      .map((p) => `${p.mz.toFixed(4)} ${p.intensity.toFixed(4)} ${p.rel}`)
+      .join('\n');
     copyTextToClipboard('Peak List', text);
   }, []);
 
-  const buildSearchUrl = useCallback((peaks: Peak[]) => {
-    const searchParams = new URLSearchParams();
-    searchParams.set(
-      'peak_list',
-      peaks.map((p) => `${p.mz};${p.rel}`).join(','),
-    );
-    const path = routes.search.path;
-    const url =
-      import.meta.env.VITE_MB3_FRONTEND_URL +
-      path +
-      `?${searchParams.toString()}`;
+  const buildSearchUrl = useCallback(
+    (peaks: Peak[]) => {
+      const searchParams = new URLSearchParams();
+      searchParams.set(
+        'peak_list',
+        peaks.map((p) => `${p.mz.toFixed(4)};${p.rel}`).join(','),
+      );
+      searchParams.set('peak_list_threshold', '0.8');
+      const url =
+        frontendUrl +
+        baseUrl +
+        routes.search.path +
+        `?${searchParams.toString()}`;
 
-    return url;
-  }, []);
+      return url;
+    },
+    [baseUrl, frontendUrl],
+  );
 
   return useMemo(
     () => (
@@ -529,38 +548,51 @@ function Chart({
             >
               <Button
                 children={
-                  <FontAwesomeIcon
-                    icon={isShowLabel ? faEyeSlash : faEye}
-                    title={
-                      isShowLabel ? 'Hide peak labels' : 'Show peak labels'
-                    }
-                  />
+                  isShowLabel ? (
+                    <EyeInvisibleOutlined title="Hide peak labels" />
+                  ) : (
+                    <EyeOutlined title="Show peak labels" />
+                  )
                 }
                 onClick={() => setIsShowLabel(!isShowLabel)}
-                style={{ width: 20, border: 'none' }}
+                style={toolButtonStyle}
               />
               <Button
                 children={
-                  <FontAwesomeIcon
-                    icon={faFileArrowDown}
-                    title="Download current spectrum view as SVG"
-                  />
+                  <DownloadOutlined title="Download current spectrum view as SVG" />
                 }
                 onClick={handleOnDownload}
-                style={{ width: 20, border: 'none' }}
+                style={toolButtonStyle}
               />
               {!disableExport && (
-                <ExportableContent
-                  width={80}
-                  height={'100%'}
-                  mode="copy"
-                  title="Copy peak list of current spectrum view to clipboard"
-                  onClick={() => handleOnCopy(filteredPeakData)}
-                  permanentButton
-                  enableSearch
-                  searchTitle="Search similar spectra for peaks in current spectrum view"
-                  searchUrl={buildSearchUrl(filteredPeakData)}
-                />
+                <Content
+                  style={{
+                    width: '100%',
+                    height: MARGIN.button,
+                    display: 'flex',
+                    justifyContent: 'left',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Button
+                    children={
+                      <CopyOutlined title="Copy peak list of current spectrum view to clipboard" />
+                    }
+                    onClick={() => handleOnCopy(filteredPeakData)}
+                    style={toolButtonStyle}
+                  />
+                  <Button
+                    children={
+                      <a
+                        href={buildSearchUrl(filteredPeakData)}
+                        target="_blank"
+                      >
+                        <SearchOutlined title="Search similar spectra for peaks in current spectrum view" />
+                      </a>
+                    }
+                    style={toolButtonStyle}
+                  />
+                </Content>
               )}
             </Content>
             <Content

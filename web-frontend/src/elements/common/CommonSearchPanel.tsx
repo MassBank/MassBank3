@@ -7,24 +7,24 @@ import { Button, Form, Menu } from 'antd';
 import SearchFields from '../../types/filterOptions/SearchFields';
 import ContentFilterOptions from '../../types/filterOptions/ContentFilterOtions';
 import { useForm } from 'antd/es/form/Form';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { Content } from 'antd/es/layout/layout';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import ValueCount from '../../types/ValueCount';
 import { ItemType, MenuItemType } from 'antd/es/menu/interface';
+import getActiveKeysFromFormData from '../../utils/getActiveKeysFromFormData';
+import defaultSearchFieldValues from '../../constants/defaultSearchFieldValues';
+import collapseButtonWidth from '../../constants/collapseButtonWidth';
 
 const submitButtonHeight = 40;
 
 type InputProps = {
   items: ItemType<MenuItemType>[];
-  initialValues?: SearchFields | undefined;
+  initialValues: SearchFields;
   width: number;
   height: number;
   collapsed: boolean;
-  massSpecFilterOptions: ContentFilterOptions | undefined;
-  // eslint-disable-next-line no-unused-vars
+  propertyFilterOptions: ContentFilterOptions | undefined;
   onCollapse: (collapsed: boolean) => void;
-  // eslint-disable-next-line no-unused-vars
   onSubmit: (data: SearchFields) => void;
 };
 
@@ -34,7 +34,7 @@ function CommonSearchPanel({
   width,
   height,
   collapsed,
-  massSpecFilterOptions,
+  propertyFilterOptions,
   onCollapse,
   onSubmit,
 }: InputProps) {
@@ -48,13 +48,30 @@ function CommonSearchPanel({
     const mapper = (vcs: ValueCount[]) => {
       return vcs.filter((vc) => vc.flag === true).map((vc) => vc.value);
     };
-    setFieldValue('massSpecFilterOptions', {
-      contributor: mapper(massSpecFilterOptions?.contributor || []),
-      instrument_type: mapper(massSpecFilterOptions?.instrument_type || []),
-      ms_type: mapper(massSpecFilterOptions?.ms_type || []),
-      ion_mode: mapper(massSpecFilterOptions?.ion_mode || []),
-    } as SearchFields['massSpecFilterOptions']);
-  }, [initialValues, massSpecFilterOptions, setFieldValue, setFieldsValue]);
+    setFieldValue('propertyFilterOptions', {
+      contributor: mapper(propertyFilterOptions?.contributor ?? []),
+      instrument_type: mapper(propertyFilterOptions?.instrument_type ?? []),
+      ms_type: mapper(propertyFilterOptions?.ms_type ?? []),
+      ion_mode: mapper(propertyFilterOptions?.ion_mode ?? []),
+    } as SearchFields['propertyFilterOptions']);
+
+    return () => {
+      form.setFieldsValue(
+        JSON.parse(JSON.stringify(defaultSearchFieldValues)) as SearchFields,
+      );
+    };
+  }, [
+    form,
+    initialValues,
+    propertyFilterOptions,
+    setFieldValue,
+    setFieldsValue,
+  ]);
+
+  const activeKeys = useMemo(
+    () => getActiveKeysFromFormData(initialValues),
+    [initialValues],
+  );
 
   const handleOnSubmit: FormProps<SearchFields>['onFinish'] = useCallback(
     (values: SearchFields) => {
@@ -75,7 +92,6 @@ function CommonSearchPanel({
           height,
           backgroundColor: 'white',
           display: 'flex',
-          flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
           userSelect: 'none',
@@ -83,18 +99,21 @@ function CommonSearchPanel({
       >
         <Content
           style={{
-            width,
-            height: collapsed ? height : submitButtonHeight,
+            minWidth: collapseButtonWidth,
+            maxWidth: collapseButtonWidth,
+            height: '100%',
             display: 'flex',
-            justifyContent: 'left',
-            alignItems: 'start',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
           <Button
             onClick={handleOnCollapse}
+            size="large"
             style={{
-              width: 50,
-              height: submitButtonHeight,
+              minWidth: collapseButtonWidth,
+              maxWidth: collapseButtonWidth,
+              height: '100%',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
@@ -102,9 +121,8 @@ function CommonSearchPanel({
               color: 'blue',
               boxShadow: 'none',
             }}
-            size="large"
           >
-            <FontAwesomeIcon icon={collapsed ? faAngleRight : faAngleDown} />
+            {collapsed ? <RightOutlined /> : <LeftOutlined />}
           </Button>
         </Content>
         <Form.Provider>
@@ -113,8 +131,8 @@ function CommonSearchPanel({
             autoComplete="off"
             layout="inline"
             style={{
-              width,
-              height,
+              width: width - collapseButtonWidth,
+              height: '100%',
               backgroundColor: 'white',
               display: collapsed ? 'none' : 'flex',
               flexDirection: 'column',
@@ -140,17 +158,22 @@ function CommonSearchPanel({
                   width: '100%',
                   height: '100%',
                   overflow: 'scroll',
+                  border: 'none',
                 }}
                 mode="inline"
                 items={items}
+                inlineIndent={10}
+                defaultOpenKeys={activeKeys}
+                defaultSelectedKeys={activeKeys}
               />
-
               <Button
-                type="primary"
                 htmlType="submit"
                 style={{
                   width: 150,
-                  height: submitButtonHeight,
+                  height: submitButtonHeight - 10,
+                  marginTop: 5,
+                  marginBottom: 5,
+                  backgroundColor: 'rgb(167, 199, 254)',
                 }}
               >
                 Search
@@ -161,14 +184,15 @@ function CommonSearchPanel({
       </Content>
     ),
     [
-      form,
       width,
       height,
+      form,
+      collapsed,
       initialValues,
       handleOnSubmit,
-      collapsed,
-      handleOnCollapse,
       items,
+      activeKeys,
+      handleOnCollapse,
     ],
   );
 }

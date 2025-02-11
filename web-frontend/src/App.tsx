@@ -1,24 +1,26 @@
-import React from 'react';
-import { Layout } from 'antd';
-import { BrowserRouter } from 'react-router-dom';
-import { HighlightProvider } from './highlight/Index';
+import { useEffect, useState } from 'react';
 import Routing from './elements/routes/Routing';
+import { HighlightProvider } from './context/highlight/HighlightProvider';
+import { ConfigProvider } from 'antd';
 
-const App: React.FC = () => {
+function App() {
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  if (!hydrated) {
+    return null;
+  }
+
   return (
-    <BrowserRouter>
+    <ConfigProvider wave={{ disabled: true }}>
       <HighlightProvider>
-        <Layout
-          style={{
-            width: '100vw',
-            height: '100vh',
-          }}
-        >
-          <Routing />
-        </Layout>
+        <Routing />
       </HighlightProvider>
-    </BrowserRouter>
+    </ConfigProvider>
   );
-};
+}
 
 export default App;
