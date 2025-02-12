@@ -234,10 +234,15 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       props,
     });
 
+    const noFollowLinksMeta = `<meta name="robots" content="nofollow"></meta>`;
     const googleSearchConsoleMeta = `<meta name="google-site-verification" content="${googleSearchConsoleKey}"></meta>`;
     rendered.head = rendered.head
-      ? rendered.head.concat('\n').concat(googleSearchConsoleMeta)
-      : googleSearchConsoleMeta;
+      ? rendered.head
+          .concat('\n')
+          .concat(noFollowLinksMeta)
+          .concat('\n')
+          .concat(googleSearchConsoleMeta)
+      : noFollowLinksMeta.concat('\n').concat(googleSearchConsoleMeta);
 
     const pageRoute = path.replace(baseUrl, '');
     if (
