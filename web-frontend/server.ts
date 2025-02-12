@@ -145,17 +145,53 @@ baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
 
     const lastmodDate = await getLastmodDate();
 
-    const urlSets: string[] = [
+    const xmlContent: string[] = [
       '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
     ];
+
     const n = Math.ceil(hitsCount / nRecords);
     for (let i = 0; i < n; i++) {
-      urlSets.push(
+      xmlContent.push(
         `<sitemap><loc>${prefixUrl}sitemap_${i}.xml</loc><lastmod>${lastmodDate}</lastmod></sitemap>`,
       );
     }
-    urlSets.push('</sitemapindex>');
-    const xml = xmlFormat(urlSets.join(''));
+    xmlContent.push(
+      `<sitemap><loc>${prefixUrl}sitemap_misc.xml</loc><changefreq>weekly</changefreq></sitemap>`,
+    );
+    xmlContent.push('</sitemapindex>');
+    const xml = xmlFormat(xmlContent.join(''));
+
+    res.status(200).set({ 'Content-Type': 'application/xml' }).send(xml);
+  } catch (e) {
+    vite?.ssrFixStacktrace(e);
+    console.log(e.stack);
+    res.status(500).end(e.stack);
+  }
+});
+
+baseRouter.get('/sitemap_misc.xml', async (req: Request, res: Response) => {
+  try {
+    const xmlHeader =
+      '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+    const xmlContent: string[] = [xmlHeader];
+    xmlContent.push(
+      `<url><loc>${prefixUrl}</loc><changefreq>weekly</changefreq></url>`,
+    );
+    xmlContent.push(
+      `<url><loc>${prefixUrl}search</loc><changefreq>weekly</changefreq></url>`,
+    );
+    xmlContent.push(
+      `<url><loc>${prefixUrl}content</loc><changefreq>weekly</changefreq></url>`,
+    );
+    xmlContent.push(
+      `<url><loc>${prefixUrl}news</loc><changefreq>weekly</changefreq></url>`,
+    );
+    xmlContent.push(
+      `<url><loc>${prefixUrl}about</loc><changefreq>weekly</changefreq></url>`,
+    );
+
+    xmlContent.push('</urlset>');
+    const xml = xmlFormat(xmlContent.join(''));
 
     res.status(200).set({ 'Content-Type': 'application/xml' }).send(xml);
   } catch (e) {
