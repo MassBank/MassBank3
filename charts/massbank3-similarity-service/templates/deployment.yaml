@@ -40,6 +40,9 @@ spec:
           {{- end }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "massbank3-similarity-service.fullname" . }}-env-configmap
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -56,6 +59,18 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      initContainers:
+        - name: {{ .Chart.Name }}-init
+          image: busybox:latest
+          command:
+            - wget
+            - "-O"
+            - "/msp/MassBank_NIST.msp"
+            - https://github.com/MassBank/MassBank-data/releases/latest/download/MassBank_NIST.msp
           {{- with .Values.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
