@@ -156,7 +156,7 @@ baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
       );
     }
     xmlContent.push(
-      `<sitemap><loc>${prefixUrl}sitemap_misc.xml</loc><changefreq>weekly</changefreq></sitemap>`,
+      `<sitemap><loc>${prefixUrl}sitemap_misc.xml</loc></sitemap>`,
     );
     xmlContent.push('</sitemapindex>');
     const xml = xmlFormat(xmlContent.join(''));
