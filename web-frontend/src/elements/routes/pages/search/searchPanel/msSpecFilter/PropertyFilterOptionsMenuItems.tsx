@@ -5,9 +5,13 @@ import ContentFilterOptions from '../../../../../../types/filterOptions/ContentF
 
 type InputProps = {
   propertyFilterOptions: ContentFilterOptions | undefined;
+  showCounts?: boolean;
 };
 
-function PropertyFilterOptionsMenuItems({ propertyFilterOptions }: InputProps) {
+function PropertyFilterOptionsMenuItems({
+  propertyFilterOptions,
+  showCounts = false,
+}: InputProps) {
   return [
     {
       key: 'propertyFilterOptions.contributor',
@@ -26,6 +30,7 @@ function PropertyFilterOptionsMenuItems({ propertyFilterOptions }: InputProps) {
               filterOptions={propertyFilterOptions?.contributor ?? []}
               filterName="propertyFilterOptions"
               label="contributor"
+              showCounts={showCounts}
             />
           ),
         },
@@ -56,6 +61,7 @@ function PropertyFilterOptionsMenuItems({ propertyFilterOptions }: InputProps) {
                 filterOptions={propertyFilterOptions?.instrument_type ?? []}
                 filterName="propertyFilterOptions"
                 label="instrument_type"
+                showCounts={showCounts}
               />
             </Form.Item>
           ),
@@ -88,6 +94,7 @@ function PropertyFilterOptionsMenuItems({ propertyFilterOptions }: InputProps) {
                 filterName="propertyFilterOptions"
                 label="ms_type"
                 height={50}
+                showCounts={showCounts}
               />
             </Form.Item>
           ),
@@ -120,6 +127,7 @@ function PropertyFilterOptionsMenuItems({ propertyFilterOptions }: InputProps) {
                 filterName="propertyFilterOptions"
                 label="ion_mode"
                 height={30}
+                showCounts={showCounts}
               />
             </Form.Item>
           ),

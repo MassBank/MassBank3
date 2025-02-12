@@ -189,6 +189,7 @@ function ContentView() {
       <CommonSearchPanel
         items={PropertyFilterOptionsMenuItems({
           propertyFilterOptions,
+          showCounts: true,
         })}
         collapsed={isCollapsed}
         onCollapse={handleOnCollapse}

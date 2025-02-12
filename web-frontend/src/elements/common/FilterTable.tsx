@@ -10,6 +10,7 @@ type InputProps = {
   filterName: string;
   label: string;
   height?: number;
+  showCounts?: boolean;
 };
 
 function FilterTable({
@@ -17,20 +18,31 @@ function FilterTable({
   filterName,
   label,
   height = 250,
+  showCounts = false,
 }: InputProps) {
   const formInstance = useFormInstance<SearchFields>();
   const { setFieldValue } = formInstance;
   const [allSelected, setAllSelected] = useState<boolean>(true);
 
-  const createOptions = useCallback((_filterOptions: ValueCount[]) => {
-    return _filterOptions.map((vc) => {
-      return {
-        label: vc.value,
-        value: vc.value,
-        checked: vc.flag || false,
-      };
-    });
-  }, []);
+  const createOptions = useCallback(
+    (_filterOptions: ValueCount[]) => {
+      return _filterOptions.map((vc) => {
+        return {
+          label: showCounts ? (
+            <Content>
+              <label>{vc.value}</label>
+              <label style={{ color: 'grey' }}>{' (' + vc.count + ')'}</label>
+            </Content>
+          ) : (
+            vc.value
+          ),
+          value: vc.value,
+          checked: vc.flag ?? false,
+        };
+      });
+    },
+    [showCounts],
+  );
 
   const options = useMemo(
     () => createOptions(filterOptions),
