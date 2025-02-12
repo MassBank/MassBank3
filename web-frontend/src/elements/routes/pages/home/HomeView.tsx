@@ -2,6 +2,7 @@ import Layout, { Content, Header } from 'antd/es/layout/layout';
 import { useRef } from 'react';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
+import News from '../../../common/News';
 
 const accessionSearchInputFieldHeight = 50;
 
@@ -37,18 +38,29 @@ function HomeView() {
         style={{
           width: '100%',
           height: height - accessionSearchInputFieldHeight,
-          display: 'flex',
-          flexDirection: 'column',
+          display: 'block',
           justifyContent: 'center',
           alignItems: 'center',
+          overflow: 'scroll',
         }}
       >
-        <p style={{ fontWeight: 'bold', fontSize: 18 }}>Welcome to MassBank!</p>
-        <p style={{ textAlign: 'center' }}>
-          MassBank is a community effort and you are invited to contribute.
-          Please refer to our contributor documentation and get in touch via
-          github or email.
-        </p>
+        <Content style={{ width: '100%', textAlign: 'center' }}>
+          <p style={{ fontWeight: 'bold', fontSize: 18 }}>
+            Welcome to MassBank!
+          </p>
+          <p>
+            MassBank is a community effort and you are invited to contribute.
+            Please refer to our contributor documentation and get in touch via
+            github or email.
+          </p>
+        </Content>
+        <News
+          styles={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        />
       </Content>
     </Layout>
   );
