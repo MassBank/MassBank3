@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
 import News from '../../../common/News';
+import SectionDivider from '../../../basic/SectionDivider';
 
 const accessionSearchInputFieldHeight = 50;
 
@@ -54,6 +55,7 @@ function HomeView() {
             github or email.
           </p>
         </Content>
+        <SectionDivider label="News" />
         <News
           styles={{
             display: 'flex',
