@@ -38,7 +38,7 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
         - name: massbank3-export-service
-          image: quay.io/massbank/massbank3-export-service:v1.3 # Container Image
+          image: quay.io/massbank/massbank3-export-service:v1.4 # Container Image
           envFrom:
             - configMapRef:
                 name:

@@ -38,7 +38,7 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       containers:
         - name: massbank3-similarity-service-cosine
-          image: quay.io/massbank/massbank3-similarity-service:v1.0-matchms-0.28.2 # Container Image
+          image: quay.io/massbank/massbank3-similarity-service:v1.0.2-matchms-0.28.2 # Container Image
           envFrom:
             - configMapRef:
                 name:
