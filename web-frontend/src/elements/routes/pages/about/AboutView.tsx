@@ -84,7 +84,7 @@ function AboutView() {
         {logos.map((logo, i) => (
           <img
             src={logo}
-            style={{ width: width / 5, maxHeight: 120 }}
+            style={{ width: width / 5 }}
             key={'supporter-logo-' + i}
           />
         ))}
