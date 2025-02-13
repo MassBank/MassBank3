@@ -54,6 +54,7 @@ function Header({ height }: InputProps) {
           (route) =>
             route.id !== routes.notFound.id &&
             route.id !== routes.home.id &&
+            route.id !== routes.accession.id &&
             route.id !== routes.accessionNext.id,
         )
         .map((route) => {

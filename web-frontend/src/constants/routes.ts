@@ -6,6 +6,7 @@ import HomeView from '../elements/routes/pages/home/HomeView';
 import NewsView from '../elements/routes/pages/news/NewsView';
 import NotFoundView from '../elements/routes/pages/notfound/NotFoundView';
 import SearchView from '../elements/routes/pages/search/SearchView';
+import Documentation from '../elements/routes/pages/documentation/Documentation';
 
 type RouteType = {
   component: React.FC;
@@ -32,6 +33,12 @@ const routes = {
     label: 'Content',
     id: 'content',
     path: 'content',
+  } as RouteType,
+  documentation: {
+    component: Documentation,
+    label: 'Documentation',
+    id: 'documentation',
+    path: 'documentation',
   } as RouteType,
   accessionNext: {
     component: AccessionView,

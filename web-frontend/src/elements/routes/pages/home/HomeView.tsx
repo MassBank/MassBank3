@@ -56,13 +56,7 @@ function HomeView() {
           </p>
         </Content>
         <SectionDivider label="News" />
-        <News
-          styles={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        />
+        <News />
       </Content>
     </Layout>
   );
