@@ -9,11 +9,12 @@ import eawagLogo from '../../../../assets/EAWAG_logo.png';
 import uniLuxLogo from '../../../../assets/UniLu-LCSB_Logo.png';
 import ipbLogo from '../../../../assets/IPB.png';
 import normanLogo from '../../../../assets/NORMAN.png';
-import fnrLogo from '../../../../assets/FNR_logo.png';
+import fnrLogo from '../../../../assets/fnr_logo.png';
 import hbm4euLogo from '../../../../assets/HBM4EU_logo.png';
-import nfdi4chemLogo from '../../../../assets/NFDI4Chem_logo.png';
+import nfdi4chemLogo from '../../../../assets/nfdi4chem_logo.png';
 import ufzLogo from '../../../../assets/UFZ.png';
 import SectionDivider from '../../../basic/SectionDivider';
+import ServiceStatusView from './ServiceStatusView';
 
 const logos = [
   denbiLogo,
@@ -43,7 +44,7 @@ function AboutView() {
         overflow: 'scroll',
       }}
     >
-      <Paragraph>
+      <Paragraph style={{ padding: 10 }}>
         MassBank is an open source mass spectral library for the identification
         of small chemical molecules of metabolomics, exposomics and
         environmental relevance. The vast majority of MassBank contents now
@@ -56,7 +57,7 @@ function AboutView() {
         downloaded in different formats such as text records, database files
         (sql) and MSP files.
       </Paragraph>
-      <Paragraph>
+      <Paragraph style={{ padding: 10 }}>
         MassBank is maintained and developed by the MassBank consortium and is
         supported by the NORMAN Association, FNR and NFDI4Chem. The main
         sustainers and developers of MassBank and related tools are the team of
@@ -77,12 +78,19 @@ function AboutView() {
           gridTemplateColumns: '1fr 1fr 1fr 1fr',
           justifyContent: 'center',
           alignItems: 'center',
+          padding: 10,
         }}
       >
-        {logos.map((logo) => (
-          <img src={logo} style={{ width: width / 5, maxHeight: 120 }} />
+        {logos.map((logo, i) => (
+          <img
+            src={logo}
+            style={{ width: width / 5, maxHeight: 120 }}
+            key={'supporter-logo-' + i}
+          />
         ))}
       </Content>
+      <SectionDivider label="Service Status" />
+      <ServiceStatusView />
     </Content>
   );
   // return (
