@@ -674,9 +674,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			}
 		} else if(checkSubstructure && !checkSimilarity && !checkFilters) {
 			fmt.Println(" -> single results (substructure)")
-			for _, accession := range accessionsSubstructureSearch {	
-				fmt.Println("accession: ", accession)
-				fmt.Println("atomCount: ", atomCountResultMap[accession])			
+			for _, accession := range accessionsSubstructureSearch {
 				searchResultData := SearchResultDataInner{
 					Accession: accession,
 					Atomcount: atomCountResultMap[accession],

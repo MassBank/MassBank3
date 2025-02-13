@@ -11,7 +11,7 @@ package mb3server
 
 import (
 	"context"
-	"errors"
+	"database/sql"
 	"net/http"
 )
 
@@ -30,7 +30,9 @@ func NewDefaultApiService() *DefaultAPIService {
 func (s *DefaultAPIService) GetBrowseOptions(ctx context.Context, instrumentType []string, msType []string, ionMode string, contributor []string) (ImplResponse, error) {
 	opt, err := GetBrowseOptions(instrumentType, msType, ionMode, contributor)
 	if err != nil {
-		return Response(http.StatusInternalServerError, nil), errors.New("Could not get results")
+		if err != sql.ErrNoRows {
+			return Response(http.StatusInternalServerError, nil), err
+		}
 	}
 	return Response(http.StatusOK, opt), nil
 }
@@ -39,7 +41,9 @@ func (s *DefaultAPIService) GetBrowseOptions(ctx context.Context, instrumentType
 func (s *DefaultAPIService) GetCount(ctx context.Context) (ImplResponse, error) {
 	count, err := GetCount()
 	if err != nil {
-		return Response(http.StatusInternalServerError, nil), errors.New("Could not get result count")
+		if err != sql.ErrNoRows {
+			return Response(http.StatusInternalServerError, nil), err
+		}
 	}
 
 	return Response(200, count), nil
@@ -49,7 +53,9 @@ func (s *DefaultAPIService) GetCount(ctx context.Context) (ImplResponse, error) 
 func (s *DefaultAPIService) GetMetadata(ctx context.Context) (ImplResponse, error) {	
 	metadata, err := GetMetadata()
 	if err != nil {
-		return Response(http.StatusInternalServerError, nil), err
+		if err != sql.ErrNoRows {
+			return Response(http.StatusInternalServerError, nil), err
+		}
 	}
 	return Response(200, metadata), err
 }
@@ -58,7 +64,9 @@ func (s *DefaultAPIService) GetMetadata(ctx context.Context) (ImplResponse, erro
 func (s *DefaultAPIService) GetRecord(ctx context.Context, accession string) (ImplResponse, error) {
 	record, err := GetRecord(accession)
 	if err != nil {
-		return Response(http.StatusInternalServerError, nil), err
+		if err != sql.ErrNoRows {
+			return Response(http.StatusInternalServerError, nil), err
+		}
 	}
 	return Response(200, record), err
 }
@@ -67,7 +75,9 @@ func (s *DefaultAPIService) GetRecord(ctx context.Context, accession string) (Im
 func (s *DefaultAPIService) GetRecords(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, compoundClass string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, inchi string, inchiKey string, contributor []string) (ImplResponse, error) {
 	result, err := GetRecords(instrumentType, splash, msType, ionMode, compoundName, compoundClass, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, inchi, inchiKey, contributor)
 	if err != nil {
-		return Response(http.StatusInternalServerError, nil), err
+		if err != sql.ErrNoRows {
+			return Response(http.StatusInternalServerError, nil), err
+		}
 	}
 	return Response(200, result), nil
 }
@@ -76,20 +86,20 @@ func (s *DefaultAPIService) GetRecords(ctx context.Context, instrumentType []str
 func (s *DefaultAPIService) GetVersion(ctx context.Context) (ImplResponse, error) {
 	result, err := GetVersion()
 	if err != nil {
-		return Response(http.StatusInternalServerError, nil), err
+		if err != sql.ErrNoRows {
+			return Response(http.StatusInternalServerError, nil), err
+		}
 	}
 	return Response(200, result), nil
 }
 
 // GetSimilarity implements DefaultAPIServicer.
 func (s *DefaultAPIService) GetSimilarity(ctx context.Context, peakList []string, referenceSpectraList []string, limit int32, threshold float64) (ImplResponse, error) {
-	// TODO - update GetSimilarity with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
 	result, err := GetSimilarity(peakList, referenceSpectraList, limit, threshold)
-
 	if err != nil {
-		return Response(http.StatusInternalServerError, nil), err
+		if err != sql.ErrNoRows {
+			return Response(http.StatusInternalServerError, nil), err
+		}
 	}
 
 	return Response(http.StatusOK, result), err
@@ -97,10 +107,13 @@ func (s *DefaultAPIService) GetSimilarity(ctx context.Context, peakList []string
 
 // GetSimpleRecord - Get a simple MassBank record
 func (s *DefaultAPIService) GetSimpleRecord(ctx context.Context, accession string) (ImplResponse, error) {
-	// TODO - update GetRecord with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
 	record, err := GetSimpleRecord(accession)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			return Response(http.StatusInternalServerError, nil), err
+		}
+	}
+
 	return Response(200, record), err
 }
 
@@ -108,7 +121,9 @@ func (s *DefaultAPIService) GetSimpleRecord(ctx context.Context, accession strin
 func (s *DefaultAPIService) GetSearchResults(ctx context.Context, instrumentType []string, splash string, msType []string, ionMode string, compoundName string, compoundClass string,exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, peakListThreshold float64, inchi string, inchiKey string, contributor []string, substructure string) (ImplResponse, error) {
 	result, err := GetSearchResults(instrumentType, splash, msType, ionMode, compoundName, compoundClass, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, peakList, peakListThreshold, inchi, inchiKey, contributor, substructure)
 	if err != nil {
-		return Response(http.StatusInternalServerError, nil), err
+		if err != sql.ErrNoRows {
+			return Response(http.StatusInternalServerError, nil), err
+		}
 	}
 
 	return Response(200, result), nil

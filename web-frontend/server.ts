@@ -65,26 +65,32 @@ if (!isProduction) {
 }
 
 const buildRecordMetadata = async (_accession: string) => {
-  const url = `${exportServiceUrlInternal}/metadata/${_accession}`;
+  try {
+    const url = `${exportServiceUrlInternal}/metadata/${_accession}`;
+    const resp = await axios.get(url, {
+      headers: {
+        Accept: 'application/ld+json',
+      },
+    });
+    if (resp.status === 200) {
+      const data = await resp.data;
+      if (data) {
+        const json =
+          '[' +
+          (data as object[])
+            .map((d) => JSON.stringify(d, null, 2))
+            .join(',\n') +
+          ']';
 
-  const resp = await axios.get(url, {
-    headers: {
-      Accept: 'application/ld+json',
-    },
-  });
-  if (resp.status === 200) {
-    const data = await resp.data;
-    if (data) {
-      const json =
-        '[' +
-        (data as object[]).map((d) => JSON.stringify(d, null, 2)).join(',\n') +
-        ']';
-
-      return json;
+        return json;
+      }
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (err) {
+    // console.error('buildRecordMetadata failed', e);
   }
 
-  return '';
+  return null;
 };
 
 async function getLastmodDate() {
@@ -290,10 +296,12 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       req.query.id
     ) {
       const metadata = await buildRecordMetadata(req.query.id as string);
-      const metadataScript = `<script type="application/ld+json">${metadata}</script>`;
-      rendered.head = rendered.head
-        ? rendered.head.concat('\n').concat(metadataScript)
-        : metadataScript;
+      if (metadata) {
+        const metadataScript = `<script type="application/ld+json">${metadata}</script>`;
+        rendered.head = rendered.head
+          ? rendered.head.concat('\n').concat(metadataScript)
+          : metadataScript;
+      }
     }
 
     const initDataScript = `<script> window.__INITIAL_DATA__ = ${JSON.stringify(props)}; </script>`;
