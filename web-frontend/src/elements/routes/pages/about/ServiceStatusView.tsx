@@ -5,7 +5,7 @@ import { Button, Result, Spin } from 'antd';
 import axios from 'axios';
 
 function ServiceStatusView() {
-  const { backendUrl, baseUrl, exportServiceUrl, similarityServiceUrl } =
+  const { backendUrl, exportServiceUrl, similarityServiceUrl } =
     usePropertiesContext();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -21,7 +21,7 @@ function ServiceStatusView() {
     setIsLoading(true);
 
     try {
-      const response = await axios.get(`${baseUrl + backendUrl}/v1/version`);
+      const response = await axios.get(`${backendUrl}/v1/version`);
       if (response.status === 200) {
         setErrorApi(null);
       } else {
@@ -32,9 +32,7 @@ function ServiceStatusView() {
       console.error(error);
     }
     try {
-      const response = await axios.get(
-        `${baseUrl + similarityServiceUrl}/version`,
-      );
+      const response = await axios.get(`${similarityServiceUrl}/version`);
       if (response.status === 200) {
         setErrorSimilarityService(null);
       } else {
@@ -45,7 +43,7 @@ function ServiceStatusView() {
       console.error(error);
     }
     try {
-      const response = await axios.get(`${baseUrl + exportServiceUrl}/version`);
+      const response = await axios.get(`${exportServiceUrl}/version`);
       if (response.status === 200) {
         setErrorExportService(null);
       } else {
@@ -57,7 +55,7 @@ function ServiceStatusView() {
     }
 
     setIsLoading(false);
-  }, [backendUrl, baseUrl, exportServiceUrl, similarityServiceUrl]);
+  }, [backendUrl, exportServiceUrl, similarityServiceUrl]);
 
   useEffect(() => {
     handleOnCheckServiceStatus();
