@@ -104,10 +104,9 @@ function Documentation() {
         style={{
           width: '100%',
           height: '100%',
-          display: 'block',
+          display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          overflow: 'scroll',
         }}
       >
         {markDowns.length > 0 ? (
@@ -116,6 +115,7 @@ function Documentation() {
             items={items}
             onChange={handleOnChange}
             tabBarStyle={{ width: '100%', height: tabsHeight }}
+            centered
           />
         ) : (
           <Placeholder
