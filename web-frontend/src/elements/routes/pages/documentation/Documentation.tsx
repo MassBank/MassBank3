@@ -1,6 +1,6 @@
 import { Content } from 'antd/es/layout/layout';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Tabs } from 'antd';
+import { Spin, Tabs } from 'antd';
 import type { TabsProps } from 'antd';
 import { splitStringAndJoin } from '../../../../utils/stringUtils';
 import Markdown from 'react-markdown';
@@ -40,6 +40,7 @@ const markDownUrls: labelValueType[] = [
 function Documentation() {
   const ref = useRef(null);
   const { height } = useContainerDimensions(ref);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [markDowns, setMarkDowns] = useState<labelValueType[]>([]);
   const [activeKey, setActiveKey] = useState<string | undefined>(undefined);
 
@@ -48,6 +49,8 @@ function Documentation() {
   }, []);
 
   const fetchMarkDowns = useCallback(async () => {
+    setIsLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     try {
       markDownUrls.forEach(async (entry) => {
         const response = await fetch(entry.value);
@@ -64,6 +67,7 @@ function Documentation() {
     } catch (e) {
       console.error(e);
     }
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
@@ -86,11 +90,7 @@ function Documentation() {
               overflow: 'scroll',
             }}
           >
-            <Markdown
-              remarkPlugins={[remarkGfm]}
-              children={entry.value}
-              className="markdown-element"
-            />
+            <Markdown remarkPlugins={[remarkGfm]} children={entry.value} />
           </Content>
         ),
       })),
@@ -109,12 +109,29 @@ function Documentation() {
           alignItems: 'center',
         }}
       >
-        {markDowns.length > 0 ? (
+        {isLoading ? (
+          <Spin
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            size="large"
+          />
+        ) : markDowns.length > 0 ? (
           <Tabs
             activeKey={activeKey}
             items={items}
             onChange={handleOnChange}
-            tabBarStyle={{ width: '100%', height: tabsHeight }}
+            tabBarStyle={{
+              width: '100%',
+              height: tabsHeight,
+              padding: 0,
+              margin: 0,
+              backgroundColor: '#f3ece0',
+            }}
             centered
           />
         ) : (
@@ -125,7 +142,7 @@ function Documentation() {
         )}
       </Content>
     ),
-    [activeKey, handleOnChange, items, markDowns.length],
+    [activeKey, handleOnChange, isLoading, items, markDowns.length],
   );
 }
 
