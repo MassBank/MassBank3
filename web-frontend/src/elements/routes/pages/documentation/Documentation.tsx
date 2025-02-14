@@ -50,7 +50,7 @@ function Documentation() {
 
   const fetchMarkDowns = useCallback(async () => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     try {
       markDownUrls.forEach(async (entry) => {
         const response = await fetch(entry.value);
@@ -67,6 +67,7 @@ function Documentation() {
     } catch (e) {
       console.error(e);
     }
+
     setIsLoading(false);
   }, []);
 
