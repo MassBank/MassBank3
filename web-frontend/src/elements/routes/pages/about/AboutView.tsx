@@ -177,7 +177,7 @@ function AboutView() {
       <Segmented
         elements={elements}
         elementLabels={elementLabels}
-        width="100%"
+        width={width}
         height="100%"
       />
     </Content>

@@ -40,7 +40,6 @@ function ResultTable({
             alignItems: 'center',
           }}
         >
-          {' '}
           <Chart
             peakData={reference}
             peakData2={
@@ -100,7 +99,6 @@ function ResultTable({
 
   const dataSource: ResultTableDataType[] = useMemo(() => {
     const rows: ResultTableDataType[] = [];
-
     hits.forEach((hit) => {
       const row: ResultTableDataType = {
         key: 'result-table-row_' + hit.index + '_' + hit.score,
@@ -111,7 +109,6 @@ function ResultTable({
         chart: buildChart(hit),
         structure: buildStructure(hit.record.compound.smiles),
       };
-
       rows.push(row);
     });
 

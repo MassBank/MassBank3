@@ -13,7 +13,7 @@ export default function useIsVisible(
         setIntersecting(entry.isIntersecting);
       },
       {
-        threshold: 0.5,
+        threshold: 0.99,
       },
     );
 

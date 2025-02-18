@@ -1,3 +1,5 @@
+import './Segmented.scss';
+
 import { Segmented as SegmentedAntD } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import { SegmentedOptions } from 'antd/es/segmented';
@@ -10,8 +12,8 @@ import {
   useRef,
   useState,
 } from 'react';
-import useContainerDimensions from '../../utils/useContainerDimensions';
 import useIsVisible from '../../utils/useIsVisible';
+import segmentedWidth from '../../constants/segmentedWidth';
 
 type InputProps = {
   elements: (JSX.Element | string)[];
@@ -27,7 +29,6 @@ function Segmented({
   height = '100%',
 }: InputProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const { width: segmentedWidth } = useContainerDimensions(ref);
   const [activeSegment, setActiveSegment] = useState<string | undefined>();
 
   const elementRefs = useMemo(
@@ -60,9 +61,7 @@ function Segmented({
   const handleOnChange = useCallback(
     (value: string) => {
       const index = elementLabels.indexOf(value);
-      elementRefs[index].current?.scrollIntoView({
-        behavior: 'smooth',
-      });
+      elementRefs[index].current?.scrollIntoView();
       setActiveSegment(value);
     },
     [elementLabels, elementRefs],
@@ -86,12 +85,13 @@ function Segmented({
           onChange={handleOnChange}
           vertical
           style={{
+            width: segmentedWidth,
             height,
           }}
         />
         <Content
           style={{
-            width: `calc(100% - ${segmentedWidth})`,
+            width: `calc(${width} - ${segmentedWidth})`,
             height: '100%',
             display: 'block',
             justifyContent: 'center',
@@ -104,7 +104,7 @@ function Segmented({
               key={index}
               ref={elementRefs[index]}
               style={{
-                width: `calc(100% - ${segmentedWidth})`,
+                width: (width as number) - segmentedWidth,
               }}
             >
               {element}
@@ -120,7 +120,6 @@ function Segmented({
       handleOnChange,
       height,
       options,
-      segmentedWidth,
       width,
     ],
   );

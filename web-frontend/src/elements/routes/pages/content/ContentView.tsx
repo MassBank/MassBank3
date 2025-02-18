@@ -24,6 +24,8 @@ import defaultSearchFieldValues from '../../../../constants/defaultSearchFieldVa
 import ResultTableSortOption from '../../../../types/ResultTableSortOption';
 import sortHits from '../../../../utils/sortHits';
 import collapseButtonWidth from '../../../../constants/collapseButtonWidth';
+import Segmented from '../../../basic/Segmented';
+import segmentedWidth from '../../../../constants/segmentedWidth';
 
 function ContentView() {
   const ref = useRef(null);
@@ -126,7 +128,7 @@ function ContentView() {
           key={'chart_' + key}
           content={propertyFilterOptions}
           identifier={key}
-          width={width / 2}
+          width={(width - segmentedWidth) / 2}
           height={heights.chartPanelHeight / 2}
         />
       ));
@@ -134,7 +136,7 @@ function ContentView() {
       return (
         <Content
           style={{
-            width,
+            width: width - segmentedWidth,
             height: heights.chartPanelHeight,
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
@@ -209,7 +211,7 @@ function ContentView() {
     return (
       <SearchAndResultPanel
         searchPanel={searchPanel}
-        width={width}
+        width={width - segmentedWidth}
         height={heights.searchPanelHeight}
         searchPanelWidth={searchPanelWidth}
         widthOverview={width}
@@ -235,8 +237,21 @@ function ContentView() {
     handleOnResize,
   ]);
 
-  return useMemo(
-    () => (
+  return useMemo(() => {
+    const elements = [
+      searchAndResultPanel,
+      <Content>
+        <SectionDivider label="Charts (Selection)" />
+        {charts}
+      </Content>,
+      <Content>
+        <SectionDivider label="Information" />
+        <MetadataPanel metadata={metadata} />
+      </Content>,
+    ];
+    const elementLabels = ['Filter', 'Charts', 'Information'];
+
+    return (
       <Layout
         ref={ref}
         style={{
@@ -260,16 +275,16 @@ function ContentView() {
             backgroundColor: 'white',
           }}
         >
-          {searchAndResultPanel}
-          <SectionDivider label="Charts (Selection)" />
-          {charts}
-          <SectionDivider label="Information" />
-          <MetadataPanel metadata={metadata} />
+          <Segmented
+            elements={elements}
+            elementLabels={elementLabels}
+            width={width}
+            height="100%"
+          />
         </Content>
       </Layout>
-    ),
-    [charts, isFetchingContent, metadata, searchAndResultPanel],
-  );
+    );
+  }, [charts, isFetchingContent, metadata, searchAndResultPanel, width]);
 }
 
 export default ContentView;
