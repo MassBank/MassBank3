@@ -1,21 +1,18 @@
 import { Content } from 'antd/es/layout/layout';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Spin, Tabs } from 'antd';
-import type { TabsProps } from 'antd';
-import { splitStringAndJoin } from '../../../../utils/stringUtils';
+import { Spin } from 'antd';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import Placeholder from '../../../basic/Placeholder';
+import Segmented from '../../../basic/Segmented';
+import useContainerDimensions from '../../../../utils/useContainerDimensions';
 
-const tabsHeight = 50;
-
-type labelValueType = {
+type LabelValueType = {
   label: string;
   value: string;
 };
 
-const markDownUrls: labelValueType[] = [
+const markDownUrls: LabelValueType[] = [
   {
     label: 'User',
     value:
@@ -39,31 +36,22 @@ const markDownUrls: labelValueType[] = [
 
 function Documentation() {
   const ref = useRef(null);
-  const { height } = useContainerDimensions(ref);
+  const { width } = useContainerDimensions(ref);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [markDowns, setMarkDowns] = useState<labelValueType[]>([]);
-  const [activeKey, setActiveKey] = useState<string | undefined>(undefined);
-
-  const handleOnChange = useCallback((key: string) => {
-    setActiveKey(key);
-  }, []);
+  const [markDowns, setMarkDowns] = useState<LabelValueType[]>([]);
 
   const fetchMarkDowns = useCallback(async () => {
     setIsLoading(true);
 
     try {
-      markDownUrls.forEach(async (entry) => {
+      const _markDowns: LabelValueType[] = [];
+      for (const entry of markDownUrls) {
         const response = await fetch(entry.value);
         const md = await response.text();
 
-        setMarkDowns((prev) => [
-          ...prev,
-          {
-            label: entry.label,
-            value: md,
-          },
-        ]);
-      });
+        _markDowns.push({ label: entry.label, value: md });
+      }
+      setMarkDowns(_markDowns);
     } catch (e) {
       console.error(e);
     }
@@ -75,27 +63,22 @@ function Documentation() {
     fetchMarkDowns();
   }, [fetchMarkDowns]);
 
-  const items: TabsProps['items'] = useMemo(
+  const elements = useMemo(
     () =>
-      markDowns.map((entry) => ({
-        key: entry.label,
-        label: splitStringAndJoin(entry.label, '_', ' '),
-        children: (
-          <Content
-            style={{
-              width: '100%',
-              height: height - tabsHeight,
-              display: 'block',
-              justifyContent: 'center',
-              alignItems: 'center',
-              overflow: 'scroll',
-            }}
-          >
-            <Markdown remarkPlugins={[remarkGfm]} children={entry.value} />
-          </Content>
-        ),
-      })),
-    [height, markDowns],
+      markDowns.map((entry) => (
+        <Content
+          key={'markdown-entry-' + entry.label}
+          style={{ width: '100%', height: '100%' }}
+        >
+          <Markdown remarkPlugins={[remarkGfm]} children={entry.value} />
+        </Content>
+      )),
+    [markDowns],
+  );
+
+  const elementLabels = useMemo(
+    () => markDowns.map((entry) => entry.label),
+    [markDowns],
   );
 
   return useMemo(
@@ -122,18 +105,11 @@ function Documentation() {
             size="large"
           />
         ) : markDowns.length > 0 ? (
-          <Tabs
-            activeKey={activeKey}
-            items={items}
-            onChange={handleOnChange}
-            tabBarStyle={{
-              width: '100%',
-              height: tabsHeight,
-              padding: 0,
-              margin: 0,
-              backgroundColor: '#f3ece0',
-            }}
-            centered
+          <Segmented
+            elements={elements}
+            elementLabels={elementLabels}
+            width={width}
+            height="100%"
           />
         ) : (
           <Placeholder
@@ -143,7 +119,7 @@ function Documentation() {
         )}
       </Content>
     ),
-    [activeKey, handleOnChange, isLoading, items, markDowns.length],
+    [elementLabels, elements, isLoading, markDowns.length],
   );
 }
 

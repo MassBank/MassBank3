@@ -10,6 +10,8 @@ import CommentsTable from './CommentsTable';
 import SpeciesTable from './SpeciesTable';
 import InformationTable from './InformationTable';
 import SectionDivider from '../basic/SectionDivider';
+import Segmented from '../basic/Segmented';
+import segmentedWidth from '../../constants/segmentedWidth';
 
 type inputProps = {
   record: Record;
@@ -30,7 +32,7 @@ function RecordView({ record, width, height }: inputProps) {
   );
 
   return useMemo(() => {
-    const hasAnotation =
+    const hasAnnotation =
       record.peak &&
       record.peak.annotation &&
       record.peak.annotation.header &&
@@ -40,63 +42,129 @@ function RecordView({ record, width, height }: inputProps) {
     const hasSpecies = record.species && Object.keys(record.species).length > 0;
     const hasComments = record.comments && record.comments.length > 0;
 
-    return (
-      <Content
-        style={{
-          width,
-          height,
-          display: 'block',
-          overflow: 'scroll',
-          userSelect: 'none',
-          backgroundColor: 'white',
-        }}
-      >
-        <RecordViewHeader
-          record={record}
-          width="100%"
-          height={headerHeight}
-          imageWidth={imageWidth}
-        />
+    const elements: JSX.Element[] = [];
+    const elementLabels: string[] = [];
+
+    const overview = (
+      <RecordViewHeader
+        record={record}
+        width="100%"
+        height={headerHeight}
+        imageWidth={imageWidth}
+      />
+    );
+    elements.push(overview);
+    elementLabels.push('Overview');
+
+    const spectrum = (
+      <Content>
         {buildDivider('Spectrum')}
         <Resizable
           record={record}
-          width={width as number}
+          width={(width as number) - segmentedWidth}
           height={chartAndPeakTableHeight}
           minChartWidth={minChartWidth}
           minPeakTableWith={minPeakTableWith}
         />
-        {hasAnotation && buildDivider('Peak Annotation')}
-        {hasAnotation && (
-          <AnnotationTable
-            annotation={record.peak.annotation}
-            width="100%"
-            height="auto"
-          />
-        )}
+      </Content>
+    );
+    elements.push(spectrum);
+    elementLabels.push('Spectrum');
+
+    if (hasAnnotation) {
+      const peakAnnotation = (
+        <Content>
+          {buildDivider('Peak Annotation')}
+          {
+            <AnnotationTable
+              annotation={record.peak.annotation}
+              width="100%"
+              height="auto"
+            />
+          }
+        </Content>
+      );
+      elements.push(peakAnnotation);
+      elementLabels.push('Peak Annotation');
+    }
+
+    const acquisition = (
+      <Content>
         {buildDivider('Acquisition')}
         <AcquisitionTable
           acquisition={record.acquisition}
           width="100%"
           height="auto"
         />
-        {hasLinks && buildDivider('Links')}
-        {hasLinks && (
+      </Content>
+    );
+    elements.push(acquisition);
+    elementLabels.push('Acquisition');
+
+    if (hasLinks) {
+      const links = (
+        <Content>
+          {buildDivider('Links')}
           <LinksTable links={record.compound.link} width="100%" height="auto" />
-        )}
-        {hasSpecies && buildDivider('Species')}
-        {hasSpecies && (
+        </Content>
+      );
+      elements.push(links);
+      elementLabels.push('Links');
+    }
+
+    if (hasSpecies) {
+      const species = (
+        <Content>
+          {buildDivider('Species')}
           <SpeciesTable species={record.species} width="100%" height="auto" />
-        )}
-        {hasComments && buildDivider('Comments')}
-        {hasComments && (
+        </Content>
+      );
+      elements.push(species);
+      elementLabels.push('Species');
+    }
+
+    if (hasComments) {
+      const comments = (
+        <Content>
+          {buildDivider('Comments')}
           <CommentsTable
             comments={record.comments}
             width="100%"
             height="auto"
           />
-        )}
+        </Content>
+      );
+      elements.push(comments);
+      elementLabels.push('Comments');
+    }
+
+    const furtherInformation = (
+      <Content>
         {buildDivider('Further Information')}
         <InformationTable record={record} width="100%" height="auto" />
+      </Content>
+    );
+    elements.push(furtherInformation);
+    elementLabels.push('Further Information');
+
+    return (
+      <Content
+        style={{
+          width,
+          height,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          userSelect: 'none',
+          backgroundColor: 'white',
+        }}
+      >
+        <Segmented
+          elements={elements}
+          elementLabels={elementLabels}
+          width={width}
+          height={height}
+        />
       </Content>
     );
   }, [buildDivider, height, minChartWidth, record, width]);

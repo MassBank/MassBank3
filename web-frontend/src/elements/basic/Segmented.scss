@@ -1,0 +1,18 @@
+$color: lightblue;
+
+.ant-segmented {
+  border: 1px solid lightgrey !important;
+  border-radius: 0 !important;
+}
+
+.ant-segmented-item {
+  transition: $color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
+}
+
+.ant-segmented-item-selected {
+  background-color: $color !important;
+}
+
+.ant-segmented-thumb {
+  background-color: $color !important;
+}
