@@ -119,7 +119,7 @@ function Documentation() {
         )}
       </Content>
     ),
-    [elementLabels, elements, isLoading, markDowns.length],
+    [elementLabels, elements, isLoading, markDowns.length, width],
   );
 }
 
