@@ -10,6 +10,9 @@ image:
   tag: "v1.4"
   pullPolicy: IfNotPresent
 
+# use this string as a common suffix for all ingress
+commonSuffix: "MassBank"
+
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 # This is to override the chart name.
@@ -64,7 +67,7 @@ ingress:
   hosts:
     - host: msbi.ipb-halle.de
       paths:
-        - path: /MassBank-export(/|$)(.*)
+        - path: /{{ .Values.commonSuffix }}-export(/|$)(.*)
           pathType: ImplementationSpecific
   tls: []
   #  - secretName: chart-example-tls
