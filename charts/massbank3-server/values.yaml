@@ -7,7 +7,7 @@ image:
   pullPolicy: IfNotPresent
 
 # use this string as a common suffix for all ingress
-commonSuffix: "MassBank3"
+commonSuffix: "MassBank4"
 
 # postggresql config
 # for massbank we need a special version of postgres with bingo cartridge
@@ -16,10 +16,7 @@ global:
     allowInsecureImages: true
 postgresql:
   image:
-    repository: quay.io/massbank/postgres-bingo
-    tag: "v15-bingo-1.28.0"
-    debug: true
-    pullPolicy: Always
+    tag: "15"
   auth:
     postgresPassword: "massbank3adminpassword"
     username: "massbank3"
@@ -30,9 +27,28 @@ postgresql:
       user: "postgres"
       password: "massbank3adminpassword"
       scripts:
+        000_bingo_install.sql: |
+          \i /opt/bingo-postgres/init-scripts/000_bingo_install.sql
         00_init.sql: |
           -- update ALLOW_NON_UNIQUE_DEAROMATIZATION to 1 --
           UPDATE bingo.bingo_config SET cvalue = 1 WHERE cname = 'ALLOW_NON_UNIQUE_DEAROMATIZATION';
+    initContainers:
+      - name: bingo-init
+        image: quay.io/massbank/postgres-bingo-init:v15-bingo-1.28.0
+        command:
+          - "sh"
+          - "-c"
+          - |
+            cp -rp /bingo-postgres/* /opt/bingo-postgres/
+        volumeMounts:
+          - name: bingo-volume
+            mountPath: /opt/bingo-postgres
+    extraVolumes: |
+      - name: bingo-volume
+        emptyDir: {}
+    extraVolumeMounts: |
+      - name: bingo-volume
+        mountPath: /opt/bingo-postgres
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
@@ -110,11 +126,11 @@ resources: {}
 # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 livenessProbe:
   httpGet:
-    path: /version
+    path: /v1/version
     port: http
 readinessProbe:
   httpGet:
-    path: /version
+    path: /v1/version
     port: http
 
 # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
