@@ -1,3 +1,5 @@
+import './UserInterface.scss';
+
 import { Content } from 'antd/es/layout/layout';
 import Header from '../header/Header';
 import Footer from '../footer/Footer';
@@ -14,31 +16,20 @@ type InputProps = {
 function UserInterface({ body }: InputProps) {
   return useMemo(
     () => (
-      <Layout style={{ width: '100vw', height: '100vh' }}>
+      <Layout className="user-interface">
+        <Header height={headerHeight} />
         <Content
           style={{
             width: '100%',
-            height: '100%',
+            height: `calc(100% - ${headerHeight} - ${footerHeight})`,
             display: 'flex',
-            flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
           }}
         >
-          <Header height={headerHeight} />
-          <Content
-            style={{
-              width: '100%',
-              height: `calc(100% - ${headerHeight} - ${footerHeight})`,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            {body}
-          </Content>
-          <Footer height={footerHeight} />
+          {body}
         </Content>
+        <Footer height={footerHeight} />
       </Layout>
     ),
     [body],
