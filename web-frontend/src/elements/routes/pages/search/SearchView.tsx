@@ -33,6 +33,8 @@ import defaultSearchFieldValues from '../../../../constants/defaultSearchFieldVa
 import ResultTableSortOption from '../../../../types/ResultTableSortOption';
 import collapseButtonWidth from '../../../../constants/collapseButtonWidth';
 
+const defaultSearchPanelWidth = 450;
+
 function SearchView() {
   const ref = useRef(null);
   const { width, height } = useContainerDimensions(ref);
@@ -52,7 +54,9 @@ function SearchView() {
   const [initialValues, setInitialValues] = useState<
     SearchFields | undefined
   >();
-  const [searchPanelWidth, setSearchPanelWidth] = useState<number>(450);
+  const [searchPanelWidth, setSearchPanelWidth] = useState<number>(
+    defaultSearchPanelWidth,
+  );
 
   const handleOnFetchContent = useCallback(
     async (formDataContent: ContentFilterOptions | undefined) => {
@@ -177,7 +181,9 @@ function SearchView() {
 
   const handleOnCollapse = useCallback((_collapsed: boolean) => {
     setIsCollapsed(_collapsed);
-    setSearchPanelWidth(_collapsed ? collapseButtonWidth : 450);
+    setSearchPanelWidth(
+      _collapsed ? collapseButtonWidth : defaultSearchPanelWidth,
+    );
   }, []);
 
   const searchPanel = useMemo(

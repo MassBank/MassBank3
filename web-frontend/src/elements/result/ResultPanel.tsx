@@ -284,7 +284,6 @@ function ResultPanel({
         }}
       >
         <Pagination
-          size="small"
           total={hits.length}
           pageSize={pageLimit}
           showTotal={(total) => (
@@ -319,7 +318,6 @@ function ResultPanel({
         />
         {sortOptions.length > 0 && (
           <Select
-            size="small"
             defaultValue={selectedSortOption}
             style={{ width: 200 }}
             placeholder="Sort by"
@@ -336,7 +334,6 @@ function ResultPanel({
 
         <Dropdown menu={{ items }} trigger={['click']}>
           <Button
-            size="small"
             style={{
               width: 100,
               marginRight: 30,

@@ -1,4 +1,4 @@
-import { Button, Result } from 'antd';
+import { Button, Layout, Result } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -14,26 +14,33 @@ function NotFoundView() {
 
   return useMemo(
     () => (
-      <Content
+      <Layout
         style={{
           width: '100%',
           height: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
         }}
       >
-        <Result
-          status="404"
-          title="404"
-          subTitle="Sorry, the page you visited does not exist."
-          extra={
-            <Button type="primary" onClick={handleOnNavigateHome}>
-              Back Home
-            </Button>
-          }
-        />
-      </Content>
+        <Content
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Result
+            status="404"
+            title="404"
+            subTitle="Sorry, the page you visited does not exist."
+            extra={
+              <Button type="primary" onClick={handleOnNavigateHome}>
+                Back Home
+              </Button>
+            }
+          />
+        </Content>
+      </Layout>
     ),
     [handleOnNavigateHome],
   );

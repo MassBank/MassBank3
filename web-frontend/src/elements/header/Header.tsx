@@ -8,7 +8,7 @@ import { usePropertiesContext } from '../../context/properties/properties';
 import { CSSProperties, useMemo } from 'react';
 import logo from '../../assets/logo.svg';
 
-const backgroundColor: CSSProperties['backgroundColor'] = 'white';
+const backgroundColor: CSSProperties['backgroundColor'] = 'rgb(223, 223, 223)';
 
 type InputProps = {
   height: CSSProperties['height'];
@@ -31,7 +31,8 @@ function Header({ height }: InputProps) {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            height: `calc(${height} - 5px)`,
+            height:
+              typeof height === 'number' ? height - 5 : `calc(${height} - 5px)`,
             backgroundColor,
           }}
         >
@@ -39,7 +40,13 @@ function Header({ height }: InputProps) {
             <img
               src={logo}
               alt="MassBank Europe"
-              style={{ height: (height as number) - 5 }}
+              style={{
+                height:
+                  typeof height === 'number'
+                    ? height - 5
+                    : `calc(${height} - 5px)`,
+                padding: 5,
+              }}
             />
           </Link>
         </Button>
@@ -68,7 +75,10 @@ function Header({ height }: InputProps) {
                   key={path + '-li'}
                   style={{
                     color: path == location.pathname ? 'blue' : 'black',
-                    height: `calc(${height} - 5px)`,
+                    height:
+                      typeof height === 'number'
+                        ? height - 5
+                        : `calc(${height} - 5px)`,
                     backgroundColor,
                   }}
                 >
@@ -90,7 +100,7 @@ function Header({ height }: InputProps) {
           height,
           display: 'flex',
           flexDirection: 'row',
-          justifyContent: 'center',
+          justifyContent: 'left',
           alignItems: 'center',
           backgroundColor,
           padding: 0,
@@ -104,7 +114,7 @@ function Header({ height }: InputProps) {
             width: '100%',
             height,
             display: 'flex',
-            justifyContent: 'space-evenly',
+            justifyContent: 'left',
             alignItems: 'center',
             backgroundColor,
           }}

@@ -1,6 +1,6 @@
 import { Content } from 'antd/es/layout/layout';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Spin } from 'antd';
+import { Layout, Spin } from 'antd';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Placeholder from '../../../basic/Placeholder';
@@ -68,7 +68,7 @@ function Documentation() {
       markDowns.map((entry) => (
         <Content
           key={'markdown-entry-' + entry.label}
-          style={{ width: '100%', height: '100%' }}
+          style={{ width: '100%', height: '100%', padding: 10 }}
         >
           <Markdown remarkPlugins={[remarkGfm]} children={entry.value} />
         </Content>
@@ -83,41 +83,48 @@ function Documentation() {
 
   return useMemo(
     () => (
-      <Content
+      <Layout
         ref={ref}
         style={{
           width: '100%',
           height: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
         }}
       >
-        {isLoading ? (
-          <Spin
-            style={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-            size="large"
-          />
-        ) : markDowns.length > 0 ? (
-          <Segmented
-            elements={elements}
-            elementLabels={elementLabels}
-            width={width}
-            height="100%"
-          />
-        ) : (
-          <Placeholder
-            child="Could not fetch documentation data"
-            style={{ width: '100%', height: '100%' }}
-          />
-        )}
-      </Content>
+        <Content
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          {isLoading ? (
+            <Spin
+              style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              size="large"
+            />
+          ) : markDowns.length > 0 ? (
+            <Segmented
+              elements={elements}
+              elementLabels={elementLabels}
+              width={width}
+              height="100%"
+            />
+          ) : (
+            <Placeholder
+              child="Could not fetch documentation data"
+              style={{ width: '100%', height: '100%' }}
+            />
+          )}
+        </Content>
+      </Layout>
     ),
     [elementLabels, elements, isLoading, markDowns.length, width],
   );

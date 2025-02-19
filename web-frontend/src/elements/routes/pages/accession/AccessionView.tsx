@@ -8,6 +8,7 @@ import AccessionSearchInputField from '../../../common/AccessionSearchInputField
 import searchAccession from '../../../../utils/request/searchAccession';
 import { useSearchParams } from 'react-router-dom';
 import { usePropertiesContext } from '../../../../context/properties/properties';
+import accessionSearchInputFieldHeight from '../../../../constants/accessionSearchInputFieldHeight';
 
 function AccessionView() {
   const ref = useRef(null);
@@ -19,8 +20,6 @@ function AccessionView() {
   const [record, setRecord] = useState<Record | undefined>();
   const [searchParams] = useSearchParams();
   const accession = searchParams.get('id');
-
-  const headerHeight = 50;
 
   const handleOnSearch = useCallback(
     async (acc: string) => {
@@ -46,7 +45,7 @@ function AccessionView() {
         <RecordView
           record={record}
           width={width}
-          height={height - headerHeight}
+          height={height - accessionSearchInputFieldHeight}
         />
       ) : requestedAccession !== '' ? (
         <p style={{ fontWeight: 'bolder', fontSize: 'larger' }}>
@@ -59,17 +58,23 @@ function AccessionView() {
   return useMemo(
     () => (
       <Layout ref={ref} style={{ width: '100%', height: '100%' }}>
-        <Header style={{ width: '100%', height: headerHeight, padding: 0 }}>
+        <Header
+          style={{
+            width: '100%',
+            height: accessionSearchInputFieldHeight,
+            padding: 0,
+          }}
+        >
           <AccessionSearchInputField
             width="100%"
-            height={headerHeight}
+            height={accessionSearchInputFieldHeight}
             accession={accession ?? ''}
           />
         </Header>
         <Content
           style={{
             width: '100%',
-            height: height - headerHeight,
+            height: height - accessionSearchInputFieldHeight,
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
