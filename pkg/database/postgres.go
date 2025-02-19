@@ -861,10 +861,7 @@ func (p *PostgresSQLDB) GetAccessionsBySubstructure(substructure string) ([]stri
 
 
 // GetRecordsBySubstructure see [MB3Database.GetRecordsBySubstructure]
-func (p *PostgresSQLDB) GetRecordsBySubstructure(substructure string) (*[]massbank.MassBank2, error) {
-	
-	fmt.Println("substructure: ", substructure)
-	
+func (p *PostgresSQLDB) GetRecordsBySubstructure(substructure string) (*[]massbank.MassBank2, error) {	
 	records := []massbank.MassBank2{}
 	accessions, _, err := p.GetAccessionsBySubstructure(substructure)
 	if err != nil {
