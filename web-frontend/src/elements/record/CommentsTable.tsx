@@ -1,7 +1,7 @@
 import './Table.scss';
 
 import { CSSProperties, useMemo } from 'react';
-import SubTag from '../../types/SubTag';
+import SubTag from '../../types/record/SubTag';
 import { Table } from 'antd';
 
 type InputProps = {

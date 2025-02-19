@@ -4,8 +4,7 @@ import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
 import News from '../../../common/News';
 import SectionDivider from '../../../basic/SectionDivider';
-
-const accessionSearchInputFieldHeight = 50;
+import accessionSearchInputFieldHeight from '../../../../constants/accessionSearchInputFieldHeight';
 
 function HomeView() {
   const ref = useRef(null);

@@ -1,5 +1,5 @@
 import Record from '../../types/record/Record';
-import { CSSProperties, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import Resizable from '../common/Resizable';
 import { Content } from 'antd/es/layout/layout';
 import AnnotationTable from './AnnotationTable';
@@ -15,14 +15,14 @@ import segmentedWidth from '../../constants/segmentedWidth';
 
 type inputProps = {
   record: Record;
-  width: CSSProperties['width'];
-  height: CSSProperties['height'];
+  width: number;
+  height: number;
 };
 
 function RecordView({ record, width, height }: inputProps) {
   const imageWidth = 500;
   const headerHeight = 400;
-  const minChartWidth = useMemo(() => (width as number) / 2, [width]);
+  const minChartWidth = useMemo(() => width / 2, [width]);
   const minPeakTableWith = 400;
   const chartAndPeakTableHeight = 500;
 
@@ -61,7 +61,7 @@ function RecordView({ record, width, height }: inputProps) {
         {buildDivider('Spectrum')}
         <Resizable
           record={record}
-          width={(width as number) - segmentedWidth}
+          width={width - segmentedWidth}
           height={chartAndPeakTableHeight}
           minChartWidth={minChartWidth}
           minPeakTableWith={minPeakTableWith}

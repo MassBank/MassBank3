@@ -78,7 +78,6 @@ function ContentChart({ content, identifier, width, height }: InputProps) {
           width,
           height,
           display: 'flex',
-          // flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
           padding: 0,

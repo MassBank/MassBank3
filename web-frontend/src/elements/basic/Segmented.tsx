@@ -91,7 +91,10 @@ function Segmented({
         />
         <Content
           style={{
-            width: `calc(${width} - ${segmentedWidth})`,
+            width:
+              typeof width === 'number'
+                ? width - segmentedWidth
+                : `calc(${width} - ${segmentedWidth})`,
             height: '100%',
             display: 'block',
             justifyContent: 'center',
@@ -104,7 +107,10 @@ function Segmented({
               key={index}
               ref={elementRefs[index]}
               style={{
-                width: (width as number) - segmentedWidth,
+                width:
+                  typeof width === 'number'
+                    ? width - segmentedWidth
+                    : `calc(${width} - ${segmentedWidth})`,
               }}
             >
               {element}

@@ -27,6 +27,8 @@ import collapseButtonWidth from '../../../../constants/collapseButtonWidth';
 import Segmented from '../../../basic/Segmented';
 import segmentedWidth from '../../../../constants/segmentedWidth';
 
+const defaultSearchPanelWidth = 450;
+
 function ContentView() {
   const ref = useRef(null);
   const { width, height } = useContainerDimensions(ref);
@@ -40,7 +42,9 @@ function ContentView() {
     ContentFilterOptions | undefined
   >();
   const [metadata, setMetadata] = useState<Metadata | undefined>();
-  const [searchPanelWidth, setSearchPanelWidth] = useState<number>(450);
+  const [searchPanelWidth, setSearchPanelWidth] = useState<number>(
+    defaultSearchPanelWidth,
+  );
 
   const handleOnFetchContent = useCallback(
     async (formDataContent: ContentFilterOptions | undefined) => {
@@ -113,10 +117,12 @@ function ContentView() {
     handleOnSearch(undefined);
   }, [handleOnFetchContent, handleOnSearch]);
 
-  const heights = {
-    chartPanelHeight: 600,
-    searchPanelHeight: 600,
-  };
+  const heights = useMemo(() => {
+    return {
+      chartPanelHeight: height * 0.9,
+      searchPanelHeight: height * 0.9,
+    };
+  }, [height]);
 
   const charts = useMemo(() => {
     if (propertyFilterOptions) {
@@ -166,7 +172,9 @@ function ContentView() {
 
   const handleOnCollapse = useCallback((_collapsed: boolean) => {
     setIsCollapsed(_collapsed);
-    setSearchPanelWidth(_collapsed ? collapseButtonWidth : 450);
+    setSearchPanelWidth(
+      _collapsed ? collapseButtonWidth : defaultSearchPanelWidth,
+    );
   }, []);
 
   const handleOnSelectSort = useCallback(
