@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { Layout, Typography } from 'antd';
+import { Layout, List, Typography } from 'antd';
 const { Paragraph, Text } = Typography;
 import { Content } from 'antd/es/layout/layout';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
@@ -63,64 +63,87 @@ function AboutView() {
       </Content>
     );
 
+    const data: JSX.Element[] = [
+      <Content>
+        <a href="https://cdk.github.io/" target="_blank">
+          CDK
+        </a>
+        <br />
+        <label>
+          Willighagen, E.L., Mayfield, J.W., Alvarsson, J. et al. The Chemistry
+          Development Kit (CDK) v2.0: atom typing, depiction, molecular
+          formulas, and substructure searching. J Cheminform 9, 33 (2017).
+        </label>{' '}
+        <a href="https://doi.org/10.1186/s13321-017-0220-4" target="_blank">
+          https://doi.org/10.1186/s13321-017-0220-4
+        </a>
+      </Content>,
+      <Content>
+        <a href="https://github.com/matchms" target="_blank">
+          matchms
+        </a>
+        <br />
+        <label>
+          Huber et al., (2020). matchms - processing and similarity evaluation
+          of mass spectrometry data.. Journal of Open Source Software, 5(52).
+          2411.
+        </label>{' '}
+        <a href="https://doi.org/10.21105/joss.02411" target="_blank">
+          https://doi.org/10.21105/joss.02411
+        </a>
+      </Content>,
+      <Content>
+        <a
+          href="https://github.com/epam/Indigo/tree/master/bingo"
+          target="_blank"
+        >
+          Bingo
+        </a>
+        <br />
+        <label>
+          Pavlov, D., Rybalkin, M. & Karulin, B. Bingo from SciTouch LLC:
+          chemistry cartridge for Oracle database. J Cheminform 2 (Suppl 1), F1
+          (2010).
+        </label>{' '}
+        <a href="https://doi.org/10.1186/1758-2946-2-S1-F1" target="_blank">
+          https://doi.org/10.1186/1758-2946-2-S1-F1
+        </a>
+      </Content>,
+      <Content>
+        <a href="https://github.com/cheminfo/openchemlib-js" target="_blank">
+          OpenChemLib JS
+        </a>
+        <br />
+        <label>
+          Zasso, M., Patiny, L., Sander, T., & Rufener, C. openchemlib-js:
+          library to manipulate chemical structures and reactions in JavaScript
+          [Computer software].
+        </label>{' '}
+        <a href="https://doi.org/10.5281/zenodo.5139988" target="_blank">
+          https://doi.org/10.5281/zenodo.5139988
+        </a>
+      </Content>,
+    ];
+
     const acknowledgement = (
       <Content>
         <SectionDivider label="Acknowledgement" />
         <Paragraph style={{ padding: 10 }}>
-          <Text>
+          <Text
+            style={{
+              fontWeight: 'bolder',
+              marginLeft: 20,
+            }}
+          >
             Standing on the shoulder of giants, we would like to acknowledge
             some of the dependencies used in the MassBank system:
           </Text>
-          <ul>
-            <li>
-              {<a href="https://cdk.github.io/">CDK</a>}: Willighagen et al. The
-              Chemistry Development Kit (CDK) v2.0: atom typing, depiction,
-              molecular formulas, and substructure searching. J. Cheminform.
-              2017; 9(3),{' '}
-              {
-                <a
-                  href="https://doi.org/10.1186/s13321-017-0220-4"
-                  target="_blank"
-                >
-                  doi:10.1186/s13321-017-0220-4
-                </a>
-              }
-            </li>
-            <li>
-              {<a href="https://github.com/matchms">matchms</a>}:
-              <ul>
-                <li>
-                  F Huber, S. Verhoeven, C. Meijer, H. Spreeuw, E. M. Villanueva
-                  Castilla, C. Geng, J.J.J. van der Hooft, S. Rogers, A.
-                  Belloum, F. Diblen, J.H. Spaaks, (2020). matchms - processing
-                  and similarity evaluation of mass spectrometry data. Journal
-                  of Open Source Software, 5(52), 2411,
-                  <a href="https://doi.org/10.21105/joss.02411}">
-                    doi:10.21105/joss.02411
-                  </a>
-                </li>
-                <li>
-                  de Jonge NF, Hecht H, Michael Strobel, Mingxun Wang, van der
-                  Hooft JJJ, Huber F. (2024). Reproducible MS/MS library
-                  cleaning pipeline in matchms. Journal of Cheminformatics,
-                  2024,
-                  {
-                    <a
-                      href="https://doi.org/10.1186/s13321-024-00878-1"
-                      target="_blank"
-                    >
-                      doi:10.1186/s13321-024-00878-1
-                    </a>
-                  }
-                </li>
-              </ul>
-            </li>
-            <li>Zakodium components: ...</li>
-            <li>
-              Further components: please check the source code and
-              configurations in our GitHub repository
-            </li>
-          </ul>
+          <List
+            dataSource={data}
+            renderItem={(item) => (
+              <List.Item style={{ border: 'none' }}>{item}</List.Item>
+            )}
+          />
         </Paragraph>
       </Content>
     );
