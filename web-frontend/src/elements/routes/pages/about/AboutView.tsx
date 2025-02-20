@@ -44,28 +44,144 @@ function AboutView() {
           kinds of mass spectral data are accepted. A range of search options
           are available for browsing the data. The MassBank library is based on
           text file records containing the record metadata and the mass spectral
-          information in the MassBank record format. All data is archived on
-          GitHub and Zenodo; the code is also on GitHub. The MassBank library
-          can be downloaded in different formats such as text records, database
-          files (sql) and MSP files.
+          information in the{' '}
+          {
+            <a
+              href="https://github.com/MassBank/MassBank-web/blob/main/Documentation/MassBankRecordFormat.md"
+              target="_blank"
+              style={{ color: 'black', textDecoration: 'underline' }}
+            >
+              MassBank record format
+            </a>
+          }
+          . All data is archived on{' '}
+          {
+            <a
+              href="https://github.com/MassBank/MassBank-data"
+              target="_blank"
+              style={{ color: 'black', textDecoration: 'underline' }}
+            >
+              GitHub
+            </a>
+          }{' '}
+          and{' '}
+          {
+            <a
+              href="https://zenodo.org/records/14221628"
+              target="_blank"
+              style={{ color: 'black', textDecoration: 'underline' }}
+            >
+              {' '}
+              Zenodo
+            </a>
+          }
+          ; the code is also on{' '}
+          {
+            <a
+              href="https://github.com/MassBank/MassBank3"
+              target="_blank"
+              style={{ color: 'black', textDecoration: 'underline' }}
+            >
+              GitHub
+            </a>
+          }
+          . The MassBank library can be downloaded in different{' '}
+          {
+            <a
+              href="https://github.com/MassBank/MassBank-data/releases"
+              target="_blank"
+              style={{ color: 'black', textDecoration: 'underline' }}
+            >
+              file formats
+            </a>
+          }{' '}
+          such as text records, database files (sql) and MSP files.
         </Paragraph>
         <Paragraph>
-          MassBank is maintained and developed by the MassBank consortium and is
-          supported by the NORMAN Association, FNR and NFDI4Chem. The main
-          sustainers and developers of MassBank and related tools are the team
-          of Steffen Neumann (Leibniz Institute of Plant Biochemistry. IPB,
-          Halle/Saale, Germany), Michael Stravs (Swiss Federal Institute of
-          Aquatic Science and Technology, EAWAG, Dübendorf, Switzerland), Emma
-          Schymanski (Luxembourg Centre for Systems Biomedicine, University of
-          Luxembourg, LCSB, Belvaux, Luxembourg), and Tobias Schulze (Helmholtz
-          Centre for Environmental Research, UFZ, Leipzig, Germany).
+          MassBank is maintained and developed by the{' '}
+          {
+            <a
+              href="https://github.com/MassBank"
+              target="_blank"
+              style={{ color: 'black', textDecoration: 'underline' }}
+            >
+              MassBank consortium
+            </a>
+          }{' '}
+          and is supported by the{' '}
+          {
+            <a
+              href="https://www.norman-network.net/"
+              target="_blank"
+              style={{ color: 'black', textDecoration: 'underline' }}
+            >
+              NORMAN Association
+            </a>
+          }
+          ,{' '}
+          {
+            <a
+              href="https://www.fnr.lu/"
+              target="_blank"
+              style={{ color: 'black', textDecoration: 'underline' }}
+            >
+              FNR
+            </a>
+          }{' '}
+          and{' '}
+          {
+            <a
+              href="https://www.nfdi4chem.de/"
+              target="_blank"
+              style={{ color: 'black', textDecoration: 'underline' }}
+            >
+              NFDI4Chem
+            </a>
+          }
+          . The main sustainers and developers of MassBank and related tools are
+          the team of Steffen Neumann (
+          {
+            <a
+              href="https://www.ipb-halle.de/en/research/program-center-metacom/research-groups/computational-plant-biochemistry"
+              target="_blank"
+              style={{ color: 'black', textDecoration: 'underline' }}
+            >
+              Leibniz Institute of Plant Biochemistry, Halle/Saale, Germany
+            </a>
+          }
+          ), Michael Stravs (
+          {
+            <a
+              href="https://www.eawag.ch/en/about-us/portrait/organisation/staff/profile/michael-stravs/show/"
+              target="_blank"
+              style={{ color: 'black', textDecoration: 'underline' }}
+            >
+              Swiss Federal Institute of Aquatic Science and Technology, EAWAG,
+              Dübendorf, Switzerland
+            </a>
+          }
+          ), Emma Schymanski (
+          <a
+            href="https://www.uni.lu/lcsb-en/people/emma-schymanski/"
+            target="_blank"
+            style={{ color: 'black', textDecoration: 'underline' }}
+          >
+            Luxembourg Centre for Systems Biomedicine, University of Luxembourg,
+            LCSB, Belvaux, Luxembourg
+          </a>
+          ) and the Helmholtz Centre for Environmental Research, Leipzig,
+          Germany.
         </Paragraph>
       </Content>
     );
 
     const data: JSX.Element[] = [
       <Content>
-        <a href="https://cdk.github.io/" target="_blank">
+        <a
+          href="https://cdk.github.io/"
+          target="_blank"
+          style={{ color: 'black', textDecoration: 'underline' }}
+        >
           CDK
         </a>
         <br />
@@ -79,7 +195,11 @@ function AboutView() {
         </a>
       </Content>,
       <Content>
-        <a href="https://github.com/matchms" target="_blank">
+        <a
+          href="https://github.com/matchms"
+          target="_blank"
+          style={{ color: 'black', textDecoration: 'underline' }}
+        >
           matchms
         </a>
         <br />
@@ -96,6 +216,7 @@ function AboutView() {
         <a
           href="https://github.com/epam/Indigo/tree/master/bingo"
           target="_blank"
+          style={{ color: 'black', textDecoration: 'underline' }}
         >
           Bingo
         </a>
@@ -110,7 +231,11 @@ function AboutView() {
         </a>
       </Content>,
       <Content>
-        <a href="https://github.com/cheminfo/openchemlib-js" target="_blank">
+        <a
+          href="https://github.com/cheminfo/openchemlib-js"
+          target="_blank"
+          style={{ color: 'black', textDecoration: 'underline' }}
+        >
           OpenChemLib JS
         </a>
         <br />
