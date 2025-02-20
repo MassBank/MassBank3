@@ -16,6 +16,7 @@ import ufzLogo from '../../../../assets/UFZ.png';
 import SectionDivider from '../../../basic/SectionDivider';
 import ServiceStatusView from './ServiceStatusView';
 import Segmented from '../../../basic/Segmented';
+import Imprint from './Imprint';
 
 const logos = [
   denbiLogo,
@@ -305,11 +306,24 @@ function AboutView() {
       </Content>
     );
 
-    return [infoText, supporters, acknowledgement, serviceStatus];
+    const imprint = (
+      <Content>
+        <SectionDivider label="Imprint" />
+        <Imprint />
+      </Content>
+    );
+
+    return [infoText, supporters, acknowledgement, serviceStatus, imprint];
   }, [width]);
 
   const elementLabels = useMemo(
-    () => ['Information', 'Supporters', 'Acknowledgement', 'Service Status'],
+    () => [
+      'Information',
+      'Supporters',
+      'Acknowledgement',
+      'Service Status',
+      'Imprint',
+    ],
     [],
   );
 

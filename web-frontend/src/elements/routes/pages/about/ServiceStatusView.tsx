@@ -66,7 +66,7 @@ function ServiceStatusView() {
       <Content
         style={{
           width: '100%',
-          height: 250,
+          height: 300,
           padding: 20,
           display: 'flex',
           flexDirection: 'column',

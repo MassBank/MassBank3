@@ -14,20 +14,23 @@ const port = 3000;
 const host = '0.0.0.0';
 
 const isProduction = process.env.NODE_ENV === 'production';
-const backendUrl = process.env.VITE_MB3_API_URL ?? 'http://localhost:8081';
-const frontendUrl =
-  process.env.VITE_MB3_FRONTEND_URL ?? 'http://localhost:8080';
-const baseUrl = process.env.VITE_MB3_BASE_URL ?? '/MassBank3/';
+const backendUrl = process.env.MB3_API_URL ?? 'http://localhost:8081';
+const frontendUrl = process.env.MB3_FRONTEND_URL ?? 'http://localhost:8080';
+const baseUrl = process.env.MB3_BASE_URL ?? '/MassBank3/';
 const exportServiceUrl =
-  process.env.VITE_EXPORT_SERVICE_URL ?? 'http://localhost:8083';
-const version = process.env.VITE_MB3_VERSION ?? '0.4.0 (beta)';
-const googleSearchConsoleKey = process.env.VITE_GOOGLE_SEARCH_CONSOLE_KEY ?? '';
+  process.env.EXPORT_SERVICE_URL ?? 'http://localhost:8083';
+const version = process.env.MB3_VERSION ?? '0.4.0 (beta)';
+const googleSearchConsoleKey = process.env.GOOGLE_SEARCH_CONSOLE_KEY ?? '';
 const backendUrlInternal =
-  process.env.VITE_MB3_API_URL_INTERNAL ?? 'http://mb3server:8080';
+  process.env.MB3_API_URL_INTERNAL ?? 'http://mb3server:8080';
 const similarityServiceUrl =
-  process.env.VITE_SIMILARITY_SERVICE_URL ?? 'http://localhost:8082';
+  process.env.SIMILARITY_SERVICE_URL ?? 'http://localhost:8082';
 const exportServiceUrlInternal =
-  process.env.VITE_EXPORT_SERVICE_URL_INTERNAL ?? 'http://export-service:8080';
+  process.env.EXPORT_SERVICE_URL_INTERNAL ?? 'http://export-service:8080';
+const distributorText =
+  process.env.DISTRIBUTOR_TEXT ??
+  'This website is hosted and distributed by ...';
+const distributorUrl = process.env.DISTRIBUTOR_URL ?? '...';
 
 console.log('\n');
 console.log('isProduction', process.env.NODE_ENV === 'production');
@@ -42,6 +45,8 @@ console.log('similarityServiceUrl', similarityServiceUrl);
 console.log('exportServiceUrl', exportServiceUrl);
 console.log('exportServiceUrlInternal', exportServiceUrlInternal);
 console.log('googleSearchConsoleKey', googleSearchConsoleKey);
+console.log('distributorText', distributorText);
+console.log('distributorUrl', distributorUrl);
 console.log('\n');
 
 // Create http server
@@ -274,6 +279,8 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       similarityServiceUrl,
       exportServiceUrl,
       version,
+      distributorText,
+      distributorUrl,
     } as PropertiesContextProps;
     const rendered = await render({
       path,
