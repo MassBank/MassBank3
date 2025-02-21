@@ -159,12 +159,7 @@ function RecordView({ record, width, height }: inputProps) {
           backgroundColor: 'white',
         }}
       >
-        <Segmented
-          elements={elements}
-          elementLabels={elementLabels}
-          width={width}
-          height={height}
-        />
+        <Segmented elements={elements} elementLabels={elementLabels} />
       </Content>
     );
   }, [buildDivider, height, minChartWidth, record, width]);

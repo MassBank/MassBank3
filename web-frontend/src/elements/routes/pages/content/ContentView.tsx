@@ -283,16 +283,11 @@ function ContentView() {
             backgroundColor: 'white',
           }}
         >
-          <Segmented
-            elements={elements}
-            elementLabels={elementLabels}
-            width={width}
-            height="100%"
-          />
+          <Segmented elements={elements} elementLabels={elementLabels} />
         </Content>
       </Layout>
     );
-  }, [charts, isFetchingContent, metadata, searchAndResultPanel, width]);
+  }, [charts, isFetchingContent, metadata, searchAndResultPanel]);
 }
 
 export default ContentView;

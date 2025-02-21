@@ -1,11 +1,11 @@
 import { Content } from 'antd/es/layout/layout';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Layout, Spin } from 'antd';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Placeholder from '../../../basic/Placeholder';
 import Segmented from '../../../basic/Segmented';
-import useContainerDimensions from '../../../../utils/useContainerDimensions';
+import SectionDivider from '../../../basic/SectionDivider';
 
 type LabelValueType = {
   label: string;
@@ -35,13 +35,11 @@ const markDownUrls: LabelValueType[] = [
 ];
 
 function Documentation() {
-  const ref = useRef(null);
-  const { width } = useContainerDimensions(ref);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isFetching, setIsFetching] = useState<boolean>(true);
   const [markDowns, setMarkDowns] = useState<LabelValueType[]>([]);
 
   const fetchMarkDowns = useCallback(async () => {
-    setIsLoading(true);
+    setIsFetching(true);
 
     try {
       const _markDowns: LabelValueType[] = [];
@@ -56,7 +54,7 @@ function Documentation() {
       console.error(e);
     }
 
-    setIsLoading(false);
+    setIsFetching(false);
   }, []);
 
   useEffect(() => {
@@ -70,6 +68,7 @@ function Documentation() {
           key={'markdown-entry-' + entry.label}
           style={{ width: '100%', height: '100%', padding: 10 }}
         >
+          <SectionDivider label={entry.label} />
           <Markdown remarkPlugins={[remarkGfm]} children={entry.value} />
         </Content>
       )),
@@ -84,7 +83,6 @@ function Documentation() {
   return useMemo(
     () => (
       <Layout
-        ref={ref}
         style={{
           width: '100%',
           height: '100%',
@@ -99,7 +97,7 @@ function Documentation() {
             alignItems: 'center',
           }}
         >
-          {isLoading ? (
+          {isFetching ? (
             <Spin
               style={{
                 width: '100%',
@@ -111,12 +109,7 @@ function Documentation() {
               size="large"
             />
           ) : markDowns.length > 0 ? (
-            <Segmented
-              elements={elements}
-              elementLabels={elementLabels}
-              width={width}
-              height="100%"
-            />
+            <Segmented elements={elements} elementLabels={elementLabels} />
           ) : (
             <Placeholder
               child="Could not fetch documentation data"
@@ -126,7 +119,7 @@ function Documentation() {
         </Content>
       </Layout>
     ),
-    [elementLabels, elements, isLoading, markDowns.length, width],
+    [elementLabels, elements, isFetching, markDowns.length],
   );
 }
 

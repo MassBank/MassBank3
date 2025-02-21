@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { Layout } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import SectionDivider from '../../../basic/SectionDivider';
@@ -10,8 +10,6 @@ import InfoText from './InfoText';
 import Supporters from './Supporters';
 
 function AboutView() {
-  const ref = useRef(null);
-
   const elements = useMemo(() => {
     const infoText = <InfoText />;
 
@@ -60,18 +58,12 @@ function AboutView() {
   return useMemo(
     () => (
       <Layout
-        ref={ref}
         style={{
           width: '100%',
           height: '100%',
         }}
       >
-        <Segmented
-          elements={elements}
-          elementLabels={elementLabels}
-          width="100%"
-          height="100%"
-        />
+        <Segmented elements={elements} elementLabels={elementLabels} />
       </Layout>
     ),
     [elementLabels, elements],
