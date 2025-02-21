@@ -154,8 +154,17 @@ function InfoText() {
             Luxembourg Centre for Systems Biomedicine, University of Luxembourg,
             LCSB, Belvaux, Luxembourg
           </a>
-          ) and the Helmholtz Centre for Environmental Research, Leipzig,
-          Germany.
+          ) and the{' '}
+          {
+            <a
+              href="https://www.ufz.de/"
+              target="_blank"
+              style={{ color: 'black', textDecoration: 'underline' }}
+            >
+              Helmholtz Centre for Environmental Research, Leipzig, Germany
+            </a>
+          }
+          .
         </Paragraph>
       </Content>
     </Content>
