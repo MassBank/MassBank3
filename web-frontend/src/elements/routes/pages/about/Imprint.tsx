@@ -8,7 +8,7 @@ function Imprint() {
 
   return useMemo(
     () => (
-      <Content style={{ padding: 10 }}>
+      <Content style={{ padding: 20 }}>
         <Paragraph>{distributorText}</Paragraph>
         <Paragraph>
           Visit the{' '}
