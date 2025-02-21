@@ -6,9 +6,6 @@ image:
   tag: "dev"
   pullPolicy: IfNotPresent
 
-# use this string as a common suffix for all ingress
-commonSuffix: "MassBank4"
-
 # postggresql config
 # for massbank we need a special version of postgres with bingo cartridge
 global:
@@ -104,7 +101,7 @@ ingress:
   hosts:
     - host: msbi.ipb-halle.de
       paths:
-        - path: /{{ .Values.commonSuffix }}-api(/|$)(.*)
+        - path: /MassBank-api(/|$)(.*)
           pathType: ImplementationSpecific
   tls: []
   #  - secretName: chart-example-tls
