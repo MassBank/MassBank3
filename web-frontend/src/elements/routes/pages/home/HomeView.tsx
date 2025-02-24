@@ -1,64 +1,65 @@
-import Layout, { Content, Header } from 'antd/es/layout/layout';
-import { useRef } from 'react';
-import useContainerDimensions from '../../../../utils/useContainerDimensions';
-import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
+import Layout, { Content } from 'antd/es/layout/layout';
+import { useMemo, useRef } from 'react';
 import News from '../../../common/News';
 import SectionDivider from '../../../basic/SectionDivider';
-import accessionSearchInputFieldHeight from '../../../../constants/accessionSearchInputFieldHeight';
+import AcknowledgementNFDI4Chem from '../../../common/AcknowledgementNFDI4Chem';
+import Segmented from '../../../basic/Segmented';
+import QuickSearch from './QuickSearch';
+import { Typography } from 'antd';
+const { Paragraph, Title } = Typography;
 
 function HomeView() {
   const ref = useRef(null);
-  const { height } = useContainerDimensions(ref);
 
-  return (
-    <Layout
-      ref={ref}
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Header
-        style={{
-          width: '100%',
-          height: accessionSearchInputFieldHeight,
-          padding: 0,
-        }}
-      >
-        <AccessionSearchInputField
-          width="100%"
-          height={accessionSearchInputFieldHeight}
-        />
-      </Header>
-      <Content
-        style={{
-          width: '100%',
-          height: height - accessionSearchInputFieldHeight,
-          display: 'block',
-          justifyContent: 'center',
-          alignItems: 'center',
-          overflow: 'scroll',
-        }}
-      >
-        <Content style={{ width: '100%', textAlign: 'center' }}>
-          <p style={{ fontWeight: 'bold', fontSize: 18 }}>
-            Welcome to MassBank!
-          </p>
-          <p>
-            MassBank is a community effort and you are invited to contribute.
-            Please refer to our contributor documentation and get in touch via
-            github or email.
-          </p>
-        </Content>
-        <SectionDivider label="News" />
+  return useMemo(() => {
+    const elements: JSX.Element[] = [];
+    elements.push(
+      <Typography style={{ textAlign: 'center' }}>
+        <Title>Welcome to MassBank</Title>
+        <Paragraph>
+          MassBank is a community effort and you are invited to contribute.
+          Please refer to our contributor documentation and get in touch via
+          github or email.
+        </Paragraph>
+      </Typography>,
+    );
+    elements.push(
+      <Content>
+        <SectionDivider label="Quick Search" />
+        <QuickSearch />
+      </Content>,
+    );
+    elements.push(
+      <Content>
+        <SectionDivider label="Latest News" />
         <News />
-      </Content>
-    </Layout>
-  );
+      </Content>,
+    );
+    elements.push(
+      <Content>
+        <SectionDivider label="Funding" />
+        <AcknowledgementNFDI4Chem />
+      </Content>,
+    );
+
+    const elementLabels = ['Welcome', 'Quick Search', 'Latest News', 'Funding'];
+
+    return (
+      <Layout
+        ref={ref}
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Segmented elements={elements} elementLabels={elementLabels} />
+      </Layout>
+    );
+  }, []);
 }
 
 export default HomeView;

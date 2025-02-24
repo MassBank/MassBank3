@@ -18,7 +18,7 @@ function App() {
     <ConfigProvider
       wave={{ disabled: true }}
       typography={{
-        style: { fontSize: 16 },
+        style: { fontSize: 15 },
       }}
     >
       <HighlightProvider>

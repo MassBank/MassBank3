@@ -3,8 +3,7 @@ import Typography from 'antd/es/typography';
 const { Paragraph, Text } = Typography;
 import List from 'antd/es/list';
 import { Content } from 'antd/es/layout/layout';
-
-import nfdi4chemLogo from '../../../../assets/nfdi4chem_logo.png';
+import AcknowledgementNFDI4Chem from '../../../common/AcknowledgementNFDI4Chem';
 
 function Acknowledgement() {
   const data: JSX.Element[] = [
@@ -86,49 +85,9 @@ function Acknowledgement() {
       style={{
         width: '100%',
         height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'left',
-        alignItems: 'center',
       }}
     >
-      <Content
-        style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <img src={nfdi4chemLogo} style={{ height: 300 }} />
-        <Paragraph style={{ fontWeight: 'bolder' }}>
-          <Text>
-            This project is funded by the DFG (
-            {
-              <a
-                href="https://www.dfg.de/de"
-                target="_blank"
-                style={{ color: 'black', textDecoration: 'underline' }}
-              >
-                Deutsche Forschungsgesellschaft
-              </a>
-            }
-            ) under the NFDI4Chem (
-            {
-              <a
-                href="https://www.nfdi4chem.de/"
-                target="_blank"
-                style={{ color: 'black', textDecoration: 'underline' }}
-              >
-                National Research Data Infrastructure for Chemistry
-              </a>
-            }
-            ) project. <br />
-            Project number: 441958208.
-          </Text>
-        </Paragraph>
-      </Content>
+      <AcknowledgementNFDI4Chem />
       <Paragraph style={{ padding: 10, marginTop: 40 }}>
         <Text
           style={{

@@ -102,13 +102,12 @@ function SearchAndResultPanel({
           <Splitter.Panel
             size={panelWidths.searchPanel}
             min={200 + collapseButtonWidth}
-            max={600}
           >
             {searchPanel}
           </Splitter.Panel>
           <Splitter.Panel
             size={panelWidths.resultPanel}
-            min={600}
+            min={700}
             resizable={panelWidths.searchPanel !== collapseButtonWidth}
           >
             <Content

@@ -15,12 +15,14 @@ type InputProps = {
   width: CSSProperties['width'];
   height: CSSProperties['height'];
   accession?: string;
+  style?: CSSProperties;
 };
 
 function AccessionSearchInputField({
   width,
   height,
   accession: acc,
+  style = {},
 }: InputProps) {
   const [accession, setAccession] = useState<string>(acc ?? '');
   const navigate = useNavigate();
@@ -54,12 +56,15 @@ function AccessionSearchInputField({
   return (
     <Content
       style={{
-        width,
-        height,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f3ece0',
+        ...{
+          width,
+          height,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'transparent',
+        },
+        ...style,
       }}
     >
       <Input

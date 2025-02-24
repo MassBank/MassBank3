@@ -12,20 +12,22 @@ import PeakSearch from './searchPanel/peakSearch/PeakSearch';
 import PropertyFilterOptionsMenuItems from './searchPanel/msSpecFilter/PropertyFilterOptionsMenuItems';
 import StructuralEditor from '../../../basic/StructuralEditor';
 import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
+import defaultSearchFieldValues from '../../../../constants/defaultSearchFieldValues';
+import { ItemType, MenuItemType } from 'antd/es/menu/interface';
 
 const peakListPattern =
   /^(\d+(\.\d+){0,1} \d+(\.\d+){0,1}( \d+(\.\d+){0,1}){0,1})(\n\d+(\.\d+){0,1} \d+(\.\d+){0,1}( \d+(\.\d+){0,1}){0,1})*$/;
 
 type InputProps = {
-  propertyFilterOptions: ContentFilterOptions | undefined;
-  initialStructure: string;
+  propertyFilterOptions?: ContentFilterOptions | undefined;
+  initialStructure?: string;
 };
 
 function SearchPanelMenuItems({
-  propertyFilterOptions,
-  initialStructure,
+  propertyFilterOptions = defaultSearchFieldValues.propertyFilterOptions,
+  initialStructure = '',
 }: InputProps) {
-  return [
+  const items: ItemType<MenuItemType>[] = [
     {
       key: 'compoundSearchFilterOptions',
       label: 'Compound Search',
@@ -419,13 +421,18 @@ function SearchPanelMenuItems({
         },
       ],
     },
-    {
+  ];
+
+  if (propertyFilterOptions) {
+    items.push({
       key: 'propertyFilterOptions',
       label: 'Property Filter',
       icon: <DatabaseOutlined />,
       children: PropertyFilterOptionsMenuItems({ propertyFilterOptions }),
-    },
-  ];
+    });
+  }
+
+  return items;
 }
 
 export default SearchPanelMenuItems;
