@@ -15,7 +15,12 @@ function App() {
   }
 
   return (
-    <ConfigProvider wave={{ disabled: true }}>
+    <ConfigProvider
+      wave={{ disabled: true }}
+      typography={{
+        style: { fontSize: 16 },
+      }}
+    >
       <HighlightProvider>
         <Routing />
       </HighlightProvider>

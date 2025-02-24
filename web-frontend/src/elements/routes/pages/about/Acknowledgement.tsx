@@ -4,6 +4,8 @@ const { Paragraph, Text } = Typography;
 import List from 'antd/es/list';
 import { Content } from 'antd/es/layout/layout';
 
+import nfdi4chemLogo from '../../../../assets/nfdi4chem_logo.png';
+
 function Acknowledgement() {
   const data: JSX.Element[] = [
     <Content>
@@ -80,23 +82,71 @@ function Acknowledgement() {
   ];
 
   return (
-    <Paragraph style={{ padding: 10 }}>
-      <Text
+    <Content
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'left',
+        alignItems: 'center',
+      }}
+    >
+      <Content
         style={{
-          fontWeight: 'bolder',
-          marginLeft: 20,
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
-        Standing on the shoulder of giants, we would like to acknowledge some of
-        the dependencies used in the MassBank system:
-      </Text>
-      <List
-        dataSource={data}
-        renderItem={(item) => (
-          <List.Item style={{ border: 'none' }}>{item}</List.Item>
-        )}
-      />
-    </Paragraph>
+        <img src={nfdi4chemLogo} style={{ height: 300 }} />
+        <Paragraph style={{ fontWeight: 'bolder' }}>
+          <Text>
+            This project is funded by the DFG (
+            {
+              <a
+                href="https://www.dfg.de/de"
+                target="_blank"
+                style={{ color: 'black', textDecoration: 'underline' }}
+              >
+                Deutsche Forschungsgesellschaft
+              </a>
+            }
+            ) under the NFDI4Chem (
+            {
+              <a
+                href="https://www.nfdi4chem.de/"
+                target="_blank"
+                style={{ color: 'black', textDecoration: 'underline' }}
+              >
+                National Research Data Infrastructure for Chemistry
+              </a>
+            }
+            ) project. <br />
+            Project number: 441958208.
+          </Text>
+        </Paragraph>
+      </Content>
+      <Paragraph style={{ padding: 10, marginTop: 40 }}>
+        <Text
+          style={{
+            fontWeight: 'bolder',
+            marginLeft: 20,
+          }}
+        >
+          Standing on the shoulder of giants, we would like to acknowledge some
+          of the dependencies used in the MassBank system:
+        </Text>
+        <List
+          dataSource={data}
+          renderItem={(item) => (
+            <List.Item style={{ border: 'none' }}>{item}</List.Item>
+          )}
+        />
+      </Paragraph>
+    </Content>
   );
 }
 
