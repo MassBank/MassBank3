@@ -11,7 +11,7 @@ import { createSearchParams, useNavigate } from 'react-router-dom';
 import buildSearchParamsFromFormData from '../../../../utils/buildSearchParamsFromFormData';
 import routes from '../../../../constants/routes';
 import defaultSearchFieldValues from '../../../../constants/defaultSearchFieldValues';
-import Paragraph from 'antd/es/typography/Paragraph';
+import Text from 'antd/es/typography/Text';
 
 function QuickSearch() {
   const [form] = useForm<SearchFields>();
@@ -42,15 +42,18 @@ function QuickSearch() {
         }}
       >
         <AccessionSearchInputField
-          width="100%"
-          height={accessionSearchInputFieldHeight}
-          style={{ marginBottom: 30 }}
+          style={{
+            width: '75%',
+            height: accessionSearchInputFieldHeight,
+            marginBottom: 30,
+          }}
         />
-        <Paragraph
+        <Text
+          strong
           style={{ width: '100%', marginBottom: 10, textAlign: 'center' }}
         >
           Compound/Spectral Search:
-        </Paragraph>
+        </Text>
         <SearchPanelForm
           form={form}
           items={SearchPanelMenuItems({})}
@@ -59,8 +62,10 @@ function QuickSearch() {
           collapsed={false}
           collapseButtonWidth={0}
           style={{
-            backgroundColor: 'rgb(245, 245, 245)',
+            width: '75%',
             border: '1px solid lightgrey',
+            borderRadius: 5,
+            backgroundColor: 'rgb(250, 250, 250)',
           }}
         />
       </Content>

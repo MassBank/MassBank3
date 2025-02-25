@@ -12,17 +12,17 @@ import routes from '../../constants/routes';
 import { usePropertiesContext } from '../../context/properties/properties';
 
 type InputProps = {
-  width: CSSProperties['width'];
-  height: CSSProperties['height'];
   accession?: string;
   style?: CSSProperties;
+  inputStyle?: CSSProperties;
+  buttonStyle?: CSSProperties;
 };
 
 function AccessionSearchInputField({
-  width,
-  height,
   accession: acc,
   style = {},
+  inputStyle = {},
+  buttonStyle = {},
 }: InputProps) {
   const [accession, setAccession] = useState<string>(acc ?? '');
   const navigate = useNavigate();
@@ -56,14 +56,12 @@ function AccessionSearchInputField({
   return (
     <Content
       style={{
-        ...{
-          width,
-          height,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: 'transparent',
-        },
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'transparent',
         ...style,
       }}
     >
@@ -75,13 +73,13 @@ function AccessionSearchInputField({
         onChange={handleOnChange}
         onKeyDown={handleOnKeyDown}
         allowClear
-        style={{ width: 500 }}
+        style={{ width: 500, ...inputStyle }}
       />
       <Button
         children="Search"
         onClick={handleOnClick}
         disabled={accession.trim() === ''}
-        style={{ width: 100, marginLeft: 20 }}
+        style={{ width: 100, marginLeft: 20, ...buttonStyle }}
       />
     </Content>
   );
