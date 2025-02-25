@@ -388,7 +388,13 @@ function ResultPanel({
       ) : (
         <Placeholder
           child={'No results'}
-          style={{ width, height, fontSize: 18, fontWeight: 'bold' }}
+          style={{
+            width,
+            height,
+            fontSize: 18,
+            fontWeight: 'bold',
+            backgroundColor: 'white',
+          }}
         />
       ),
     [

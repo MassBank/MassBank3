@@ -59,7 +59,7 @@ function QuickSearch() {
           collapsed={false}
           collapseButtonWidth={0}
           style={{
-            backgroundColor: 'rgb(235, 235, 235)',
+            backgroundColor: 'rgb(245, 245, 245)',
             border: '1px solid lightgrey',
           }}
         />
