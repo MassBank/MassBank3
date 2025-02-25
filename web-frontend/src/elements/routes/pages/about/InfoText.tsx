@@ -166,6 +166,19 @@ function InfoText() {
           }
           .
         </Paragraph>
+        <Paragraph>
+          Furthermore, MassBank is a service for{' '}
+          {
+            <a
+              href="https://elixir-europe.org/about-us/who-we-are/nodes/germany"
+              target="_blank"
+              style={{ color: 'black', textDecoration: 'underline' }}
+            >
+              ELIXIR-DE
+            </a>
+          }
+          .
+        </Paragraph>
       </Content>
     </Content>
   );

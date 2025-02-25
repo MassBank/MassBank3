@@ -50,7 +50,7 @@ function Chart({
   disableExport = false,
 }: InputProps) {
   const wrapperRef = useRef(null);
-  const svgRef = useRef(null);
+  const svgRef = useRef<SVGSVGElement>(null);
   const { baseUrl, frontendUrl } = usePropertiesContext();
 
   const [isShowLabel, setIsShowLabel] = useState<boolean>(false);
@@ -511,6 +511,7 @@ function Chart({
           ref={svgRef}
           width={width}
           height={disableLabels ? height : height - MARGIN.button}
+          viewBox={`0 0 ${width} ${disableLabels ? height : height - MARGIN.button}`}
         >
           <g
             width={boundsWidth}

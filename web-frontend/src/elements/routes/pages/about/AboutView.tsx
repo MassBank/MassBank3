@@ -41,15 +41,15 @@ function AboutView() {
       </Content>
     );
 
-    return [infoText, serviceStatus, supporters, acknowledgement, imprint];
+    return [infoText, serviceStatus, acknowledgement, supporters, imprint];
   }, []);
 
   const elementLabels = useMemo(
     () => [
       'Information',
       'Service Status',
-      'Supporters',
       'Acknowledgement',
+      'Supporters',
       'Imprint',
     ],
     [],

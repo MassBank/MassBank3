@@ -1,9 +1,9 @@
 import './CommonSearchPanel.scss';
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { CSSProperties, useCallback, useEffect, useMemo } from 'react';
 
 import type { FormProps } from 'antd';
-import { Button, Form, Menu } from 'antd';
+import { Button } from 'antd';
 import SearchFields from '../../types/filterOptions/SearchFields';
 import ContentFilterOptions from '../../types/filterOptions/ContentFilterOtions';
 import { useForm } from 'antd/es/form/Form';
@@ -14,14 +14,13 @@ import { ItemType, MenuItemType } from 'antd/es/menu/interface';
 import getActiveKeysFromFormData from '../../utils/getActiveKeysFromFormData';
 import defaultSearchFieldValues from '../../constants/defaultSearchFieldValues';
 import collapseButtonWidth from '../../constants/collapseButtonWidth';
-
-const submitButtonHeight = 40;
+import SearchPanelForm from './SearchPanelForm';
 
 type InputProps = {
   items: ItemType<MenuItemType>[];
   initialValues: SearchFields;
-  width: number;
-  height: number;
+  width: CSSProperties['width'];
+  height: CSSProperties['height'];
   collapsed: boolean;
   propertyFilterOptions: ContentFilterOptions | undefined;
   onCollapse: (collapsed: boolean) => void;
@@ -125,62 +124,18 @@ function CommonSearchPanel({
             {collapsed ? <RightOutlined /> : <LeftOutlined />}
           </Button>
         </Content>
-        <Form.Provider>
-          <Form
-            form={form}
-            autoComplete="off"
-            layout="inline"
-            style={{
-              width: width - collapseButtonWidth,
-              height: '100%',
-              backgroundColor: 'white',
-              display: collapsed ? 'none' : 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              userSelect: 'none',
-            }}
-            initialValues={initialValues}
-            onFinish={handleOnSubmit}
-          >
-            <Content
-              style={{
-                width: '100%',
-                height: height - submitButtonHeight,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <Menu
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  overflow: 'scroll',
-                  border: 'none',
-                }}
-                mode="inline"
-                items={items}
-                inlineIndent={10}
-                defaultOpenKeys={activeKeys}
-                defaultSelectedKeys={activeKeys}
-              />
-              <Button
-                htmlType="submit"
-                style={{
-                  width: 150,
-                  height: submitButtonHeight - 10,
-                  marginTop: 5,
-                  marginBottom: 5,
-                  backgroundColor: 'rgb(167, 199, 254)',
-                }}
-              >
-                Search
-              </Button>
-            </Content>
-          </Form>
-        </Form.Provider>
+        <SearchPanelForm
+          form={form}
+          items={items}
+          initialValues={initialValues}
+          onSubmit={handleOnSubmit}
+          collapsed={collapsed}
+          width={width}
+          height={height}
+          collapseButtonWidth={collapseButtonWidth}
+          defaultOpenKeys={activeKeys}
+          defaultSelectedKeys={activeKeys}
+        />
       </Content>
     ),
     [

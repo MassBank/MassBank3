@@ -97,6 +97,7 @@ function Segmented({
             justifyContent: 'center',
             alignItems: 'center',
             overflow: 'scroll',
+            backgroundColor: 'white',
           }}
         >
           {elements.map((element, index) => (
