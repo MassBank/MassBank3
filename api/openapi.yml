@@ -339,6 +339,49 @@ paths:
                 type: string
                 example: MassBank API service 0.1, 2025-01-22T14:20:57+01:00
 
+  /status:
+    get:
+      summary: get API status
+      operationId: getStatus
+      responses:
+        "200":
+          description: "Status of the API and attached services"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  postgres:
+                    description: The status of the postgres database.
+                    type: object
+                    properties:
+                      status:
+                        description: The status of the postgres database.
+                        type: string
+                      error:
+                        description: The error message if the postgres database is not running.
+                        type: string
+                  export_service:
+                    description: The status of the export service.
+                    type: object
+                    properties:
+                      status:
+                        description: The status of the export service.
+                        type: string
+                      error:
+                        description: The error message if the export service is not running.
+                        type: string
+                  similarity_service:
+                    description: The status of the similarity service.
+                    type: object
+                    properties:
+                      status:
+                        description: The status of the similarity service.
+                        type: string
+                      error:
+                        description: The error message if the similarity service is not running.
+                        type: string
+
   /similarity:
     parameters:
       - in: query

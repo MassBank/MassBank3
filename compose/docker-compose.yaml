@@ -45,6 +45,8 @@ services:
       - MB3_SERVER_PORT
       - SIMILARITY_SERVICE_COSINE_HOST=similarity-service
       - SIMILARITY_SERVICE_COSINE_PORT=8080
+      - EXPORT_SERVICE_HOST=export-service
+      - EXPORT_SERVICE_PORT=8080
 
   similarity-service:
     image: quay.io/massbank/massbank3-similarity-service:latest

@@ -496,6 +496,60 @@ func GetVersion()(string, error){
 	return "test version, test timestamp", nil
 }
 
+func GetStatus()(GetStatus200Response, error){
+ 	postgresStatus := GetStatus200ResponsePostgres{
+			Status: "OK",
+			Error: "",
+	}
+	export_service_status := GetStatus200ResponseExportService{
+			Status: "OK",
+			Error: "",
+	}
+	similarity_service_status := GetStatus200ResponseSimilarityService{	
+			Status: "OK",
+			Error: "",
+	}
+
+	if err := initDB(); err != nil {
+		postgresStatus.Status = "ERROR"
+		postgresStatus.Error = err.Error()
+	}
+
+	hostname := getEnv("EXPORT_SERVICE_HOST", "export-service")
+	port := getEnv("EXPORT_SERVICE_PORT", "8080")
+	requestURL := "http://" + hostname + ":" + port + "/version"
+	res, err := http.Get(requestURL)
+	if err != nil {
+		export_service_status.Status = "ERROR"
+		export_service_status.Error = err.Error()
+	} else {
+		if res.StatusCode != 200 {
+			export_service_status.Status = "ERROR"
+			export_service_status.Error = "Export service returned status code " + strconv.Itoa(res.StatusCode)
+		}
+	}
+
+	hostname = getEnv("SIMILARITY_SERVICE_COSINE_HOST", "similarity-service-cosine")
+	port = getEnv("SIMILARITY_SERVICE_COSINE_PORT", "8080")
+	requestURL = "http://" + hostname + ":" + port + "/version"	
+	res, err = http.Get(requestURL)
+	if err != nil {
+		similarity_service_status.Status = "ERROR"
+		similarity_service_status.Error = err.Error()
+	} else {
+		if res.StatusCode != 200 {
+			similarity_service_status.Status = "ERROR"
+			similarity_service_status.Error = "Similarity service returned status code " + strconv.Itoa(res.StatusCode)
+		}
+	}
+
+	return GetStatus200Response{
+		Postgres: postgresStatus,
+		ExportService: export_service_status,
+		SimilarityService: similarity_service_status,
+	}, nil
+}
+
 func GetMetadata()(*Metadata, error){
 	if err := initDB(); err != nil {
 		return nil, err

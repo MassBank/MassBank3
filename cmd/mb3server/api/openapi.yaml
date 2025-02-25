@@ -428,6 +428,17 @@ paths:
                 type: string
           description: Version for MassBank API with timestamp of build
       summary: get API version
+  /status:
+    get:
+      operationId: getStatus
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getStatus_200_response'
+          description: Status of the API and attached services
+      summary: get API status
   /similarity:
     get:
       operationId: getSimilarity
@@ -939,6 +950,64 @@ components:
       items:
         $ref: '#/components/schemas/MsDataProcessing_inner'
       type: array
+    getStatus_200_response_postgres:
+      description: The status of the postgres database.
+      example:
+        error: error
+        status: status
+      properties:
+        status:
+          description: The status of the postgres database.
+          type: string
+        error:
+          description: The error message if the postgres database is not running.
+          type: string
+      type: object
+    getStatus_200_response_export_service:
+      description: The status of the export service.
+      example:
+        error: error
+        status: status
+      properties:
+        status:
+          description: The status of the export service.
+          type: string
+        error:
+          description: The error message if the export service is not running.
+          type: string
+      type: object
+    getStatus_200_response_similarity_service:
+      description: The status of the similarity service.
+      example:
+        error: error
+        status: status
+      properties:
+        status:
+          description: The status of the similarity service.
+          type: string
+        error:
+          description: The error message if the similarity service is not running.
+          type: string
+      type: object
+    getStatus_200_response:
+      example:
+        similarity_service:
+          error: error
+          status: status
+        export_service:
+          error: error
+          status: status
+        postgres:
+          error: error
+          status: status
+      properties:
+        postgres:
+          $ref: '#/components/schemas/getStatus_200_response_postgres'
+        export_service:
+          $ref: '#/components/schemas/getStatus_200_response_export_service'
+        similarity_service:
+          $ref: '#/components/schemas/getStatus_200_response_similarity_service'
+      type: object
     MBRecord_deprecated:
       description: Mark the record as deprecated
       example:

@@ -26,6 +26,7 @@ type DefaultAPIRouter interface {
 	GetBrowseOptions(http.ResponseWriter, *http.Request)
 	GetMetadata(http.ResponseWriter, *http.Request)
 	GetVersion(http.ResponseWriter, *http.Request)
+	GetStatus(http.ResponseWriter, *http.Request)
 	GetSimilarity(http.ResponseWriter, *http.Request)
 }
 
@@ -42,5 +43,6 @@ type DefaultAPIServicer interface {
 	GetBrowseOptions(context.Context, []string, []string, string, []string) (ImplResponse, error)
 	GetMetadata(context.Context) (ImplResponse, error)
 	GetVersion(context.Context) (ImplResponse, error)
+	GetStatus(context.Context) (ImplResponse, error)
 	GetSimilarity(context.Context, []string, []string, int32, float64) (ImplResponse, error)
 }

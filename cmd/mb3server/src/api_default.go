@@ -98,6 +98,12 @@ func (c *DefaultAPIController) Routes() Routes {
 			c.GetVersion,
 		},
 		{
+			"GetStatus",
+			strings.ToUpper("Get"),
+			"/v1/status",
+			c.GetStatus,
+		},
+		{
 			"GetSimilarity",
 			strings.ToUpper("Get"),
 			"/v1/similarity",
@@ -265,6 +271,19 @@ func (c *DefaultAPIController) GetMetadata(w http.ResponseWriter, r *http.Reques
 // GetVersion - get API version
 func (c *DefaultAPIController) GetVersion(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.GetVersion(r.Context())
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+
+}
+
+// GetStatus - get API status
+func (c *DefaultAPIController) GetStatus(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetStatus(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

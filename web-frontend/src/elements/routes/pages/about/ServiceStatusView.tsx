@@ -3,13 +3,19 @@ import { usePropertiesContext } from '../../../../context/properties/properties'
 import { Content } from 'antd/es/layout/layout';
 import { Button, Result, Spin } from 'antd';
 import axios from 'axios';
+import StatusResult from '../../../../types/StatusResult';
+
+const resultStyle = {
+  width: 250,
+  padding: 20,
+};
 
 function ServiceStatusView() {
-  const { backendUrl, exportServiceUrl, similarityServiceUrl } =
-    usePropertiesContext();
+  const { backendUrl } = usePropertiesContext();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorApi, setErrorApi] = useState<string | null>(null);
+  const [errorPostgres, setErrorPostgres] = useState<string | null>(null);
   const [errorSimilarityService, setErrorSimilarityService] = useState<
     string | null
   >(null);
@@ -21,41 +27,39 @@ function ServiceStatusView() {
     setIsLoading(true);
 
     try {
-      const response = await axios.get(`${backendUrl}/v1/version`);
+      const response = await axios.get(`${backendUrl}/v1/status`);
       if (response.status === 200) {
         setErrorApi(null);
+        const statusResult = response.data as StatusResult;
+        setErrorPostgres(
+          statusResult.postgres.error ? statusResult.postgres.error : null,
+        );
+        setErrorSimilarityService(
+          statusResult.similarity_service.error
+            ? statusResult.similarity_service.error
+            : null,
+        );
+        setErrorExportService(
+          statusResult.export_service.error
+            ? statusResult.export_service.error
+            : null,
+        );
       } else {
         setErrorApi(response.statusText);
+        setErrorPostgres("Couldn't connect to the API");
+        setErrorSimilarityService("Couldn't connect to the API");
+        setErrorExportService("Couldn't connect to the API");
       }
     } catch (error: unknown) {
       setErrorApi((error as Error).message);
-      console.error(error);
-    }
-    try {
-      const response = await axios.get(`${similarityServiceUrl}/version`);
-      if (response.status === 200) {
-        setErrorSimilarityService(null);
-      } else {
-        setErrorSimilarityService(response.statusText);
-      }
-    } catch (error: unknown) {
-      setErrorSimilarityService((error as Error).message);
-      console.error(error);
-    }
-    try {
-      const response = await axios.get(`${exportServiceUrl}/version`);
-      if (response.status === 200) {
-        setErrorExportService(null);
-      } else {
-        setErrorExportService(response.statusText);
-      }
-    } catch (error: unknown) {
-      setErrorExportService((error as Error).message);
+      setErrorPostgres("Couldn't connect to the API");
+      setErrorSimilarityService("Couldn't connect to the API");
+      setErrorExportService("Couldn't connect to the API");
       console.error(error);
     }
 
     setIsLoading(false);
-  }, [backendUrl, exportServiceUrl, similarityServiceUrl]);
+  }, [backendUrl]);
 
   useEffect(() => {
     handleOnCheckServiceStatus();
@@ -66,7 +70,7 @@ function ServiceStatusView() {
       <Content
         style={{
           width: '100%',
-          height: 300,
+          minHeight: 300,
           padding: 20,
           display: 'flex',
           flexDirection: 'column',
@@ -94,7 +98,19 @@ function ServiceStatusView() {
                   : 'Successfully connected'
               }
               status={errorApi && errorApi.length > 0 ? 'error' : 'success'}
-              style={{ padding: 20 }}
+              style={resultStyle}
+            />
+            <Result
+              title="Postgres Database"
+              subTitle={
+                errorPostgres && errorPostgres.length > 0
+                  ? errorPostgres
+                  : 'Successfully connected'
+              }
+              status={
+                errorPostgres && errorPostgres.length > 0 ? 'error' : 'success'
+              }
+              style={resultStyle}
             />
             <Result
               title="Similarity Service"
@@ -108,7 +124,7 @@ function ServiceStatusView() {
                   ? 'error'
                   : 'success'
               }
-              style={{ padding: 20 }}
+              style={resultStyle}
             />
             <Result
               title="Export Service"
@@ -122,7 +138,7 @@ function ServiceStatusView() {
                   ? 'error'
                   : 'success'
               }
-              style={{ padding: 20 }}
+              style={resultStyle}
             />
           </Content>
         )}
@@ -139,6 +155,7 @@ function ServiceStatusView() {
     [
       errorApi,
       errorExportService,
+      errorPostgres,
       errorSimilarityService,
       handleOnCheckServiceStatus,
       isLoading,

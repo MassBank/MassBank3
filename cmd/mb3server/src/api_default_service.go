@@ -82,13 +82,22 @@ func (s *DefaultAPIService) GetRecords(ctx context.Context, instrumentType []str
 	return Response(200, result), nil
 }
 
-// GetRecords - Get a list of records
+// GetVersion - Get the version of the MassBank API
 func (s *DefaultAPIService) GetVersion(ctx context.Context) (ImplResponse, error) {
 	result, err := GetVersion()
 	if err != nil {
 		if err != sql.ErrNoRows {
 			return Response(http.StatusInternalServerError, nil), err
 		}
+	}
+	return Response(200, result), nil
+}
+
+// GetStatus - Get the status of the MassBank API
+func (s *DefaultAPIService) GetStatus(ctx context.Context) (ImplResponse, error) {
+	result, err := GetStatus()
+	if err != nil {
+		return Response(http.StatusInternalServerError, nil), err
 	}
 	return Response(200, result), nil
 }

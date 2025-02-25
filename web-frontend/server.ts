@@ -23,8 +23,6 @@ const version = process.env.MB3_VERSION ?? '0.4.0 (beta)';
 const googleSearchConsoleKey = process.env.GOOGLE_SEARCH_CONSOLE_KEY ?? '';
 const backendUrlInternal =
   process.env.MB3_API_URL_INTERNAL ?? 'http://mb3server:8080';
-const similarityServiceUrl =
-  process.env.SIMILARITY_SERVICE_URL ?? 'http://localhost:8082';
 const exportServiceUrlInternal =
   process.env.EXPORT_SERVICE_URL_INTERNAL ?? 'http://export-service:8080';
 const distributorText =
@@ -41,7 +39,6 @@ console.log('frontendUrl', frontendUrl);
 console.log('version', version);
 console.log('backendUrl', backendUrl);
 console.log('backendUrlInternal', backendUrlInternal);
-console.log('similarityServiceUrl', similarityServiceUrl);
 console.log('exportServiceUrl', exportServiceUrl);
 console.log('exportServiceUrlInternal', exportServiceUrlInternal);
 console.log('googleSearchConsoleKey', googleSearchConsoleKey);
@@ -276,7 +273,6 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       baseUrl,
       backendUrl,
       frontendUrl,
-      similarityServiceUrl,
       exportServiceUrl,
       version,
       distributorText,

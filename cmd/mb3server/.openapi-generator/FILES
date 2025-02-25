@@ -15,6 +15,10 @@ src/model_ac_mass_spec_subtags_inner.go
 src/model_authors_inner.go
 src/model_browse_options.go
 src/model_database_object.go
+src/model_get_status_200_response.go
+src/model_get_status_200_response_export_service.go
+src/model_get_status_200_response_postgres.go
+src/model_get_status_200_response_similarity_service.go
 src/model_mb_record.go
 src/model_mb_record_acquisition.go
 src/model_mb_record_comments_inner.go
