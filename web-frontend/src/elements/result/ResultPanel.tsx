@@ -48,6 +48,8 @@ function ResultPanel({
   const { backendUrl, exportServiceUrl } = usePropertiesContext();
 
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
+  const [isRequestingDownload, setIsRequestingDownload] =
+    useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [slideIndex, setSlideIndex] = useState<number>(0);
   const [resultPageIndex, setResultPageIndex] = useState<number>(0);
@@ -207,7 +209,7 @@ function ResultPanel({
 
   const handleOnDownloadResult = useCallback(
     async (format: string) => {
-      setIsRequesting(true);
+      setIsRequestingDownload(true);
       const host = exportServiceUrl;
       const url = `${host}/convert`;
 
@@ -234,7 +236,7 @@ function ResultPanel({
         saveAs(blob, filename);
       }
 
-      setIsRequesting(false);
+      setIsRequestingDownload(false);
     },
     [exportServiceUrl, hits],
   );
@@ -371,6 +373,24 @@ function ResultPanel({
             >
               <Spin size="large" />
             </Content>
+          ) : isRequestingDownload ? (
+            <Content
+              style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Spin size="large" />
+              <label
+                style={{ marginTop: 20, fontSize: 16, fontWeight: 'bolder' }}
+              >
+                Preparing download file...
+              </label>
+            </Content>
           ) : (
             <Content
               style={{
@@ -400,6 +420,7 @@ function ResultPanel({
     [
       height,
       isRequesting,
+      isRequestingDownload,
       modal,
       paginationContainer,
       resultTable,
