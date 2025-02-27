@@ -170,7 +170,7 @@ function SearchPanelMenuItems({
         },
         {
           key: 'compoundSearchFilterOptions.inchi.menuItem',
-          label: 'InChI',
+          label: 'InChI(Key)',
           icon: <SignatureOutlined />,
           children: [
             {
