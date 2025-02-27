@@ -77,7 +77,7 @@ function buildFormDataFromSearchParams(searchParams: URLSearchParams) {
     containsValues = true;
   }
 
-  const inchi = searchParams.get('inchi');
+  const inchi = searchParams.get('inchi') ?? searchParams.get('inchi_key');
   if (inchi && inchi.length > 0) {
     (
       formData.compoundSearchFilterOptions as CompoundSearchFilterOptions
