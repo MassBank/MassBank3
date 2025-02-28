@@ -52,7 +52,7 @@ function LinksTable({ links, width, height, title }: InputProps) {
             enableSearch={link.database === 'INCHIKEY'}
             searchTitle="Search for InChIKey"
             searchUrl={buildSearchUrl(
-              'inchi',
+              'inchi_key',
               link.identifier,
               baseUrl,
               frontendUrl,
