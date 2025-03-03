@@ -1,6 +1,5 @@
 import defaultSearchFieldValues from '../constants/defaultSearchFieldValues';
 import SearchFields from '../types/filterOptions/SearchFields';
-import Peak from '../types/peak/Peak';
 import parsePeakListInputField from './parsePeakListAndReferences';
 import propertyFilterOptionsFormDataToContentMapper from './propertyFilterOptionsFormDataToContentMapper';
 import buildSearchParams from './request/buildSearchParams';
@@ -46,18 +45,57 @@ function buildSearchParamsFromFormData(formData: SearchFields) {
     formData.spectralSearchFilterOptions?.peaks
       ? (formData.spectralSearchFilterOptions?.peaks.peaks ?? [])
       : []
-  ).map((p: Peak) => p.mz);
-  if (peaks.length > 0) {
-    builtSearchParams['peaks'] = [peaks.join(',')];
+  )
+    .filter((p) => p.mz && p.mz > 0)
+    .map((p) => p.mz);
 
-    if (formData.spectralSearchFilterOptions?.peaks.massTolerance > 0) {
+  if (formData.spectralSearchFilterOptions?.peaks && peaks.length > 0) {
+    builtSearchParams['peaks'] = [peaks.join(',')];
+    if (
+      formData.spectralSearchFilterOptions?.peaks.massTolerance &&
+      formData.spectralSearchFilterOptions?.peaks.massTolerance > 0
+    ) {
       builtSearchParams['mass_tolerance'] = [
         String(formData.spectralSearchFilterOptions?.peaks.massTolerance),
       ];
     }
-    if (formData.spectralSearchFilterOptions?.peaks.intensity > 0) {
+    if (
+      formData.spectralSearchFilterOptions?.peaks.intensity &&
+      formData.spectralSearchFilterOptions?.peaks.intensity > 0
+    ) {
       builtSearchParams['intensity'] = [
         String(formData.spectralSearchFilterOptions?.peaks.intensity),
+      ];
+    }
+  }
+
+  const neutralLoss = (
+    formData.spectralSearchFilterOptions?.neutralLoss
+      ? (formData.spectralSearchFilterOptions?.neutralLoss.neutralLosses ?? [])
+      : []
+  )
+    .filter((p) => p.mz && p.mz > 0)
+    .map((p) => p.mz);
+
+  if (
+    formData.spectralSearchFilterOptions?.neutralLoss &&
+    neutralLoss.length > 0
+  ) {
+    builtSearchParams['neutral_loss'] = [neutralLoss.join(',')];
+    if (
+      formData.spectralSearchFilterOptions?.neutralLoss.massTolerance &&
+      formData.spectralSearchFilterOptions?.neutralLoss.massTolerance > 0
+    ) {
+      builtSearchParams['mass_tolerance'] = [
+        String(formData.spectralSearchFilterOptions?.neutralLoss.massTolerance),
+      ];
+    }
+    if (
+      formData.spectralSearchFilterOptions?.neutralLoss.intensity &&
+      formData.spectralSearchFilterOptions?.neutralLoss.intensity > 0
+    ) {
+      builtSearchParams['intensity'] = [
+        String(formData.spectralSearchFilterOptions?.neutralLoss.intensity),
       ];
     }
   }

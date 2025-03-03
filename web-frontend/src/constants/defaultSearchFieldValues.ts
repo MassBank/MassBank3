@@ -23,6 +23,11 @@ const defaultSearchFieldValues: SearchFields = {
       massTolerance: defaultMassTolerance,
       intensity: defaultPeakIntensity,
     },
+    neutralLoss: {
+      neutralLosses: [],
+      massTolerance: defaultMassTolerance,
+      intensity: defaultPeakIntensity,
+    },
     splash: undefined,
   },
   propertyFilterOptions: undefined,

@@ -8,18 +8,27 @@ import useFormInstance from 'antd/es/form/hooks/useFormInstance';
 
 type InputProps = {
   index: number;
+  type: 'peaks' | 'neutralLoss';
 };
 
-function PeakSearchRow({ index }: InputProps) {
+function PeakSearchRow({ index, type }: InputProps) {
   const formInstance = useFormInstance<SearchFields>();
   const { getFieldValue, setFieldValue } = formInstance;
 
   const handleOnChangeMass = useCallback(() => {
     setFieldValue(
-      ['spectralSearchFilterOptions', 'peaks', 'peaks', index, 'formula'],
+      type === 'peaks'
+        ? ['spectralSearchFilterOptions', 'peaks', 'peaks', index, 'formula']
+        : [
+            'spectralSearchFilterOptions',
+            'neutralLoss',
+            'neutralLosses',
+            index,
+            'formula',
+          ],
       undefined,
     );
-  }, [index, setFieldValue]);
+  }, [index, setFieldValue, type]);
 
   const handleOnChangeFormula = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -28,20 +37,25 @@ function PeakSearchRow({ index }: InputProps) {
 
       const formula = e.target.value;
       const mass = calculateMolecularMass(formula);
-      const peaks = (getFieldValue([
-        'spectralSearchFilterOptions',
-        'peaks',
-        'peaks',
-      ]) || []) as PeakSearchPeakType[];
+      const peaks = (getFieldValue(
+        type === 'peaks'
+          ? ['spectralSearchFilterOptions', 'peaks', 'peaks']
+          : ['spectralSearchFilterOptions', 'neutralLoss', 'neutralLosses'],
+      ) || []) as PeakSearchPeakType[];
       const value = mass > 0 ? mass : undefined;
       if (index >= 0 && index < peaks.length) {
         peaks[index] = { mz: value, formula };
       } else {
         peaks.push({ mz: value, formula });
       }
-      setFieldValue(['spectralSearchFilterOptions', 'peaks', 'peaks'], peaks);
+      setFieldValue(
+        type === 'peaks'
+          ? ['spectralSearchFilterOptions', 'peaks', 'peaks']
+          : ['spectralSearchFilterOptions', 'neutralLoss', 'neutralLosses'],
+        peaks,
+      );
     },
-    [getFieldValue, index, setFieldValue],
+    [getFieldValue, index, setFieldValue, type],
   );
 
   return useMemo(
@@ -59,13 +73,17 @@ function PeakSearchRow({ index }: InputProps) {
         <Col span={4}>{index + 1}</Col>
         <Col span={9}>
           <Form.Item<SearchFields>
-            name={[
-              'spectralSearchFilterOptions',
-              'peaks',
-              'peaks',
-              index,
-              'mz',
-            ]}
+            name={
+              type === 'peaks'
+                ? ['spectralSearchFilterOptions', 'peaks', 'peaks', index, 'mz']
+                : [
+                    'spectralSearchFilterOptions',
+                    'neutralLoss',
+                    'neutralLosses',
+                    index,
+                    'mz',
+                  ]
+            }
             rules={[{ required: false }]}
             style={{
               width: '100%',
@@ -86,13 +104,23 @@ function PeakSearchRow({ index }: InputProps) {
         </Col>
         <Col span={7}>
           <Form.Item<SearchFields>
-            name={[
-              'spectralSearchFilterOptions',
-              'peaks',
-              'peaks',
-              index,
-              'formula',
-            ]}
+            name={
+              type === 'peaks'
+                ? [
+                    'spectralSearchFilterOptions',
+                    'peaks',
+                    'peaks',
+                    index,
+                    'formula',
+                  ]
+                : [
+                    'spectralSearchFilterOptions',
+                    'neutralLoss',
+                    'neutralLosses',
+                    index,
+                    'formula',
+                  ]
+            }
             rules={[{ required: false }]}
             style={{
               width: '100%',
@@ -110,7 +138,7 @@ function PeakSearchRow({ index }: InputProps) {
         </Col>
       </Row>
     ),
-    [handleOnChangeFormula, handleOnChangeMass, index],
+    [handleOnChangeFormula, handleOnChangeMass, index, type],
   );
 }
 

@@ -21,7 +21,7 @@ type Filters struct {
 	MassEpsilon       *float64
 	Formula           string
 	Peaks             *[]float64
-	PeakDifferences   *[]float64
+	NeutralLoss   *[]float64
 	Inchi          	  string
 	InchiKey          string
 	Contributor       *[]string

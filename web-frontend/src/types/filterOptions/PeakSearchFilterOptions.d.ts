@@ -1,3 +1,5 @@
+import PeakSearchPeakType from './PeakSearchPeakType';
+
 interface PeakSearchFilterOptions {
   peaks?: PeakSearchPeakType[] | undefined;
   massTolerance?: number;

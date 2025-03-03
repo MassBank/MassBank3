@@ -27,6 +27,75 @@ function SearchPanelMenuItems({
   propertyFilterOptions = defaultSearchFieldValues.propertyFilterOptions,
   initialStructure = '',
 }: InputProps) {
+  const buildPeakBasedSearchFields = (type: 'peaks' | 'neutralLoss') => [
+    {
+      key: type + '_panel',
+      style: {
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 0,
+      },
+      label: <PeakSearch type={type} />,
+    },
+    {
+      key: type + '_massTolerance_peaks',
+      style: {
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 0,
+      },
+      label: (
+        <Form.Item<SearchFields>
+          label="Mass Tolerance"
+          name={['spectralSearchFilterOptions', type, 'massTolerance']}
+          rules={[{ required: false }]}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+          labelAlign="left"
+          labelCol={{ span: 7 }}
+          wrapperCol={{ span: 17 }}
+        >
+          <InputNumber placeholder="0.1" step={0.01} min={0} max={1} />
+        </Form.Item>
+      ),
+    },
+    {
+      key: type + '_intensity',
+      style: {
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 0,
+      },
+      label: (
+        <Form.Item<SearchFields>
+          label="Min. Intensity"
+          name={['spectralSearchFilterOptions', type, 'intensity']}
+          rules={[{ required: false }]}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+          labelAlign="left"
+          labelCol={{ span: 7 }}
+          wrapperCol={{ span: 17 }}
+        >
+          <InputNumber placeholder="50" step={5} min={0} />
+        </Form.Item>
+      ),
+    },
+  ];
+
   const items: ItemType<MenuItemType>[] = [
     {
       key: 'compoundSearchFilterOptions',
@@ -298,95 +367,12 @@ function SearchPanelMenuItems({
         {
           key: 'spectralSearchFilterOptions.peaks.menuItem',
           label: 'Peak Search',
-          children: [
-            {
-              key: 'peaks_panel',
-              style: {
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginLeft: 0,
-              },
-              label: <PeakSearch />,
-            },
-            {
-              key: 'massTolerance_peaks',
-              style: {
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginLeft: 0,
-              },
-              label: (
-                <Form.Item<SearchFields>
-                  label="Mass Tolerance"
-                  name={[
-                    'spectralSearchFilterOptions',
-                    'peaks',
-                    'massTolerance',
-                  ]}
-                  rules={[{ required: false }]}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                  }}
-                  labelAlign="left"
-                  labelCol={{ span: 7 }}
-                  wrapperCol={{ span: 17 }}
-                >
-                  <InputNumber placeholder="0.1" step={0.01} min={0} max={1} />
-                </Form.Item>
-              ),
-            },
-            {
-              key: 'intensity',
-              style: {
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginLeft: 0,
-              },
-              label: (
-                <Form.Item<SearchFields>
-                  label="Min. Intensity"
-                  name={['spectralSearchFilterOptions', 'peaks', 'intensity']}
-                  rules={[{ required: false }]}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                  }}
-                  labelAlign="left"
-                  labelCol={{ span: 7 }}
-                  wrapperCol={{ span: 17 }}
-                >
-                  <InputNumber placeholder="50" step={5} min={0} />
-                </Form.Item>
-              ),
-            },
-          ],
+          children: buildPeakBasedSearchFields('peaks'),
         },
         {
-          key: 'neutralLoss.menuItem',
+          key: 'spectralSearchFilterOptions.neutralLoss.menuItem',
           label: 'Neutral Loss Search',
-          children: [
-            {
-              key: 'neutralLossSearch',
-              style: {
-                width: '100%',
-                height: '100%',
-                marginLeft: 0,
-                textAlign: 'center',
-                color: 'orange',
-              },
-              label: 'Feature is not yet implemented!',
-            },
-          ],
+          children: buildPeakBasedSearchFields('neutralLoss'),
         },
         {
           key: 'spectralSearchFilterOptions.splash.menuItem',

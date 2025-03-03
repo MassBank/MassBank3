@@ -71,8 +71,8 @@ paths:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Intensity"
         required: false
       - in: query
-        name: peak_differences
-        description: Filter by peak difference
+        name: neutral_loss
+        description: Filter by neutral losses.
         schema:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Peaks"
         required: false
@@ -179,8 +179,8 @@ paths:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Intensity"
         required: false
       - in: query
-        name: peak_differences
-        description: Filter by peak difference
+        name: neutral_loss
+        description: Filter by neutral losses.
         schema:
           $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Peaks"
         required: false

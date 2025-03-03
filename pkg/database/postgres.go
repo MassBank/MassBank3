@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"regexp"
 	"slices"
 	"strconv"
@@ -108,6 +109,10 @@ func (db *PostgresSQLDB) GetIndexes() []Index {
 	indexes = append(indexes, Index{IndexName: "browse_options_formula_index", TableName: "browse_options", Columns: []string{"formula"}})
 	indexes = append(indexes, Index{IndexName: "browse_options_mass_index", TableName: "browse_options", Columns: []string{"mass"}})
 	indexes = append(indexes, Index{IndexName: "browse_options_atomcount_index", TableName: "browse_options", Columns: []string{"atomcount"}})
+
+	indexes = append(indexes, Index{IndexName: "neutral_losses_spectrum_id_index", TableName: "neutral_losses", Columns: []string{"spectrum_id"}})
+	indexes = append(indexes, Index{IndexName: "neutral_losses_difference_index", TableName: "neutral_losses", Columns: []string{"difference"}})
+	indexes = append(indexes, Index{IndexName: "neutral_losses_min_rel_intensity_index", TableName: "neutral_losses", Columns: []string{"min_rel_intensity"}})
 
 	return indexes
 }
@@ -1086,6 +1091,53 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) (string, []stri
 		}
 	}
 
+	if(filters.NeutralLoss != nil && filters.MassEpsilon != nil) {
+		neutralLossesCount := len(*filters.NeutralLoss)
+		var from = "FROM " 				
+		var where = "WHERE "
+		if(neutralLossesCount == 1) {			
+			parameters = append(parameters,  strconv.FormatFloat((*filters.NeutralLoss)[0] - *filters.MassEpsilon, 'f', -1, 64))
+			parameters = append(parameters,  strconv.FormatFloat((*filters.NeutralLoss)[0] + *filters.MassEpsilon, 'f', -1, 64))
+			from = from + "neutral_losses AS n1"
+			where = where + "n1.difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
+			if(filters.Intensity != nil) {
+				parameters = append(parameters, strconv.FormatInt(*filters.Intensity, 10))
+				where = where + " AND n1.min_rel_intensity >= $" + strconv.Itoa(len(parameters))
+			}
+		} else {			
+			for i := 0; i < neutralLossesCount; i++ {
+				parameters = append(parameters,  strconv.FormatFloat((*filters.NeutralLoss)[i] - *filters.MassEpsilon, 'f', -1, 64))
+				parameters = append(parameters,  strconv.FormatFloat((*filters.NeutralLoss)[i] + *filters.MassEpsilon, 'f', -1, 64))
+				from = from + "neutral_losses AS n" + strconv.Itoa(i+1)
+				if(i < neutralLossesCount - 1) {
+					from = from + ", "
+				}
+				if(i == 0) {
+					where = where + "n1.difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
+				} else {
+					where = where + "n" + strconv.Itoa(i+1) + ".spectrum_id=n1.spectrum_id AND n" + strconv.Itoa(i+1) + ".difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
+				}
+				if(filters.Intensity != nil) {
+					parameters = append(parameters, strconv.FormatInt(*filters.Intensity, 10))
+					where = where + " AND n" + strconv.Itoa(i+1) + ".min_rel_intensity >= $" + strconv.Itoa(len(parameters))
+				}
+				if(i < neutralLossesCount - 1) {
+					where = where + " AND "
+				}
+			}
+		}
+		subQuery := "massbank_id IN (SELECT massbank_id FROM spectrum WHERE id IN (SELECT DISTINCT(n1.spectrum_id) " + from + " " + where + "))"
+		if(addedWhere || addedAnd) {
+			query = query + " AND " + subQuery
+			addedAnd = true
+		} else {
+			query = query + " WHERE " + subQuery
+			addedWhere = true
+		}
+	}
+
+
+
 	return query, parameters
 }
 
@@ -1742,6 +1794,25 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 		}
 		return err
 	}
+	
+	q = `INSERT INTO neutral_losses (spectrum_id, difference, min_rel_intensity) VALUES ($1, $2, $3);`
+	for i := 0; i < int(*record.Peak.NumPeak); i++ {
+		for j := i + 1; j < int(*record.Peak.NumPeak); j++ {
+			var  diff float64 
+			if(record.Peak.Peak.Mz[i] >= record.Peak.Peak.Mz[j]) {
+				diff = record.Peak.Peak.Mz[i] - record.Peak.Peak.Mz[j]
+			} else {
+				diff = record.Peak.Peak.Mz[j] - record.Peak.Peak.Mz[i]
+			}							
+			_, err = tx.Exec(q, spectrumId, diff, math.Min(float64(record.Peak.Peak.Rel[i]), float64(record.Peak.Peak.Rel[j])))
+			if err != nil {
+				if err2 := tx.Rollback(); err2 != nil {
+					return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+				}
+				return err
+			}
+		}
+	}
 
 	if(record.Compound.Smiles != nil && *record.Compound.Smiles != ""){
 		q = `INSERT INTO molecules (molecule, accession, atomcount) VALUES ($1, $2, $3);`
@@ -1939,7 +2010,7 @@ func (p *PostgresSQLDB) Init() error {
 		
 
 		-- project
-		-- CREATE TABLE IF NOT EXISTS  project (
+		-- CREATE TABLE IF NOT EXISTS project (
 		-- 	id SERIAL PRIMARY KEY,
 		-- 	name TEXT NOT NULL UNIQUE
 		-- );
@@ -1971,6 +2042,12 @@ func (p *PostgresSQLDB) Init() error {
 			atomcount INT NOT NULL
 		);
 
+		CREATE TABLE IF NOT EXISTS neutral_losses (
+			spectrum_id INT NOT NULL REFERENCES spectrum(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			difference FLOAT NOT NULL,			
+			min_rel_intensity FLOAT NOT NULL	
+		);
+
 		CREATE TABLE IF NOT EXISTS molecules (
 			id SERIAL NOT NULL PRIMARY KEY,
 			molecule TEXT NOT NULL,
@@ -1978,7 +2055,7 @@ func (p *PostgresSQLDB) Init() error {
 			atomcount INT NOT NULL
 		);
 
-		TRUNCATE metadata, massbank, contributor, accession_contributor, author, accession_author, license, accession_license, publication, accession_publication, compound, compound_name, compound_class, compound_link, acquisition_instrument, accession_acquisition, acquisition_mass_spectrometry, acquisition_chromatography, acquisition_general, mass_spectrometry_focused_ion, mass_spectrometry_data_processing, spectrum, peak, peak_annotation, browse_options, molecules CASCADE;
+		TRUNCATE metadata, massbank, contributor, accession_contributor, author, accession_author, license, accession_license, publication, accession_publication, compound, compound_name, compound_class, compound_link, acquisition_instrument, accession_acquisition, acquisition_mass_spectrometry, acquisition_chromatography, acquisition_general, mass_spectrometry_focused_ion, mass_spectrometry_data_processing, spectrum, peak, peak_annotation, browse_options, neutral_losses, molecules CASCADE;
 
 		`;
 	

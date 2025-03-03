@@ -99,10 +99,10 @@ paths:
         schema:
           $ref: '#/components/schemas/Intensity'
         style: form
-      - description: Filter by peak difference
+      - description: Filter by neutral losses.
         explode: true
         in: query
-        name: peak_differences
+        name: neutral_loss
         required: false
         schema:
           $ref: '#/components/schemas/Peaks'
@@ -243,10 +243,10 @@ paths:
         schema:
           $ref: '#/components/schemas/Intensity'
         style: form
-      - description: Filter by peak difference
+      - description: Filter by neutral losses.
         explode: true
         in: query
-        name: peak_differences
+        name: neutral_loss
         required: false
         schema:
           $ref: '#/components/schemas/Peaks'

@@ -7,30 +7,44 @@ import PeakSearchPeakType from '../../../../../../types/filterOptions/PeakSearch
 import useFormInstance from 'antd/es/form/hooks/useFormInstance';
 import { Content } from 'antd/es/layout/layout';
 
-function PeakSearch(): JSX.Element {
+type peaks = ['spectralSearchFilterOptions', 'peaks', 'peaks'];
+type neutralLoss = [
+  'spectralSearchFilterOptions',
+  'neutralLoss',
+  'neutralLosses',
+];
+
+type InputProps = {
+  type: 'peaks' | 'neutralLoss';
+};
+
+function PeakSearch({ type }: InputProps): JSX.Element {
   const formInstance = useFormInstance<SearchFields>();
   const { getFieldValue, setFieldValue } = formInstance;
   const [peakSearchRows, setPeakSearchRows] = useState<JSX.Element[]>([]);
+  const [fieldName, setFieldName] = useState<peaks | neutralLoss>();
 
   useEffect(() => {
-    const p = getFieldValue([
-      'spectralSearchFilterOptions',
-      'peaks',
-      'peaks',
-    ]) as PeakSearchPeakType[] | undefined;
+    const _fieldName: peaks | neutralLoss =
+      type === 'peaks'
+        ? ['spectralSearchFilterOptions', 'peaks', 'peaks']
+        : ['spectralSearchFilterOptions', 'neutralLoss', 'neutralLosses'];
+    setFieldName(_fieldName);
+
+    const p = getFieldValue(_fieldName) as PeakSearchPeakType[] | undefined;
 
     if (p && p.length > 0) {
       setPeakSearchRows(
         p.map((_, i) => (
-          <PeakSearchRow index={i} key={'peak-search-row-' + i} />
+          <PeakSearchRow index={i} type={type} key={'peak-search-row-' + i} />
         )),
       );
     } else {
       setPeakSearchRows([
-        <PeakSearchRow index={0} key={'peak-search-row-0'} />,
+        <PeakSearchRow index={0} type={type} key={'peak-search-row-0'} />,
       ]);
     }
-  }, [getFieldValue]);
+  }, [getFieldValue, type]);
 
   const handleOnDelete = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
@@ -38,32 +52,27 @@ function PeakSearch(): JSX.Element {
       e.stopPropagation();
 
       if (peakSearchRows.length > 1) {
-        const peaks = getFieldValue([
-          'spectralSearchFilterOptions',
-          'peaks',
-          'peaks',
-        ]) as PeakSearchPeakType[] | undefined;
+        const peaks = getFieldValue(fieldName) as
+          | PeakSearchPeakType[]
+          | undefined;
 
         if (peaks && peakSearchRows.length === peaks.length) {
           peaks.pop();
 
-          setFieldValue(
-            ['spectralSearchFilterOptions', 'peaks', 'peaks'],
-            peaks,
-          );
+          setFieldValue(fieldName, peaks);
         }
 
         const _rows = [...peakSearchRows];
         _rows.pop();
         setPeakSearchRows(_rows);
       } else {
-        setFieldValue(['spectralSearchFilterOptions', 'peaks', 'peaks'], []);
+        setFieldValue(fieldName, []);
         setPeakSearchRows([
-          <PeakSearchRow index={0} key={'peak-search-row-0'} />,
+          <PeakSearchRow index={0} type={type} key={'peak-search-row-0'} />,
         ]);
       }
     },
-    [getFieldValue, peakSearchRows, setFieldValue],
+    [fieldName, getFieldValue, peakSearchRows, setFieldValue, type],
   );
 
   const handleOnAdd = useCallback(
@@ -74,13 +83,17 @@ function PeakSearch(): JSX.Element {
       const index = peakSearchRows.length;
       setPeakSearchRows([
         ...peakSearchRows,
-        <PeakSearchRow index={index} key={'peak-search-row-' + index} />,
+        <PeakSearchRow
+          index={index}
+          type={type}
+          key={'peak-search-row-' + index}
+        />,
       ]);
     },
-    [peakSearchRows],
+    [peakSearchRows, type],
   );
 
-  const peakSearch: JSX.Element = useMemo(() => {
+  return useMemo(() => {
     const rows = peakSearchRows.concat([
       <Row
         key={'peak-search-row-' + peakSearchRows.length}
@@ -133,6 +146,7 @@ function PeakSearch(): JSX.Element {
 
     return (
       <Content
+        key={'peak-search-content-' + type}
         style={{
           width: '100%',
           height: '100%',
@@ -140,7 +154,7 @@ function PeakSearch(): JSX.Element {
         }}
       >
         <Row key="peak-search-header">
-          <Col span={4}>Peak</Col>
+          <Col span={4}>{type === 'peaks' ? 'Peak' : 'Loss'}</Col>
           <Col span={9}>Mass</Col>
           <Col span={4}></Col>
           <Col span={7}>Formula</Col>
@@ -148,9 +162,7 @@ function PeakSearch(): JSX.Element {
         {rows}
       </Content>
     );
-  }, [handleOnAdd, handleOnDelete, peakSearchRows]);
-
-  return peakSearch;
+  }, [handleOnAdd, handleOnDelete, peakSearchRows, type]);
 }
 
 export default PeakSearch;

@@ -130,6 +130,29 @@ function buildFormDataFromSearchParams(searchParams: URLSearchParams) {
     containsValues = true;
   }
 
+  const neutralLoss = searchParams.get('neutral_loss');
+  if (neutralLoss && neutralLoss.length > 0) {
+    const neutralLosses = neutralLoss.split(',').map((p) => {
+      return { mz: Number(p) };
+    });
+    const mass_tolerance = searchParams.get('mass_tolerance');
+    const intensity = searchParams.get('intensity');
+    (
+      formData.spectralSearchFilterOptions as SpectralSearchFilterOptions
+    ).neutralLoss = {
+      neutralLosses,
+      massTolerance: mass_tolerance
+        ? Number(mass_tolerance)
+        : defaultSearchFieldValues.spectralSearchFilterOptions?.neutralLoss
+            .massTolerance,
+      intensity: intensity
+        ? Number(intensity)
+        : defaultSearchFieldValues.spectralSearchFilterOptions?.neutralLoss
+            .intensity,
+    };
+    containsValues = true;
+  }
+
   return { formData, containsValues };
 }
 

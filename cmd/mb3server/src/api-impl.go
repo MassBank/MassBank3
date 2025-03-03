@@ -51,11 +51,11 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 		MassEpsilon:       nil,
 		Formula:           "",
 		Peaks:             nil,
-		PeakDifferences:   nil,
+		NeutralLoss:   	   nil,
 		Inchi: 			   "",
 		InchiKey:          "",
 		Contributor:       co,
-		Intensity:   nil,
+		Intensity:   	   nil,
 	}
 	vals, err := db.GetUniqueValues(filters)
 	if err != nil {
@@ -100,7 +100,7 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 	return &result, nil
 }
 
-func buildFilters(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, compoundClass string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, inchi string, inchiKey string, contributor []string) (*database.Filters, error) {
+func buildFilters(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, compoundClass string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, neutralLoss []string, inchi string, inchiKey string, contributor []string) (*database.Filters, error) {
 	it := &instrumentType
 	if len(*it) == 0 || (len(*it) == 1 && (*it)[0] == "") {
 		it = nil
@@ -135,6 +135,19 @@ func buildFilters(instrumentType []string, splash string, msType []string, ionMo
 		_peaks = nil
 	}
 
+	var _neutralLoss *[]float64
+	if len(neutralLoss) > 0 && neutralLoss[0] != "" {
+		_neutralLoss = &[]float64{}
+		for _, l := range neutralLoss {
+			loss, err := strconv.ParseFloat(l, 64)
+			if err != nil {
+				return nil, err
+			}
+			*_neutralLoss = append(*_neutralLoss, loss)
+		}
+	} else {
+		_neutralLoss = nil
+	}
 
 	_intensity := int64(intensity)
 
@@ -149,11 +162,11 @@ func buildFilters(instrumentType []string, splash string, msType []string, ionMo
 		MassEpsilon:       &massTolerance,
 		Formula:           formula,
 		Peaks:             _peaks,
-		PeakDifferences:   nil,
+		NeutralLoss:   	   _neutralLoss,
 		Inchi: 			   inchi,
 		InchiKey:          inchiKey,
 		Contributor:       co,
-		Intensity:   &_intensity,
+		Intensity:  	   &_intensity,
 	}
 
 	return &filters, nil
@@ -469,12 +482,12 @@ func GetSimpleRecord(accession string) (*MbRecord, error) {
 	return &result, nil
 }
 
-func GetRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, compoundClass string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, inchi string, inchiKey string, contributor []string) (*[]MbRecord, error) {
+func GetRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, compoundClass string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, neutralLoss []string, peakList []string, inchi string, inchiKey string, contributor []string) (*[]MbRecord, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
 
-	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, compoundClass, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, inchi, inchiKey, contributor)
+	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, compoundClass, exactMass, massTolerance, formula, peaks, intensity, neutralLoss, inchi, inchiKey, contributor)
 	if err != nil {
 		return nil, err
 	}
@@ -578,7 +591,7 @@ func GetMetadata()(*Metadata, error){
 	return &result, nil
 }
 
-func GetSearchResults(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, compoundClass string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, peakDifferences []string, peakList []string, peakListThreshold float64, inchi string, inchiKey string, contributor []string, substructure string) (*SearchResult, error) {
+func GetSearchResults(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, compoundClass string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, neutralLoss []string, peakList []string, peakListThreshold float64, inchi string, inchiKey string, contributor []string, substructure string) (*SearchResult, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
@@ -626,14 +639,14 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 	}	
 
 	// filter search
-	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, compoundClass, exactMass, massTolerance, formula, peaks, intensity, peakDifferences, inchi, inchiKey, contributor)	
+	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, compoundClass, exactMass, massTolerance, formula, peaks, intensity, neutralLoss, inchi, inchiKey, contributor)	
 	if err != nil {
 		return nil, err
 	}
 	fmt.Println("filters: ", filters)	
 	
 	checkFilters := (!checkSimilarity && !checkSubstructure) || filters.CompoundName != "" || filters.CompoundClass != "" || filters.Mass != nil || filters.Formula != "" || 
-		filters.Peaks != nil || filters.PeakDifferences != nil || filters.Inchi != "" || 
+		filters.Peaks != nil || filters.NeutralLoss != nil || filters.Inchi != "" || 
 		filters.InchiKey != "" || filters.Splash != "" || filters.IonMode != massbank.ANY || 
 		filters.MsType != nil || filters.InstrumentType != nil || filters.Contributor != nil
 
