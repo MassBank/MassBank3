@@ -8,8 +8,10 @@ function getActiveKeysFromFormData(formData: SearchFields) {
     Object.keys(formData.compoundSearchFilterOptions).forEach((key) => {
       if (
         formData.compoundSearchFilterOptions &&
-        formData.compoundSearchFilterOptions[key] &&
-        formData.compoundSearchFilterOptions[key].length > 0
+        formData.compoundSearchFilterOptions[key] !== undefined &&
+        ((typeof formData.compoundSearchFilterOptions[key] === 'string' &&
+          formData.compoundSearchFilterOptions[key].length > 0) ||
+          typeof formData.compoundSearchFilterOptions[key] === 'number')
       ) {
         keys.push('compoundSearchFilterOptions.' + key);
         isActive = true;

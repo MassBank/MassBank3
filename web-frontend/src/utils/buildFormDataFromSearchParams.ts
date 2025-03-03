@@ -75,6 +75,13 @@ function buildFormDataFromSearchParams(searchParams: URLSearchParams) {
       formData.compoundSearchFilterOptions as CompoundSearchFilterOptions
     ).exactMass = Number(exact_mass);
     containsValues = true;
+
+    const mass_tolerance = searchParams.get('mass_tolerance');
+    if (mass_tolerance && mass_tolerance.length > 0) {
+      (
+        formData.compoundSearchFilterOptions as CompoundSearchFilterOptions
+      ).massTolerance = Number(mass_tolerance);
+    }
   }
 
   const inchi = searchParams.get('inchi') ?? searchParams.get('inchi_key');
