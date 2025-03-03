@@ -11,7 +11,8 @@ function getActiveKeysFromFormData(formData: SearchFields) {
         formData.compoundSearchFilterOptions[key] !== undefined &&
         ((typeof formData.compoundSearchFilterOptions[key] === 'string' &&
           formData.compoundSearchFilterOptions[key].length > 0) ||
-          typeof formData.compoundSearchFilterOptions[key] === 'number')
+          (typeof formData.compoundSearchFilterOptions[key] === 'number' &&
+            key !== 'massTolerance'))
       ) {
         keys.push('compoundSearchFilterOptions.' + key);
         isActive = true;
