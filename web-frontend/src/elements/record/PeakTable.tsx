@@ -8,7 +8,7 @@ import { useHighlightData } from '../../context/highlight/useHighlightData';
 
 const columns = [
   {
-    title: 'mz',
+    title: 'm/z',
     dataIndex: 'mz',
     key: 'mz',
     align: 'center' as const,

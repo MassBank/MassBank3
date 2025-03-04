@@ -9,21 +9,21 @@ import Peak from '../../types/peak/Peak';
 
 const columns = [
   {
-    title: 'Difference',
-    dataIndex: 'difference',
-    key: 'difference',
-    align: 'center' as const,
-  },
-  {
-    title: 'Peak 1',
+    title: 'Mass 1',
     dataIndex: 'peak1',
     key: 'peak1',
     align: 'center' as const,
   },
   {
-    title: 'Peak 2',
+    title: 'Mass 2',
     dataIndex: 'peak2',
     key: 'peak2',
+    align: 'center' as const,
+  },
+  {
+    title: 'Difference',
+    dataIndex: 'difference',
+    key: 'difference',
     align: 'center' as const,
   },
 ];
