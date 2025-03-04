@@ -56,20 +56,20 @@ function Resizable({
   >(record.peak.neutral_loss);
 
   const handleOnZoom = useCallback(
-    (fpd1: Peak[], fpd2?: Peak[]) => {
+    ({
+      fpd1,
+      nld,
+      fpd2,
+    }: {
+      fpd1: Peak[];
+      nld: NeutralLoss[];
+      fpd2?: Peak[];
+    }) => {
       setFilteredPeakData(fpd1);
       setFilteredPeakData2(fpd2);
-
-      if (record.peak.neutral_loss) {
-        const _filteredNeutralLossData = record.peak.neutral_loss.filter(
-          (nl) =>
-            fpd1.some((p) => p.id === nl.peak1_id) &&
-            fpd1.some((p) => p.id === nl.peak2_id),
-        );
-        setFilteredNeutralLossData(_filteredNeutralLossData);
-      }
+      setFilteredNeutralLossData(nld);
     },
-    [record.peak.neutral_loss],
+    [],
   );
 
   const resize = useCallback((sizes: number[]) => {
@@ -84,6 +84,7 @@ function Resizable({
       <Chart
         peakData={record.peak.peak.values}
         peakData2={record2 ? record2.peak.peak.values : undefined}
+        neutralLossData={record.peak.neutral_loss}
         onZoom={handleOnZoom}
         width={chartWidth}
         height={height}
@@ -95,6 +96,7 @@ function Resizable({
       disableExport,
       handleOnZoom,
       height,
+      record.peak.neutral_loss,
       record.peak.peak.values,
       record2,
     ],

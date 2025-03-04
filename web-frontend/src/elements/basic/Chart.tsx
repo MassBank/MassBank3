@@ -5,6 +5,7 @@ import Peak from '../../types/peak/Peak';
 import { Button } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import {
+  ColumnWidthOutlined,
   CopyOutlined,
   DownloadOutlined,
   EyeInvisibleOutlined,
@@ -16,6 +17,7 @@ const { saveAs } = FileSaver;
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
 import routes from '../../constants/routes';
 import { usePropertiesContext } from '../../context/properties/properties';
+import NeutralLoss from '../../types/peak/NeutralLoss';
 
 const toolButtonStyle = {
   width: 20,
@@ -28,8 +30,16 @@ const toolButtonStyle = {
 type InputProps = {
   peakData: Peak[];
   peakData2?: Peak[];
-
-  onZoom?: (fpd1: Peak[], fpd2?: Peak[]) => void;
+  neutralLossData?: NeutralLoss[];
+  onZoom?: ({
+    fpd1,
+    nld,
+    fpd2,
+  }: {
+    fpd1: Peak[];
+    nld: NeutralLoss[];
+    fpd2?: Peak[];
+  }) => void;
   width?: number;
   height?: number;
   disableLabels?: boolean;
@@ -40,7 +50,8 @@ type InputProps = {
 
 function Chart({
   peakData,
-  peakData2,
+  peakData2 = [],
+  neutralLossData = [],
   onZoom = () => {},
   width = 400,
   height = 300,
@@ -102,30 +113,44 @@ function Chart({
 
   const filteredPeakData2 = useMemo(
     () =>
-      peakData2
+      peakData2 && peakData2.length > 0
         ? getFilteredPeakData(peakData2).map((p) => {
             const _p: Peak = { ...p };
             _p.intensity = -1 * _p.intensity;
             _p.rel = -1 * _p.rel;
-
             return _p;
           })
         : undefined,
     [getFilteredPeakData, peakData2],
   );
 
+  const filteredNeutralLossData = useMemo(
+    () =>
+      neutralLossData.filter((nl) => {
+        return (
+          filteredPeakData.some((p) => p.id === nl.peak1_id) &&
+          filteredPeakData.some((p) => p.id === nl.peak2_id)
+        );
+      }),
+    [filteredPeakData, neutralLossData],
+  );
+
   const handleOnZoom = useCallback(
     (_filteredPeakData: Peak[], _filteredPeakData2?: Peak[]) => {
-      const _filteredPeakData2_temp = (_filteredPeakData2 || []).map((p) => {
+      const _filteredPeakData2_temp = (_filteredPeakData2 ?? []).map((p) => {
         return {
           ...p,
           intensity: -1 * p.intensity,
           rel: -1 * p.rel,
         } as Peak;
       });
-      onZoom(_filteredPeakData, _filteredPeakData2_temp);
+      onZoom({
+        fpd1: _filteredPeakData,
+        fpd2: _filteredPeakData2_temp,
+        nld: filteredNeutralLossData,
+      });
     },
-    [onZoom],
+    [filteredNeutralLossData, onZoom],
   );
 
   useEffect(
@@ -470,7 +495,7 @@ function Chart({
     copyTextToClipboard('Peak List', text);
   }, []);
 
-  const buildSearchUrl = useCallback(
+  const buildSearchUrlPeaks = useCallback(
     (peaks: Peak[]) => {
       const searchParams = new URLSearchParams();
       searchParams.set(
@@ -478,6 +503,26 @@ function Chart({
         peaks.map((p) => `${p.mz.toFixed(4)};${p.rel}`).join(','),
       );
       searchParams.set('peak_list_threshold', '0.8');
+      const url =
+        frontendUrl +
+        baseUrl +
+        routes.search.path +
+        `?${searchParams.toString()}`;
+
+      return url;
+    },
+    [baseUrl, frontendUrl],
+  );
+
+  const buildSearchUrlNeutralLoss = useCallback(
+    (nld: NeutralLoss[]) => {
+      const searchParams = new URLSearchParams();
+      searchParams.set(
+        'neutral_loss',
+        nld.map((nl) => nl.difference.toFixed(4)).join(','),
+      );
+      searchParams.set('mass_tolerance', '0.1');
+      searchParams.set('intensity', '50');
       const url =
         frontendUrl +
         baseUrl +
@@ -585,10 +630,23 @@ function Chart({
                   <Button
                     children={
                       <a
-                        href={buildSearchUrl(filteredPeakData)}
+                        href={buildSearchUrlPeaks(filteredPeakData)}
                         target="_blank"
                       >
-                        <SearchOutlined title="Search similar spectra for peaks in current spectrum view" />
+                        <SearchOutlined title="Search similar spectra by peaks in current spectrum view" />
+                      </a>
+                    }
+                    style={toolButtonStyle}
+                  />
+                  <Button
+                    children={
+                      <a
+                        href={buildSearchUrlNeutralLoss(
+                          filteredNeutralLossData,
+                        )}
+                        target="_blank"
+                      >
+                        <ColumnWidthOutlined title="Search neutral losses by peak differences in current spectrum view" />
                       </a>
                     }
                     style={toolButtonStyle}
@@ -626,11 +684,13 @@ function Chart({
       MARGIN.top,
       boundsHeight,
       boundsWidth,
-      buildSearchUrl,
+      buildSearchUrlNeutralLoss,
+      buildSearchUrlPeaks,
       chartElements,
       disableExport,
       disableLabels,
       disableZoom,
+      filteredNeutralLossData,
       filteredPeakData,
       filteredPeakData2,
       handleOnCopy,

@@ -1,5 +1,6 @@
 import defaultSearchFieldValues from '../constants/defaultSearchFieldValues';
 import CompoundSearchFilterOptions from '../types/filterOptions/CompoundSearchFilterOptions';
+import PeakSearchPeakType from '../types/filterOptions/PeakSearchPeakType';
 import SearchFields from '../types/filterOptions/SearchFields';
 import SpectralSearchFilterOptions from '../types/filterOptions/SpectralSearchFilterOptions';
 
@@ -133,7 +134,7 @@ function buildFormDataFromSearchParams(searchParams: URLSearchParams) {
   const neutralLoss = searchParams.get('neutral_loss');
   if (neutralLoss && neutralLoss.length > 0) {
     const neutralLosses = neutralLoss.split(',').map((p) => {
-      return { mz: Number(p) };
+      return { mz: Number(p), formula: undefined } as PeakSearchPeakType;
     });
     const mass_tolerance = searchParams.get('mass_tolerance');
     const intensity = searchParams.get('intensity');
