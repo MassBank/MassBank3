@@ -20,6 +20,9 @@ type MbRecordPeak struct {
 	NumPeak int32 `json:"numPeak"`
 
 	Peak MbRecordPeakPeak `json:"peak"`
+
+	// Neutral Losses
+	NeutralLoss []MbRecordPeakNeutralLossInner `json:"neutral_loss,omitempty"`
 }
 
 // AssertMbRecordPeakRequired checks if the required fields are not zero-ed
@@ -40,6 +43,11 @@ func AssertMbRecordPeakRequired(obj MbRecordPeak) error {
 	}
 	if err := AssertMbRecordPeakPeakRequired(obj.Peak); err != nil {
 		return err
+	}
+	for _, el := range obj.NeutralLoss {
+		if err := AssertMbRecordPeakNeutralLossInnerRequired(el); err != nil {
+			return err
+		}
 	}
 	return nil
 }

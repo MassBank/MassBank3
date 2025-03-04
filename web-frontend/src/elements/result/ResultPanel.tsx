@@ -108,7 +108,7 @@ function ResultPanel({
 
         const record = await fetchData(url);
 
-        if (record) {
+        if (record !== undefined && typeof record === 'object') {
           record.peak.peak.values = record.peak.peak.values.map(
             (p: Peak) =>
               ({

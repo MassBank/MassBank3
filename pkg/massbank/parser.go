@@ -165,6 +165,7 @@ func getPeaks(s string) (*PkPeak, error) {
 	}
 	return &PkPeak{
 		Header:    strings.Split(s, " "),
+		Id:        []int32{},
 		Mz:        []float64{},
 		Intensity: []float64{},
 		Rel:       []int32{},

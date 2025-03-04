@@ -12,6 +12,9 @@ package mb3server
 // MbRecordPeakPeakValuesInner - Values for a single peak
 type MbRecordPeakPeakValuesInner struct {
 
+	// Peak identifier
+	Id int32 `json:"id,omitempty"`
+
 	// m/z of the peak
 	Mz float64 `json:"mz,omitempty"`
 

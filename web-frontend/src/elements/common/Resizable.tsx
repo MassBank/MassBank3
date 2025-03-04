@@ -4,12 +4,13 @@ import Chart from '../basic/Chart';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Peak from '../../types/peak/Peak';
 import Record from '../../types/record/Record';
-import getLinkedAnnotations from '../../utils/getLinkedAnnotations';
-import LinkedPeakAnnotation from '../../types/peak/LinkedPeakAnnotation';
 import { Content } from 'antd/es/layout/layout';
-import { Splitter } from 'antd';
+import { Splitter, Tabs, TabsProps } from 'antd';
+import NeutralLossTable from '../record/NeutralLossTable';
+import NeutralLoss from '../../types/peak/NeutralLoss';
 
 const sidebarWidth = 7;
+const tabsHeight = 55;
 
 type InputProps = {
   record: Record;
@@ -19,6 +20,7 @@ type InputProps = {
   minChartWidth?: number;
   minPeakTableWith?: number;
   disableExport?: boolean;
+  disableNeutralLossTab?: boolean;
 };
 
 function Resizable({
@@ -29,6 +31,7 @@ function Resizable({
   minChartWidth = 400,
   minPeakTableWith = 300,
   disableExport = false,
+  disableNeutralLossTab = false,
 }: InputProps) {
   const [chartWidth, setChartWidth] = useState<number>(0);
   const [peakTableWidth, setPeakTableWidth] = useState<number>(0);
@@ -48,47 +51,25 @@ function Resizable({
     Peak[] | undefined
   >(record2 ? record2.peak.peak.values : undefined);
 
-  const linkedAnnotations = useMemo(
-    () => getLinkedAnnotations(record.peak.peak.values, record.peak.annotation),
-    [record.peak],
-  );
-  const linkedAnnotations2 = useMemo(
-    () =>
-      record2
-        ? getLinkedAnnotations(
-            record2.peak.peak.values,
-            record2.peak.annotation,
-          )
-        : [],
-    [record2],
-  );
-
-  const [filteredLinkedAnnotations, setFilteredLinkedAnnotations] =
-    useState<LinkedPeakAnnotation[]>(linkedAnnotations);
-
-  const [filteredLinkedAnnotations2, setFilteredLinkedAnnotations2] =
-    useState<LinkedPeakAnnotation[]>(linkedAnnotations2);
+  const [filteredNeutralLossData, setFilteredNeutralLossData] = useState<
+    NeutralLoss[]
+  >(record.peak.neutral_loss);
 
   const handleOnZoom = useCallback(
     (fpd1: Peak[], fpd2?: Peak[]) => {
       setFilteredPeakData(fpd1);
       setFilteredPeakData2(fpd2);
 
-      const _filteredLinkedAnnotations = getLinkedAnnotations(
-        fpd1,
-        record.peak.annotation,
-      );
-      setFilteredLinkedAnnotations(_filteredLinkedAnnotations);
-
-      if (record2 && fpd2) {
-        const _filteredLinkedAnnotations2 = getLinkedAnnotations(
-          fpd2,
-          record2.peak.annotation,
+      if (record.peak.neutral_loss) {
+        const _filteredNeutralLossData = record.peak.neutral_loss.filter(
+          (nl) =>
+            fpd1.some((p) => p.id === nl.peak1_id) &&
+            fpd1.some((p) => p.id === nl.peak2_id),
         );
-        setFilteredLinkedAnnotations2(_filteredLinkedAnnotations2);
+        setFilteredNeutralLossData(_filteredNeutralLossData);
       }
     },
-    [record.peak.annotation, record2],
+    [record.peak.neutral_loss],
   );
 
   const resize = useCallback((sizes: number[]) => {
@@ -119,45 +100,81 @@ function Resizable({
     ],
   );
 
-  const peakTable = useMemo(
-    () => (
-      <PeakTable
-        peaks={filteredPeakData}
-        annotations={record.peak.annotation}
-        linkedAnnotations={filteredLinkedAnnotations}
-        width={peakTableWidth}
-        height={record2 && filteredPeakData2 ? height / 2 : height}
+  const peakTable = useMemo(() => {
+    if (disableNeutralLossTab) {
+      return (
+        <PeakTable
+          peaks={filteredPeakData}
+          width={peakTableWidth}
+          height={record2 && filteredPeakData2 ? height / 2 : height}
+        />
+      );
+    }
+    const items: TabsProps['items'] = [
+      {
+        key: '1',
+        label: 'Peaks',
+        children: (
+          <PeakTable
+            peaks={filteredPeakData}
+            width={peakTableWidth}
+            height={
+              record2 && filteredPeakData2
+                ? height / 2 - tabsHeight
+                : height - tabsHeight
+            }
+          />
+        ),
+      },
+      {
+        key: '2',
+        label: 'Neutral Losses',
+        children: (
+          <NeutralLossTable
+            neutralLosses={filteredNeutralLossData}
+            peaks={filteredPeakData}
+            width={peakTableWidth}
+            height={
+              record2 && filteredPeakData2
+                ? height / 2 - tabsHeight
+                : height - tabsHeight
+            }
+          />
+        ),
+      },
+    ];
+    return (
+      <Tabs
+        defaultActiveKey="1"
+        items={items}
+        style={{
+          width: peakTableWidth,
+          height: tabsHeight,
+        }}
+        centered
       />
-    ),
-    [
-      filteredLinkedAnnotations,
-      filteredPeakData,
-      filteredPeakData2,
-      height,
-      peakTableWidth,
-      record.peak.annotation,
-      record2,
-    ],
-  );
+    );
+  }, [
+    disableNeutralLossTab,
+    filteredNeutralLossData,
+    filteredPeakData,
+    filteredPeakData2,
+    height,
+    peakTableWidth,
+    record2,
+  ]);
+
   const peakTable2 = useMemo(
     () =>
       record2 &&
       filteredPeakData2 && (
         <PeakTable
           peaks={filteredPeakData2}
-          annotations={record2.peak.annotation}
-          linkedAnnotations={filteredLinkedAnnotations2}
           width={peakTableWidth}
           height={height / 2}
         />
       ),
-    [
-      filteredLinkedAnnotations2,
-      filteredPeakData2,
-      height,
-      peakTableWidth,
-      record2,
-    ],
+    [filteredPeakData2, height, peakTableWidth, record2],
   );
 
   return useMemo(

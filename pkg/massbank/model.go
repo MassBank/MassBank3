@@ -63,6 +63,7 @@ type PeakProperties struct {
 	Annotation *PkAnnotation `mb2:"PK$ANNOTATION" optional:"true" json:"annotation"`
 	NumPeak    *uint         `mb2:"PK$NUM_PEAK" json:"n_Peak"`
 	Peak       *PkPeak       `mb2:"PK$PEAK" json:"peak"`
+	NeutralLoss *PkNeutralLoss 
 }
 
 type Metadata struct {
@@ -108,10 +109,19 @@ type RecordAuthorName struct {
 
 type PkPeak struct {
 	Header    []string  `json:"header"`
+	Id 	  	  []int32   `json:"id"`
 	Mz        []float64 `json:"mz"`
 	Intensity []float64 `json:"intensity"`
 	Rel       []int32    `json:"rel"`
 }
+
+type PkNeutralLoss struct {
+	Difference []float64 `json:"difference"`
+	Peak1Id    []int32   `json:"peak1_id"`
+	Peak2Id    []int32   `json:"peak2_id"`
+	MinRelIntensity []int32 `json:"min_rel_intensity"`
+}
+
 
 type PkAnnotation struct {
 	Header []string                 `json:"header"`

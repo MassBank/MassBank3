@@ -24,7 +24,7 @@ function RecordView({ record, width, height }: inputProps) {
   const headerHeight = 400;
   const minChartWidth = useMemo(() => width / 2, [width]);
   const minPeakTableWith = 400;
-  const chartAndPeakTableHeight = 500;
+  const chartAndPeakTableHeight = 600;
 
   const buildDivider = useCallback(
     (label: string) => <SectionDivider label={label} />,

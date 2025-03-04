@@ -1,62 +1,55 @@
 import './PeakTable.scss';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import Peak from '../../types/peak/Peak';
+import { useCallback, useMemo, useState } from 'react';
 import { Table } from 'antd';
-import PeakTableDataType from '../../types/PeakTableDataType';
 import { useHighlightData } from '../../context/highlight/useHighlightData';
+import NeutralLoss from '../../types/peak/NeutralLoss';
+import NeutralLossTableDataType from '../../types/NeutralLossTableDataType';
+import Peak from '../../types/peak/Peak';
 
 const columns = [
   {
-    title: 'mz',
-    dataIndex: 'mz',
-    key: 'mz',
+    title: 'Difference',
+    dataIndex: 'difference',
+    key: 'difference',
     align: 'center' as const,
   },
   {
-    title: 'Intensity',
-    dataIndex: 'intensity',
-    key: 'intensity',
+    title: 'Peak 1',
+    dataIndex: 'peak1',
+    key: 'peak1',
     align: 'center' as const,
   },
   {
-    title: 'Rel. Int.',
-    dataIndex: 'rel',
-    key: 'rel',
+    title: 'Peak 2',
+    dataIndex: 'peak2',
+    key: 'peak2',
     align: 'center' as const,
   },
 ];
 
 type InputProps = {
+  neutralLosses: NeutralLoss[];
   peaks: Peak[];
   width: number;
   height: number;
 };
 
-function PeakTable({ peaks, width, height }: InputProps) {
+function NeutralLossTable({ neutralLosses, peaks, width, height }: InputProps) {
   const highlightData = useHighlightData();
   const [activeKey, setActiveKey] = useState<string | undefined>();
 
-  useEffect(() => {
-    const p = peaks.find((p) => highlightData.highlight.highlighted.has(p.id));
-    if (p) {
-      setActiveKey(p.id);
-    } else {
-      setActiveKey(undefined);
-    }
-  }, [activeKey, highlightData.highlight.highlighted, peaks]);
-
   const dataSource = useMemo(
     () =>
-      peaks.map((p) => {
+      neutralLosses.map((nl) => {
         return {
-          key: p.id,
-          mz: p.mz.toFixed(4),
-          intensity: p.intensity.toFixed(1),
-          rel: p.rel,
-        } as PeakTableDataType;
+          key: nl.peak1_id + '_' + nl.peak2_id,
+          difference: nl.difference.toFixed(4),
+          peak1: peaks.find((p) => p.id === nl.peak1_id)?.mz.toFixed(4) ?? '',
+          peak2: peaks.find((p) => p.id === nl.peak2_id)?.mz.toFixed(4) ?? '',
+        } as NeutralLossTableDataType;
       }),
-    [peaks],
+    [neutralLosses, peaks],
   );
 
   const handleOnMouseEnter = useCallback(
@@ -64,7 +57,7 @@ function PeakTable({ peaks, width, height }: InputProps) {
       setActiveKey(key);
       highlightData.dispatch({
         type: 'SHOW',
-        payload: { convertedHighlights: new Set<string>([key]) },
+        payload: { convertedHighlights: new Set<string>(key.split('_')) },
       });
     },
     [highlightData],
@@ -75,7 +68,7 @@ function PeakTable({ peaks, width, height }: InputProps) {
       setActiveKey(undefined);
       highlightData.dispatch({
         type: 'HIDE',
-        payload: { convertedHighlights: new Set<string>([key]) },
+        payload: { convertedHighlights: new Set<string>(key.split('_')) },
       });
     },
     [highlightData],
@@ -83,7 +76,7 @@ function PeakTable({ peaks, width, height }: InputProps) {
 
   return useMemo(
     () => (
-      <Table<PeakTableDataType>
+      <Table<NeutralLossTableDataType>
         className="peak-table"
         style={{ width, height }}
         sticky
@@ -112,4 +105,4 @@ function PeakTable({ peaks, width, height }: InputProps) {
   );
 }
 
-export default PeakTable;
+export default NeutralLossTable;

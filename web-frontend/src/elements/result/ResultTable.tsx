@@ -104,10 +104,12 @@ function ResultTable({
         key: 'result-table-row_' + hit.index + '_' + hit.score,
         index: hit.index + 1,
         score: hit.score ? hit.score.toFixed(4) : undefined,
-        accession: <ResultLink hit={hit} />,
-        title: hit.record.title,
-        chart: buildChart(hit),
-        structure: buildStructure(hit.record.compound.smiles),
+        accession: hit.record ? <ResultLink hit={hit} /> : 'No data',
+        title: hit.record ? hit.record.title : 'No data',
+        chart: hit.record ? buildChart(hit) : null,
+        structure: hit.record
+          ? buildStructure(hit.record.compound.smiles)
+          : null,
       };
       rows.push(row);
     });

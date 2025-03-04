@@ -89,6 +89,7 @@ func (db *PostgresSQLDB) GetIndexes() []Index {
 	indexes = append(indexes, Index{IndexName: "spectrum_num_peak_index", TableName: "spectrum", Columns: []string{"num_peak"}})
 	indexes = append(indexes, Index{IndexName: "spectrum_massbank_id_index", TableName: "spectrum", Columns: []string{"massbank_id"}})
 
+	indexes = append(indexes, Index{IndexName: "peak_id_index", TableName: "peak", Columns: []string{"id"}})
 	indexes = append(indexes, Index{IndexName: "peak_mz_index", TableName: "peak", Columns: []string{"mz"}})
 	indexes = append(indexes, Index{IndexName: "peak_intensity_index", TableName: "peak", Columns: []string{"intensity"}})
 	indexes = append(indexes, Index{IndexName: "peak_relative_intensity_index", TableName: "peak", Columns: []string{"relative_intensity"}})
@@ -112,6 +113,8 @@ func (db *PostgresSQLDB) GetIndexes() []Index {
 
 	indexes = append(indexes, Index{IndexName: "neutral_losses_spectrum_id_index", TableName: "neutral_losses", Columns: []string{"spectrum_id"}})
 	indexes = append(indexes, Index{IndexName: "neutral_losses_difference_index", TableName: "neutral_losses", Columns: []string{"difference"}})
+	indexes = append(indexes, Index{IndexName: "neutral_losses_peak1_id_index", TableName: "neutral_losses", Columns: []string{"peak1_id"}})
+	indexes = append(indexes, Index{IndexName: "neutral_losses_peak2_id_index", TableName: "neutral_losses", Columns: []string{"peak2_id"}})
 	indexes = append(indexes, Index{IndexName: "neutral_losses_min_rel_intensity_index", TableName: "neutral_losses", Columns: []string{"min_rel_intensity"}})
 
 	return indexes
@@ -682,7 +685,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		result.Peak.Splash = &splash
 		result.Peak.NumPeak = &numPeak
 
-		query = "SELECT mz, intensity, relative_intensity FROM peak WHERE spectrum_id = $1;"
+		query = "SELECT id, mz, intensity, relative_intensity FROM peak WHERE spectrum_id = $1;"
 		stmt, err = p.database.Prepare(query)		
 		if err != nil {
 			return nil, err
@@ -690,16 +693,19 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		rows, err = stmt.Query(spectrumId)
 		stmt.Close()
 		if err == nil {
+			result.Peak.Peak.Id = []int32{}
 			result.Peak.Peak.Mz = []float64{}
 			result.Peak.Peak.Intensity = []float64{}
 			result.Peak.Peak.Rel = []int32{}
 			for rows.Next() {
+				var id int32
 				var mz float64
 				var intensity float64
 				var rel int32
-				if err := rows.Scan(&mz, &intensity, &rel); err != nil {
+				if err := rows.Scan(&id, &mz, &intensity, &rel); err != nil {
 					return nil, err
 				}
+				result.Peak.Peak.Id = append(result.Peak.Peak.Id, id)
 				result.Peak.Peak.Mz = append(result.Peak.Peak.Mz, mz)
 				result.Peak.Peak.Intensity = append(result.Peak.Peak.Intensity, intensity)
 				result.Peak.Peak.Rel = append(result.Peak.Peak.Rel, rel)
@@ -709,7 +715,38 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 			if err != sql.ErrNoRows {
 				return nil, err
 			}
-		}	
+		}
+		
+		query = "SELECT difference, peak1_id, peak2_id FROM neutral_losses WHERE spectrum_id = $1;"
+		stmt, err = p.database.Prepare(query)
+		if err != nil {
+			return nil, err
+		}
+		rows, err = stmt.Query(spectrumId)
+		stmt.Close()
+		if err == nil {
+			result.Peak.NeutralLoss = &massbank.PkNeutralLoss{
+				Difference: []float64{},
+				Peak1Id: []int32{},
+				Peak2Id: []int32{},				
+			}			
+			for rows.Next() {
+				var difference float64
+				var peak1Id int32
+				var peak2Id int32
+				if err := rows.Scan(&difference, &peak1Id, &peak2Id); err != nil {
+					return nil, err
+				}
+				result.Peak.NeutralLoss.Difference = append(result.Peak.NeutralLoss.Difference, difference)
+				result.Peak.NeutralLoss.Peak1Id = append(result.Peak.NeutralLoss.Peak1Id, peak1Id)
+				result.Peak.NeutralLoss.Peak2Id = append(result.Peak.NeutralLoss.Peak2Id, peak2Id)
+			}			
+			rows.Close()
+		} else {
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
+		}
 
 		query = "SELECT subtag, value FROM peak_annotation WHERE spectrum_id = $1;"
 		stmt, err = p.database.Prepare(query)		
@@ -1735,15 +1772,18 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 		return err
 	}
 	
-	q = `INSERT INTO peak (mz, intensity, relative_intensity, spectrum_id) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING;`
-	for i, mz := range record.Peak.Peak.Mz {
-		_, err = tx.Exec(q, mz, record.Peak.Peak.Intensity[i], record.Peak.Peak.Rel[i], spectrumId)
+	q = `INSERT INTO peak (mz, intensity, relative_intensity, spectrum_id) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING RETURNING id;`
+	peakIds := []int{}
+	var peakId int
+	for i, mz := range record.Peak.Peak.Mz {		
+		err = tx.QueryRow(q, mz, record.Peak.Peak.Intensity[i], record.Peak.Peak.Rel[i], spectrumId).Scan(&peakId)
 		if err != nil {
 			if err2 := tx.Rollback(); err2 != nil {
 				return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
 			}
 			return err
 		}
+		peakIds = append(peakIds, peakId)
 	}
 	if(record.Peak.Annotation != nil && record.Peak.Annotation.Values != nil) {
 		q = `INSERT INTO peak_annotation(subtag, value, spectrum_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
@@ -1795,16 +1835,16 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 		return err
 	}
 	
-	q = `INSERT INTO neutral_losses (spectrum_id, difference, min_rel_intensity) VALUES ($1, $2, $3);`
+	q = `INSERT INTO neutral_losses (spectrum_id, difference, peak1_id, peak2_id, min_rel_intensity) VALUES ($1, $2, $3, $4, $5);`	
+	var  diff float64 
 	for i := 0; i < int(*record.Peak.NumPeak); i++ {
 		for j := i + 1; j < int(*record.Peak.NumPeak); j++ {
-			var  diff float64 
 			if(record.Peak.Peak.Mz[i] >= record.Peak.Peak.Mz[j]) {
 				diff = record.Peak.Peak.Mz[i] - record.Peak.Peak.Mz[j]
 			} else {
 				diff = record.Peak.Peak.Mz[j] - record.Peak.Peak.Mz[i]
 			}							
-			_, err = tx.Exec(q, spectrumId, diff, math.Min(float64(record.Peak.Peak.Rel[i]), float64(record.Peak.Peak.Rel[j])))
+			_, err = tx.Exec(q, spectrumId, diff, peakIds[i], peakIds[j], math.Min(float64(record.Peak.Peak.Rel[i]), float64(record.Peak.Peak.Rel[j])))
 			if err != nil {
 				if err2 := tx.Rollback(); err2 != nil {
 					return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
@@ -1996,6 +2036,7 @@ func (p *PostgresSQLDB) Init() error {
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
 		CREATE TABLE IF NOT EXISTS peak (
+			id SERIAL PRIMARY KEY,
 			mz FLOAT NOT NULL,
 			intensity FLOAT NOT NULL,
 			relative_intensity FLOAT NOT NULL,	
@@ -2044,7 +2085,9 @@ func (p *PostgresSQLDB) Init() error {
 
 		CREATE TABLE IF NOT EXISTS neutral_losses (
 			spectrum_id INT NOT NULL REFERENCES spectrum(id) ON UPDATE CASCADE ON DELETE CASCADE,
-			difference FLOAT NOT NULL,			
+			difference FLOAT NOT NULL,	
+			peak1_id INT NOT NULL REFERENCES peak(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			peak2_id INT NOT NULL REFERENCES peak(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			min_rel_intensity FLOAT NOT NULL	
 		);
 

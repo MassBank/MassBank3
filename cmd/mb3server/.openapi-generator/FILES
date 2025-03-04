@@ -29,6 +29,7 @@ src/model_mb_record_deprecated.go
 src/model_mb_record_mass_spectrometry.go
 src/model_mb_record_peak.go
 src/model_mb_record_peak_annotation.go
+src/model_mb_record_peak_neutral_loss_inner.go
 src/model_mb_record_peak_peak.go
 src/model_mb_record_peak_peak_values_inner.go
 src/model_mb_record_species.go

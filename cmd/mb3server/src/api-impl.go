@@ -273,6 +273,7 @@ func buildMbRecord(record *massbank.MassBank2) (*MbRecord){
 				Header: record.Peak.Peak.Header,
 				Values: nil,
 			},
+			NeutralLoss: nil,
 		},
 	}
 	if record.Publication != nil {
@@ -296,15 +297,41 @@ func buildMbRecord(record *massbank.MassBank2) (*MbRecord){
 	}
 
 	// insert peak data
+	var ids = record.Peak.Peak.Id
 	var mzs = record.Peak.Peak.Mz
 	var ints = record.Peak.Peak.Intensity
 	var rels = record.Peak.Peak.Rel
 	for i := 0; i < len(mzs); i++ {
 		result.Peak.Peak.Values = append(result.Peak.Peak.Values, MbRecordPeakPeakValuesInner{
+			Id: 	   ids[i],
 			Mz:        mzs[i],
 			Intensity: ints[i],
 			Rel:       rels[i],
 		})
+	}
+
+	if record.Peak.NeutralLoss != nil {
+		result.Peak.NeutralLoss = []MbRecordPeakNeutralLossInner{}
+
+		var diffs []float64
+		diffs = append(diffs, record.Peak.NeutralLoss.Difference...)
+		var peak1_ids []int32
+		peak1_ids = append(peak1_ids, record.Peak.NeutralLoss.Peak1Id...)
+		var peak2_ids []int32
+		peak2_ids = append(peak2_ids, record.Peak.NeutralLoss.Peak2Id...)
+		// var min_rel_intensities []int32
+		// for _, min_rel_intensity := range *&record.Peak.NeutralLoss.MinRelIntensity {
+		// 	min_rel_intensities = append(min_rel_intensities, min_rel_intensity)
+		// }
+
+		for i := 0; i < len(diffs); i++ {
+			result.Peak.NeutralLoss = append(result.Peak.NeutralLoss, MbRecordPeakNeutralLossInner{
+				Difference: diffs[i],
+				Peak1Id:   peak1_ids[i],
+				Peak2Id:   peak2_ids[i],
+				// MinRelIntensity: min_rel_intensities[i],
+			})
+		}
 	}
 
 	// insert annotation data

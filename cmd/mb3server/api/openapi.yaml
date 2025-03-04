@@ -593,14 +593,23 @@ components:
             header:
             - header
             - header
+          neutral_loss:
+          - peak1_id: 1
+            difference: 0.7061401241503109
+            peak2_id: 1
+          - peak1_id: 1
+            difference: 0.7061401241503109
+            peak2_id: 1
           peak:
             values:
-            - intensity: 5.962133916683182
-              rel: 563
-              mz: 1.4658129805029452
-            - intensity: 5.962133916683182
-              rel: 563
-              mz: 1.4658129805029452
+            - intensity: 5.637376656633329
+              rel: 230
+              id: 1
+              mz: 5.962133916683182
+            - intensity: 5.637376656633329
+              rel: 230
+              id: 1
+              mz: 5.962133916683182
             header:
             - header
             - header
@@ -1266,10 +1275,15 @@ components:
     MBRecord_peak_peak_values_inner:
       description: Values for a single peak
       example:
-        intensity: 5.962133916683182
-        rel: 563
-        mz: 1.4658129805029452
+        intensity: 5.637376656633329
+        rel: 230
+        id: 1
+        mz: 5.962133916683182
       properties:
+        id:
+          description: Peak identifier
+          minimum: 1
+          type: integer
         mz:
           description: m/z of the peak
           format: double
@@ -1288,12 +1302,14 @@ components:
       description: Peak Data
       example:
         values:
-        - intensity: 5.962133916683182
-          rel: 563
-          mz: 1.4658129805029452
-        - intensity: 5.962133916683182
-          rel: 563
-          mz: 1.4658129805029452
+        - intensity: 5.637376656633329
+          rel: 230
+          id: 1
+          mz: 5.962133916683182
+        - intensity: 5.637376656633329
+          rel: 230
+          id: 1
+          mz: 5.962133916683182
         header:
         - header
         - header
@@ -1309,6 +1325,27 @@ components:
             $ref: '#/components/schemas/MBRecord_peak_peak_values_inner'
           type: array
       type: object
+    MBRecord_peak_neutral_loss_inner:
+      description: Values for a single neutral loss
+      example:
+        peak1_id: 1
+        difference: 0.7061401241503109
+        peak2_id: 1
+      properties:
+        difference:
+          description: Difference in mass
+          format: double
+          minimum: 0
+          type: number
+        peak1_id:
+          description: Peak identifier of the first peak
+          minimum: 1
+          type: integer
+        peak2_id:
+          description: Peak identifier of the second peak
+          minimum: 1
+          type: integer
+      type: object
     MBRecord_peak:
       example:
         annotation:
@@ -1320,14 +1357,23 @@ components:
           header:
           - header
           - header
+        neutral_loss:
+        - peak1_id: 1
+          difference: 0.7061401241503109
+          peak2_id: 1
+        - peak1_id: 1
+          difference: 0.7061401241503109
+          peak2_id: 1
         peak:
           values:
-          - intensity: 5.962133916683182
-            rel: 563
-            mz: 1.4658129805029452
-          - intensity: 5.962133916683182
-            rel: 563
-            mz: 1.4658129805029452
+          - intensity: 5.637376656633329
+            rel: 230
+            id: 1
+            mz: 5.962133916683182
+          - intensity: 5.637376656633329
+            rel: 230
+            id: 1
+            mz: 5.962133916683182
           header:
           - header
           - header
@@ -1345,6 +1391,11 @@ components:
           type: integer
         peak:
           $ref: '#/components/schemas/MBRecord_peak_peak'
+        neutral_loss:
+          description: Neutral Losses
+          items:
+            $ref: '#/components/schemas/MBRecord_peak_neutral_loss_inner'
+          type: array
       required:
       - numPeak
       - peak

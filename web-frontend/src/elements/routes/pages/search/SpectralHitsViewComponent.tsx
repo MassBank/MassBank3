@@ -50,6 +50,7 @@ function SpectralHitsViewComponent({
             width={widthResizable}
             height={height}
             disableExport
+            disableNeutralLossTab
           />
         ) : (
           <Resizable
@@ -57,6 +58,7 @@ function SpectralHitsViewComponent({
             width={widthResizable}
             height={height}
             disableExport
+            disableNeutralLossTab
           />
         )}
       </Content>
