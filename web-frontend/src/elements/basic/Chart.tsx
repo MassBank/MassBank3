@@ -31,6 +31,7 @@ type InputProps = {
   peakData: Peak[];
   peakData2?: Peak[];
   neutralLossData?: NeutralLoss[];
+  neutralLossLimit?: number;
   onZoom?: ({
     fpd1,
     nld,
@@ -52,6 +53,7 @@ function Chart({
   peakData,
   peakData2 = [],
   neutralLossData = [],
+  neutralLossLimit = 50,
   onZoom = () => {},
   width = 400,
   height = 300,
@@ -639,18 +641,21 @@ function Chart({
                     style={toolButtonStyle}
                   />
                   <Button
-                    children={
-                      <a
-                        href={buildSearchUrlNeutralLoss(
-                          filteredNeutralLossData,
-                        )}
-                        target="_blank"
-                      >
-                        <ColumnWidthOutlined title="Search neutral losses by peak differences in current spectrum view" />
-                      </a>
+                    title={
+                      filteredNeutralLossData.length > neutralLossLimit
+                        ? `Too many peak differences to search. Limit is ${neutralLossLimit}. Zoom in to reduce the number of peak differences.`
+                        : undefined
                     }
                     style={toolButtonStyle}
-                  />
+                    disabled={filteredNeutralLossData.length > neutralLossLimit}
+                  >
+                    <a
+                      href={buildSearchUrlNeutralLoss(filteredNeutralLossData)}
+                      target="_blank"
+                    >
+                      <ColumnWidthOutlined title="Search neutral losses by peak differences in current spectrum view" />
+                    </a>
+                  </Button>
                 </Content>
               )}
             </Content>
@@ -697,6 +702,7 @@ function Chart({
       handleOnDownload,
       height,
       isShowLabel,
+      neutralLossLimit,
       peakData.length,
       peakData2,
       width,

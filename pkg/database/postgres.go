@@ -111,11 +111,11 @@ func (db *PostgresSQLDB) GetIndexes() []Index {
 	indexes = append(indexes, Index{IndexName: "browse_options_mass_index", TableName: "browse_options", Columns: []string{"mass"}})
 	indexes = append(indexes, Index{IndexName: "browse_options_atomcount_index", TableName: "browse_options", Columns: []string{"atomcount"}})
 
-	indexes = append(indexes, Index{IndexName: "neutral_losses_spectrum_id_index", TableName: "neutral_losses", Columns: []string{"spectrum_id"}})
-	indexes = append(indexes, Index{IndexName: "neutral_losses_difference_index", TableName: "neutral_losses", Columns: []string{"difference"}})
-	indexes = append(indexes, Index{IndexName: "neutral_losses_peak1_id_index", TableName: "neutral_losses", Columns: []string{"peak1_id"}})
-	indexes = append(indexes, Index{IndexName: "neutral_losses_peak2_id_index", TableName: "neutral_losses", Columns: []string{"peak2_id"}})
-	indexes = append(indexes, Index{IndexName: "neutral_losses_min_rel_intensity_index", TableName: "neutral_losses", Columns: []string{"min_rel_intensity"}})
+	indexes = append(indexes, Index{IndexName: "peak_differences_spectrum_id_index", TableName: "peak_differences", Columns: []string{"spectrum_id"}})
+	indexes = append(indexes, Index{IndexName: "peak_differences_difference_index", TableName: "peak_differences", Columns: []string{"difference"}})
+	indexes = append(indexes, Index{IndexName: "peak_differences_peak1_id_index", TableName: "peak_differences", Columns: []string{"peak1_id"}})
+	indexes = append(indexes, Index{IndexName: "peak_differences_peak2_id_index", TableName: "peak_differences", Columns: []string{"peak2_id"}})
+	indexes = append(indexes, Index{IndexName: "peak_differences_min_rel_intensity_index", TableName: "peak_differences", Columns: []string{"min_rel_intensity"}})
 
 	return indexes
 }
@@ -717,7 +717,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 			}
 		}
 		
-		query = "SELECT difference, peak1_id, peak2_id FROM neutral_losses WHERE spectrum_id = $1;"
+		query = "SELECT difference, peak1_id, peak2_id FROM peak_differences WHERE spectrum_id = $1;"
 		stmt, err = p.database.Prepare(query)
 		if err != nil {
 			return nil, err
@@ -1083,7 +1083,7 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) (string, []stri
 		}		
 	}
 
-	if(filters.Peaks != nil && filters.MassEpsilon != nil) {
+	if(filters.Peaks != nil && len(*filters.Peaks) > 0 && filters.MassEpsilon != nil) {
 		peaksCount := len(*filters.Peaks)
 		var from = "FROM " 				
 		var where = "WHERE "
@@ -1128,42 +1128,47 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) (string, []stri
 		}
 	}
 
-	if(filters.NeutralLoss != nil && filters.MassEpsilon != nil) {
-		neutralLossesCount := len(*filters.NeutralLoss)
+	if(filters.NeutralLoss != nil && len(*filters.NeutralLoss) > 0 && filters.MassEpsilon != nil) {
+		neutralLossesCount := len(*filters.NeutralLoss)		
 		var from = "FROM " 				
 		var where = "WHERE "
+			
+		subQuery := ""
 		if(neutralLossesCount == 1) {			
 			parameters = append(parameters,  strconv.FormatFloat((*filters.NeutralLoss)[0] - *filters.MassEpsilon, 'f', -1, 64))
 			parameters = append(parameters,  strconv.FormatFloat((*filters.NeutralLoss)[0] + *filters.MassEpsilon, 'f', -1, 64))
-			from = from + "neutral_losses AS n1"
-			where = where + "n1.difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
+			from = from + "peak_differences AS t1"
+			where = where + "t1.difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
 			if(filters.Intensity != nil) {
 				parameters = append(parameters, strconv.FormatInt(*filters.Intensity, 10))
-				where = where + " AND n1.min_rel_intensity >= $" + strconv.Itoa(len(parameters))
+				where = where + " AND t1.min_rel_intensity >= $" + strconv.Itoa(len(parameters))
 			}
-		} else {			
+			subQuery = "massbank_id IN (SELECT massbank_id FROM spectrum WHERE id IN (SELECT DISTINCT(t1.spectrum_id) " + from + " " + where + "))"
+		} else {
+			var with = "WITH "
+			from = from + "t1"			
 			for i := 0; i < neutralLossesCount; i++ {
 				parameters = append(parameters,  strconv.FormatFloat((*filters.NeutralLoss)[i] - *filters.MassEpsilon, 'f', -1, 64))
 				parameters = append(parameters,  strconv.FormatFloat((*filters.NeutralLoss)[i] + *filters.MassEpsilon, 'f', -1, 64))
-				from = from + "neutral_losses AS n" + strconv.Itoa(i+1)
-				if(i < neutralLossesCount - 1) {
-					from = from + ", "
-				}
-				if(i == 0) {
-					where = where + "n1.difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
+				if(i == 0){
+					with = with + "t" + strconv.Itoa(i+1) + " AS (SELECT DISTINCT(spectrum_id), min_rel_intensity FROM peak_differences WHERE difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters)) + ")"
 				} else {
-					where = where + "n" + strconv.Itoa(i+1) + ".spectrum_id=n1.spectrum_id AND n" + strconv.Itoa(i+1) + ".difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
+					with = with + "t" + strconv.Itoa(i+1) + " AS (SELECT DISTINCT(spectrum_id) FROM peak_differences WHERE difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters)) + ")"
 				}
-				if(filters.Intensity != nil) {
-					parameters = append(parameters, strconv.FormatInt(*filters.Intensity, 10))
-					where = where + " AND n" + strconv.Itoa(i+1) + ".min_rel_intensity >= $" + strconv.Itoa(len(parameters))
-				}
+				if(i > 1){
+					from = from + " JOIN " + "t" + strconv.Itoa(i) + " ON t" + strconv.Itoa(i-1) + ".spectrum_id=t" + strconv.Itoa(i) + ".spectrum_id" 
+				}				
 				if(i < neutralLossesCount - 1) {
-					where = where + " AND "
-				}
+					with = with + ", "
+				}											
 			}
-		}
-		subQuery := "massbank_id IN (SELECT massbank_id FROM spectrum WHERE id IN (SELECT DISTINCT(n1.spectrum_id) " + from + " " + where + "))"
+			if(filters.Intensity != nil) {
+				parameters = append(parameters, strconv.FormatInt(*filters.Intensity, 10))
+				where = where + "t1.min_rel_intensity >= $" + strconv.Itoa(len(parameters))
+			}
+			subQuery = "massbank_id IN (SELECT massbank_id FROM spectrum WHERE id IN (" + with + " SELECT DISTINCT(t1.spectrum_id) " + from + " " + where + "))"
+		}		
+		
 		if(addedWhere || addedAnd) {
 			query = query + " AND " + subQuery
 			addedAnd = true
@@ -1430,11 +1435,11 @@ func (p *PostgresSQLDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error
 }
 
 func (p *PostgresSQLDB) DropIndex(i *Index) (string) {
-	return "DROP INDEX IF EXISTS " + i.IndexName + ";"
+	return "DROP INDEX " + i.IndexName + ";"
 }
 
 func (p *PostgresSQLDB) CreateIndex(i *Index) (string) {
-	return "CREATE INDEX IF NOT EXISTS " + i.IndexName + " ON " + i.TableName + " (" + strings.Join(i.Columns, ",") + ");"
+	return "CREATE INDEX " + i.IndexName + " ON " + i.TableName + " (" + strings.Join(i.Columns, ",") + ");"
 }
 
 // RemoveIndexes see [MB3Database.RemoveIndexes]
@@ -1473,7 +1478,7 @@ func (p *PostgresSQLDB) AddIndexes() error {
 	}
 
 	// add bingo index on molecules table
-	query := "CREATE INDEX IF NOT EXISTS bingo_molecules_idx ON molecules USING bingo_idx (molecule bingo.molecule);"
+	query := "CREATE INDEX bingo_molecules_idx ON molecules USING bingo_idx (molecule bingo.molecule);"
 	if _, err := p.database.Exec(query); err != nil {
 		return err
 	}
@@ -1835,7 +1840,7 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 		return err
 	}
 	
-	q = `INSERT INTO neutral_losses (spectrum_id, difference, peak1_id, peak2_id, min_rel_intensity) VALUES ($1, $2, $3, $4, $5);`	
+	q = `INSERT INTO peak_differences (spectrum_id, difference, peak1_id, peak2_id, min_rel_intensity) VALUES ($1, $2, $3, $4, $5);`	
 	var  diff float64 
 	for i := 0; i < int(*record.Peak.NumPeak); i++ {
 		for j := i + 1; j < int(*record.Peak.NumPeak); j++ {
@@ -1892,7 +1897,9 @@ func (p *PostgresSQLDB) Init() error {
 	var err error
 	var query = 
 		`
-		CREATE TABLE IF NOT EXISTS metadata (
+		DROP TABLE IF EXISTS metadata, massbank, contributor, accession_contributor, author, accession_author, license, accession_license, publication, accession_publication, compound, compound_name, compound_class, compound_link, acquisition_instrument, accession_acquisition, acquisition_mass_spectrometry, acquisition_chromatography, acquisition_general, mass_spectrometry_focused_ion, mass_spectrometry_data_processing, spectrum, peak, peak_annotation, browse_options, peak_differences, molecules;
+
+		CREATE TABLE metadata (
 			id SERIAL PRIMARY KEY,
 			commit char(40),
 			timestamp timestamp NOT NULL,
@@ -1900,7 +1907,7 @@ func (p *PostgresSQLDB) Init() error {
 			UNIQUE (commit, timestamp, version)
 		);
 
-		CREATE TABLE IF NOT EXISTS massbank (
+		CREATE TABLE massbank (
 			id SERIAL PRIMARY KEY,
 			filename TEXT NOT NULL,
 			accession VARCHAR(40) NOT NULL UNIQUE,	
@@ -1912,54 +1919,54 @@ func (p *PostgresSQLDB) Init() error {
 		);
 
 		-- contributor
-		CREATE TABLE IF NOT EXISTS contributor (
+		CREATE TABLE contributor (
 			id SERIAL PRIMARY KEY,
 			name TEXT NOT NULL,
 			UNIQUE (name)
 		);
-		CREATE TABLE IF NOT EXISTS accession_contributor (
+		CREATE TABLE accession_contributor (
 			massbank_id INT REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			contributor_id INT NOT NULL REFERENCES contributor(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (massbank_id, contributor_id)
 		);
 
 		-- author
-		CREATE TABLE IF NOT EXISTS author (
+		CREATE TABLE author (
 			id SERIAL PRIMARY KEY,
 			name TEXT NOT NULL
 		);
-		CREATE TABLE IF NOT EXISTS accession_author (
+		CREATE TABLE accession_author (
 			massbank_id INT REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			author_id INT NOT NULL REFERENCES author(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (massbank_id, author_id)
 		);
 
 		-- license
-		CREATE TABLE IF NOT EXISTS license (
+		CREATE TABLE license (
 			id SERIAL PRIMARY KEY,
 			name TEXT NOT NULL,
 			UNIQUE (name)
 		);
-		CREATE TABLE IF NOT EXISTS accession_license (
+		CREATE TABLE accession_license (
 			massbank_id INT REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			license_id INT NOT NULL REFERENCES license(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (massbank_id, license_id)
 		);
 
 		-- publication
-		CREATE TABLE IF NOT EXISTS publication (
+		CREATE TABLE publication (
 			id SERIAL PRIMARY KEY,
 			name TEXT NOT NULL,
 			UNIQUE (name)
 		);
-		CREATE TABLE IF NOT EXISTS accession_publication (
+		CREATE TABLE accession_publication (
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			publication_id INT NOT NULL REFERENCES publication(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (massbank_id, publication_id)
 		);
 
 		-- compound
-		CREATE TABLE IF NOT EXISTS compound (
+		CREATE TABLE compound (
 			id SERIAL PRIMARY KEY,
 			inchi TEXT NOT NULL,
 			formula TEXT NOT NULL,
@@ -1967,19 +1974,19 @@ func (p *PostgresSQLDB) Init() error {
 			mass FLOAT NOT NULL,
 			UNIQUE (inchi, formula, smiles, mass)
 		);
-		CREATE TABLE IF NOT EXISTS compound_name (
+		CREATE TABLE compound_name (
 			name TEXT NOT NULL,
 			compound_id INT NOT NULL REFERENCES compound(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (name, compound_id, massbank_id)		
 		);
-		CREATE TABLE IF NOT EXISTS compound_class (
+		CREATE TABLE compound_class (
 			class TEXT NOT NULL,
 			compound_id INT NOT NULL REFERENCES compound(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (class, compound_id, massbank_id)
 		);
-		CREATE TABLE IF NOT EXISTS compound_link (
+		CREATE TABLE compound_link (
 			database TEXT NOT NULL,
 			identifier TEXT NOT NULL,
 			compound_id INT NOT NULL REFERENCES compound(id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -1988,40 +1995,40 @@ func (p *PostgresSQLDB) Init() error {
 		);
 
 		-- acquisition
-		CREATE TABLE IF NOT EXISTS acquisition_instrument (
+		CREATE TABLE acquisition_instrument (
 			id SERIAL PRIMARY KEY,
 			instrument TEXT NOT NULL,
 			instrument_type TEXT NOT NULL,
 			UNIQUE (instrument, instrument_type)
 		);
-		CREATE TABLE IF NOT EXISTS accession_acquisition (
+		CREATE TABLE accession_acquisition (
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			acquisition_instrument_id INT NOT NULL REFERENCES acquisition_instrument(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
-		CREATE TABLE IF NOT EXISTS acquisition_mass_spectrometry (
+		CREATE TABLE acquisition_mass_spectrometry (
 			subtag TEXT NOT NULL,
 			value TEXT NOT NULL,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
-		CREATE TABLE IF NOT EXISTS acquisition_chromatography (
+		CREATE TABLE acquisition_chromatography (
 			subtag TEXT NOT NULL,
 			value TEXT NOT NULL,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
-		CREATE TABLE IF NOT EXISTS acquisition_general (
+		CREATE TABLE acquisition_general (
 			subtag TEXT NOT NULL,
 			value TEXT NOT NULL,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
 
 		-- mass spectrometry
-		CREATE TABLE IF NOT EXISTS mass_spectrometry_focused_ion (
+		CREATE TABLE mass_spectrometry_focused_ion (
 			subtag TEXT NOT NULL,
 			value TEXT NOT NULL,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			UNIQUE (subtag, value, massbank_id)
 		);
-		CREATE TABLE IF NOT EXISTS mass_spectrometry_data_processing (
+		CREATE TABLE mass_spectrometry_data_processing (
 			subtag TEXT NOT NULL,
 			value TEXT NOT NULL,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -2029,20 +2036,20 @@ func (p *PostgresSQLDB) Init() error {
 		);
 
 		-- spectrum (peak)
-		CREATE TABLE IF NOT EXISTS spectrum (
+		CREATE TABLE spectrum (
 			id SERIAL PRIMARY KEY,
 			splash TEXT NOT NULL,
 			num_peak INT NOT NULL,			
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
-		CREATE TABLE IF NOT EXISTS peak (
+		CREATE TABLE peak (
 			id SERIAL PRIMARY KEY,
 			mz FLOAT NOT NULL,
 			intensity FLOAT NOT NULL,
 			relative_intensity FLOAT NOT NULL,	
 			spectrum_id INT NOT NULL REFERENCES spectrum(id) ON UPDATE CASCADE ON DELETE CASCADE
 		);
-		CREATE TABLE IF NOT EXISTS peak_annotation (
+		CREATE TABLE peak_annotation (
 			subtag TEXT NOT NULL,
 			value TEXT NOT NULL,
 			spectrum_id INT NOT NULL REFERENCES spectrum(id) ON UPDATE CASCADE ON DELETE CASCADE
@@ -2051,11 +2058,11 @@ func (p *PostgresSQLDB) Init() error {
 		
 
 		-- project
-		-- CREATE TABLE IF NOT EXISTS project (
+		-- CREATE TABLE project (
 		-- 	id SERIAL PRIMARY KEY,
 		-- 	name TEXT NOT NULL UNIQUE
 		-- );
-		-- CREATE TABLE IF NOT EXISTS accession_project (
+		-- CREATE TABLE accession_project (
 		-- 	massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 		-- 	project_id INT NOT NULL REFERENCES project(id) ON UPDATE CASCADE ON DELETE CASCADE,
 		-- 	UNIQUE (massbank_id, project_id)
@@ -2063,7 +2070,7 @@ func (p *PostgresSQLDB) Init() error {
 		
 		-- species (sample)
 
-		CREATE TABLE IF NOT EXISTS browse_options (
+		CREATE TABLE browse_options (
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			accession VARCHAR(40) NOT NULL REFERENCES massbank(accession) ON UPDATE CASCADE ON DELETE CASCADE,
 			contributor TEXT NOT NULL REFERENCES contributor(name) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -2083,23 +2090,20 @@ func (p *PostgresSQLDB) Init() error {
 			atomcount INT NOT NULL
 		);
 
-		CREATE TABLE IF NOT EXISTS neutral_losses (
+		CREATE TABLE peak_differences (
 			spectrum_id INT NOT NULL REFERENCES spectrum(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			difference FLOAT NOT NULL,	
 			peak1_id INT NOT NULL REFERENCES peak(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			peak2_id INT NOT NULL REFERENCES peak(id) ON UPDATE CASCADE ON DELETE CASCADE,
-			min_rel_intensity FLOAT NOT NULL	
+			min_rel_intensity FLOAT NOT NULL
 		);
 
-		CREATE TABLE IF NOT EXISTS molecules (
+		CREATE TABLE molecules (
 			id SERIAL NOT NULL PRIMARY KEY,
 			molecule TEXT NOT NULL,
 			accession TEXT NOT NULL,
 			atomcount INT NOT NULL
 		);
-
-		TRUNCATE metadata, massbank, contributor, accession_contributor, author, accession_author, license, accession_license, publication, accession_publication, compound, compound_name, compound_class, compound_link, acquisition_instrument, accession_acquisition, acquisition_mass_spectrometry, acquisition_chromatography, acquisition_general, mass_spectrometry_focused_ion, mass_spectrometry_data_processing, spectrum, peak, peak_annotation, browse_options, neutral_losses, molecules CASCADE;
-
 		`;
 	
 	if _, err = p.database.Exec(query); err != nil {

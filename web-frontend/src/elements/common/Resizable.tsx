@@ -115,7 +115,7 @@ function Resizable({
     const items: TabsProps['items'] = [
       {
         key: '1',
-        label: 'Peaks',
+        label: 'Peaks (' + filteredPeakData.length + ')',
         children: (
           <PeakTable
             peaks={filteredPeakData}
@@ -130,7 +130,7 @@ function Resizable({
       },
       {
         key: '2',
-        label: 'Differences',
+        label: 'Differences (' + filteredNeutralLossData.length + ')',
         children: (
           <NeutralLossTable
             neutralLosses={filteredNeutralLossData}
