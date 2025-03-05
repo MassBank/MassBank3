@@ -6,24 +6,25 @@ import { useHighlightData } from '../../context/highlight/useHighlightData';
 import NeutralLoss from '../../types/peak/NeutralLoss';
 import NeutralLossTableDataType from '../../types/NeutralLossTableDataType';
 import Peak from '../../types/peak/Peak';
+import { ColumnsType } from 'antd/es/table';
 
-const columns = [
+const columns: ColumnsType<NeutralLossTableDataType> = [
   {
-    title: 'Mass 1',
+    title: 'Difference',
+    dataIndex: 'difference',
+    key: 'difference',
+    align: 'center' as const,
+  },
+  {
+    title: 'Peak 1',
     dataIndex: 'peak1',
     key: 'peak1',
     align: 'center' as const,
   },
   {
-    title: 'Mass 2',
+    title: 'Peak 2',
     dataIndex: 'peak2',
     key: 'peak2',
-    align: 'center' as const,
-  },
-  {
-    title: 'Difference',
-    dataIndex: 'difference',
-    key: 'difference',
     align: 'center' as const,
   },
 ];
