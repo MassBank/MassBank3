@@ -130,7 +130,7 @@ function Resizable({
       },
       {
         key: '2',
-        label: 'Differences (' + filteredNeutralLossData.length + ')',
+        label: 'Differences (' + (filteredNeutralLossData?.length ?? 0) + ')',
         children: (
           <NeutralLossTable
             neutralLosses={filteredNeutralLossData}

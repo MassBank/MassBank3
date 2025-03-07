@@ -5,7 +5,6 @@ import Peak from '../../types/peak/Peak';
 import { Button } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import {
-  ColumnWidthOutlined,
   CopyOutlined,
   DownloadOutlined,
   EyeInvisibleOutlined,
@@ -31,7 +30,6 @@ type InputProps = {
   peakData: Peak[];
   peakData2?: Peak[];
   neutralLossData?: NeutralLoss[];
-  neutralLossLimit?: number;
   onZoom?: ({
     fpd1,
     nld,
@@ -53,7 +51,6 @@ function Chart({
   peakData,
   peakData2 = [],
   neutralLossData = [],
-  neutralLossLimit = 50,
   onZoom = () => {},
   width = 400,
   height = 300,
@@ -128,12 +125,11 @@ function Chart({
 
   const filteredNeutralLossData = useMemo(
     () =>
-      neutralLossData.filter((nl) => {
-        return (
+      neutralLossData.filter(
+        (nl) =>
           filteredPeakData.some((p) => p.id === nl.peak1_id) &&
-          filteredPeakData.some((p) => p.id === nl.peak2_id)
-        );
-      }),
+          filteredPeakData.some((p) => p.id === nl.peak2_id),
+      ),
     [filteredPeakData, neutralLossData],
   );
 
@@ -497,7 +493,7 @@ function Chart({
     copyTextToClipboard('Peak List', text);
   }, []);
 
-  const buildSearchUrlPeaks = useCallback(
+  const buildSearchUrl = useCallback(
     (peaks: Peak[]) => {
       const searchParams = new URLSearchParams();
       searchParams.set(
@@ -505,26 +501,6 @@ function Chart({
         peaks.map((p) => `${p.mz.toFixed(4)};${p.rel}`).join(','),
       );
       searchParams.set('peak_list_threshold', '0.8');
-      const url =
-        frontendUrl +
-        baseUrl +
-        routes.search.path +
-        `?${searchParams.toString()}`;
-
-      return url;
-    },
-    [baseUrl, frontendUrl],
-  );
-
-  const buildSearchUrlNeutralLoss = useCallback(
-    (nld: NeutralLoss[]) => {
-      const searchParams = new URLSearchParams();
-      searchParams.set(
-        'neutral_loss',
-        nld.map((nl) => nl.difference.toFixed(4)).join(','),
-      );
-      searchParams.set('mass_tolerance', '0.1');
-      searchParams.set('intensity', '50');
       const url =
         frontendUrl +
         baseUrl +
@@ -632,7 +608,7 @@ function Chart({
                   <Button
                     children={
                       <a
-                        href={buildSearchUrlPeaks(filteredPeakData)}
+                        href={buildSearchUrl(filteredPeakData)}
                         target="_blank"
                       >
                         <SearchOutlined title="Search similar spectra by peaks in current spectrum view" />
@@ -640,22 +616,6 @@ function Chart({
                     }
                     style={toolButtonStyle}
                   />
-                  <Button
-                    title={
-                      filteredNeutralLossData.length > neutralLossLimit
-                        ? `Too many peak differences to search. Limit is ${neutralLossLimit}. Zoom in to reduce the number of peak differences.`
-                        : undefined
-                    }
-                    style={toolButtonStyle}
-                    disabled={filteredNeutralLossData.length > neutralLossLimit}
-                  >
-                    <a
-                      href={buildSearchUrlNeutralLoss(filteredNeutralLossData)}
-                      target="_blank"
-                    >
-                      <ColumnWidthOutlined title="Search neutral losses by peak differences in current spectrum view" />
-                    </a>
-                  </Button>
                 </Content>
               )}
             </Content>
@@ -689,20 +649,17 @@ function Chart({
       MARGIN.top,
       boundsHeight,
       boundsWidth,
-      buildSearchUrlNeutralLoss,
-      buildSearchUrlPeaks,
+      buildSearchUrl,
       chartElements,
       disableExport,
       disableLabels,
       disableZoom,
-      filteredNeutralLossData,
       filteredPeakData,
       filteredPeakData2,
       handleOnCopy,
       handleOnDownload,
       height,
       isShowLabel,
-      neutralLossLimit,
       peakData.length,
       peakData2,
       width,
