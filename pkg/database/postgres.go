@@ -32,7 +32,7 @@ func (db *PostgresSQLDB) GetIndexes() []Index {
 	indexes = append(indexes, Index{IndexName: "massbank_id_index", TableName: "massbank", Columns: []string{"id"}})
 	indexes = append(indexes, Index{IndexName: "massbank_accession_index", TableName: "massbank", Columns: []string{"accession"}})
 	indexes = append(indexes, Index{IndexName: "massbank_title_index", TableName: "massbank", Columns: []string{"title"}})
-		
+
 	indexes = append(indexes, Index{IndexName: "contributor_id_index", TableName: "contributor", Columns: []string{"id"}})
 	indexes = append(indexes, Index{IndexName: "contributor_name_index", TableName: "contributor", Columns: []string{"name"}})
 
@@ -74,8 +74,8 @@ func (db *PostgresSQLDB) GetIndexes() []Index {
 	indexes = append(indexes, Index{IndexName: "acquisition_instrument_instrument_index", TableName: "acquisition_instrument", Columns: []string{"instrument"}})
 	indexes = append(indexes, Index{IndexName: "acquisition_instrument_instrument_type_index", TableName: "acquisition_instrument", Columns: []string{"instrument_type"}})
 
-	indexes	= append(indexes, Index{IndexName: "accession_acquisition_massbank_id_index", TableName: "accession_acquisition", Columns: []string{"massbank_id"}})
-	indexes	= append(indexes, Index{IndexName: "accession_acquisition_acquisition_instrument_id_index", TableName: "accession_acquisition", Columns: []string{"acquisition_instrument_id"}})
+	indexes = append(indexes, Index{IndexName: "accession_acquisition_massbank_id_index", TableName: "accession_acquisition", Columns: []string{"massbank_id"}})
+	indexes = append(indexes, Index{IndexName: "accession_acquisition_acquisition_instrument_id_index", TableName: "accession_acquisition", Columns: []string{"acquisition_instrument_id"}})
 
 	indexes = append(indexes, Index{IndexName: "acquisition_mass_spectrometry_massbank_id_index", TableName: "acquisition_mass_spectrometry", Columns: []string{"massbank_id"}})
 	indexes = append(indexes, Index{IndexName: "acquisition_chromatography_massbank_id_index", TableName: "acquisition_chromatography", Columns: []string{"massbank_id"}})
@@ -242,7 +242,7 @@ func (p *PostgresSQLDB) GetMetadata() (*massbank.MbMetaData, error) {
 		&commit,
 		&timestamp,
 		&version,
-	);
+	)
 	stmt.Close()
 	if err != nil {
 		return nil, err
@@ -257,7 +257,7 @@ func (p *PostgresSQLDB) GetMetadata() (*massbank.MbMetaData, error) {
 	var spectraCount uint
 	err = stmt.QueryRow().Scan(
 		&spectraCount,
-	);
+	)
 	stmt.Close()
 	if err != nil {
 		return nil, err
@@ -272,7 +272,7 @@ func (p *PostgresSQLDB) GetMetadata() (*massbank.MbMetaData, error) {
 	var compoundCount uint
 	err = stmt.QueryRow().Scan(
 		&compoundCount,
-	);
+	)
 	stmt.Close()
 	if err != nil {
 		return nil, err
@@ -332,7 +332,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		return nil, err
 	}
 	err = stmt.QueryRow(*s).Scan(
-		&massbankId, 
+		&massbankId,
 		&filename,
 		&accession,
 		&title,
@@ -340,20 +340,20 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		&copyright,
 		&date,
 		&metadataId,
-	);
+	)
 	stmt.Close()
 	if err != nil {
 		return nil, err
-	}	
+	}
 
 	result.RecordTitle = &title
-	result.Date = &massbank.RecordDate{Created: date, Updated: date, Modified: date} 
+	result.Date = &massbank.RecordDate{Created: date, Updated: date, Modified: date}
 	result.Accession = &accession
-	result.Comments = &[]massbank.SubtagProperty{} 
+	result.Comments = &[]massbank.SubtagProperty{}
 	for _, comment := range comments {
 		parts := strings.Split(comment, "---")
 		*result.Comments = append(*result.Comments, massbank.SubtagProperty{Subtag: parts[0], Value: parts[1]})
-	}	
+	}
 
 	// contributors
 	var contributor string
@@ -362,13 +362,13 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = stmt.QueryRow(massbankId).Scan(&contributor); 
+	err = stmt.QueryRow(massbankId).Scan(&contributor)
 	stmt.Close()
 	if err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
 	result.Contributor = &contributor
-	
+
 	// authors
 	query = "SELECT name FROM author WHERE id IN (SELECT author_id FROM accession_author WHERE massbank_id = $1);"
 	stmt, err = p.database.Prepare(query)
@@ -377,7 +377,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	}
 	rows, err := stmt.Query(massbankId)
 	stmt.Close()
-    if err == nil {
+	if err == nil {
 		result.Authors = &[]massbank.RecordAuthorName{}
 		for rows.Next() {
 			var author string
@@ -385,14 +385,14 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 				return nil, err
 			}
 			*result.Authors = append(*result.Authors, massbank.RecordAuthorName{Name: author})
-		}		
+		}
 		rows.Close()
-    } else {
-		if err != sql.ErrNoRows{
+	} else {
+		if err != sql.ErrNoRows {
 			return nil, err
 		}
 	}
-    
+
 	// license
 	query = "SELECT name FROM license WHERE id IN (SELECT license_id FROM accession_license WHERE massbank_id = $1);"
 	stmt, err = p.database.Prepare(query)
@@ -404,7 +404,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	stmt.Close()
 	if err != nil && err != sql.ErrNoRows {
 		return nil, err
-	} 
+	}
 	result.License = &license
 
 	// publication (for now only one publication per record)
@@ -412,15 +412,15 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	stmt, err = p.database.Prepare(query)
 	if err != nil {
 		return nil, err
-	}	
+	}
 	var publication string
 	err = stmt.QueryRow(massbankId).Scan(&publication)
-	stmt.Close()	
-	if err != nil && err != sql.ErrNoRows {				
+	stmt.Close()
+	if err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
 	result.Publication = &publication
-	
+
 	// compound
 	query = "SELECT inchi, formula, smiles, mass FROM compound WHERE id IN (SELECT compound_id FROM compound_name WHERE massbank_id = $1);"
 	stmt, err = p.database.Prepare(query)
@@ -456,14 +456,14 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 					return nil, err
 				}
 				*result.Compound.Names = append(*result.Compound.Names, name)
-			}			
+			}
 			rows.Close()
 		} else {
 			if err != sql.ErrNoRows {
 				return nil, err
 			}
 		}
-		
+
 		// compound classes
 		result.Compound.Classes = &[]string{}
 		query = "SELECT class FROM compound_class WHERE massbank_id = $1;"
@@ -487,8 +487,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 				return nil, err
 			}
 		}
-		
-		
+
 		// compound link
 		result.Compound.Link = &[]massbank.DatabaseProperty{}
 		query = "SELECT database, identifier FROM compound_link WHERE massbank_id = $1;"
@@ -506,13 +505,13 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 					return nil, err
 				}
 				*result.Compound.Link = append(*result.Compound.Link, massbank.DatabaseProperty{Database: database, Identifier: identifier})
-			}			
+			}
 			rows.Close()
 		} else {
 			if err != sql.ErrNoRows {
 				return nil, err
 			}
-		}		
+		}
 	} else {
 		if err != sql.ErrNoRows {
 			return nil, err
@@ -524,7 +523,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	stmt, err = p.database.Prepare(query)
 	if err != nil {
 		return nil, err
-	}	
+	}
 	var instrument string
 	var instrumentType string
 	err = stmt.QueryRow(massbankId).Scan(&instrument, &instrumentType)
@@ -532,7 +531,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	if err == nil {
 		result.Acquisition = massbank.AcquisitionProperties{
 			Instrument:     &instrument,
-			InstrumentType: &instrumentType, 
+			InstrumentType: &instrumentType,
 		}
 		// acquisition mass spectrometry
 		result.Acquisition.MassSpectrometry = &[]massbank.SubtagProperty{}
@@ -540,20 +539,20 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		stmt, err = p.database.Prepare(query)
 		if err != nil {
 			return nil, err
-		}		
+		}
 		rows, err = stmt.Query(massbankId)
 		stmt.Close()
 		if err == nil {
 			defer rows.Close()
 
 			for rows.Next() {
-				var subtag string 
+				var subtag string
 				var value string
 				if err := rows.Scan(&subtag, &value); err != nil {
 					return nil, err
 				}
 				*result.Acquisition.MassSpectrometry = append(*result.Acquisition.MassSpectrometry, massbank.SubtagProperty{Subtag: subtag, Value: value})
-			}						
+			}
 			rows.Close()
 		} else {
 			if err != sql.ErrNoRows {
@@ -577,14 +576,14 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 					return nil, err
 				}
 				*result.Acquisition.Chromatography = append(*result.Acquisition.Chromatography, massbank.SubtagProperty{Subtag: subtag, Value: value})
-			}			
+			}
 			rows.Close()
 		} else {
 			if err != sql.ErrNoRows {
 				return nil, err
 			}
 		}
-		
+
 		// acquisition general
 		result.Acquisition.General = &[]massbank.SubtagProperty{}
 		query = "SELECT subtag, value FROM acquisition_general WHERE massbank_id = $1;"
@@ -602,7 +601,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 					return nil, err
 				}
 				*result.Acquisition.General = append(*result.Acquisition.General, massbank.SubtagProperty{Subtag: subtag, Value: value})
-			}			
+			}
 			rows.Close()
 		} else {
 			if err != sql.ErrNoRows {
@@ -614,7 +613,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 			return nil, err
 		}
 	}
-	
+
 	// mass spectrometry
 	query = "SELECT subtag, value FROM mass_spectrometry_focused_ion WHERE massbank_id = $1;"
 	stmt, err = p.database.Prepare(query)
@@ -648,8 +647,8 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	}
 	rows, err = stmt.Query(massbankId)
 	stmt.Close()
-	if err == nil {	
-		result.MassSpectrometry.DataProcessing = &[]massbank.SubtagProperty{}	
+	if err == nil {
+		result.MassSpectrometry.DataProcessing = &[]massbank.SubtagProperty{}
 		for rows.Next() {
 			var subtag string
 			var value string
@@ -665,7 +664,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 			return nil, err
 		}
 	}
-	
+
 	// peak
 	result.Peak = massbank.PeakProperties{}
 	var spectrumId uint
@@ -681,12 +680,12 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	stmt.Close()
 	if err == nil {
 		result.Peak.Peak = &massbank.PkPeak{}
-			
+
 		result.Peak.Splash = &splash
 		result.Peak.NumPeak = &numPeak
 
 		query = "SELECT id, mz, intensity, relative_intensity FROM peak WHERE spectrum_id = $1;"
-		stmt, err = p.database.Prepare(query)		
+		stmt, err = p.database.Prepare(query)
 		if err != nil {
 			return nil, err
 		}
@@ -716,40 +715,40 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 				return nil, err
 			}
 		}
-		
-		query = "SELECT difference, peak1_id, peak2_id FROM peak_differences WHERE spectrum_id = $1;"
-		stmt, err = p.database.Prepare(query)
-		if err != nil {
-			return nil, err
-		}
-		rows, err = stmt.Query(spectrumId)
-		stmt.Close()
-		if err == nil {
-			result.Peak.NeutralLoss = &massbank.PkNeutralLoss{
-				Difference: []float64{},
-				Peak1Id: []int32{},
-				Peak2Id: []int32{},				
-			}			
-			for rows.Next() {
-				var difference float64
-				var peak1Id int32
-				var peak2Id int32
-				if err := rows.Scan(&difference, &peak1Id, &peak2Id); err != nil {
-					return nil, err
-				}
-				result.Peak.NeutralLoss.Difference = append(result.Peak.NeutralLoss.Difference, difference)
-				result.Peak.NeutralLoss.Peak1Id = append(result.Peak.NeutralLoss.Peak1Id, peak1Id)
-				result.Peak.NeutralLoss.Peak2Id = append(result.Peak.NeutralLoss.Peak2Id, peak2Id)
-			}			
-			rows.Close()
-		} else {
-			if err != sql.ErrNoRows {
-				return nil, err
-			}
-		}
+
+		// query = "SELECT difference, peak1_id, peak2_id FROM peak_differences WHERE spectrum_id = $1;"
+		// stmt, err = p.database.Prepare(query)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// rows, err = stmt.Query(spectrumId)
+		// stmt.Close()
+		// if err == nil {
+		// 	result.Peak.NeutralLoss = &massbank.PkNeutralLoss{
+		// 		Difference: []float64{},
+		// 		Peak1Id: []int32{},
+		// 		Peak2Id: []int32{},
+		// 	}
+		// 	for rows.Next() {
+		// 		var difference float64
+		// 		var peak1Id int32
+		// 		var peak2Id int32
+		// 		if err := rows.Scan(&difference, &peak1Id, &peak2Id); err != nil {
+		// 			return nil, err
+		// 		}
+		// 		result.Peak.NeutralLoss.Difference = append(result.Peak.NeutralLoss.Difference, difference)
+		// 		result.Peak.NeutralLoss.Peak1Id = append(result.Peak.NeutralLoss.Peak1Id, peak1Id)
+		// 		result.Peak.NeutralLoss.Peak2Id = append(result.Peak.NeutralLoss.Peak2Id, peak2Id)
+		// 	}
+		// 	rows.Close()
+		// } else {
+		// 	if err != sql.ErrNoRows {
+		// 		return nil, err
+		// 	}
+		// }
 
 		query = "SELECT subtag, value FROM peak_annotation WHERE spectrum_id = $1;"
-		stmt, err = p.database.Prepare(query)		
+		stmt, err = p.database.Prepare(query)
 		if err != nil {
 			return nil, err
 		}
@@ -758,7 +757,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		if err == nil {
 			result.Peak.Annotation = &massbank.PkAnnotation{}
 			result.Peak.Annotation.Header = []string{}
-			result.Peak.Annotation.Values = map[string][]interface{}{}		
+			result.Peak.Annotation.Values = map[string][]interface{}{}
 			for rows.Next() {
 				var subtag string
 				var value string
@@ -778,7 +777,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 			if err != sql.ErrNoRows {
 				return nil, err
 			}
-		}	
+		}
 	} else {
 		if err != sql.ErrNoRows {
 			return nil, err
@@ -827,21 +826,21 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 	result.RecordTitle = &title
 	result.Accession = &accession
 	result.Compound = massbank.CompoundProperties{
-		Smiles: &smiles,
-		Formula: &formula,
+		Smiles:    &smiles,
+		Formula:   &formula,
 		AtomCount: &atomcount,
 	}
-	
+
 	result.Peak = massbank.PeakProperties{}
 	numPeak := uint(len(mz_vec))
 	result.Peak.NumPeak = &numPeak
 	result.Peak.Peak = &massbank.PkPeak{
-		Mz: mz_vec, 
-		Intensity: intensity_vec, 
-		Rel: relative_intensity_vec,
+		Mz:        mz_vec,
+		Intensity: intensity_vec,
+		Rel:       relative_intensity_vec,
 	}
 	result.Compound.Mass = &mass
-	
+
 	return &result, err
 }
 
@@ -901,9 +900,8 @@ func (p *PostgresSQLDB) GetAccessionsBySubstructure(substructure string) ([]stri
 	return accessions, atomcounts, nil
 }
 
-
 // GetRecordsBySubstructure see [MB3Database.GetRecordsBySubstructure]
-func (p *PostgresSQLDB) GetRecordsBySubstructure(substructure string) (*[]massbank.MassBank2, error) {	
+func (p *PostgresSQLDB) GetRecordsBySubstructure(substructure string) (*[]massbank.MassBank2, error) {
 	records := []massbank.MassBank2{}
 	accessions, _, err := p.GetAccessionsBySubstructure(substructure)
 	if err != nil {
@@ -945,75 +943,39 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) (string, []stri
 
 	parameters := []string{}
 
-	if(filters.Contributor != nil) {
+	if filters.Contributor != nil {
 		var placeholder []string
 		for _, contributor := range *filters.Contributor {
 			parameters = append(parameters, contributor)
-			placeholder = append(placeholder, "$" + strconv.Itoa(len(parameters)))
+			placeholder = append(placeholder, "$"+strconv.Itoa(len(parameters)))
 		}
 		query = query + " WHERE contributor IN (" + strings.Join(placeholder, ",") + ")"
-		addedWhere = true		
+		addedWhere = true
 	}
-	if (filters.InstrumentType != nil) {
+	if filters.InstrumentType != nil {
 		var placeholder []string
 		for _, it := range *filters.InstrumentType {
 			parameters = append(parameters, it)
-			placeholder = append(placeholder, "$" + strconv.Itoa(len(parameters)))
+			placeholder = append(placeholder, "$"+strconv.Itoa(len(parameters)))
 		}
-		subQuery := "instrument_type IN (" + strings.Join(placeholder, ",")+ ")"
-		if(addedWhere) {
+		subQuery := "instrument_type IN (" + strings.Join(placeholder, ",") + ")"
+		if addedWhere {
 			query = query + " AND " + subQuery
 			addedAnd = true
 		} else {
 			query = query + " WHERE " + subQuery
 			addedWhere = true
-		}		
+		}
 	}
 
-	if(filters.MsType != nil) {	
-		var placeholder []string	
+	if filters.MsType != nil {
+		var placeholder []string
 		for _, ms := range *filters.MsType {
 			parameters = append(parameters, ms.String())
-			placeholder = append(placeholder, "$" + strconv.Itoa(len(parameters)))
+			placeholder = append(placeholder, "$"+strconv.Itoa(len(parameters)))
 		}
 		subQuery := "ms_type IN (" + strings.Join(placeholder, ",") + ")"
-		if(addedWhere || addedAnd) {
-			query = query + " AND " + subQuery
-			addedAnd = true
-		} else {
-			query = query + " WHERE " + subQuery
-			addedWhere = true
-		}		
-	}
-
-	if(filters.IonMode != massbank.ANY) {		
-		parameters = append(parameters, string(filters.IonMode))
-		subQuery := "ion_mode = $" + strconv.Itoa(len(parameters))
-		if(addedWhere || addedAnd) {
-			query = query + " AND " + subQuery
-			addedAnd = true
-		} else {
-			query = query + " WHERE " + subQuery
-			addedWhere = true
-		}		
-	}
-
-	if(filters.Inchi != "") {
-		parameters = append(parameters, filters.Inchi)
-		subQuery := "inchi = $" + strconv.Itoa(len(parameters))
-		if(addedWhere || addedAnd) {
-			query = query + " AND " + subQuery
-			addedAnd = true
-		} else {
-			query = query + " WHERE " + subQuery
-			addedWhere = true
-		}		
-	}
-
-	if(filters.InchiKey != "") {
-		parameters = append(parameters, filters.InchiKey)
-		subQuery := "inchikey = $" + strconv.Itoa(len(parameters))
-		if(addedWhere || addedAnd) {
+		if addedWhere || addedAnd {
 			query = query + " AND " + subQuery
 			addedAnd = true
 		} else {
@@ -1022,35 +984,71 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) (string, []stri
 		}
 	}
 
-	if(filters.Splash != "") {
+	if filters.IonMode != massbank.ANY {
+		parameters = append(parameters, string(filters.IonMode))
+		subQuery := "ion_mode = $" + strconv.Itoa(len(parameters))
+		if addedWhere || addedAnd {
+			query = query + " AND " + subQuery
+			addedAnd = true
+		} else {
+			query = query + " WHERE " + subQuery
+			addedWhere = true
+		}
+	}
+
+	if filters.Inchi != "" {
+		parameters = append(parameters, filters.Inchi)
+		subQuery := "inchi = $" + strconv.Itoa(len(parameters))
+		if addedWhere || addedAnd {
+			query = query + " AND " + subQuery
+			addedAnd = true
+		} else {
+			query = query + " WHERE " + subQuery
+			addedWhere = true
+		}
+	}
+
+	if filters.InchiKey != "" {
+		parameters = append(parameters, filters.InchiKey)
+		subQuery := "inchikey = $" + strconv.Itoa(len(parameters))
+		if addedWhere || addedAnd {
+			query = query + " AND " + subQuery
+			addedAnd = true
+		} else {
+			query = query + " WHERE " + subQuery
+			addedWhere = true
+		}
+	}
+
+	if filters.Splash != "" {
 		parameters = append(parameters, filters.Splash)
 		subQuery := "splash = $" + strconv.Itoa(len(parameters))
-		if(addedWhere || addedAnd) {
+		if addedWhere || addedAnd {
 			query = query + " AND " + subQuery
 			addedAnd = true
 		} else {
 			query = query + " WHERE " + subQuery
 			addedWhere = true
-		}		
+		}
 	}
 
-	if(filters.Formula != "") {
+	if filters.Formula != "" {
 		parameters = append(parameters, filters.Formula)
 		subQuery := "formula = $" + strconv.Itoa(len(parameters))
-		if(addedWhere || addedAnd) {
+		if addedWhere || addedAnd {
 			query = query + " AND " + subQuery
 			addedAnd = true
 		} else {
 			query = query + " WHERE " + subQuery
 			addedWhere = true
-		}		
+		}
 	}
 
-	if(filters.Mass != nil && filters.MassEpsilon != nil) {
+	if filters.Mass != nil && filters.MassEpsilon != nil {
 		parameters = append(parameters, strconv.FormatFloat(*filters.Mass, 'f', -1, 64))
 		parameters = append(parameters, strconv.FormatFloat(*filters.MassEpsilon, 'f', -1, 64))
 		subQuery := "ABS(mass - $" + strconv.Itoa(len(parameters)-1) + ") <= $" + strconv.Itoa(len(parameters))
-		if(addedWhere || addedAnd) {
+		if addedWhere || addedAnd {
 			query = query + " AND " + subQuery
 			addedAnd = true
 		} else {
@@ -1059,67 +1057,67 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) (string, []stri
 		}
 	}
 
-	if(filters.CompoundName != "") {
+	if filters.CompoundName != "" {
 		parameters = append(parameters, filters.CompoundName)
 		subQuery := "massbank_id IN (SELECT DISTINCT(massbank_id) FROM compound_name WHERE LOWER(name) LIKE LOWER(CONCAT('%%',$" + strconv.Itoa(len(parameters)) + "::text,'%%')))"
-		if(addedWhere || addedAnd) {
+		if addedWhere || addedAnd {
 			query = query + " AND " + subQuery
 			addedAnd = true
 		} else {
 			query = query + " WHERE " + subQuery
 			addedWhere = true
-		}		
+		}
 	}
 
-	if(filters.CompoundClass != "") {
+	if filters.CompoundClass != "" {
 		parameters = append(parameters, filters.CompoundClass)
 		subQuery := "massbank_id IN (SELECT DISTINCT(massbank_id) FROM compound_class WHERE LOWER(class) LIKE LOWER(CONCAT('%%',$" + strconv.Itoa(len(parameters)) + "::text,'%%')))"
-		if(addedWhere || addedAnd) {
+		if addedWhere || addedAnd {
 			query = query + " AND " + subQuery
 			addedAnd = true
 		} else {
 			query = query + " WHERE " + subQuery
 			addedWhere = true
-		}		
+		}
 	}
 
-	if(filters.Peaks != nil && len(*filters.Peaks) > 0 && filters.MassEpsilon != nil) {
+	if filters.Peaks != nil && len(*filters.Peaks) > 0 && filters.MassEpsilon != nil {
 		peaksCount := len(*filters.Peaks)
-		var from = "FROM " 				
+		var from = "FROM "
 		var where = "WHERE "
-		if(peaksCount == 1) {			
-			parameters = append(parameters,  strconv.FormatFloat((*filters.Peaks)[0] - *filters.MassEpsilon, 'f', -1, 64))
-			parameters = append(parameters,  strconv.FormatFloat((*filters.Peaks)[0] + *filters.MassEpsilon, 'f', -1, 64))
+		if peaksCount == 1 {
+			parameters = append(parameters, strconv.FormatFloat((*filters.Peaks)[0]-*filters.MassEpsilon, 'f', -1, 64))
+			parameters = append(parameters, strconv.FormatFloat((*filters.Peaks)[0]+*filters.MassEpsilon, 'f', -1, 64))
 			from = from + "peak AS p1"
 			where = where + "p1.mz BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
-			if(filters.Intensity != nil) {
+			if filters.Intensity != nil {
 				parameters = append(parameters, strconv.FormatInt(*filters.Intensity, 10))
 				where = where + " AND p1.relative_intensity >= $" + strconv.Itoa(len(parameters))
 			}
-		} else {			
+		} else {
 			for i := 0; i < peaksCount; i++ {
-				parameters = append(parameters,  strconv.FormatFloat((*filters.Peaks)[i] - *filters.MassEpsilon, 'f', -1, 64))
-				parameters = append(parameters,  strconv.FormatFloat((*filters.Peaks)[i] + *filters.MassEpsilon, 'f', -1, 64))
+				parameters = append(parameters, strconv.FormatFloat((*filters.Peaks)[i]-*filters.MassEpsilon, 'f', -1, 64))
+				parameters = append(parameters, strconv.FormatFloat((*filters.Peaks)[i]+*filters.MassEpsilon, 'f', -1, 64))
 				from = from + "peak AS p" + strconv.Itoa(i+1)
-				if(i < peaksCount - 1) {
+				if i < peaksCount-1 {
 					from = from + ", "
 				}
-				if(i == 0) {
+				if i == 0 {
 					where = where + "p1.mz BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
 				} else {
 					where = where + "p" + strconv.Itoa(i+1) + ".spectrum_id=p1.spectrum_id AND p" + strconv.Itoa(i+1) + ".mz BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
 				}
-				if(filters.Intensity != nil) {
+				if filters.Intensity != nil {
 					parameters = append(parameters, strconv.FormatInt(*filters.Intensity, 10))
 					where = where + " AND p" + strconv.Itoa(i+1) + ".relative_intensity >= $" + strconv.Itoa(len(parameters))
 				}
-				if(i < peaksCount - 1) {
+				if i < peaksCount-1 {
 					where = where + " AND "
 				}
 			}
 		}
 		subQuery := "massbank_id IN (SELECT massbank_id FROM spectrum WHERE id IN (SELECT DISTINCT(p1.spectrum_id) " + from + " " + where + "))"
-		if(addedWhere || addedAnd) {
+		if addedWhere || addedAnd {
 			query = query + " AND " + subQuery
 			addedAnd = true
 		} else {
@@ -1128,59 +1126,142 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) (string, []stri
 		}
 	}
 
-	if(filters.NeutralLoss != nil && len(*filters.NeutralLoss) > 0 && filters.MassEpsilon != nil) {
-		neutralLossesCount := len(*filters.NeutralLoss)		
-		var from = "FROM " 				
-		var where = "WHERE "
-			
-		subQuery := ""
-		if(neutralLossesCount == 1) {			
-			parameters = append(parameters,  strconv.FormatFloat((*filters.NeutralLoss)[0] - *filters.MassEpsilon, 'f', -1, 64))
-			parameters = append(parameters,  strconv.FormatFloat((*filters.NeutralLoss)[0] + *filters.MassEpsilon, 'f', -1, 64))
-			from = from + "peak_differences AS t1"
-			where = where + "t1.difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
-			if(filters.Intensity != nil) {
-				parameters = append(parameters, strconv.FormatInt(*filters.Intensity, 10))
-				where = where + " AND t1.min_rel_intensity >= $" + strconv.Itoa(len(parameters))
-			}
-			subQuery = "massbank_id IN (SELECT massbank_id FROM spectrum WHERE id IN (SELECT DISTINCT(t1.spectrum_id) " + from + " " + where + "))"
-		} else {
-			var with = "WITH "
-			from = from + "t1"			
-			for i := 0; i < neutralLossesCount; i++ {
-				parameters = append(parameters,  strconv.FormatFloat((*filters.NeutralLoss)[i] - *filters.MassEpsilon, 'f', -1, 64))
-				parameters = append(parameters,  strconv.FormatFloat((*filters.NeutralLoss)[i] + *filters.MassEpsilon, 'f', -1, 64))
-				if(i == 0){
-					with = with + "t" + strconv.Itoa(i+1) + " AS (SELECT DISTINCT(spectrum_id), min_rel_intensity FROM peak_differences WHERE difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters)) + ")"
-				} else {
-					with = with + "t" + strconv.Itoa(i+1) + " AS (SELECT DISTINCT(spectrum_id) FROM peak_differences WHERE difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters)) + ")"
-				}
-				if(i > 1){
-					from = from + " JOIN " + "t" + strconv.Itoa(i) + " ON t" + strconv.Itoa(i-1) + ".spectrum_id=t" + strconv.Itoa(i) + ".spectrum_id" 
-				}				
-				if(i < neutralLossesCount - 1) {
-					with = with + ", "
-				}											
-			}
-			if(filters.Intensity != nil) {
-				parameters = append(parameters, strconv.FormatInt(*filters.Intensity, 10))
-				where = where + "t1.min_rel_intensity >= $" + strconv.Itoa(len(parameters))
-			}
-			subQuery = "massbank_id IN (SELECT massbank_id FROM spectrum WHERE id IN (" + with + " SELECT DISTINCT(t1.spectrum_id) " + from + " " + where + "))"
-		}		
-		
-		if(addedWhere || addedAnd) {
-			query = query + " AND " + subQuery
-			addedAnd = true
-		} else {
-			query = query + " WHERE " + subQuery
-			addedWhere = true
-		}
-	}
+	// if filters.NeutralLoss != nil && len(*filters.NeutralLoss) > 0 && filters.MassEpsilon != nil {
+	// 	neutralLossesCount := len(*filters.NeutralLoss)
+	// 	var from = "FROM "
+	// 	var where = "WHERE "
 
+	// 	subQuery := ""
+	// 	if neutralLossesCount == 1 {
+	// 		parameters = append(parameters, strconv.FormatFloat((*filters.NeutralLoss)[0]-*filters.MassEpsilon, 'f', -1, 64))
+	// 		parameters = append(parameters, strconv.FormatFloat((*filters.NeutralLoss)[0]+*filters.MassEpsilon, 'f', -1, 64))
+	// 		from = from + "peak_differences AS t1"
+	// 		where = where + "t1.difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
+	// 		if filters.Intensity != nil {
+	// 			parameters = append(parameters, strconv.FormatInt(*filters.Intensity, 10))
+	// 			where = where + " AND t1.min_rel_intensity >= $" + strconv.Itoa(len(parameters))
+	// 		}
+	// 		subQuery = "massbank_id IN (SELECT massbank_id FROM spectrum WHERE id IN (SELECT DISTINCT(t1.spectrum_id) " + from + " " + where + "))"
+	// 	} else {
+	// 		var with = "WITH "
+	// 		from = from + "t1"
+	// 		for i := 0; i < neutralLossesCount; i++ {
+	// 			parameters = append(parameters, strconv.FormatFloat((*filters.NeutralLoss)[i]-*filters.MassEpsilon, 'f', -1, 64))
+	// 			parameters = append(parameters, strconv.FormatFloat((*filters.NeutralLoss)[i]+*filters.MassEpsilon, 'f', -1, 64))
+	// 			if i == 0 {
+	// 				with = with + "t" + strconv.Itoa(i+1) + " AS (SELECT DISTINCT(spectrum_id), min_rel_intensity FROM peak_differences WHERE difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters)) + ")"
+	// 			} else {
+	// 				with = with + "t" + strconv.Itoa(i+1) + " AS (SELECT DISTINCT(spectrum_id) FROM peak_differences WHERE difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters)) + ")"
+	// 			}
+	// 			if i > 1 {
+	// 				from = from + " JOIN " + "t" + strconv.Itoa(i) + " ON t" + strconv.Itoa(i-1) + ".spectrum_id=t" + strconv.Itoa(i) + ".spectrum_id"
+	// 			}
+	// 			if i < neutralLossesCount-1 {
+	// 				with = with + ", "
+	// 			}
+	// 		}
+	// 		if filters.Intensity != nil {
+	// 			parameters = append(parameters, strconv.FormatInt(*filters.Intensity, 10))
+	// 			where = where + "t1.min_rel_intensity >= $" + strconv.Itoa(len(parameters))
+	// 		}
+	// 		subQuery = "massbank_id IN (SELECT massbank_id FROM spectrum WHERE id IN (" + with + " SELECT DISTINCT(t1.spectrum_id) " + from + " " + where + "))"
+	// 	}
 
+	// 	if addedWhere || addedAnd {
+	// 		query = query + " AND " + subQuery
+	// 		addedAnd = true
+	// 	} else {
+	// 		query = query + " WHERE " + subQuery
+	// 		addedWhere = true
+	// 	}
+	// }
 
 	return query, parameters
+}
+
+func (p *PostgresSQLDB) NeutralLossSearch(neutralLoss *[]float64, tolerance *float64, minRelIntensity *int64) ([]string, []int32, []string, error) {
+	var accessions = []string{}
+	var atomcounts = []int32{}
+	var peakPairs = []string{}
+
+	if neutralLoss != nil && len(*neutralLoss) > 0 && tolerance != nil {
+		neutralLossesCount := len(*neutralLoss)
+		var where = "WHERE "
+		parameters := []string{}
+		var query string
+		if neutralLossesCount == 1 {
+			parameters = append(parameters, strconv.FormatFloat((*neutralLoss)[0]-*tolerance, 'f', -1, 64))
+			parameters = append(parameters, strconv.FormatFloat((*neutralLoss)[0]+*tolerance, 'f', -1, 64))
+			where = where + "difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
+			if minRelIntensity != nil {
+				parameters = append(parameters, strconv.FormatInt(*minRelIntensity, 10))
+				where = where + " AND min_rel_intensity >= $" + strconv.Itoa(len(parameters))
+			}
+			query = "SELECT peak1_id, peak2_id, browse_options.accession, browse_options.atomcount FROM peak_differences JOIN spectrum ON spectrum.id = spectrum_id JOIN browse_options ON browse_options.massbank_id = spectrum.massbank_id " + where + ";"
+		} else {
+			var from = "FROM "
+			var with = "WITH "
+			from = from + "t1"
+			for i := 0; i < neutralLossesCount; i++ {
+				parameters = append(parameters, strconv.FormatFloat((*neutralLoss)[i]-*tolerance, 'f', -1, 64))
+				parameters = append(parameters, strconv.FormatFloat((*neutralLoss)[i]+*tolerance, 'f', -1, 64))
+				if i == 0 {
+					with = with + "t" + strconv.Itoa(i+1) + " AS (SELECT spectrum_id, peak1_id, peak2_id, min_rel_intensity FROM peak_differences WHERE difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
+					if minRelIntensity != nil {
+						parameters = append(parameters, strconv.FormatInt(*minRelIntensity, 10))
+						with = with + " AND min_rel_intensity >= $" + strconv.Itoa(len(parameters))
+					}
+					with = with + ")"
+				} else {
+					with = with + "t" + strconv.Itoa(i+1) + " AS (SELECT DISTINCT(spectrum_id) FROM peak_differences WHERE difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
+					if minRelIntensity != nil {
+						parameters = append(parameters, strconv.FormatInt(*minRelIntensity, 10))
+						with = with + " AND min_rel_intensity >= $" + strconv.Itoa(len(parameters))
+					}
+					with = with + ")"
+				}
+				if i > 0 {
+					from = from + " JOIN " + "t" + strconv.Itoa(i+1) + " ON t" + strconv.Itoa(i+1) + ".spectrum_id=t" + strconv.Itoa(i) + ".spectrum_id"
+				}
+				if i < neutralLossesCount-1 {
+					with = with + ", "
+				}
+			}
+			query = with + " SELECT t1.peak1_id, t1.peak2_id, browse_options.accession, browse_options.atomcount " + from + " JOIN spectrum ON spectrum.id = t1.spectrum_id JOIN browse_options ON browse_options.massbank_id = spectrum.massbank_id;"
+		}
+
+		stmt, err := p.database.Prepare(query)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		defer stmt.Close()
+
+		args := make([]any, len(parameters))
+		for i, v := range parameters {
+			args[i] = v
+		}
+		rows, err := stmt.Query(args...)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var peak1Id string
+			var peak2Id string
+			var accession string
+			var atomcount int32
+			if err := rows.Scan(&peak1Id, &peak2Id, &accession, &atomcount); err != nil {
+				return nil, nil, nil, err
+			}
+			peakPairs = append(peakPairs, peak1Id+"_"+peak2Id)
+			accessions = append(accessions, accession)
+			atomcounts = append(atomcounts, atomcount)
+		}
+
+	}
+
+	return accessions, atomcounts, peakPairs, nil
 }
 
 func (p *PostgresSQLDB) GetAccessionsByFilterOptions(filters Filters) ([]string, []int32, error) {
@@ -1189,7 +1270,7 @@ func (p *PostgresSQLDB) GetAccessionsByFilterOptions(filters Filters) ([]string,
 	query := "SELECT accession, atomcount FROM browse_options"
 	subQuery, parameters := p.BuildBrowseOptionsWhere(filters)
 	query = query + subQuery
-	if(filters.Mass != nil && filters.MassEpsilon != nil) {
+	if filters.Mass != nil && filters.MassEpsilon != nil {
 		parameters = append(parameters, strconv.FormatFloat(*filters.Mass, 'f', -1, 64))
 		query = query + " ORDER BY ABS(mass - $" + strconv.Itoa(len(parameters)) + ");"
 	} else {
@@ -1205,7 +1286,7 @@ func (p *PostgresSQLDB) GetAccessionsByFilterOptions(filters Filters) ([]string,
 	}
 	defer stmt.Close()
 
-	args := make([]interface{}, len(parameters))
+	args := make([]any, len(parameters))
 	for i, v := range parameters {
 		args[i] = v
 	}
@@ -1269,10 +1350,11 @@ func (p *PostgresSQLDB) GetInstrumentTypes() ([]string, error) {
 }
 
 type MSTypeAndIonMode struct {
-	MSType []string
+	MSType  []string
 	IonMode []string
 }
-func (p *PostgresSQLDB) GetMsTypeAndIonMode() (*MSTypeAndIonMode, error){
+
+func (p *PostgresSQLDB) GetMsTypeAndIonMode() (*MSTypeAndIonMode, error) {
 	var msTypeAndIonMode = MSTypeAndIonMode{}
 
 	query := "SELECT DISTINCT(subtag), value FROM acquisition_mass_spectrometry WHERE subtag = 'MS_TYPE' OR subtag = 'ION_MODE' ORDER BY value;"
@@ -1288,7 +1370,7 @@ func (p *PostgresSQLDB) GetMsTypeAndIonMode() (*MSTypeAndIonMode, error){
 		if err := rows.Scan(&subtag, &value); err != nil {
 			return &MSTypeAndIonMode{}, err
 		}
-		if (subtag == "MS_TYPE") {
+		if subtag == "MS_TYPE" {
 			msTypeAndIonMode.MSType = append(msTypeAndIonMode.MSType, value)
 		} else {
 			msTypeAndIonMode.IonMode = append(msTypeAndIonMode.IonMode, value)
@@ -1310,7 +1392,7 @@ func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	var ionModes = []MBCountValues{}
 
 	// contributor
-	cont, err := p.GetContributors();
+	cont, err := p.GetContributors()
 	if err != nil {
 		return MB3Values{}, err
 	}
@@ -1319,7 +1401,7 @@ func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	}
 
 	// intrument type
-	it, err := p.GetInstrumentTypes();
+	it, err := p.GetInstrumentTypes()
 	if err != nil {
 		return MB3Values{}, err
 	}
@@ -1339,7 +1421,6 @@ func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 		ionModes = append(ionModes, MBCountValues{Val: im, Count: 0})
 	}
 
-	
 	query := "SELECT contributor, instrument_type, ms_type, ion_mode, COUNT(contributor) FROM browse_options"
 	subQuery, parameters := p.BuildBrowseOptionsWhere(filters)
 	query = query + subQuery
@@ -1375,25 +1456,25 @@ func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 		}
 
 		for i, contr := range contributors {
-			if(contributor == contr.Val) {
+			if contributor == contr.Val {
 				contributors[i].Count = contributors[i].Count + count
 				break
 			}
 		}
-		for i, it := range instrumentTypes {				
-			if(instrumentType == it.Val) {
-				instrumentTypes[i].Count = instrumentTypes[i].Count + count			
+		for i, it := range instrumentTypes {
+			if instrumentType == it.Val {
+				instrumentTypes[i].Count = instrumentTypes[i].Count + count
 				break
 			}
 		}
 		for i, mt := range msTypes {
-			if(msType == mt.Val) {
+			if msType == mt.Val {
 				msTypes[i].Count = msTypes[i].Count + count
 				break
 			}
 		}
 		for i, im := range ionModes {
-			if(ionMode == im.Val) {
+			if ionMode == im.Val {
 				ionModes[i].Count = ionModes[i].Count + count
 				break
 			}
@@ -1404,11 +1485,9 @@ func (p *PostgresSQLDB) GetUniqueValues(filters Filters) (MB3Values, error) {
 	val.InstrumentType = instrumentTypes
 	val.MSType = msTypes
 	val.IonMode = ionModes
-	
+
 	return val, err
 }
-
-
 
 // UpdateMetadata see [MB3Database.UpdateMetadata]
 func (p *PostgresSQLDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error) {
@@ -1430,15 +1509,15 @@ func (p *PostgresSQLDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error
 	if err != nil {
 		return "", err
 	}
-	
+
 	return strconv.Itoa(id), err
 }
 
-func (p *PostgresSQLDB) DropIndex(i *Index) (string) {
+func (p *PostgresSQLDB) DropIndex(i *Index) string {
 	return "DROP INDEX " + i.IndexName + ";"
 }
 
-func (p *PostgresSQLDB) CreateIndex(i *Index) (string) {
+func (p *PostgresSQLDB) CreateIndex(i *Index) string {
 	return "CREATE INDEX " + i.IndexName + " ON " + i.TableName + " (" + strings.Join(i.Columns, ",") + ");"
 }
 
@@ -1487,27 +1566,27 @@ func (p *PostgresSQLDB) AddIndexes() error {
 }
 
 func getAtomCount(formula string) int {
-  var count = 0
-  re := regexp.MustCompile(`[A-Z]\d*[a-z]{0,1}\d*`)
-  matches := re.FindAllString(formula, -1)
+	var count = 0
+	re := regexp.MustCompile(`[A-Z]\d*[a-z]{0,1}\d*`)
+	matches := re.FindAllString(formula, -1)
 
-  for _, m := range matches {
-    re2 := regexp.MustCompile(`\d*`)
-    matches2 := re2.FindAllString(m, -1)
-    valueString := matches2[len(matches2) - 1]
-    var value = 1
-    if len(valueString) > 0 {
-        i, err := strconv.Atoi(valueString)
-        if err != nil {
-            panic(err)
-        }
-        value = i
-    }
-    
-    count += value
-  }
-  
-  return count
+	for _, m := range matches {
+		re2 := regexp.MustCompile(`\d*`)
+		matches2 := re2.FindAllString(m, -1)
+		valueString := matches2[len(matches2)-1]
+		var value = 1
+		if len(valueString) > 0 {
+			i, err := strconv.Atoi(valueString)
+			if err != nil {
+				panic(err)
+			}
+			value = i
+		}
+
+		count += value
+	}
+
+	return count
 }
 
 // AddRecord see [MB3Database.AddRecord]
@@ -1537,18 +1616,18 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 	var comments = []string{}
 	if record.Comments != nil {
 		for _, comment := range *record.Comments {
-			comments = append(comments, "\"" + strings.ReplaceAll(comment.Subtag, "\"", "'") + "---" + strings.ReplaceAll(comment.Value, "\"", "'") + "\"")
-		} 
+			comments = append(comments, "\""+strings.ReplaceAll(comment.Subtag, "\"", "'")+"---"+strings.ReplaceAll(comment.Value, "\"", "'")+"\"")
+		}
 	}
 	var massbankId int
 	err = tx.QueryRow(q,
-		record.Metadata.FileName, 
-		record.Accession, 
-		record.RecordTitle, 
-		"{" + strings.Join(comments, ",") + "}", 
-		record.Copyright, 
+		record.Metadata.FileName,
+		record.Accession,
+		record.RecordTitle,
+		"{"+strings.Join(comments, ",")+"}",
+		record.Copyright,
 		record.Date.Created,
-		mid).Scan(&massbankId)		
+		mid).Scan(&massbankId)
 	if err != nil {
 		if err2 := tx.Rollback(); err2 != nil {
 			return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
@@ -1566,19 +1645,19 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 		}
 		return err
 	}
-	// insert into accession_contributor table	
-	q = `INSERT INTO accession_contributor (massbank_id, contributor_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`					
+	// insert into accession_contributor table
+	q = `INSERT INTO accession_contributor (massbank_id, contributor_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`
 	_, err = tx.Exec(q, massbankId, contributorId)
 	if err != nil {
 		if err2 := tx.Rollback(); err2 != nil {
 			return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
 		}
 		return err
-	}	
+	}
 
 	// insert into author table
-	if record.Authors != nil {			
-		for _, author := range *record.Authors {	
+	if record.Authors != nil {
+		for _, author := range *record.Authors {
 			q = `INSERT INTO author (name) VALUES ($1) ON CONFLICT DO NOTHING RETURNING id;`
 			var authorId int
 			err := tx.QueryRow(q, author.Name).Scan(&authorId)
@@ -1588,7 +1667,7 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 				}
 				return err
 			}
-			q = `INSERT INTO accession_author (massbank_id, author_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`								
+			q = `INSERT INTO accession_author (massbank_id, author_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`
 			_, err = tx.Exec(q, massbankId, authorId)
 			if err != nil {
 				if err2 := tx.Rollback(); err2 != nil {
@@ -1596,7 +1675,7 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 				}
 				return err
 			}
-		}					
+		}
 	}
 	// insert into license tables
 	if record.License != nil {
@@ -1609,18 +1688,18 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 			}
 			return err
 		}
-		q = `INSERT INTO accession_license (massbank_id, license_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`						
+		q = `INSERT INTO accession_license (massbank_id, license_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`
 		_, err = tx.Exec(q, massbankId, licenseId)
 		if err != nil {
 			if err2 := tx.Rollback(); err2 != nil {
 				return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
 			}
 			return err
-		}	
+		}
 	}
 	// insert into publication table
 	if record.Publication != nil {
-		q = `INSERT INTO publication (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id;`			
+		q = `INSERT INTO publication (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id;`
 		var publicationId int
 		err = tx.QueryRow(q, *record.Publication).Scan(&publicationId)
 		if err != nil {
@@ -1629,14 +1708,14 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 			}
 			return err
 		}
-		q = `INSERT INTO accession_publication (massbank_id, publication_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`						
+		q = `INSERT INTO accession_publication (massbank_id, publication_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`
 		_, err = tx.Exec(q, massbankId, publicationId)
 		if err != nil {
 			if err2 := tx.Rollback(); err2 != nil {
 				return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
 			}
 			return err
-		}	
+		}
 	}
 	// insert into compound table
 	q = `INSERT INTO compound (inchi, formula, smiles, mass) VALUES ($1, $2, $3, $4) ON CONFLICT (inchi, formula, smiles, mass) DO UPDATE SET inchi = EXCLUDED.inchi, formula = EXCLUDED.formula, smiles = EXCLUDED.smiles, mass = EXCLUDED.mass RETURNING id;`
@@ -1648,9 +1727,9 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 		}
 		return err
 	}
-	if(record.Compound.Names != nil) {
+	if record.Compound.Names != nil {
 		q = `INSERT INTO compound_name (name, compound_id, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
-		for _, name := range *record.Compound.Names {							
+		for _, name := range *record.Compound.Names {
 			_, err = tx.Exec(q, name, compoundId, massbankId)
 			if err != nil {
 				if err2 := tx.Rollback(); err2 != nil {
@@ -1660,9 +1739,9 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 			}
 		}
 	}
-	if(record.Compound.Classes != nil) {
+	if record.Compound.Classes != nil {
 		q = `INSERT INTO compound_class (class, compound_id, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
-		for _, c := range *record.Compound.Classes {								
+		for _, c := range *record.Compound.Classes {
 			_, err = tx.Exec(q, c, compoundId, massbankId)
 			if err != nil {
 				if err2 := tx.Rollback(); err2 != nil {
@@ -1672,9 +1751,9 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 			}
 		}
 	}
-	if(record.Compound.Link != nil) {
+	if record.Compound.Link != nil {
 		q = `INSERT INTO compound_link (database, identifier, compound_id, massbank_id) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING;`
-		for _, link := range *record.Compound.Link {												
+		for _, link := range *record.Compound.Link {
 			_, err = tx.Exec(q, link.Database, link.Identifier, compoundId, massbankId)
 			if err != nil {
 				if err2 := tx.Rollback(); err2 != nil {
@@ -1687,14 +1766,14 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 	// insert into acquisition table
 	q = `INSERT INTO acquisition_instrument (instrument, instrument_type) VALUES ($1, $2) ON CONFLICT (instrument, instrument_type) DO UPDATE SET instrument = EXCLUDED.instrument, instrument_type = EXCLUDED.instrument_type RETURNING id;`
 	var acquisitionInstrumentId int
-	err = tx.QueryRow(q, *record.Acquisition.Instrument, *record.Acquisition.InstrumentType).Scan(&acquisitionInstrumentId)		
+	err = tx.QueryRow(q, *record.Acquisition.Instrument, *record.Acquisition.InstrumentType).Scan(&acquisitionInstrumentId)
 	if err != nil {
 		if err2 := tx.Rollback(); err2 != nil {
 			return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
 		}
 		return err
 	}
-	q = `INSERT INTO accession_acquisition (massbank_id, acquisition_instrument_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`			
+	q = `INSERT INTO accession_acquisition (massbank_id, acquisition_instrument_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`
 	_, err = tx.Exec(q, massbankId, acquisitionInstrumentId)
 	if err != nil {
 		if err2 := tx.Rollback(); err2 != nil {
@@ -1703,9 +1782,9 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 		return err
 	}
 
-	if(record.Acquisition.MassSpectrometry != nil) {
+	if record.Acquisition.MassSpectrometry != nil {
 		q = `INSERT INTO acquisition_mass_spectrometry (subtag, value, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
-		for _, subProp := range *record.Acquisition.MassSpectrometry {												
+		for _, subProp := range *record.Acquisition.MassSpectrometry {
 			_, err = tx.Exec(q, subProp.Subtag, subProp.Value, massbankId)
 			if err != nil {
 				if err2 := tx.Rollback(); err2 != nil {
@@ -1715,9 +1794,9 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 			}
 		}
 	}
-	if(record.Acquisition.Chromatography != nil) {
+	if record.Acquisition.Chromatography != nil {
 		q = `INSERT INTO acquisition_chromatography (subtag, value, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
-		for _, subProp := range *record.Acquisition.Chromatography {												
+		for _, subProp := range *record.Acquisition.Chromatography {
 			_, err = tx.Exec(q, subProp.Subtag, subProp.Value, massbankId)
 			if err != nil {
 				if err2 := tx.Rollback(); err2 != nil {
@@ -1727,9 +1806,9 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 			}
 		}
 	}
-	if(record.Acquisition.General != nil) {
+	if record.Acquisition.General != nil {
 		q = `INSERT INTO acquisition_general (subtag, value, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
-		for _, subProp := range *record.Acquisition.General {												
+		for _, subProp := range *record.Acquisition.General {
 			_, err = tx.Exec(q, subProp.Subtag, subProp.Value, massbankId)
 			if err != nil {
 				if err2 := tx.Rollback(); err2 != nil {
@@ -1741,9 +1820,9 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 	}
 
 	// insert into mass spectrometry table
-	if(record.MassSpectrometry.FocusedIon != nil) {
+	if record.MassSpectrometry.FocusedIon != nil {
 		q = `INSERT INTO mass_spectrometry_focused_ion (subtag, value, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
-		for _, subProp := range *record.MassSpectrometry.FocusedIon {				
+		for _, subProp := range *record.MassSpectrometry.FocusedIon {
 			_, err = tx.Exec(q, subProp.Subtag, subProp.Value, massbankId)
 			if err != nil {
 				if err2 := tx.Rollback(); err2 != nil {
@@ -1753,9 +1832,9 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 			}
 		}
 	}
-	if(record.MassSpectrometry.DataProcessing != nil) {
+	if record.MassSpectrometry.DataProcessing != nil {
 		q = `INSERT INTO mass_spectrometry_data_processing(subtag, value, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
-		for _, subProp := range *record.MassSpectrometry.DataProcessing {				
+		for _, subProp := range *record.MassSpectrometry.DataProcessing {
 			_, err = tx.Exec(q, subProp.Subtag, subProp.Value, massbankId)
 			if err != nil {
 				if err2 := tx.Rollback(); err2 != nil {
@@ -1767,7 +1846,7 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 	}
 
 	// insert into peak-related tables
-	q = `INSERT INTO spectrum (splash, num_peak, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING id;`		
+	q = `INSERT INTO spectrum (splash, num_peak, massbank_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING id;`
 	var spectrumId int
 	err = tx.QueryRow(q, *record.Peak.Splash, *record.Peak.NumPeak, massbankId).Scan(&spectrumId)
 	if err != nil {
@@ -1776,11 +1855,11 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 		}
 		return err
 	}
-	
+
 	q = `INSERT INTO peak (mz, intensity, relative_intensity, spectrum_id) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING RETURNING id;`
 	peakIds := []int{}
 	var peakId int
-	for i, mz := range record.Peak.Peak.Mz {		
+	for i, mz := range record.Peak.Peak.Mz {
 		err = tx.QueryRow(q, mz, record.Peak.Peak.Intensity[i], record.Peak.Peak.Rel[i], spectrumId).Scan(&peakId)
 		if err != nil {
 			if err2 := tx.Rollback(); err2 != nil {
@@ -1790,10 +1869,10 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 		}
 		peakIds = append(peakIds, peakId)
 	}
-	if(record.Peak.Annotation != nil && record.Peak.Annotation.Values != nil) {
+	if record.Peak.Annotation != nil && record.Peak.Annotation.Values != nil {
 		q = `INSERT INTO peak_annotation(subtag, value, spectrum_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
 		for _, header := range record.Peak.Annotation.Header {
-			values := record.Peak.Annotation.Values[header];
+			values := record.Peak.Annotation.Values[header]
 			for _, value := range values {
 				_, err = tx.Exec(q, header, value, spectrumId)
 				if err != nil {
@@ -1808,9 +1887,9 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 
 	// insert into browse option table
 	inchikey := ""
-	if(record.Compound.Link != nil) {
+	if record.Compound.Link != nil {
 		for _, link := range *record.Compound.Link {
-			if(link.Database == "INCHIKEY") {
+			if link.Database == "INCHIKEY" {
 				inchikey = link.Identifier
 				break
 			}
@@ -1818,19 +1897,19 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 	}
 
 	q = `INSERT INTO browse_options (massbank_id, accession, contributor, instrument_type, ms_type, ion_mode, title, smiles, mz_vec, intensity_vec, relative_intensity_vec, inchi, inchikey, splash, formula, mass, atomcount) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17);`
-	var msType string 
+	var msType string
 	var ionMode string
 	for _, subProp := range *record.Acquisition.MassSpectrometry {
-		if(subProp.Subtag == "MS_TYPE") {
+		if subProp.Subtag == "MS_TYPE" {
 			msType = subProp.Value
-		} else if(subProp.Subtag == "ION_MODE") {
+		} else if subProp.Subtag == "ION_MODE" {
 			ionMode = subProp.Value
 		}
-		if(msType != "" && ionMode != "") {
+		if msType != "" && ionMode != "" {
 			break
 		}
 	}
-	
+
 	_, err = tx.Exec(q, massbankId, *record.Accession, *record.Contributor, *record.Acquisition.InstrumentType, msType, ionMode, *record.RecordTitle, *record.Compound.Smiles, pq.Array(record.Peak.Peak.Mz), pq.Array(record.Peak.Peak.Intensity), pq.Array(record.Peak.Peak.Rel), *record.Compound.InChI, inchikey, *record.Peak.Splash, *record.Compound.Formula, *record.Compound.Mass, getAtomCount(*record.Compound.Formula))
 	if err != nil {
 		fmt.Println("Error: ", err)
@@ -1839,17 +1918,36 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 		}
 		return err
 	}
-	
-	q = `INSERT INTO peak_differences (spectrum_id, difference, peak1_id, peak2_id, min_rel_intensity) VALUES ($1, $2, $3, $4, $5);`	
-	var  diff float64 
-	for i := 0; i < int(*record.Peak.NumPeak); i++ {
-		for j := i + 1; j < int(*record.Peak.NumPeak); j++ {
-			if(record.Peak.Peak.Mz[i] >= record.Peak.Peak.Mz[j]) {
-				diff = record.Peak.Peak.Mz[i] - record.Peak.Peak.Mz[j]
-			} else {
-				diff = record.Peak.Peak.Mz[j] - record.Peak.Peak.Mz[i]
-			}							
-			_, err = tx.Exec(q, spectrumId, diff, peakIds[i], peakIds[j], math.Min(float64(record.Peak.Peak.Rel[i]), float64(record.Peak.Peak.Rel[j])))
+
+	if (msType == "MS2" || msType == "MS3" || msType == "MS4") && *record.Peak.NumPeak > 1 {
+		var sb strings.Builder
+		sb.WriteString("INSERT INTO peak_differences (spectrum_id, difference, peak1_id, peak2_id, min_rel_intensity) VALUES")
+		var diff float64
+		var toInsert = false
+		for i := 0; i < int(*record.Peak.NumPeak); i++ {
+			for j := i + 1; j < int(*record.Peak.NumPeak); j++ {
+				if record.Peak.Peak.Mz[i] >= record.Peak.Peak.Mz[j] {
+					diff = record.Peak.Peak.Mz[i] - record.Peak.Peak.Mz[j]
+				} else {
+					diff = record.Peak.Peak.Mz[j] - record.Peak.Peak.Mz[i]
+				}
+				if diff > 11.5 {
+					sb.WriteString(fmt.Sprintf(" (%d, %f, %d, %d, %f)", spectrumId, diff, peakIds[i], peakIds[j], math.Min(float64(record.Peak.Peak.Rel[i]), float64(record.Peak.Peak.Rel[j]))))
+					if j < int(*record.Peak.NumPeak)-1 {
+						sb.WriteString(",")
+					}
+					toInsert = true
+				} else {
+					toInsert = false
+				}
+			}
+			if toInsert && i < int(*record.Peak.NumPeak)-2 {
+				sb.WriteString(",")
+			}
+		}
+		if toInsert {
+			sb.WriteString(";")
+			_, err = tx.Exec(sb.String())
 			if err != nil {
 				if err2 := tx.Rollback(); err2 != nil {
 					return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
@@ -1859,7 +1957,7 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 		}
 	}
 
-	if(record.Compound.Smiles != nil && *record.Compound.Smiles != ""){
+	if record.Compound.Smiles != nil && *record.Compound.Smiles != "" {
 		q = `INSERT INTO molecules (molecule, accession, atomcount) VALUES ($1, $2, $3);`
 		_, err = tx.Exec(q, *record.Compound.Smiles, *record.Accession, getAtomCount(*record.Compound.Formula))
 		if err != nil {
@@ -1876,7 +1974,7 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 			return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
 		}
 		return err
-	}	
+	}
 
 	return nil
 }
@@ -1895,9 +1993,8 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId str
 
 func (p *PostgresSQLDB) Init() error {
 	var err error
-	var query = 
-		`
-		DROP TABLE IF EXISTS metadata, massbank, contributor, accession_contributor, author, accession_author, license, accession_license, publication, accession_publication, compound, compound_name, compound_class, compound_link, acquisition_instrument, accession_acquisition, acquisition_mass_spectrometry, acquisition_chromatography, acquisition_general, mass_spectrometry_focused_ion, mass_spectrometry_data_processing, spectrum, peak, peak_annotation, browse_options, peak_differences, molecules;
+	var query = `
+		DROP TABLE IF EXISTS metadata, massbank, contributor, accession_contributor, author, accession_author, license, accession_license, publication, accession_publication, compound, compound_name, compound_class, compound_link, acquisition_instrument, accession_acquisition, acquisition_mass_spectrometry, acquisition_chromatography, acquisition_general, mass_spectrometry_focused_ion, mass_spectrometry_data_processing, spectrum, peak, peak_annotation, browse_options, peak_differences;		
 
 		CREATE TABLE metadata (
 			id SERIAL PRIMARY KEY,
@@ -2098,14 +2195,16 @@ func (p *PostgresSQLDB) Init() error {
 			min_rel_intensity FLOAT NOT NULL
 		);
 
-		CREATE TABLE molecules (
+		CREATE TABLE IF NOT EXISTS molecules (
 			id SERIAL NOT NULL PRIMARY KEY,
 			molecule TEXT NOT NULL,
 			accession TEXT NOT NULL,
 			atomcount INT NOT NULL
 		);
-		`;
-	
+
+		TRUNCATE molecules CASCADE;
+		`
+
 	if _, err = p.database.Exec(query); err != nil {
 		return err
 	}

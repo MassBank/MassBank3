@@ -11,21 +11,21 @@ import (
 // Filters is the abstract description of filters used to find MassBank records
 // in the database
 type Filters struct {
-	InstrumentType    *[]string
-	Splash            string
-	MsType            *[]massbank.MsType
-	IonMode           massbank.IonMode
-	CompoundName      string 
-	CompoundClass     string
-	Mass              *float64
-	MassEpsilon       *float64
-	Formula           string
-	Peaks             *[]float64
-	NeutralLoss   *[]float64
-	Inchi          	  string
-	InchiKey          string
-	Contributor       *[]string
-	Intensity   	  *int64
+	InstrumentType *[]string
+	Splash         string
+	MsType         *[]massbank.MsType
+	IonMode        massbank.IonMode
+	CompoundName   string
+	CompoundClass  string
+	Mass           *float64
+	MassEpsilon    *float64
+	Formula        string
+	Peaks          *[]float64
+	NeutralLoss    *[]float64
+	Inchi          string
+	InchiKey       string
+	Contributor    *[]string
+	Intensity      *int64
 }
 
 // DatabaseType is an enum containing the database type
@@ -49,9 +49,9 @@ type DBConfig struct {
 }
 
 var DefaultValues = struct {
-	MassEpsilon     float64
-	Intensity 		int64
-	Limit           int64
+	MassEpsilon float64
+	Intensity   int64
+	Limit       int64
 }{0.1, 50, math.MaxInt64}
 
 // MBErrorType is an enum for the error types during database operations
@@ -161,6 +161,8 @@ type MB3Database interface {
 	GetAccessionsBySubstructure(substructure string) ([]string, []int32, error)
 
 	GetAccessionsByFilterOptions(filters Filters) ([]string, []int32, error)
+
+	NeutralLossSearch(neutralLoss *[]float64, tolerance *float64, minRelIntensity *int64) ([]string, []int32, []string, error)
 
 	// GetRecordsBySubstructure Get an array of MassBank records by filtering by substructure
 	//

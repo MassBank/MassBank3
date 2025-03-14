@@ -103,7 +103,11 @@ function Resizable({
   );
 
   const peakTable = useMemo(() => {
-    if (disableNeutralLossTab) {
+    if (
+      disableNeutralLossTab ||
+      !filteredNeutralLossData ||
+      filteredNeutralLossData.length === 0
+    ) {
       return (
         <PeakTable
           peaks={filteredPeakData}
@@ -130,7 +134,10 @@ function Resizable({
       },
       {
         key: '2',
-        label: 'Differences (' + (filteredNeutralLossData?.length ?? 0) + ')',
+        label:
+          'Neural Loss Search Result (' +
+          (filteredNeutralLossData?.length ?? 0) +
+          ')',
         children: (
           <NeutralLossTable
             neutralLosses={filteredNeutralLossData}

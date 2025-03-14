@@ -62,12 +62,12 @@ func main() {
 			println("Could not update metadata: " + err.Error())
 			panic(err)
 		}
-		println("Updating records...")	
+		println("Updating records...")
 		err = db.AddRecords(mbfiles, metaId)
 		if err != nil {
 			panic(err)
 		}
-		
+
 		if mbfiles == nil {
 			panic("No files found")
 		}

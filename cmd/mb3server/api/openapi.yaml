@@ -747,9 +747,15 @@ components:
       example:
         data:
         - score: 0.8008281904610115
+          peakPairs:
+          - peakPairs
+          - peakPairs
           accession: accession
           atomcount: 1
         - score: 0.8008281904610115
+          peakPairs:
+          - peakPairs
+          - peakPairs
           accession: accession
           atomcount: 1
       properties:
@@ -1404,6 +1410,9 @@ components:
     SearchResult_data_inner:
       example:
         score: 0.8008281904610115
+        peakPairs:
+        - peakPairs
+        - peakPairs
         accession: accession
         atomcount: 1
       properties:
@@ -1417,6 +1426,12 @@ components:
           description: The number of atoms in the compound.
           minimum: 1
           type: integer
+        peakPairs:
+          description: "A list of peak pairs from neutral loss search, combined with\
+            \ \"_\"."
+          items:
+            type: string
+          type: array
       type: object
     Metadata_compound_class_inner:
       example:

@@ -19,6 +19,9 @@ type SearchResultDataInner struct {
 
 	// The number of atoms in the compound.
 	Atomcount int32 `json:"atomcount,omitempty"`
+
+	// A list of peak pairs from neutral loss search, combined with \"_\".
+	PeakPairs []string `json:"peakPairs,omitempty"`
 }
 
 // AssertSearchResultDataInnerRequired checks if the required fields are not zero-ed

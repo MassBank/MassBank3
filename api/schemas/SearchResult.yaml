@@ -18,3 +18,8 @@ properties:
           description: The number of atoms in the compound.
           type: integer
           minimum: 1
+        peakPairs:
+          type: array
+          description: A list of peak pairs from neutral loss search, combined with "_".
+          items:
+            type: string
