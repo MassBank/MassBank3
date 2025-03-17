@@ -32,6 +32,7 @@ import parsePeakListInputField from '../../../../utils/parsePeakListAndReference
 import defaultSearchFieldValues from '../../../../constants/defaultSearchFieldValues';
 import ResultTableSortOption from '../../../../types/ResultTableSortOption';
 import collapseButtonWidth from '../../../../constants/collapseButtonWidth';
+import generateID from '../../../../utils/generateID';
 
 const defaultSearchPanelWidth = 450;
 
@@ -97,7 +98,21 @@ function SearchView() {
         );
         setReference(peakList ?? []);
       } else {
-        setReference([]);
+        const peakSearchPeaks =
+          formData.spectralSearchFilterOptions?.peaks?.peaks ?? [];
+        if (peakSearchPeaks.length > 0) {
+          const peakList = peakSearchPeaks.map((peak) => {
+            return {
+              mz: peak.mz,
+              intensity: 0,
+              rel: 1000,
+              id: generateID(),
+            } as Peak;
+          });
+          setReference(peakList);
+        } else {
+          setReference([]);
+        }
       }
 
       const url = backendUrl + '/v1/records/search';

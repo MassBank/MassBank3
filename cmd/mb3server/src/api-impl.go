@@ -471,11 +471,13 @@ func buildSimpleMbRecord(record *massbank.MassBank2) *MbRecord {
 	var mzs = record.Peak.Peak.Mz
 	var ints = record.Peak.Peak.Intensity
 	var rels = record.Peak.Peak.Rel
+	var ids = record.Peak.Peak.Id
 	for i := 0; i < len(mzs); i++ {
 		result.Peak.Peak.Values = append(result.Peak.Peak.Values, MbRecordPeakPeakValuesInner{
 			Mz:        mzs[i],
 			Intensity: ints[i],
 			Rel:       rels[i],
+			Id:        ids[i],
 		})
 	}
 	result.Peak.NumPeak = int32(*record.Peak.NumPeak)
@@ -681,7 +683,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 	if checkNeutralLoss {
 		fmt.Println(" -> filter by NeutralLoss")
 		var atomCountsNeutralLossSearch []int32
-		var peakPairs []string
+		var peakPairs map[string][]string
 		accessionsNeutralLossSearch, atomCountsNeutralLossSearch, peakPairs, err = db.NeutralLossSearch(filters.NeutralLoss, filters.MassEpsilon, filters.Intensity)
 		if err != nil {
 			return nil, err
@@ -691,7 +693,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			if _, ok := neutralLossResultMap[accession]; !ok {
 				neutralLossResultMap[accession] = []string{}
 			}
-			neutralLossResultMap[accession] = append(neutralLossResultMap[accession], peakPairs[i])
+			neutralLossResultMap[accession] = peakPairs[accession]
 			atomCountResultMap[accession] = atomCountsNeutralLossSearch[i]
 		}
 	}

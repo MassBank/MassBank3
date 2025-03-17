@@ -162,7 +162,7 @@ type MB3Database interface {
 
 	GetAccessionsByFilterOptions(filters Filters) ([]string, []int32, error)
 
-	NeutralLossSearch(neutralLoss *[]float64, tolerance *float64, minRelIntensity *int64) ([]string, []int32, []string, error)
+	NeutralLossSearch(neutralLoss *[]float64, tolerance *float64, minRelIntensity *int64) ([]string, []int32, map[string][]string, error)
 
 	// GetRecordsBySubstructure Get an array of MassBank records by filtering by substructure
 	//

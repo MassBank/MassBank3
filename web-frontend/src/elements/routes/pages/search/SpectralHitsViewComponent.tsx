@@ -5,6 +5,7 @@ import Resizable from '../../../common/Resizable';
 import Record from '../../../../types/record/Record';
 import { useMemo } from 'react';
 import { Content } from 'antd/es/layout/layout';
+import NeutralLoss from '../../../../types/peak/NeutralLoss';
 
 type InputProps = {
   reference?: Peak[];
@@ -22,6 +23,32 @@ function SpectralHitsViewComponent({
   return useMemo(() => {
     const widthResultInfo = width / 4;
     const widthResizable = width - widthResultInfo;
+
+    const record = { peak: { peak: { values: reference } } } as Record;
+    if (hit.peakPairs && hit.peakPairs.length > 0) {
+      const _neutralLossPeakPairs = hit.peakPairs?.map((nlp) => {
+        const [peak1_id, peak2_id] = nlp.split('_').map((p) => 'peak-' + p);
+        return { peak1_id, peak2_id };
+      });
+      const neutralLossData: NeutralLoss[] = [];
+      for (const nlp of _neutralLossPeakPairs) {
+        const peak1 = hit.record.peak.peak.values.find(
+          (p) => p.id === nlp.peak1_id,
+        );
+        const peak2 = hit.record.peak.peak.values.find(
+          (p) => p.id === nlp.peak2_id,
+        );
+        if (peak1 && peak2) {
+          const difference = Math.abs(peak1.mz - peak2.mz);
+          neutralLossData.push({
+            peak1_id: peak1.id,
+            peak2_id: peak2.id,
+            difference,
+          });
+        }
+      }
+      hit.record.peak.neutral_loss = neutralLossData;
+    }
 
     return (
       <Content
@@ -45,12 +72,11 @@ function SpectralHitsViewComponent({
         />
         {reference && reference.length > 0 ? (
           <Resizable
-            record={{ peak: { peak: { values: reference } } } as Record}
+            record={record}
             record2={hit.record}
             width={widthResizable}
             height={height}
             disableExport
-            disableNeutralLossTab
           />
         ) : (
           <Resizable
@@ -58,7 +84,6 @@ function SpectralHitsViewComponent({
             width={widthResizable}
             height={height}
             disableExport
-            disableNeutralLossTab
           />
         )}
       </Content>

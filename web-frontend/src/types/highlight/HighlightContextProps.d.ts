@@ -1,14 +1,10 @@
+import HighlightAction from './HighlightAction';
+import HighlightState from './HighlightState';
+
 interface HighlightContextProps {
   highlight: HighlightState;
 
-  dispatch: (props: {
-    type: HighlightActions;
-    payload?: {
-      convertedHighlights: Set<string>;
-      id?: string;
-      source?: string;
-    };
-  }) => void;
+  dispatch: (props: HighlightAction) => void;
   remove: () => void;
 }
 

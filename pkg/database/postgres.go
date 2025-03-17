@@ -795,13 +795,14 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 	var accession string
 	var title string
 	var smiles string
+	var peak_ids_vec []int32
 	var mz_vec []float64
 	var intensity_vec []float64
 	var relative_intensity_vec []int32
 	var formula string
 	var mass float64
 	var atomcount uint
-	var query = "SELECT massbank_id, accession, title, smiles, mz_vec, intensity_vec, relative_intensity_vec, formula, mass, atomcount FROM browse_options WHERE accession = $1;"
+	var query = "SELECT massbank_id, accession, title, smiles, peak_ids_vec, mz_vec, intensity_vec, relative_intensity_vec, formula, mass, atomcount FROM browse_options WHERE accession = $1;"
 	stmt, err := p.database.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -811,6 +812,7 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 		&accession,
 		&title,
 		&smiles,
+		(*pq.Int32Array)(&peak_ids_vec),
 		(*pq.Float64Array)(&mz_vec),
 		(*pq.Float64Array)(&intensity_vec),
 		(*pq.Int32Array)(&relative_intensity_vec),
@@ -838,6 +840,7 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 		Mz:        mz_vec,
 		Intensity: intensity_vec,
 		Rel:       relative_intensity_vec,
+		Id:        peak_ids_vec,
 	}
 	result.Compound.Mass = &mass
 
@@ -1179,57 +1182,42 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) (string, []stri
 	return query, parameters
 }
 
-func (p *PostgresSQLDB) NeutralLossSearch(neutralLoss *[]float64, tolerance *float64, minRelIntensity *int64) ([]string, []int32, []string, error) {
+func (p *PostgresSQLDB) NeutralLossSearch(neutralLoss *[]float64, tolerance *float64, minRelIntensity *int64) ([]string, []int32, map[string][]string, error) {
 	var accessions = []string{}
 	var atomcounts = []int32{}
-	var peakPairs = []string{}
+	var peakPairs = map[string][]string{}
 
 	if neutralLoss != nil && len(*neutralLoss) > 0 && tolerance != nil {
 		neutralLossesCount := len(*neutralLoss)
-		var where = "WHERE "
 		parameters := []string{}
 		var query string
-		if neutralLossesCount == 1 {
-			parameters = append(parameters, strconv.FormatFloat((*neutralLoss)[0]-*tolerance, 'f', -1, 64))
-			parameters = append(parameters, strconv.FormatFloat((*neutralLoss)[0]+*tolerance, 'f', -1, 64))
-			where = where + "difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
+
+		var from = "FROM "
+		var with = "WITH "
+		from = from + "t1"
+		for i := 0; i < neutralLossesCount; i++ {
+			parameters = append(parameters, strconv.FormatFloat((*neutralLoss)[i]-*tolerance, 'f', -1, 64))
+			parameters = append(parameters, strconv.FormatFloat((*neutralLoss)[i]+*tolerance, 'f', -1, 64))
+			with = with + "t" + strconv.Itoa(i+1) + " AS (SELECT spectrum_id, array_agg(ARRAY[peak1_id, peak2_id]) AS agg FROM peak_differences WHERE difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
 			if minRelIntensity != nil {
 				parameters = append(parameters, strconv.FormatInt(*minRelIntensity, 10))
-				where = where + " AND min_rel_intensity >= $" + strconv.Itoa(len(parameters))
+				with = with + " AND min_rel_intensity >= $" + strconv.Itoa(len(parameters))
 			}
-			query = "SELECT peak1_id, peak2_id, browse_options.accession, browse_options.atomcount FROM peak_differences JOIN spectrum ON spectrum.id = spectrum_id JOIN browse_options ON browse_options.massbank_id = spectrum.massbank_id " + where + ";"
-		} else {
-			var from = "FROM "
-			var with = "WITH "
-			from = from + "t1"
-			for i := 0; i < neutralLossesCount; i++ {
-				parameters = append(parameters, strconv.FormatFloat((*neutralLoss)[i]-*tolerance, 'f', -1, 64))
-				parameters = append(parameters, strconv.FormatFloat((*neutralLoss)[i]+*tolerance, 'f', -1, 64))
-				if i == 0 {
-					with = with + "t" + strconv.Itoa(i+1) + " AS (SELECT spectrum_id, peak1_id, peak2_id, min_rel_intensity FROM peak_differences WHERE difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
-					if minRelIntensity != nil {
-						parameters = append(parameters, strconv.FormatInt(*minRelIntensity, 10))
-						with = with + " AND min_rel_intensity >= $" + strconv.Itoa(len(parameters))
-					}
-					with = with + ")"
-				} else {
-					with = with + "t" + strconv.Itoa(i+1) + " AS (SELECT DISTINCT(spectrum_id) FROM peak_differences WHERE difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
-					if minRelIntensity != nil {
-						parameters = append(parameters, strconv.FormatInt(*minRelIntensity, 10))
-						with = with + " AND min_rel_intensity >= $" + strconv.Itoa(len(parameters))
-					}
-					with = with + ")"
-				}
-				if i > 0 {
-					from = from + " JOIN " + "t" + strconv.Itoa(i+1) + " ON t" + strconv.Itoa(i+1) + ".spectrum_id=t" + strconv.Itoa(i) + ".spectrum_id"
-				}
-				if i < neutralLossesCount-1 {
-					with = with + ", "
-				}
+			with = with + " GROUP BY spectrum_id)"
+			if i > 0 {
+				from = from + " JOIN " + "t" + strconv.Itoa(i+1) + " ON t" + strconv.Itoa(i+1) + ".spectrum_id=t" + strconv.Itoa(i) + ".spectrum_id"
 			}
-			query = with + " SELECT t1.peak1_id, t1.peak2_id, browse_options.accession, browse_options.atomcount " + from + " JOIN spectrum ON spectrum.id = t1.spectrum_id JOIN browse_options ON browse_options.massbank_id = spectrum.massbank_id;"
+			if i < neutralLossesCount-1 {
+				with = with + ", "
+			}
 		}
+		var selectAggregations = "array_to_json(t1.agg"
+		for i := 1; i < neutralLossesCount; i++ {
+			selectAggregations = selectAggregations + "|| t" + strconv.Itoa(i+1) + ".agg"
+		}
+		selectAggregations = selectAggregations + ")::json"
 
+		query = with + " SELECT " + selectAggregations + ", browse_options.accession, browse_options.atomcount " + from + " JOIN spectrum ON spectrum.id = t1.spectrum_id JOIN browse_options ON browse_options.massbank_id = spectrum.massbank_id;"
 		stmt, err := p.database.Prepare(query)
 		if err != nil {
 			return nil, nil, nil, err
@@ -1247,18 +1235,31 @@ func (p *PostgresSQLDB) NeutralLossSearch(neutralLoss *[]float64, tolerance *flo
 		defer rows.Close()
 
 		for rows.Next() {
-			var peak1Id string
-			var peak2Id string
+			var peakPairAggregation string
 			var accession string
 			var atomcount int32
-			if err := rows.Scan(&peak1Id, &peak2Id, &accession, &atomcount); err != nil {
+			if err := rows.Scan(&peakPairAggregation, &accession, &atomcount); err != nil {
 				return nil, nil, nil, err
 			}
-			peakPairs = append(peakPairs, peak1Id+"_"+peak2Id)
 			accessions = append(accessions, accession)
 			atomcounts = append(atomcounts, atomcount)
+			peakPairAggregation = strings.Replace(peakPairAggregation, "[[", "", -1)
+			peakPairAggregation = strings.Replace(peakPairAggregation, "]]", "", -1)
+			peakPairAggregation = strings.Replace(peakPairAggregation, "],[", ",", -1)
+			peakPairAggregation = strings.Replace(peakPairAggregation, "[", "", -1)
+			peakPairAggregation = strings.Replace(peakPairAggregation, "]", "", -1)
+			split := strings.Split(peakPairAggregation, ",")
+			peakPairs[accession] = []string{}
+			var pair string
+			for i, item := range split {
+				if i%2 == 0 {
+					pair = item
+				} else {
+					pair = pair + "_" + item
+					peakPairs[accession] = append(peakPairs[accession], pair)
+				}
+			}
 		}
-
 	}
 
 	return accessions, atomcounts, peakPairs, nil
@@ -1514,7 +1515,7 @@ func (p *PostgresSQLDB) UpdateMetadata(meta *massbank.MbMetaData) (string, error
 }
 
 func (p *PostgresSQLDB) DropIndex(i *Index) string {
-	return "DROP INDEX " + i.IndexName + ";"
+	return "DROP INDEX IF EXISTS " + i.IndexName + ";"
 }
 
 func (p *PostgresSQLDB) CreateIndex(i *Index) string {
@@ -1857,17 +1858,28 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 	}
 
 	q = `INSERT INTO peak (mz, intensity, relative_intensity, spectrum_id) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING RETURNING id;`
-	peakIds := []int{}
+	insertedPeaks := massbank.PkPeak{
+		Id:        []int32{},
+		Mz:        []float64{},
+		Intensity: []float64{},
+		Rel:       []int32{},
+	}
 	var peakId int
+
 	for i, mz := range record.Peak.Peak.Mz {
-		err = tx.QueryRow(q, mz, record.Peak.Peak.Intensity[i], record.Peak.Peak.Rel[i], spectrumId).Scan(&peakId)
-		if err != nil {
-			if err2 := tx.Rollback(); err2 != nil {
-				return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+		if mz > 0 && record.Peak.Peak.Intensity[i] > 0 {
+			err = tx.QueryRow(q, mz, record.Peak.Peak.Intensity[i], record.Peak.Peak.Rel[i], spectrumId).Scan(&peakId)
+			if err != nil {
+				if err2 := tx.Rollback(); err2 != nil {
+					return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+				}
+				return err
 			}
-			return err
+			insertedPeaks.Id = append(insertedPeaks.Id, int32(peakId))
+			insertedPeaks.Mz = append(insertedPeaks.Mz, mz)
+			insertedPeaks.Intensity = append(insertedPeaks.Intensity, record.Peak.Peak.Intensity[i])
+			insertedPeaks.Rel = append(insertedPeaks.Rel, record.Peak.Peak.Rel[i])
 		}
-		peakIds = append(peakIds, peakId)
 	}
 	if record.Peak.Annotation != nil && record.Peak.Annotation.Values != nil {
 		q = `INSERT INTO peak_annotation(subtag, value, spectrum_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;`
@@ -1896,7 +1908,7 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 		}
 	}
 
-	q = `INSERT INTO browse_options (massbank_id, accession, contributor, instrument_type, ms_type, ion_mode, title, smiles, mz_vec, intensity_vec, relative_intensity_vec, inchi, inchikey, splash, formula, mass, atomcount) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17);`
+	q = `INSERT INTO browse_options (massbank_id, accession, contributor, instrument_type, ms_type, ion_mode, title, smiles, peak_ids_vec, mz_vec, intensity_vec, relative_intensity_vec, inchi, inchikey, splash, formula, mass, atomcount) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18);`
 	var msType string
 	var ionMode string
 	for _, subProp := range *record.Acquisition.MassSpectrometry {
@@ -1910,7 +1922,7 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 		}
 	}
 
-	_, err = tx.Exec(q, massbankId, *record.Accession, *record.Contributor, *record.Acquisition.InstrumentType, msType, ionMode, *record.RecordTitle, *record.Compound.Smiles, pq.Array(record.Peak.Peak.Mz), pq.Array(record.Peak.Peak.Intensity), pq.Array(record.Peak.Peak.Rel), *record.Compound.InChI, inchikey, *record.Peak.Splash, *record.Compound.Formula, *record.Compound.Mass, getAtomCount(*record.Compound.Formula))
+	_, err = tx.Exec(q, massbankId, *record.Accession, *record.Contributor, *record.Acquisition.InstrumentType, msType, ionMode, *record.RecordTitle, *record.Compound.Smiles, pq.Array(insertedPeaks.Id), pq.Array(insertedPeaks.Mz), pq.Array(insertedPeaks.Intensity), pq.Array(insertedPeaks.Rel), *record.Compound.InChI, inchikey, *record.Peak.Splash, *record.Compound.Formula, *record.Compound.Mass, getAtomCount(*record.Compound.Formula))
 	if err != nil {
 		fmt.Println("Error: ", err)
 		if err2 := tx.Rollback(); err2 != nil {
@@ -1924,16 +1936,16 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 		sb.WriteString("INSERT INTO peak_differences (spectrum_id, difference, peak1_id, peak2_id, min_rel_intensity) VALUES")
 		var diff float64
 		var toInsert = false
-		for i := 0; i < int(*record.Peak.NumPeak); i++ {
-			for j := i + 1; j < int(*record.Peak.NumPeak); j++ {
-				if record.Peak.Peak.Mz[i] >= record.Peak.Peak.Mz[j] {
-					diff = record.Peak.Peak.Mz[i] - record.Peak.Peak.Mz[j]
+		for i := 0; i < len(insertedPeaks.Id); i++ {
+			for j := i + 1; j < len(insertedPeaks.Id); j++ {
+				if insertedPeaks.Mz[i] >= insertedPeaks.Mz[j] {
+					diff = insertedPeaks.Mz[i] - insertedPeaks.Mz[j]
 				} else {
-					diff = record.Peak.Peak.Mz[j] - record.Peak.Peak.Mz[i]
+					diff = insertedPeaks.Mz[j] - insertedPeaks.Mz[i]
 				}
 				if diff > 11.5 {
-					sb.WriteString(fmt.Sprintf(" (%d, %f, %d, %d, %f)", spectrumId, diff, peakIds[i], peakIds[j], math.Min(float64(record.Peak.Peak.Rel[i]), float64(record.Peak.Peak.Rel[j]))))
-					if j < int(*record.Peak.NumPeak)-1 {
+					sb.WriteString(fmt.Sprintf(" (%d, %f, %d, %d, %f)", spectrumId, diff, insertedPeaks.Id[i], insertedPeaks.Id[j], math.Min(float64(insertedPeaks.Rel[i]), float64(insertedPeaks.Rel[j]))))
+					if j < len(insertedPeaks.Id)-1 {
 						sb.WriteString(",")
 					}
 					toInsert = true
@@ -1941,7 +1953,7 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 					toInsert = false
 				}
 			}
-			if toInsert && i < int(*record.Peak.NumPeak)-2 {
+			if toInsert && i < len(insertedPeaks.Id)-2 {
 				sb.WriteString(",")
 			}
 		}
@@ -2176,6 +2188,7 @@ func (p *PostgresSQLDB) Init() error {
 			ion_mode TEXT NOT NULL,
 			title TEXT NOT NULL,
 			smiles TEXT NOT NULL,
+			peak_ids_vec INT[] NOT NULL,
 			mz_vec FLOAT[] NOT NULL,
 			intensity_vec FLOAT[] NOT NULL,
 			relative_intensity_vec INT[] NOT NULL,

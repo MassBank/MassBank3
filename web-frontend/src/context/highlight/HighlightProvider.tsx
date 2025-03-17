@@ -2,50 +2,72 @@ import { useMemo, useReducer } from 'react';
 import HighlightState from '../../types/highlight/HighlightState';
 import HighlightContextProps from '../../types/highlight/HighlightContextProps';
 import { highlightContext } from './useHighlightData';
+import HighlightAction from '../../types/highlight/HighlightAction';
 
 const emptyState: HighlightContextProps = {
   highlight: {
     highlights: new Set<string>(),
     highlighted: new Set<string>(),
     source: undefined,
-  },
+  } as HighlightState,
   dispatch: () => null,
   remove: () => null,
 };
 
-function highlightReducer(state: HighlightState, action) {
+function highlightReducer(state: HighlightState, action: HighlightAction) {
   switch (action.type) {
     case 'SHOW': {
-      const { convertedHighlights, source } = action.payload;
+      const { payload } = action;
+      if (payload) {
+        const { convertedHighlights, source } = payload;
 
-      const newState: HighlightState = {
-        ...state,
-      };
-      for (const value of convertedHighlights) {
-        if (value !== undefined) {
-          newState.highlights.add(value);
+        const newState: HighlightState = {
+          ...state,
+        };
+        if (convertedHighlights) {
+          for (const value of convertedHighlights) {
+            if (value !== undefined) {
+              newState.highlights.add(value);
+            }
+          }
+          newState.highlighted = new Set(newState.highlights);
+          newState.source = source;
         }
-      }
-      newState.highlighted = new Set(newState.highlights);
-      newState.source = source;
 
-      return newState;
+        return newState;
+      }
+
+      return state;
     }
     case 'HIDE': {
-      const { convertedHighlights } = action.payload;
+      const { payload } = action;
+      if (payload) {
+        const { convertedHighlights } = payload;
 
-      const newState: HighlightState = {
-        ...state,
-      };
-      for (const value of convertedHighlights) {
-        if (value !== undefined) {
-          newState.highlights.delete(value);
+        const newState: HighlightState = {
+          ...state,
+        };
+        if (convertedHighlights) {
+          for (const value of convertedHighlights) {
+            if (value !== undefined) {
+              newState.highlights.delete(value);
+            }
+          }
+          newState.highlighted = new Set(newState.highlights);
+          newState.source = undefined;
         }
-      }
-      newState.highlighted = new Set(newState.highlights);
-      newState.source = undefined;
 
-      return newState;
+        return newState;
+      }
+
+      return state;
+    }
+    case 'RESET': {
+      return {
+        highlights: new Set<string>(),
+        highlighted: new Set<string>(),
+        source: undefined,
+      } as HighlightState;
     }
     default: {
       throw new Error(`unknown action type: ${action.type}`);

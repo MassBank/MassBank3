@@ -34,6 +34,13 @@ func main() {
 	}
 
 	if userConfig.Init {
+		println("Removing indexes...")
+		err = db.RemoveIndexes()
+		if err != nil {
+			println("Could not remove indexes: " + err.Error())
+			panic(err)
+		}
+
 		fmt.Println("Start initialising database...")
 		if err := db.Init(); err != nil {
 			println(err.Error())

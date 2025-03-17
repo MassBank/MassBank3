@@ -3,7 +3,6 @@ import ResultTable from './ResultTable';
 import Hit from '../../types/Hit';
 import Peak from '../../types/peak/Peak';
 import Record from '../../types/record/Record';
-import generateID from '../../utils/generateID';
 import Placeholder from '../basic/Placeholder';
 import fetchData from '../../utils/request/fetchData';
 import {
@@ -109,13 +108,15 @@ function ResultPanel({
         const record = await fetchData(url);
 
         if (record !== undefined && typeof record === 'object') {
-          record.peak.peak.values = record.peak.peak.values.map(
-            (p: Peak) =>
-              ({
-                ...p,
-                id: generateID(),
-              }) as Peak,
-          );
+          record.peak.peak.values = record.peak.peak.values.map((p: Peak) => {
+            return {
+              mz: p.mz,
+              intensity: p.intensity,
+              rel: p.rel,
+              id: 'peak-' + p.id,
+            } as Peak;
+          });
+
           records.push(record);
         } else {
           records.push(undefined);
