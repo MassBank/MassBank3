@@ -29,7 +29,7 @@ function Resizable({
   width,
   height,
   minChartWidth = 400,
-  minPeakTableWith = 300,
+  minPeakTableWith = 400,
   disableExport = false,
   disableNeutralLossTab = false,
 }: InputProps) {

@@ -65,6 +65,7 @@ function RecordView({ record, width, height }: inputProps) {
           height={chartAndPeakTableHeight}
           minChartWidth={minChartWidth}
           minPeakTableWith={minPeakTableWith}
+          disableNeutralLossTab
         />
       </Content>
     );

@@ -15,14 +15,11 @@ type InputProps = {
 function ResultLink({ hit, width = '100%', height = '100%' }: InputProps) {
   const { baseUrl, frontendUrl } = usePropertiesContext();
 
-  const url = useMemo(() => {
-    const _url =
-      frontendUrl + baseUrl + routes.accession.path + '?id=' + hit.accession;
-    if (hit.peakPairs && hit.peakPairs.length > 0) {
-      return _url + '&neutralLossPeakPairs=' + hit.peakPairs.join(',');
-    }
-    return _url;
-  }, [baseUrl, frontendUrl, hit.accession, hit.peakPairs]);
+  const url = useMemo(
+    () =>
+      frontendUrl + baseUrl + routes.accession.path + '?id=' + hit.accession,
+    [baseUrl, frontendUrl, hit.accession],
+  );
 
   return useMemo(
     () =>

@@ -9,7 +9,6 @@ import searchAccession from '../../../../utils/request/searchAccession';
 import { useSearchParams } from 'react-router-dom';
 import { usePropertiesContext } from '../../../../context/properties/properties';
 import accessionSearchInputFieldHeight from '../../../../constants/accessionSearchInputFieldHeight';
-import NeutralLoss from '../../../../types/peak/NeutralLoss';
 
 function AccessionView() {
   const ref = useRef(null);
@@ -23,43 +22,11 @@ function AccessionView() {
   const [accession, setAccession] = useState<string | null>(null);
 
   const handleOnSearch = useCallback(
-    async (acc: string, neutralLossPeakPairsString: string | null) => {
+    async (acc: string) => {
       setIsRequesting(true);
       setRequestedAccession(acc);
 
-      const _record = await searchAccession(acc, backendUrl);
-      if (
-        _record &&
-        neutralLossPeakPairsString &&
-        neutralLossPeakPairsString !== ''
-      ) {
-        const neutralLossPeakPairs = neutralLossPeakPairsString
-          ? neutralLossPeakPairsString.split(',')
-          : [];
-        const _neutralLossPeakPairs = neutralLossPeakPairs.map((nlp) => {
-          const [peak1_id, peak2_id] = nlp.split('_').map((p) => 'peak-' + p);
-          return { peak1_id, peak2_id };
-        });
-        const neutralLossData: NeutralLoss[] = [];
-        for (const nlp of _neutralLossPeakPairs) {
-          const peak1 = _record.peak.peak.values.find(
-            (p) => p.id === nlp.peak1_id,
-          );
-          const peak2 = _record.peak.peak.values.find(
-            (p) => p.id === nlp.peak2_id,
-          );
-          if (peak1 && peak2) {
-            const difference = Math.abs(peak1.mz - peak2.mz);
-            neutralLossData.push({
-              peak1_id: peak1.id,
-              peak2_id: peak2.id,
-              difference,
-            });
-          }
-        }
-        _record.peak.neutral_loss = neutralLossData;
-      }
-      setRecord(_record);
+      setRecord(await searchAccession(acc, backendUrl));
 
       setIsRequesting(false);
     },
@@ -69,10 +36,9 @@ function AccessionView() {
   useEffect(() => {
     const _accession = searchParams.get('id');
     setAccession(_accession);
-    const neutralLossPeakPairsString = searchParams.get('neutralLossPeakPairs');
 
     if (_accession) {
-      handleOnSearch(_accession, neutralLossPeakPairsString);
+      handleOnSearch(_accession);
     }
   }, [handleOnSearch, searchParams]);
 
