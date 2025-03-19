@@ -19,7 +19,7 @@ function AccessionView() {
   const [requestedAccession, setRequestedAccession] = useState<string>('');
   const [record, setRecord] = useState<Record | undefined>();
   const [searchParams] = useSearchParams();
-  const [accession, setAccession] = useState<string | null>(null);
+  const accession = searchParams.get('id');
 
   const handleOnSearch = useCallback(
     async (acc: string) => {
@@ -34,13 +34,10 @@ function AccessionView() {
   );
 
   useEffect(() => {
-    const _accession = searchParams.get('id');
-    setAccession(_accession);
-
-    if (_accession) {
-      handleOnSearch(_accession);
+    if (accession) {
+      handleOnSearch(accession);
     }
-  }, [handleOnSearch, searchParams]);
+  }, [accession, handleOnSearch]);
 
   const recordView = useMemo(
     () =>
