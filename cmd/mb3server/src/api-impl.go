@@ -3,7 +3,6 @@ package mb3server
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 	"sort"
@@ -634,7 +633,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 	accessionsSubstructureSearch := []string{}
 	checkSubstructure := substructure != ""
 	if checkSubstructure {
-		fmt.Println(" -> filter by substructure")
+		// fmt.Println(" -> filter by substructure")
 		var atomCountsSubstructureSearch []int32
 		accessionsSubstructureSearch, atomCountsSubstructureSearch, err = db.GetAccessionsBySubstructure(substructure)
 		if err != nil {
@@ -644,7 +643,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			setSubstructureSearch.Add(accession)
 			atomCountResultMap[accession] = atomCountsSubstructureSearch[i]
 		}
-		fmt.Println("recordsSubstructureSearch: ", len(accessionsSubstructureSearch))
+		// fmt.Println("recordsSubstructureSearch: ", len(accessionsSubstructureSearch))
 	}
 
 	// similarity search
@@ -654,7 +653,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 	similaritySearchResult := &SimilaritySearchResult{}
 	checkSimilarity := len(peakList) > 0 && peakList[0] != ""
 	if checkSimilarity {
-		fmt.Println(" -> filter by Similarity")
+		// fmt.Println(" -> filter by Similarity")
 		similaritySearchResult, err = GetSimilarity(peakList, []string{}, 0, peakListThreshold)
 		if err != nil {
 			return nil, err
@@ -664,7 +663,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			similarityResultMap[similarityResult.Accession] = similarityResult.Score
 			atomCountResultMap[similarityResult.Accession] = similarityResult.Atomcount
 		}
-		fmt.Println("similaritySearchResult: ", len(similaritySearchResult.Data))
+		// fmt.Println("similaritySearchResult: ", len(similaritySearchResult.Data))
 	}
 
 	// filter search
@@ -672,7 +671,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("filters: ", filters)
+	// fmt.Println("filters: ", filters)
 
 	// neutral loss search, only if filters.NeutralLoss is given
 	checkNeutralLoss := filters.NeutralLoss != nil && len(*filters.NeutralLoss) > 0 && filters.MassEpsilon != nil
@@ -681,7 +680,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 	neutralLossResultMap := make(map[string][]string)
 	accessionsNeutralLossSearch := []string{}
 	if checkNeutralLoss {
-		fmt.Println(" -> filter by NeutralLoss")
+		// fmt.Println(" -> filter by NeutralLoss")
 		var atomCountsNeutralLossSearch []int32
 		var peakPairs map[string][]string
 		accessionsNeutralLossSearch, atomCountsNeutralLossSearch, peakPairs, err = db.NeutralLossSearch(filters.NeutralLoss, filters.MassEpsilon, filters.Intensity)
@@ -707,7 +706,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 
 	accessionsFilters := []string{}
 	if checkFilters {
-		fmt.Println(" -> filter by Filters")
+		// fmt.Println(" -> filter by Filters")
 		var atomCountsFilters []int32
 		accessionsFilters, atomCountsFilters, err = db.GetAccessionsByFilterOptions(*filters)
 		if err != nil {
@@ -717,7 +716,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			setFilterSearch.Add(accession)
 			atomCountResultMap[accession] = atomCountsFilters[i]
 		}
-		fmt.Println("recordsFilters: ", len(accessionsFilters))
+		// fmt.Println("recordsFilters: ", len(accessionsFilters))
 	}
 
 	// merge search results
@@ -725,7 +724,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 	results.Data = []SearchResultDataInner{}
 
 	if checkSubstructure && checkSimilarity && checkNeutralLoss && checkFilters {
-		fmt.Println(" -> combined results (substructure + similarity + neutral loss + filters)")
+		// fmt.Println(" -> combined results (substructure + similarity + neutral loss + filters)")
 		intersection := setSubstructureSearch.Intersect(setSimilaritySearch).Intersect(setNeutralLossSearch).Intersect(setFilterSearch)
 		for _, accession := range intersection.ToSlice() {
 			var peakPairs []string
@@ -746,7 +745,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			return results.Data[i].Score > results.Data[j].Score
 		})
 	} else if checkSubstructure && checkSimilarity && checkNeutralLoss && !checkFilters {
-		fmt.Println(" -> combined results (substructure + similarity + neutral loss)")
+		// fmt.Println(" -> combined results (substructure + similarity + neutral loss)")
 		intersection := setSubstructureSearch.Intersect(setSimilaritySearch).Intersect(setNeutralLossSearch)
 		for _, accession := range intersection.ToSlice() {
 			var peakPairs []string
@@ -767,7 +766,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			return results.Data[i].Score > results.Data[j].Score
 		})
 	} else if checkSubstructure && checkSimilarity && !checkNeutralLoss && checkFilters {
-		fmt.Println(" -> combined results (substructure + similarity + filters)")
+		// fmt.Println(" -> combined results (substructure + similarity + filters)")
 		intersection := setSubstructureSearch.Intersect(setSimilaritySearch).Intersect(setFilterSearch)
 		for _, accession := range intersection.ToSlice() {
 			searchResultData := SearchResultDataInner{
@@ -781,7 +780,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			return results.Data[i].Score > results.Data[j].Score
 		})
 	} else if checkSubstructure && !checkSimilarity && checkNeutralLoss && checkFilters {
-		fmt.Println(" -> combined results (substructure + neutral loss + filters)")
+		// fmt.Println(" -> combined results (substructure + neutral loss + filters)")
 		intersection := setSubstructureSearch.Intersect(setNeutralLossSearch).Intersect(setFilterSearch)
 		for _, accession := range intersection.ToSlice() {
 			var peakPairs []string
@@ -798,7 +797,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			results.Data = append(results.Data, searchResultData)
 		}
 	} else if !checkSubstructure && checkSimilarity && checkNeutralLoss && checkFilters {
-		fmt.Println(" -> combined results (similarity + neutral loss + filters)")
+		// fmt.Println(" -> combined results (similarity + neutral loss + filters)")
 		intersection := setSimilaritySearch.Intersect(setNeutralLossSearch).Intersect(setFilterSearch)
 		for _, accession := range intersection.ToSlice() {
 			var peakPairs []string
@@ -819,7 +818,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			return results.Data[i].Score > results.Data[j].Score
 		})
 	} else if checkSubstructure && checkSimilarity && !checkNeutralLoss && !checkFilters {
-		fmt.Println(" -> combined results (substructure + similarity)")
+		// fmt.Println(" -> combined results (substructure + similarity)")
 		intersection := setSubstructureSearch.Intersect(setSimilaritySearch)
 		for _, accession := range intersection.ToSlice() {
 			searchResultData := SearchResultDataInner{
@@ -833,7 +832,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			return results.Data[i].Score > results.Data[j].Score
 		})
 	} else if checkSubstructure && !checkSimilarity && checkNeutralLoss && !checkFilters {
-		fmt.Println(" -> combined results (substructure + neutral loss)")
+		// fmt.Println(" -> combined results (substructure + neutral loss)")
 		intersection := setSubstructureSearch.Intersect(setNeutralLossSearch)
 		for _, accession := range intersection.ToSlice() {
 			var peakPairs []string
@@ -850,7 +849,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			results.Data = append(results.Data, searchResultData)
 		}
 	} else if !checkSubstructure && checkSimilarity && checkNeutralLoss && !checkFilters {
-		fmt.Println(" -> combined results (similarity + neutral loss)")
+		// fmt.Println(" -> combined results (similarity + neutral loss)")
 		intersection := setSimilaritySearch.Intersect(setNeutralLossSearch)
 		for _, accession := range intersection.ToSlice() {
 			var peakPairs []string
@@ -871,7 +870,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			return results.Data[i].Score > results.Data[j].Score
 		})
 	} else if checkSubstructure && !checkSimilarity && !checkNeutralLoss && checkFilters {
-		fmt.Println(" -> combined results (substructure + filters)")
+		// fmt.Println(" -> combined results (substructure + filters)")
 		intersection := setSubstructureSearch.Intersect(setFilterSearch)
 		for _, accession := range intersection.ToSlice() {
 			searchResultData := SearchResultDataInner{
@@ -881,7 +880,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			results.Data = append(results.Data, searchResultData)
 		}
 	} else if !checkSubstructure && checkSimilarity && !checkNeutralLoss && checkFilters {
-		fmt.Println(" -> combined results (similarity + filters)")
+		// fmt.Println(" -> combined results (similarity + filters)")
 		intersection := setSimilaritySearch.Intersect(setFilterSearch)
 		for _, accession := range intersection.ToSlice() {
 			searchResultData := SearchResultDataInner{
@@ -895,7 +894,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			return results.Data[i].Score > results.Data[j].Score
 		})
 	} else if !checkSubstructure && !checkSimilarity && checkNeutralLoss && checkFilters {
-		fmt.Println(" -> combined results (neutral loss + filters)")
+		// fmt.Println(" -> combined results (neutral loss + filters)")
 		intersection := setNeutralLossSearch.Intersect(setFilterSearch)
 		for _, accession := range intersection.ToSlice() {
 			var peakPairs []string
@@ -912,9 +911,9 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 			results.Data = append(results.Data, searchResultData)
 		}
 	} else {
-		fmt.Println("no combined results found -> single results")
+		// fmt.Println("no combined results found -> single results")
 		if checkSimilarity && !checkFilters && !checkSubstructure && !checkNeutralLoss {
-			fmt.Println(" -> single results (similarity)")
+			// fmt.Println(" -> single results (similarity)")
 			for _, similarityResult := range similaritySearchResult.Data {
 				results.Data = append(results.Data, SearchResultDataInner{
 					Accession: similarityResult.Accession,
@@ -923,7 +922,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 				})
 			}
 		} else if checkFilters && !checkSimilarity && !checkSubstructure && !checkNeutralLoss {
-			fmt.Println(" -> single results (filters)")
+			// fmt.Println(" -> single results (filters)")
 			for _, accession := range accessionsFilters {
 				var peakPairs []string
 				if _, ok := neutralLossResultMap[accession]; ok {
@@ -939,7 +938,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 				results.Data = append(results.Data, searchResultData)
 			}
 		} else if checkSubstructure && !checkSimilarity && !checkFilters && !checkNeutralLoss {
-			fmt.Println(" -> single results (substructure)")
+			// fmt.Println(" -> single results (substructure)")
 			for _, accession := range accessionsSubstructureSearch {
 				searchResultData := SearchResultDataInner{
 					Accession: accession,
@@ -948,7 +947,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 				results.Data = append(results.Data, searchResultData)
 			}
 		} else if checkNeutralLoss && !checkSimilarity && !checkFilters && !checkSubstructure {
-			fmt.Println(" -> single results (neutral loss)")
+			// fmt.Println(" -> single results (neutral loss)")
 			for _, accession := range accessionsNeutralLossSearch {
 				var peakPairs []string
 				if _, ok := neutralLossResultMap[accession]; ok {
@@ -966,7 +965,7 @@ func GetSearchResults(instrumentType []string, splash string, msType []string, i
 		}
 	}
 
-	fmt.Println("results: ", len(results.Data))
+	// fmt.Println("results: ", len(results.Data))
 
 	return results, nil
 }
@@ -992,10 +991,10 @@ func GetSimilarity(peakList []string, referenceSpectraList []string, limit int32
 		}
 		return mz1 < mz2
 	})
-	fmt.Println("peakList: ", peakList)
-	fmt.Println("referenceSpectraList: ", referenceSpectraList)
-	fmt.Println("limit: ", limit)
-	fmt.Println("threshold: ", threshold)
+	// fmt.Println("peakList: ", peakList)
+	// fmt.Println("referenceSpectraList: ", referenceSpectraList)
+	// fmt.Println("limit: ", limit)
+	// fmt.Println("threshold: ", threshold)
 
 	if err := initDB(); err != nil {
 		return nil, err
