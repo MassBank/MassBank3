@@ -109,23 +109,27 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
             alignItems: 'left',
           }}
         >
-          {compoundClasses.map((name, i) => (
-            <ExportableContent
-              key={'class-label-' + name}
-              component={<LabelWrapper value={name} />}
-              mode="copy"
-              onClick={() => handleOnCopy(`Compound class ${i + 1}`, name)}
-              title={`Copy compound class ${i + 1} to clipboard`}
-              enableSearch
-              searchTitle={`Search for compound class ${i + 1}`}
-              searchUrl={buildSearchUrl(
-                'compound_class',
-                name,
-                baseUrl,
-                frontendUrl,
-              )}
-            />
-          ))}
+          {compoundClasses.length > 0 ? (
+            compoundClasses.map((name, i) => (
+              <ExportableContent
+                key={'class-label-' + name}
+                component={<LabelWrapper value={name} />}
+                mode="copy"
+                onClick={() => handleOnCopy(`Compound class ${i + 1}`, name)}
+                title={`Copy compound class ${i + 1} to clipboard`}
+                enableSearch
+                searchTitle={`Search for compound class ${i + 1}`}
+                searchUrl={buildSearchUrl(
+                  'compound_class',
+                  name,
+                  baseUrl,
+                  frontendUrl,
+                )}
+              />
+            ))
+          ) : (
+            <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
+          )}
         </Content>
       ),
     });

@@ -69,7 +69,7 @@ function AccessionView() {
             accession={accession ?? ''}
             style={{
               height: accessionSearchInputFieldHeight,
-              backgroundColor: '#f3ece0',
+              backgroundColor: 'rgb(223, 223, 223)',
             }}
           />
         </Header>

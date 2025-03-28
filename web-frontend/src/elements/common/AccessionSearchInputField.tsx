@@ -65,15 +65,15 @@ function AccessionSearchInputField({
         ...style,
       }}
     >
+      <label style={{ marginRight: 20 }}>Go to accession:</label>
       <Input
         type="text"
         placeholder="e.g. MSBNK-AAFC-AC000114"
         value={accession && accession !== '' ? accession : undefined}
-        addonBefore="Go to accession:"
         onChange={handleOnChange}
         onKeyDown={handleOnKeyDown}
         allowClear
-        style={{ width: 500, ...inputStyle }}
+        style={{ width: 400, ...inputStyle }}
       />
       <Button
         children="Search"
