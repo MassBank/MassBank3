@@ -34,6 +34,8 @@ function Header({ height }: InputProps) {
             height:
               typeof height === 'number' ? height - 5 : `calc(${height} - 5px)`,
             backgroundColor,
+            marginLeft: 10,
+            marginRight: 10,
           }}
         >
           <Link to={baseUrl} target="_self">
@@ -69,22 +71,24 @@ function Header({ height }: InputProps) {
           return {
             key: path,
             label: (
-              <a href={path} target="_self">
-                <Button
-                  type="link"
-                  key={path + '-li'}
-                  style={{
-                    color: path == location.pathname ? 'blue' : 'black',
-                    height:
-                      typeof height === 'number'
-                        ? height - 5
-                        : `calc(${height} - 5px)`,
-                    backgroundColor,
-                  }}
-                >
+              <Button
+                type="link"
+                key={path + '-li'}
+                style={{
+                  color: path == location.pathname ? 'blue' : 'black',
+                  height:
+                    typeof height === 'number'
+                      ? height - 5
+                      : `calc(${height} - 5px)`,
+                  backgroundColor,
+                  marginLeft: 10,
+                  marginRight: 10,
+                }}
+              >
+                <a href={path} target="_self">
                   {route.label}
-                </Button>
-              </a>
+                </a>
+              </Button>
             ),
           } as MenuItem;
         }),
@@ -100,7 +104,7 @@ function Header({ height }: InputProps) {
           height,
           display: 'flex',
           flexDirection: 'row',
-          justifyContent: 'left',
+          justifyContent: 'center',
           alignItems: 'center',
           backgroundColor,
           padding: 0,
@@ -114,7 +118,7 @@ function Header({ height }: InputProps) {
             width: '100%',
             height,
             display: 'flex',
-            justifyContent: 'left',
+            justifyContent: 'center',
             alignItems: 'center',
             backgroundColor,
           }}
