@@ -81,10 +81,3 @@ Description is coming soon.
 # REST API
 
 Description is coming soon.
-
-````
-
-```
-
-```
-````
