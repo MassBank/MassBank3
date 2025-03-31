@@ -28,7 +28,7 @@ const exportServiceUrlInternal =
 const distributorText =
   process.env.DISTRIBUTOR_TEXT ??
   'This website is hosted and distributed by ...';
-const distributorUrl = process.env.DISTRIBUTOR_URL ?? '...';
+const distributorUrl = process.env.DISTRIBUTOR_URL ?? '';
 
 console.log('\n');
 console.log('isProduction', process.env.NODE_ENV === 'production');
@@ -284,14 +284,15 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
     });
 
     const noFollowLinksMeta = `<meta name="robots" content="nofollow"></meta>`;
-    const googleSearchConsoleMeta = `<meta name="google-site-verification" content="${googleSearchConsoleKey}"></meta>`;
     rendered.head = rendered.head
-      ? rendered.head
-          .concat('\n')
-          .concat(noFollowLinksMeta)
-          .concat('\n')
-          .concat(googleSearchConsoleMeta)
-      : noFollowLinksMeta.concat('\n').concat(googleSearchConsoleMeta);
+      ? rendered.head.concat('\n\t').concat(noFollowLinksMeta)
+      : noFollowLinksMeta;
+    if (googleSearchConsoleKey && googleSearchConsoleKey.trim().length > 0) {
+      const googleSearchConsoleMeta = `<meta name="google-site-verification" content="${googleSearchConsoleKey}"></meta>`;
+      rendered.head = rendered.head
+        ? rendered.head.concat('\n\t').concat(googleSearchConsoleMeta)
+        : googleSearchConsoleMeta;
+    }
 
     const pageRoute = path.replace(baseUrl, '');
     if (
@@ -302,7 +303,7 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       if (metadata) {
         const metadataScript = `<script type="application/ld+json">${metadata}</script>`;
         rendered.head = rendered.head
-          ? rendered.head.concat('\n').concat(metadataScript)
+          ? rendered.head.concat('\n\t').concat(metadataScript)
           : metadataScript;
       }
     }
