@@ -7,8 +7,8 @@ MassBank3 is the spectral reference library's next generation software product. 
 
 # Installation
 
-[!WARNING]
-Although this version of MassBank is already considered as fully functional, it is still work in progress and in a testing phase! </br> Please create a new issue in case of observing any bug or discrepancy.
+> [!NOTE]
+> Although this version of MassBank is already considered as fully functional, it is still work in progress and in a testing phase! </br> Please create a new issue in case of observing any bug or discrepancy.
 
 There are currently two ways to run MassBank:
 
@@ -41,8 +41,8 @@ Now use _docker compose_ to start the system (in daemon mode):
 
     docker compose up -d
 
-[!NOTE]
-Initially, the property _MB_DB_INIT_ is set to _true_. Change that value to _false_ after the database was filled within the first start. The database filling takes some time. The _mb3tool_ service is responsible for that and stops after finishing that task.
+> [!NOTE]
+> Initially, the property _MB_DB_INIT_ is set to _true_. Change that value to _false_ after the database was filled within the first start. The database filling takes some time. The _mb3tool_ service is responsible for that and stops after finishing that task.
 
 The frontend can (by default) be accessed in the webbrowser at http://localhost:8080/MassBank3/.
 
