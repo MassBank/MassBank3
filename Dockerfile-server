@@ -14,6 +14,9 @@ RUN wget https://github.com/swagger-api/swagger-ui/archive/refs/tags/v5.20.2.tar
 COPY api/openapi.yml ./cmd/mb3server/swagger-ui/openapi.yml
 COPY api/schemas ./cmd/mb3server/swagger-ui/schemas
 
+ENV MB3_API_URL="https://msbi.ipb-halle.de/MassBank-api/v1"
+RUN echo "servers:\n  - url: \"$MB3_API_URL\"" >> cmd/mb3server/swagger-ui/openapi.yml
+
 ENV CGO_ENABLED=0
 RUN go get -d -v ./...
 
