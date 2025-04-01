@@ -12,6 +12,7 @@ RUN wget https://github.com/swagger-api/swagger-ui/archive/refs/tags/v5.20.2.tar
     mv swagger-ui cmd/mb3server/swagger-ui
 
 COPY api/openapi.yml ./cmd/mb3server/swagger-ui/openapi.yml
+COPY api/schemas ./cmd/mb3server/swagger-ui/schemas
 
 ENV CGO_ENABLED=0
 RUN go get -d -v ./...
