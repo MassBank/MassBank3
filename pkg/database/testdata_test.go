@@ -150,9 +150,8 @@ var mbTestRecords = map[string]massbank.MassBank2{
 				"Natural Product",
 				"Fungal metabolite",
 			},
-			Formula:   toPtr("C10H10O3"),
-			CdkDepict: nil,
-			Mass:      toPtr(178.062990),
+			Formula: toPtr("C10H10O3"),
+			Mass:    toPtr(178.062990),
 
 			Smiles: toPtr("CC1CC2=C(C(=CC=C2)O)C(=O)O1"),
 			InChI:  toPtr("InChI=1S/C10H10O3/c1-6-5-7-3-2-4-8(11)9(7)10(12)13-6/h2-4,6,11H,5H2,1H3"),
@@ -437,11 +436,10 @@ var mbTestRecords = map[string]massbank.MassBank2{
 				"N/A",
 				"Environmental Standard",
 			},
-			Formula:   toPtr("C11H11N5"),
-			CdkDepict: nil,
-			Mass:      toPtr(213.1014454),
-			Smiles:    toPtr("CN1C(N)=NC2=C1C=CC1=NC=C(C)N=C21"),
-			InChI:     toPtr("InChI=1S/C11H11N5/c1-6-5-13-7-3-4-8-10(9(7)14-6)15-11(12)16(8)2/h3-5H,1-2H3,(H2,12,15)"),
+			Formula: toPtr("C11H11N5"),
+			Mass:    toPtr(213.1014454),
+			Smiles:  toPtr("CN1C(N)=NC2=C1C=CC1=NC=C(C)N=C21"),
+			InChI:   toPtr("InChI=1S/C11H11N5/c1-6-5-13-7-3-4-8-10(9(7)14-6)15-11(12)16(8)2/h3-5H,1-2H3,(H2,12,15)"),
 			Link: &[]massbank.DatabaseProperty{
 				{
 					Database:   "CAS",
@@ -690,11 +688,10 @@ var mbTestRecords = map[string]massbank.MassBank2{
 				"N/A",
 				"Environmental Standard",
 			},
-			Formula:   toPtr("C12H14N4O4S"),
-			CdkDepict: nil,
-			Mass:      toPtr(310.0736),
-			Smiles:    toPtr("c1(NS(c2ccc(N)cc2)(=O)=O)cc(nc(n1)OC)OC"),
-			InChI:     toPtr("InChI=1S/C12H14N4O4S/c1-19-11-7-10(14-12(15-11)20-2)16-21(17,18)9-5-3-8(13)4-6-9/h3-7H,13H2,1-2H3,(H,14,15,16)"),
+			Formula: toPtr("C12H14N4O4S"),
+			Mass:    toPtr(310.0736),
+			Smiles:  toPtr("c1(NS(c2ccc(N)cc2)(=O)=O)cc(nc(n1)OC)OC"),
+			InChI:   toPtr("InChI=1S/C12H14N4O4S/c1-19-11-7-10(14-12(15-11)20-2)16-21(17,18)9-5-3-8(13)4-6-9/h3-7H,13H2,1-2H3,(H,14,15,16)"),
 			Link: &[]massbank.DatabaseProperty{
 				{
 					Database:   "CAS",
@@ -960,11 +957,10 @@ var mbTestRecords = map[string]massbank.MassBank2{
 				"N/A",
 				"Environmental Transformation Products",
 			},
-			Formula:   toPtr("C12H14F3NO"),
-			CdkDepict: nil,
-			Mass:      toPtr(245.102700),
-			Smiles:    toPtr("CC(CC1=CC(=CC=C1)C(F)(F)F)NC(C)=O"),
-			InChI:     toPtr("InChI=1S/C12H14F3NO/c1-8(16-9(2)17)6-10-4-3-5-11(7-10)12(13,14)15/h3-5,7-8H,6H2,1-2H3,(H,16,17)"),
+			Formula: toPtr("C12H14F3NO"),
+			Mass:    toPtr(245.102700),
+			Smiles:  toPtr("CC(CC1=CC(=CC=C1)C(F)(F)F)NC(C)=O"),
+			InChI:   toPtr("InChI=1S/C12H14F3NO/c1-8(16-9(2)17)6-10-4-3-5-11(7-10)12(13,14)15/h3-5,7-8H,6H2,1-2H3,(H,16,17)"),
 			Link: &[]massbank.DatabaseProperty{
 				{
 					Database:   "CAS",
@@ -1227,11 +1223,10 @@ var mbTestRecords = map[string]massbank.MassBank2{
 
 				"N/A",
 			},
-			Formula:   toPtr("C7H8S"),
-			CdkDepict: nil,
-			Mass:      toPtr(124.034670),
-			Smiles:    toPtr("CSc(c1)cccc1"),
-			InChI:     toPtr("InChI=1S/C7H8S/c1-8-7-5-3-2-4-6-7/h2-6H,1H3"),
+			Formula: toPtr("C7H8S"),
+			Mass:    toPtr(124.034670),
+			Smiles:  toPtr("CSc(c1)cccc1"),
+			InChI:   toPtr("InChI=1S/C7H8S/c1-8-7-5-3-2-4-6-7/h2-6H,1H3"),
 			Link: &[]massbank.DatabaseProperty{
 				{
 					Database:   "INCHIKEY",
@@ -1450,11 +1445,10 @@ var mbTestRecords = map[string]massbank.MassBank2{
 
 				"N/A",
 			},
-			Formula:   toPtr("C10H18N2O3"),
-			CdkDepict: nil,
-			Mass:      toPtr(214.131740),
-			Smiles:    toPtr("OC(=O)CCCCCC(N1)C(C)NC(=O)1"),
-			InChI:     toPtr("InChI=1S/C10H18N2O3/c1-7-8(12-10(15)11-7)5-3-2-4-6-9(13)14/h7-8H,2-6H2,1H3,(H,13,14)(H2,11,12,15)/t7-,8+/m0/s1"),
+			Formula: toPtr("C10H18N2O3"),
+			Mass:    toPtr(214.131740),
+			Smiles:  toPtr("OC(=O)CCCCCC(N1)C(C)NC(=O)1"),
+			InChI:   toPtr("InChI=1S/C10H18N2O3/c1-7-8(12-10(15)11-7)5-3-2-4-6-9(13)14/h7-8H,2-6H2,1H3,(H,13,14)(H2,11,12,15)/t7-,8+/m0/s1"),
 			Link: &[]massbank.DatabaseProperty{
 				{
 					Database:   "CAS",
@@ -1720,11 +1714,10 @@ var mbTestRecords = map[string]massbank.MassBank2{
 
 				"Non-natural product",
 			},
-			Formula:   toPtr("C17H17ClFNO4"),
-			CdkDepict: nil,
-			Mass:      toPtr(353.083000),
-			Smiles:    toPtr("CC(=C1C(=O)N(C(=O)O1)c2cc(c(cc2F)Cl)OC3CCCC3)C"),
-			InChI:     toPtr("InChI=1S/C17H17ClFNO4/c1-9(2)15-16(21)20(17(22)24-15)13-8-14(11(18)7-12(13)19)23-10-5-3-4-6-10/h7-8,10H,3-6H2,1-2H3"),
+			Formula: toPtr("C17H17ClFNO4"),
+			Mass:    toPtr(353.083000),
+			Smiles:  toPtr("CC(=C1C(=O)N(C(=O)O1)c2cc(c(cc2F)Cl)OC3CCCC3)C"),
+			InChI:   toPtr("InChI=1S/C17H17ClFNO4/c1-9(2)15-16(21)20(17(22)24-15)13-8-14(11(18)7-12(13)19)23-10-5-3-4-6-10/h7-8,10H,3-6H2,1-2H3"),
 			Link: &[]massbank.DatabaseProperty{
 				{
 					Database:   "CAS",
@@ -1899,11 +1892,10 @@ var mbTestRecords = map[string]massbank.MassBank2{
 
 				"Flavonoid",
 			},
-			Formula:   toPtr("C21H18O13"),
-			CdkDepict: nil,
-			Mass:      toPtr(478.074740),
-			Smiles:    toPtr("OC(=O)C(O1)C(O)C(O)C(O)C1OC(C(=O)3)=C(Oc(c4)c(c(O)cc(O)4)3)c(c2)cc(O)c(O)c2"),
-			InChI:     toPtr("InChI=1S/C21H18O13/c22-7-4-10(25)12-11(5-7)32-17(6-1-2-8(23)9(24)3-6)18(13(12)26)33-21-16(29)14(27)15(28)19(34-21)20(30)31/h1-5,14-16,19,21-25,27-29H,(H,30,31)/t14-,15-,16+,19-,21+/m0/s1"),
+			Formula: toPtr("C21H18O13"),
+			Mass:    toPtr(478.074740),
+			Smiles:  toPtr("OC(=O)C(O1)C(O)C(O)C(O)C1OC(C(=O)3)=C(Oc(c4)c(c(O)cc(O)4)3)c(c2)cc(O)c(O)c2"),
+			InChI:   toPtr("InChI=1S/C21H18O13/c22-7-4-10(25)12-11(5-7)32-17(6-1-2-8(23)9(24)3-6)18(13(12)26)33-21-16(29)14(27)15(28)19(34-21)20(30)31/h1-5,14-16,19,21-25,27-29H,(H,30,31)/t14-,15-,16+,19-,21+/m0/s1"),
 			Link: &[]massbank.DatabaseProperty{
 				{
 					Database:   "CAS",
@@ -2112,11 +2104,10 @@ var mbTestRecords = map[string]massbank.MassBank2{
 
 				"Oxidized fatty acids",
 			},
-			Formula:   toPtr("C18H32O3"),
-			CdkDepict: nil,
-			Mass:      toPtr(296.451000),
-			Smiles:    toPtr("O=C(O)CCCCCCCC=CC=CC(O)CCCCC"),
-			InChI:     toPtr("InChI=1S/C18H32O3/c1-2-3-11-14-17(19)15-12-9-7-5-4-6-8-10-13-16-18(20)21/h7,9,12,15,17,19H,2-6,8,10-11,13-14,16H2,1H3,(H,20,21)"),
+			Formula: toPtr("C18H32O3"),
+			Mass:    toPtr(296.451000),
+			Smiles:  toPtr("O=C(O)CCCCCCCC=CC=CC(O)CCCCC"),
+			InChI:   toPtr("InChI=1S/C18H32O3/c1-2-3-11-14-17(19)15-12-9-7-5-4-6-8-10-13-16-18(20)21/h7,9,12,15,17,19H,2-6,8,10-11,13-14,16H2,1H3,(H,20,21)"),
 			Link: &[]massbank.DatabaseProperty{
 				{
 					Database:   "INCHIKEY",
@@ -2317,11 +2308,10 @@ var mbTestRecords = map[string]massbank.MassBank2{
 
 				"N/A",
 			},
-			Formula:   toPtr("C15H20O3"),
-			CdkDepict: nil,
-			Mass:      toPtr(248.141245),
-			Smiles:    toPtr("C/C/1=C\\CC[C@@]2([C@@H](O2)[C@@H]3[C@@H](CC1)C(=C)C(=O)O3)C"),
-			InChI:     toPtr("InChI=1S/C15H20O3/c1-9-5-4-8-15(3)13(18-15)12-11(7-6-9)10(2)14(16)17-12/h5,11-13H,2,4,6-8H2,1,3H3/b9-5+/t11-,12-,13-,15+/m0/s1"),
+			Formula: toPtr("C15H20O3"),
+			Mass:    toPtr(248.141245),
+			Smiles:  toPtr("C/C/1=C\\CC[C@@]2([C@@H](O2)[C@@H]3[C@@H](CC1)C(=C)C(=O)O3)C"),
+			InChI:   toPtr("InChI=1S/C15H20O3/c1-9-5-4-8-15(3)13(18-15)12-11(7-6-9)10(2)14(16)17-12/h5,11-13H,2,4,6-8H2,1,3H3/b9-5+/t11-,12-,13-,15+/m0/s1"),
 			Link: &[]massbank.DatabaseProperty{
 				{
 					Database:   "CAS",
@@ -2469,12 +2459,11 @@ var mbTestRecords = map[string]massbank.MassBank2{
 
 				"Natural Product",
 			},
-			Formula:   toPtr("C27H29N5O4"),
-			CdkDepict: nil,
-			Mass:      toPtr(487.221940),
-			Smiles:    toPtr("CC(C)[C@H]1C2=NC3=CC=CC=C3C(=O)N2[C@@H](C(=O)N1)C[C@@]4([C@@H]5NC(C(=O)N5C6=CC=CC=C64)(C)C)O"),
-			InChI:     toPtr("InChI=1S/C27H29N5O4/c1-14(2)20-21-28-17-11-7-5-9-15(17)23(34)31(21)19(22(33)29-20)13-27(36)16-10-6-8-12-18(16)32-24(27)30-26(3,4)25(32)35/h5-12,14,19-20,24,30,36H,13H2,1-4H3,(H,29,33)/t19-,20+,24-,27-/m1/s1"),
-			Link:      nil,
+			Formula: toPtr("C27H29N5O4"),
+			Mass:    toPtr(487.221940),
+			Smiles:  toPtr("CC(C)[C@H]1C2=NC3=CC=CC=C3C(=O)N2[C@@H](C(=O)N1)C[C@@]4([C@@H]5NC(C(=O)N5C6=CC=CC=C64)(C)C)O"),
+			InChI:   toPtr("InChI=1S/C27H29N5O4/c1-14(2)20-21-28-17-11-7-5-9-15(17)23(34)31(21)19(22(33)29-20)13-27(36)16-10-6-8-12-18(16)32-24(27)30-26(3,4)25(32)35/h5-12,14,19-20,24,30,36H,13H2,1-4H3,(H,29,33)/t19-,20+,24-,27-/m1/s1"),
+			Link:    nil,
 		},
 		Species: massbank.SpeciesProperties{
 			Name:    nil,
@@ -2585,11 +2574,10 @@ var mbTestRecords = map[string]massbank.MassBank2{
 				"Ceramide",
 				"Ganglioside",
 			},
-			Formula:   toPtr("C86H152N4O39"),
-			CdkDepict: nil,
-			Mass:      toPtr(1865.003370),
-			Smiles:    toPtr("CCCCCCCCCCCCCCCCCCCC(=O)N[C@@H](CO[C@H]1[C@@H]([C@H]([C@@H]([C@H](O1)CO)O[C@H]2[C@@H]([C@H]([C@H]([C@H](O2)CO)O[C@H]3[C@@H]([C@H]([C@H]([C@H](O3)CO)O)O[C@H]4[C@@H]([C@H]([C@H]([C@H](O4)CO)O)O[C@@]5(C[C@@H]([C@H]([C@@H](O5)C([C@@H](CO)O)O)NC(=O)C)O)C(=O)O)O)NC(=O)C)O[C@@]6(C[C@@H]([C@H]([C@@H](O6)C([C@@H](CO)O)O)NC(=O)C)O)C(=O)O)O)O)O)[C@@H](/C=C/CCCCCCCCCCCCC)O"),
-			InChI:     toPtr("InChI=1S/C86H152N4O39/c1-6-8-10-12-14-16-18-20-21-22-23-25-27-29-31-33-35-37-60(105)90-50(51(100)36-34-32-30-28-26-24-19-17-15-13-11-9-7-2)46-118-80-69(111)68(110)72(58(44-95)121-80)123-82-71(113)78(129-86(84(116)117)39-53(102)62(88-48(4)98)76(127-86)65(107)55(104)41-92)73(59(45-96)122-82)124-79-63(89-49(5)99)74(66(108)56(42-93)119-79)125-81-70(112)77(67(109)57(43-94)120-81)128-85(83(114)115)38-52(101)61(87-47(3)97)75(126-85)64(106)54(103)40-91/h34,36,50-59,61-82,91-96,100-104,106-113H,6-33,35,37-46H2,1-5H3,(H,87,97)(H,88,98)(H,89,99)(H,90,105)(H,114,115)(H,116,117)/b36-34+/t50-,51+,52-,53-,54+,55+,56+,57+,58+,59+,61+,62+,63+,64?,65?,66-,67-,68+,69+,70+,71+,72+,73-,74+,75+,76+,77-,78+,79-,80+,81-,82-,85-,86-/m0/s1"),
+			Formula: toPtr("C86H152N4O39"),
+			Mass:    toPtr(1865.003370),
+			Smiles:  toPtr("CCCCCCCCCCCCCCCCCCCC(=O)N[C@@H](CO[C@H]1[C@@H]([C@H]([C@@H]([C@H](O1)CO)O[C@H]2[C@@H]([C@H]([C@H]([C@H](O2)CO)O[C@H]3[C@@H]([C@H]([C@H]([C@H](O3)CO)O)O[C@H]4[C@@H]([C@H]([C@H]([C@H](O4)CO)O)O[C@@]5(C[C@@H]([C@H]([C@@H](O5)C([C@@H](CO)O)O)NC(=O)C)O)C(=O)O)O)NC(=O)C)O[C@@]6(C[C@@H]([C@H]([C@@H](O6)C([C@@H](CO)O)O)NC(=O)C)O)C(=O)O)O)O)O)[C@@H](/C=C/CCCCCCCCCCCCC)O"),
+			InChI:   toPtr("InChI=1S/C86H152N4O39/c1-6-8-10-12-14-16-18-20-21-22-23-25-27-29-31-33-35-37-60(105)90-50(51(100)36-34-32-30-28-26-24-19-17-15-13-11-9-7-2)46-118-80-69(111)68(110)72(58(44-95)121-80)123-82-71(113)78(129-86(84(116)117)39-53(102)62(88-48(4)98)76(127-86)65(107)55(104)41-92)73(59(45-96)122-82)124-79-63(89-49(5)99)74(66(108)56(42-93)119-79)125-81-70(112)77(67(109)57(43-94)120-81)128-85(83(114)115)38-52(101)61(87-47(3)97)75(126-85)64(106)54(103)40-91/h34,36,50-59,61-82,91-96,100-104,106-113H,6-33,35,37-46H2,1-5H3,(H,87,97)(H,88,98)(H,89,99)(H,90,105)(H,114,115)(H,116,117)/b36-34+/t50-,51+,52-,53-,54+,55+,56+,57+,58+,59+,61+,62+,63+,64?,65?,66-,67-,68+,69+,70+,71+,72+,73-,74+,75+,76+,77-,78+,79-,80+,81-,82-,85-,86-/m0/s1"),
 			Link: &[]massbank.DatabaseProperty{
 				{
 					Database:   "INCHIKEY",
@@ -3026,11 +3014,10 @@ var mbTestRecords = map[string]massbank.MassBank2{
 				"Natural Product",
 				"Lipid Standard",
 			},
-			Formula:   toPtr("C22H32O3"),
-			CdkDepict: nil,
-			Mass:      toPtr(344.235140),
-			Smiles:    toPtr("CC\\C=C/C\\C=C/C\\C=C/CC(O)\\C=C\\C=C/C\\C=C/CCC(O)=O"),
-			InChI:     toPtr("InChI=1S/C22H32O3/c1-2-3-4-5-6-7-9-12-15-18-21(23)19-16-13-10-8-11-14-17-20-22(24)25/h3-4,6-7,10-16,19,21,23H,2,5,8-9,17-18,20H2,1H3,(H,24,25)/b4-3-,7-6-,13-10-,14-11-,15-12-,19-16+"),
+			Formula: toPtr("C22H32O3"),
+			Mass:    toPtr(344.235140),
+			Smiles:  toPtr("CC\\C=C/C\\C=C/C\\C=C/CC(O)\\C=C\\C=C/C\\C=C/CCC(O)=O"),
+			InChI:   toPtr("InChI=1S/C22H32O3/c1-2-3-4-5-6-7-9-12-15-18-21(23)19-16-13-10-8-11-14-17-20-22(24)25/h3-4,6-7,10-16,19,21,23H,2,5,8-9,17-18,20H2,1H3,(H,24,25)/b4-3-,7-6-,13-10-,14-11-,15-12-,19-16+"),
 			Link: &[]massbank.DatabaseProperty{
 				{
 					Database:   "CHEBI",

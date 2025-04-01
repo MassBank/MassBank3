@@ -5,6 +5,14 @@ COPY cmd/mb3server/main.go ./cmd/mb3server
 COPY pkg ./pkg
 COPY go.mod .
 
+RUN wget https://github.com/swagger-api/swagger-ui/archive/refs/tags/v5.20.2.tar.gz && \
+    tar -xf v5.20.2.tar.gz && \
+    mv swagger-ui-5.20.2/dist ./swagger-ui && \
+    sed -i 's/url: \".*\"/url: \"\.\/openapi.yml\"/' swagger-ui/swagger-initializer.js && \
+    mv swagger-ui cmd/mb3server/swagger-ui
+
+COPY api/openapi.yml ./cmd/mb3server/swagger-ui/openapi.yml
+
 ENV CGO_ENABLED=0
 RUN go get -d -v ./...
 

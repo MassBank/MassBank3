@@ -10,14 +10,21 @@
 package main
 
 import (
+	"embed"
+	"io/fs"
 	"log"
 	"net/http"
 	"strconv"
 
-	"github.com/MassBank/MassBank3/pkg/config"
-
 	mb3server "github.com/MassBank/MassBank3/cmd/mb3server/src"
+	"github.com/MassBank/MassBank3/pkg/config"
+	"github.com/go-chi/chi/v5"
 )
+
+// Embed the swagger-ui directory
+
+//go:embed swagger-ui
+var swaggerContent embed.FS
 
 func main() {
 	log.Printf("Server started")
@@ -30,5 +37,18 @@ func main() {
 
 	router := mb3server.NewRouter(DefaultApiController)
 
+	addSwaggerEndpoint(router)
+
 	log.Fatal(http.ListenAndServe(":"+strconv.FormatUint(uint64(mb3server.ServerConfig.ServerPort), 10), router))
+
+}
+
+func addSwaggerEndpoint(router chi.Router) {
+	// Create a subdirectory filesystem for swagger-ui
+	fsys, err := fs.Sub(swaggerContent, "swagger-ui")
+	if err != nil {
+		panic("failed to create sub filesystem: " + err.Error())
+	}
+
+	router.Handle("/swagger-ui/*", http.StripPrefix("/swagger-ui/", http.FileServer(http.FS(fsys))))
 }
