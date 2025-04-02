@@ -65,11 +65,11 @@ function SearchView() {
 
       let _browseContent: ContentFilterOptions | undefined = formDataContent;
       if (!_browseContent) {
-        const url = backendUrl + '/v1/filter/browse';
+        const url = backendUrl + '/filter/browse';
         _browseContent = (await fetchData(url)) as ContentFilterOptions;
       } else {
         const builtSearchParams = buildSearchParams(_browseContent);
-        const url = backendUrl + '/v1/filter/browse';
+        const url = backendUrl + '/filter/browse';
         _browseContent = (await fetchData(
           url,
           builtSearchParams,
@@ -115,7 +115,7 @@ function SearchView() {
         }
       }
 
-      const url = backendUrl + '/v1/records/search';
+      const url = backendUrl + '/records/search';
       const searchResult = (await fetchData(
         url,
         builtSearchParams,

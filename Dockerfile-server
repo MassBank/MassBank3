@@ -17,5 +17,4 @@ COPY api/schemas ./cmd/mb3server/swagger-ui/schemas
 COPY entrypoint-mb3server.sh ./cmd/mb3server/entrypoint-mb3server.sh
 
 EXPOSE 8080
-ENTRYPOINT cd cmd/mb3server && sh entrypoint-mb3server.sh "${MB3_API_URL_EXTERNAL}"
-
+ENTRYPOINT cd cmd/mb3server && sh entrypoint-mb3server.sh "${MB3_API_URL}"

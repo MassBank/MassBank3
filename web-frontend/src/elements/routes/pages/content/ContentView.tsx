@@ -52,11 +52,11 @@ function ContentView() {
 
       let _browseContent: ContentFilterOptions | undefined = formDataContent;
       if (!_browseContent) {
-        const url = backendUrl + '/v1/filter/browse';
+        const url = backendUrl + '/filter/browse';
         _browseContent = (await fetchData(url)) as ContentFilterOptions;
       } else {
         const searchParams = buildSearchParams(_browseContent);
-        const url = backendUrl + '/v1/filter/browse';
+        const url = backendUrl + '/filter/browse';
         _browseContent = (await fetchData(
           url,
           searchParams,
@@ -65,7 +65,7 @@ function ContentView() {
       initFlags(_browseContent);
       setPropertyFilterOptions(_browseContent);
 
-      const url = backendUrl + '/v1/metadata';
+      const url = backendUrl + '/metadata';
       const metadata = (await fetchData(url)) as Metadata;
       setMetadata(metadata);
 
@@ -79,7 +79,7 @@ function ContentView() {
       setIsSearching(true);
 
       const searchParams = buildSearchParams(formDataContent);
-      const url = backendUrl + '/v1/records/search';
+      const url = backendUrl + '/records/search';
       const searchResult = (await fetchData(url, searchParams)) as SearchResult;
 
       let _hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];

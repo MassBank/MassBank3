@@ -96,7 +96,7 @@ const buildRecordMetadata = async (_accession: string) => {
 };
 
 async function getLastmodDate() {
-  let url = backendUrlInternal + '/v1/metadata';
+  let url = backendUrlInternal + '/metadata';
   const searchResultMetadata: Metadata | undefined = await fetchData(url);
   const timestampMetadata = searchResultMetadata?.timestamp;
   url = exportServiceUrlInternal + '/version';
@@ -148,7 +148,7 @@ baseRouter.get('/robots.txt', async (req: Request, res: Response) => {
 // serve sitemap index for search engines
 baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
   try {
-    const url: string = backendUrlInternal + '/v1/records/count';
+    const url: string = backendUrlInternal + '/records/count';
     const searchResultRecordCount: number | undefined = await fetchData(url);
     const hitsCount: number = searchResultRecordCount
       ? searchResultRecordCount
@@ -217,7 +217,7 @@ baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
   try {
     const index = Number(req.originalUrl.split('_')[1].split('.')[0]);
 
-    const url = backendUrlInternal + '/v1/records/search';
+    const url = backendUrlInternal + '/records/search';
     const searchResult = (await fetchData(url)) as SearchResult;
     const hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
 

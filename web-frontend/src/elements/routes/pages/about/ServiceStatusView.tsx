@@ -27,7 +27,7 @@ function ServiceStatusView() {
     setIsLoading(true);
 
     try {
-      const response = await axios.get(`${backendUrl}/v1/status`);
+      const response = await axios.get(`${backendUrl}/status`);
       if (response.status === 200) {
         setErrorApi(null);
         const statusResult = response.data as StatusResult;

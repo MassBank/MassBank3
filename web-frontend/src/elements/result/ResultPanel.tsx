@@ -103,7 +103,7 @@ function ResultPanel({
 
       const records: (Record | undefined)[] = [];
       for (const accession of accessions) {
-        const url = backendUrl + '/v1/records/' + accession + '/simple';
+        const url = backendUrl + '/records/' + accession + '/simple';
 
         const record = await fetchData(url);
 

@@ -1,7 +1,7 @@
 import fetchData from './fetchData';
 
 async function getRecord(id: string, backendUrl: string) {
-  const url = backendUrl + '/v1/records/' + id;
+  const url = backendUrl + '/records/' + id;
   return await fetchData(url);
 }
 

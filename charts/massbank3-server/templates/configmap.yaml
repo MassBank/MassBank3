@@ -15,3 +15,4 @@ data:
   SIMILARITY_SERVICE_COSINE_PORT: "8080"
   EXPORT_SERVICE_HOST: "massbank3-export-service-service"
   EXPORT_SERVICE_PORT: "8080"
+  MB3_API_URL: "https://{{ .Values.host }}/{{ .Values.pathPrefix }}-api"
