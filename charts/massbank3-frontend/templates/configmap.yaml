@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "massbank3-frontend.labels" . | nindent 4 }}
 data:
-  MB3_API_URL: "https://{{ .Values.host }}/{{ .Values.pathPrefix }}-api"
+  MB3_API_URL: "https://{{ .Values.host }}/{{ .Values.pathPrefix }}-api/v1"
   MB3_API_URL_INTERNAL: "http://{{ .Values.host }}:8080"
   MB3_FRONTEND_URL: "https://{{ .Values.host }}"
   MB3_FRONTEND_BASE_URL: "/{{ .Values.pathPrefix }}/"
