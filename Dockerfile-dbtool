@@ -9,7 +9,7 @@ RUN go get -d -v ./...
 
 RUN go build -a -installsuffix cgo -o mb3dbtool ./cmd/mb3dbtool
 
-FROM docker.io/alpine AS runtime
+FROM docker.io/alpine:3.21 AS runtime
 COPY --from=build /go/src/mb3dbtool ./
 RUN printf 'case $MB_DB_INIT in\n\
   true) echo Initialize database...\n\

@@ -9,20 +9,13 @@ RUN wget https://github.com/swagger-api/swagger-ui/archive/refs/tags/v5.20.2.tar
     tar -xf v5.20.2.tar.gz && \
     mv swagger-ui-5.20.2/dist ./swagger-ui && \
     sed -i 's/url: \".*\"/url: \"\.\/openapi.yml\"/' swagger-ui/swagger-initializer.js && \
-    mv swagger-ui cmd/mb3server/swagger-ui
+    mv swagger-ui cmd/mb3server/swagger-ui && \
+    rm -rf v5.20.2.tar.gz swagger-ui-5.20.2
 
 COPY api/openapi.yml ./cmd/mb3server/swagger-ui/openapi.yml
 COPY api/schemas ./cmd/mb3server/swagger-ui/schemas
+COPY entrypoint-mb3server.sh ./cmd/mb3server/entrypoint-mb3server.sh
 
-ENV MB3_API_URL="https://msbi.ipb-halle.de/MassBank-api/v1"
-RUN echo "servers:\n  - url: \"$MB3_API_URL\"" >> cmd/mb3server/swagger-ui/openapi.yml
+EXPOSE 8080
+ENTRYPOINT cd cmd/mb3server && sh entrypoint-mb3server.sh "${MB3_API_URL_EXTERNAL}"
 
-ENV CGO_ENABLED=0
-RUN go get -d -v ./...
-
-RUN go build -a -installsuffix cgo -o mb3server ./cmd/mb3server
-
-FROM scratch AS runtime
-COPY --from=build /go/src/mb3server ./
-EXPOSE 8080/tcp
-ENTRYPOINT ["./mb3server"]
