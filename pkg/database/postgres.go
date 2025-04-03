@@ -716,37 +716,6 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 			}
 		}
 
-		// query = "SELECT difference, peak1_id, peak2_id FROM peak_differences WHERE spectrum_id = $1;"
-		// stmt, err = p.database.Prepare(query)
-		// if err != nil {
-		// 	return nil, err
-		// }
-		// rows, err = stmt.Query(spectrumId)
-		// stmt.Close()
-		// if err == nil {
-		// 	result.Peak.NeutralLoss = &massbank.PkNeutralLoss{
-		// 		Difference: []float64{},
-		// 		Peak1Id: []int32{},
-		// 		Peak2Id: []int32{},
-		// 	}
-		// 	for rows.Next() {
-		// 		var difference float64
-		// 		var peak1Id int32
-		// 		var peak2Id int32
-		// 		if err := rows.Scan(&difference, &peak1Id, &peak2Id); err != nil {
-		// 			return nil, err
-		// 		}
-		// 		result.Peak.NeutralLoss.Difference = append(result.Peak.NeutralLoss.Difference, difference)
-		// 		result.Peak.NeutralLoss.Peak1Id = append(result.Peak.NeutralLoss.Peak1Id, peak1Id)
-		// 		result.Peak.NeutralLoss.Peak2Id = append(result.Peak.NeutralLoss.Peak2Id, peak2Id)
-		// 	}
-		// 	rows.Close()
-		// } else {
-		// 	if err != sql.ErrNoRows {
-		// 		return nil, err
-		// 	}
-		// }
-
 		query = "SELECT subtag, value FROM peak_annotation WHERE spectrum_id = $1;"
 		stmt, err = p.database.Prepare(query)
 		if err != nil {
@@ -845,32 +814,6 @@ func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) 
 	result.Compound.Mass = &mass
 
 	return &result, err
-}
-
-// GetRecords see [MB3Database.GetRecords]
-func (p *PostgresSQLDB) GetRecords(filters Filters) (*[]massbank.MassBank2, error) {
-	if filters.MassEpsilon == nil {
-		filters.MassEpsilon = &DefaultValues.MassEpsilon
-	}
-	if filters.Intensity == nil {
-		filters.Intensity = &DefaultValues.Intensity
-	}
-
-	accessions, _, err := p.GetAccessionsByFilterOptions(filters)
-	if err != nil {
-		return nil, err
-	}
-
-	records := []massbank.MassBank2{}
-	for _, accession := range accessions {
-		record, err := p.GetRecord(&accession)
-		if err != nil {
-			return nil, err
-		}
-		records = append(records, *record)
-	}
-
-	return &records, nil
 }
 
 func (p *PostgresSQLDB) GetAccessionsBySubstructure(substructure string) ([]string, []int32, error) {
@@ -1128,56 +1071,6 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) (string, []stri
 			addedWhere = true
 		}
 	}
-
-	// if filters.NeutralLoss != nil && len(*filters.NeutralLoss) > 0 && filters.MassEpsilon != nil {
-	// 	neutralLossesCount := len(*filters.NeutralLoss)
-	// 	var from = "FROM "
-	// 	var where = "WHERE "
-
-	// 	subQuery := ""
-	// 	if neutralLossesCount == 1 {
-	// 		parameters = append(parameters, strconv.FormatFloat((*filters.NeutralLoss)[0]-*filters.MassEpsilon, 'f', -1, 64))
-	// 		parameters = append(parameters, strconv.FormatFloat((*filters.NeutralLoss)[0]+*filters.MassEpsilon, 'f', -1, 64))
-	// 		from = from + "peak_differences AS t1"
-	// 		where = where + "t1.difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
-	// 		if filters.Intensity != nil {
-	// 			parameters = append(parameters, strconv.FormatInt(*filters.Intensity, 10))
-	// 			where = where + " AND t1.min_rel_intensity >= $" + strconv.Itoa(len(parameters))
-	// 		}
-	// 		subQuery = "massbank_id IN (SELECT massbank_id FROM spectrum WHERE id IN (SELECT DISTINCT(t1.spectrum_id) " + from + " " + where + "))"
-	// 	} else {
-	// 		var with = "WITH "
-	// 		from = from + "t1"
-	// 		for i := 0; i < neutralLossesCount; i++ {
-	// 			parameters = append(parameters, strconv.FormatFloat((*filters.NeutralLoss)[i]-*filters.MassEpsilon, 'f', -1, 64))
-	// 			parameters = append(parameters, strconv.FormatFloat((*filters.NeutralLoss)[i]+*filters.MassEpsilon, 'f', -1, 64))
-	// 			if i == 0 {
-	// 				with = with + "t" + strconv.Itoa(i+1) + " AS (SELECT DISTINCT(spectrum_id), min_rel_intensity FROM peak_differences WHERE difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters)) + ")"
-	// 			} else {
-	// 				with = with + "t" + strconv.Itoa(i+1) + " AS (SELECT DISTINCT(spectrum_id) FROM peak_differences WHERE difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters)) + ")"
-	// 			}
-	// 			if i > 1 {
-	// 				from = from + " JOIN " + "t" + strconv.Itoa(i) + " ON t" + strconv.Itoa(i-1) + ".spectrum_id=t" + strconv.Itoa(i) + ".spectrum_id"
-	// 			}
-	// 			if i < neutralLossesCount-1 {
-	// 				with = with + ", "
-	// 			}
-	// 		}
-	// 		if filters.Intensity != nil {
-	// 			parameters = append(parameters, strconv.FormatInt(*filters.Intensity, 10))
-	// 			where = where + "t1.min_rel_intensity >= $" + strconv.Itoa(len(parameters))
-	// 		}
-	// 		subQuery = "massbank_id IN (SELECT massbank_id FROM spectrum WHERE id IN (" + with + " SELECT DISTINCT(t1.spectrum_id) " + from + " " + where + "))"
-	// 	}
-
-	// 	if addedWhere || addedAnd {
-	// 		query = query + " AND " + subQuery
-	// 		addedAnd = true
-	// 	} else {
-	// 		query = query + " WHERE " + subQuery
-	// 		addedWhere = true
-	// 	}
-	// }
 
 	return query, parameters
 }

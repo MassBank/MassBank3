@@ -1,0 +1,126 @@
+components:
+  parameters:
+    Contributor:
+      in: query
+      name: contributor
+      description: Filter by contributors (institutions).
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/Contributor"
+      required: false
+    InstrumentType:
+      in: query
+      name: instrument_type
+      description: Filter by a list of instrument types.
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/InstrumentType"
+      required: false
+    MsType:
+      in: query
+      description: Filter by a List of MS types. If none is given, all is assumed.
+      name: ms_type
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/MSType"
+      required: false
+    IonMode:
+      in: query
+      name: ion_mode
+      description: Filter by ion mode. If none is given, both is assumed.
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/IonMode"
+      required: false
+    Splash:
+      in: query
+      description: Filter by SPLASH.
+      name: splash
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/Splash"
+      required: false
+    CompoundName:
+      in: query
+      name: compound_name
+      description: Filter by compound name.
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/CompoundName"
+      required: false
+    CompoundClass:
+      in: query
+      name: compound_class
+      description: Filter by compound class.
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/CompoundClass"
+      required: false
+    ExactMass:
+      in: query
+      name: exact_mass
+      description: Filter by exact mass.
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/ExactMass"
+    MassTolerance:
+      in: query
+      name: mass_tolerance
+      description: "Tolerance for mass filters. Default: 0.1"
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/MassTolerance"
+    Formula:
+      in: query
+      name: formula
+      description: Filter by molecular formula.
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/Formula"
+      required: false
+    Peaks:
+      in: query
+      name: peaks
+      description: Filter by peaks.
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/Peaks"
+      required: false
+    Intensity:
+      in: query
+      name: intensity
+      description: Intensity for peak search. Default is 50.
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/Intensity"
+      required: false
+    NeutralLoss:
+      in: query
+      name: neutral_loss
+      description: Filter by peak differences (neutral losses).
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/Peaks"
+      required: false
+    PeakList:
+      in: query
+      name: peak_list
+      description: Filter by peak list (similarity search).
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/PeakList"
+      required: false
+    PeakListThreshold:
+      in: query
+      name: peak_list_threshold
+      description: Threshold as minimal score for peak list search.
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/PeakListThreshold"
+      required: false
+    InChI:
+      in: query
+      name: inchi
+      description: Filter by InChI
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/InChI"
+      required: false
+    InChIKey:
+      in: query
+      name: inchi_key
+      description: Filter by InChIKey.
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/InChIKey"
+      required: false
+    Substructure:
+      in: query
+      name: substructure
+      description: "Substructure to search for (SMILES)."
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/Substructure"
+      required: false

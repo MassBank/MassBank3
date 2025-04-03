@@ -7,105 +7,30 @@ info:
 paths:
   /records:
     parameters:
-      - in: query
-        name: instrument_type
-        description: Filter by a list of instrument type, which will be associated by OR.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/InstrumentType"
-        required: false
-      - in: query
-        description: Filter by SPLASH.
-        name: splash
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Splash"
-        required: false
-      - in: query
-        description: Filter by a List of MS types, which are associated by OR. If none is given, all is assumed.
-        name: ms_type
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/MSType"
-        required: false
-      - in: query
-        name: ion_mode
-        description: Filter by ion mode. If none is given, both is assumed.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/IonMode"
-        required: false
-      - in: query
-        name: compound_name
-        description: Filter by compound name
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/CompoundName"
-      - in: query
-        name: compound_class
-        description: Filter by compound class
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/CompoundClass"
-        required: false
-      - in: query
-        name: exact_mass
-        description: Filter by exact mass.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/ExactMass"
-      - in: query
-        name: mass_tolerance
-        description: "Tolerance for mass filters. Default: 0.3"
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/MassTolerance"
-      - in: query
-        name: formula
-        description: Filter by formula.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Formula"
-        required: false
-      - in: query
-        name: peaks
-        description: Filter by peaks.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Peaks"
-        required: false
-      - in: query
-        name: intensity
-        description: Intensity for peak search, defaults to 100.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Intensity"
-        required: false
-      - in: query
-        name: neutral_loss
-        description: Filter by neutral losses.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Peaks"
-        required: false
-      - in: query
-        name: peak_list
-        description: Filter by peak list.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/PeakList"
-        required: false
-      - in: query
-        name: inchi
-        description: Filter by InChI
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/InChI"
-        required: false
-      - in: query
-        name: inchi_key
-        description: Filter by InChIKey. Complete or Partial
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/InChIKey"
-        required: false
-      - in: query
-        name: contributor
-        description: a contributor (institution)
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Contributor"
-        required: false
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/Contributor"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/InstrumentType"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/MsType"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/IonMode"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/Splash"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/CompoundName"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/CompoundClass"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/ExactMass"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/MassTolerance"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/Formula"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/Peaks"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/Intensity"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/NeutralLoss"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/PeakList"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/PeakListThreshold"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/InChI"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/InChIKey"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/Substructure"
     get:
-      summary: Get a list of records
+      summary: Get all records.
       operationId: getRecords
       responses:
         "200":
-          description: "A list of records"
+          description: "A list of records."
           content:
             application/json:
               schema:
@@ -114,118 +39,30 @@ paths:
                   $ref: "./schemas/MBRecord.yaml"
   /records/search:
     parameters:
-      - in: query
-        name: instrument_type
-        description: Filter by a list of instrument type, which will be associated by OR.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/InstrumentType"
-        required: false
-      - in: query
-        description: Filter by SPLASH.
-        name: splash
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Splash"
-        required: false
-      - in: query
-        description: Filter by a List of MS types, which are associated by OR. If none is given, all is assumed.
-        name: ms_type
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/MSType"
-        required: false
-      - in: query
-        name: ion_mode
-        description: Filter by ion mode. If none is given, both is assumed.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/IonMode"
-        required: false
-      - in: query
-        name: compound_name
-        description: Filter by compound name
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/CompoundName"
-        required: false
-      - in: query
-        name: compound_class
-        description: Filter by compound class
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/CompoundClass"
-        required: false
-      - in: query
-        name: exact_mass
-        description: Filter by exact mass.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/ExactMass"
-      - in: query
-        name: mass_tolerance
-        description: "Tolerance for mass filters. Default: 0.3"
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/MassTolerance"
-      - in: query
-        name: formula
-        description: Filter by formula.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Formula"
-        required: false
-      - in: query
-        name: peaks
-        description: Filter by peaks.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Peaks"
-        required: false
-      - in: query
-        name: intensity
-        description: Intensity for peak search, defaults to 100.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Intensity"
-        required: false
-      - in: query
-        name: neutral_loss
-        description: Filter by neutral losses.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Peaks"
-        required: false
-      - in: query
-        name: peak_list
-        description: Filter by peak list.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/PeakList"
-        required: false
-      - in: query
-        name: peak_list_threshold
-        description: Threshold as minimal score for peak list search.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/PeakListThreshold"
-        required: false
-      - in: query
-        name: inchi
-        description: Filter by InChI
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/InChI"
-        required: false
-      - in: query
-        name: inchi_key
-        description: Filter by InChIKey. Complete or Partial
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/InChIKey"
-        required: false
-      - in: query
-        name: contributor
-        description: a contributor (institution)
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Contributor"
-        required: false
-      - in: query
-        name: substructure
-        description: "Substructure to search for, in SMILES format."
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Substructure"
-        required: false
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/Contributor"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/InstrumentType"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/MsType"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/IonMode"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/Splash"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/CompoundName"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/CompoundClass"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/ExactMass"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/MassTolerance"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/Formula"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/Peaks"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/Intensity"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/NeutralLoss"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/PeakList"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/PeakListThreshold"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/InChI"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/InChIKey"
+      - $ref: "./schemas/FilterParams.yaml#/components/parameters/Substructure"
     get:
       summary: Get a list of records as a search result in a specific format (accession, similarity score)
       operationId: getSearchResults
       responses:
         "200":
-          description: "A list of search results"
+          description: "A list of search results."
           content:
             application/json:
               schema:
@@ -235,7 +72,7 @@ paths:
     parameters:
       - name: accession
         in: path
-        description: The accession id of the record
+        description: The record by accession id.
         required: true
         schema:
           type: string

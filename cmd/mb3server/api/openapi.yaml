@@ -3,142 +3,118 @@ info:
   title: MassBank3 API
   version: "3.0"
 servers:
-- url: https://api.server.test/v1
+- url: /
 paths:
   /records:
     get:
       operationId: getRecords
       parameters:
-      - description: "Filter by a list of instrument type, which will be associated\
-          \ by OR."
-        explode: true
-        in: query
-        name: instrument_type
-        required: false
-        schema:
-          $ref: '#/components/schemas/InstrumentType'
-        style: form
-      - description: Filter by SPLASH.
-        explode: true
-        in: query
-        name: splash
-        required: false
-        schema:
-          $ref: '#/components/schemas/Splash'
-        style: form
-      - description: "Filter by a List of MS types, which are associated by OR. If\
-          \ none is given, all is assumed."
-        explode: true
-        in: query
-        name: ms_type
-        required: false
-        schema:
-          $ref: '#/components/schemas/MSType'
-        style: form
-      - description: "Filter by ion mode. If none is given, both is assumed."
-        explode: true
-        in: query
-        name: ion_mode
-        required: false
-        schema:
-          $ref: '#/components/schemas/IonMode'
-        style: form
-      - description: Filter by compound name
-        explode: true
-        in: query
-        name: compound_name
-        required: false
-        schema:
-          $ref: '#/components/schemas/CompoundName'
-        style: form
-      - description: Filter by compound class
-        explode: true
-        in: query
-        name: compound_class
-        required: false
-        schema:
-          $ref: '#/components/schemas/CompoundClass'
-        style: form
-      - description: Filter by exact mass.
-        explode: true
-        in: query
-        name: exact_mass
-        required: false
-        schema:
-          $ref: '#/components/schemas/ExactMass'
-        style: form
-      - description: "Tolerance for mass filters. Default: 0.3"
-        explode: true
-        in: query
-        name: mass_tolerance
-        required: false
-        schema:
-          $ref: '#/components/schemas/MassTolerance'
-        style: form
-      - description: Filter by formula.
-        explode: true
-        in: query
-        name: formula
-        required: false
-        schema:
-          $ref: '#/components/schemas/Formula'
-        style: form
-      - description: Filter by peaks.
-        explode: true
-        in: query
-        name: peaks
-        required: false
-        schema:
-          $ref: '#/components/schemas/Peaks'
-        style: form
-      - description: "Intensity for peak search, defaults to 100."
-        explode: true
-        in: query
-        name: intensity
-        required: false
-        schema:
-          $ref: '#/components/schemas/Intensity'
-        style: form
-      - description: Filter by neutral losses.
-        explode: true
-        in: query
-        name: neutral_loss
-        required: false
-        schema:
-          $ref: '#/components/schemas/Peaks'
-        style: form
-      - description: Filter by peak list.
-        explode: true
-        in: query
-        name: peak_list
-        required: false
-        schema:
-          $ref: '#/components/schemas/PeakList'
-        style: form
-      - description: Filter by InChI
-        explode: true
-        in: query
-        name: inchi
-        required: false
-        schema:
-          $ref: '#/components/schemas/InChI'
-        style: form
-      - description: Filter by InChIKey. Complete or Partial
-        explode: true
-        in: query
-        name: inchi_key
-        required: false
-        schema:
-          $ref: '#/components/schemas/InChIKey'
-        style: form
-      - description: a contributor (institution)
-        explode: true
+      - description: Filter by contributors (institutions).
         in: query
         name: contributor
         required: false
         schema:
           $ref: '#/components/schemas/Contributor'
-        style: form
+      - description: Filter by a list of instrument types.
+        in: query
+        name: instrument_type
+        required: false
+        schema:
+          $ref: '#/components/schemas/InstrumentType'
+      - description: "Filter by a List of MS types. If none is given, all is assumed."
+        in: query
+        name: ms_type
+        required: false
+        schema:
+          $ref: '#/components/schemas/MSType'
+      - description: "Filter by ion mode. If none is given, both is assumed."
+        in: query
+        name: ion_mode
+        required: false
+        schema:
+          $ref: '#/components/schemas/IonMode'
+      - description: Filter by SPLASH.
+        in: query
+        name: splash
+        required: false
+        schema:
+          $ref: '#/components/schemas/Splash'
+      - description: Filter by compound name.
+        in: query
+        name: compound_name
+        required: false
+        schema:
+          $ref: '#/components/schemas/CompoundName'
+      - description: Filter by compound class.
+        in: query
+        name: compound_class
+        required: false
+        schema:
+          $ref: '#/components/schemas/CompoundClass'
+      - description: Filter by exact mass.
+        in: query
+        name: exact_mass
+        schema:
+          $ref: '#/components/schemas/ExactMass'
+      - description: "Tolerance for mass filters. Default: 0.1"
+        in: query
+        name: mass_tolerance
+        schema:
+          $ref: '#/components/schemas/MassTolerance'
+      - description: Filter by molecular formula.
+        in: query
+        name: formula
+        required: false
+        schema:
+          $ref: '#/components/schemas/Formula'
+      - description: Filter by peaks.
+        in: query
+        name: peaks
+        required: false
+        schema:
+          $ref: '#/components/schemas/Peaks'
+      - description: Intensity for peak search. Default is 50.
+        in: query
+        name: intensity
+        required: false
+        schema:
+          $ref: '#/components/schemas/Intensity'
+      - description: Filter by peak differences (neutral losses).
+        in: query
+        name: neutral_loss
+        required: false
+        schema:
+          $ref: '#/components/schemas/Peaks'
+      - description: Filter by peak list (similarity search).
+        in: query
+        name: peak_list
+        required: false
+        schema:
+          $ref: '#/components/schemas/PeakList'
+      - description: Threshold as minimal score for peak list search.
+        in: query
+        name: peak_list_threshold
+        required: false
+        schema:
+          $ref: '#/components/schemas/PeakListThreshold'
+      - description: Filter by InChI
+        in: query
+        name: inchi
+        required: false
+        schema:
+          $ref: '#/components/schemas/InChI'
+      - description: Filter by InChIKey.
+        in: query
+        name: inchi_key
+        required: false
+        schema:
+          $ref: '#/components/schemas/InChIKey'
+      - description: Substructure to search for (SMILES).
+        in: query
+        name: substructure
+        required: false
+        schema:
+          $ref: '#/components/schemas/Substructure'
       responses:
         "200":
           content:
@@ -147,172 +123,132 @@ paths:
                 items:
                   $ref: '#/components/schemas/MBRecord'
                 type: array
-          description: A list of records
-      summary: Get a list of records
+          description: A list of records.
+      summary: Get all records.
   /records/search:
     get:
       operationId: getSearchResults
       parameters:
-      - description: "Filter by a list of instrument type, which will be associated\
-          \ by OR."
-        explode: true
-        in: query
-        name: instrument_type
-        required: false
-        schema:
-          $ref: '#/components/schemas/InstrumentType'
-        style: form
-      - description: Filter by SPLASH.
-        explode: true
-        in: query
-        name: splash
-        required: false
-        schema:
-          $ref: '#/components/schemas/Splash'
-        style: form
-      - description: "Filter by a List of MS types, which are associated by OR. If\
-          \ none is given, all is assumed."
-        explode: true
-        in: query
-        name: ms_type
-        required: false
-        schema:
-          $ref: '#/components/schemas/MSType'
-        style: form
-      - description: "Filter by ion mode. If none is given, both is assumed."
-        explode: true
-        in: query
-        name: ion_mode
-        required: false
-        schema:
-          $ref: '#/components/schemas/IonMode'
-        style: form
-      - description: Filter by compound name
-        explode: true
-        in: query
-        name: compound_name
-        required: false
-        schema:
-          $ref: '#/components/schemas/CompoundName'
-        style: form
-      - description: Filter by compound class
-        explode: true
-        in: query
-        name: compound_class
-        required: false
-        schema:
-          $ref: '#/components/schemas/CompoundClass'
-        style: form
-      - description: Filter by exact mass.
-        explode: true
-        in: query
-        name: exact_mass
-        required: false
-        schema:
-          $ref: '#/components/schemas/ExactMass'
-        style: form
-      - description: "Tolerance for mass filters. Default: 0.3"
-        explode: true
-        in: query
-        name: mass_tolerance
-        required: false
-        schema:
-          $ref: '#/components/schemas/MassTolerance'
-        style: form
-      - description: Filter by formula.
-        explode: true
-        in: query
-        name: formula
-        required: false
-        schema:
-          $ref: '#/components/schemas/Formula'
-        style: form
-      - description: Filter by peaks.
-        explode: true
-        in: query
-        name: peaks
-        required: false
-        schema:
-          $ref: '#/components/schemas/Peaks'
-        style: form
-      - description: "Intensity for peak search, defaults to 100."
-        explode: true
-        in: query
-        name: intensity
-        required: false
-        schema:
-          $ref: '#/components/schemas/Intensity'
-        style: form
-      - description: Filter by neutral losses.
-        explode: true
-        in: query
-        name: neutral_loss
-        required: false
-        schema:
-          $ref: '#/components/schemas/Peaks'
-        style: form
-      - description: Filter by peak list.
-        explode: true
-        in: query
-        name: peak_list
-        required: false
-        schema:
-          $ref: '#/components/schemas/PeakList'
-        style: form
-      - description: Threshold as minimal score for peak list search.
-        explode: true
-        in: query
-        name: peak_list_threshold
-        required: false
-        schema:
-          $ref: '#/components/schemas/PeakListThreshold'
-        style: form
-      - description: Filter by InChI
-        explode: true
-        in: query
-        name: inchi
-        required: false
-        schema:
-          $ref: '#/components/schemas/InChI'
-        style: form
-      - description: Filter by InChIKey. Complete or Partial
-        explode: true
-        in: query
-        name: inchi_key
-        required: false
-        schema:
-          $ref: '#/components/schemas/InChIKey'
-        style: form
-      - description: a contributor (institution)
-        explode: true
+      - description: Filter by contributors (institutions).
         in: query
         name: contributor
         required: false
         schema:
           $ref: '#/components/schemas/Contributor'
-        style: form
-      - description: "Substructure to search for, in SMILES format."
-        explode: true
+      - description: Filter by a list of instrument types.
+        in: query
+        name: instrument_type
+        required: false
+        schema:
+          $ref: '#/components/schemas/InstrumentType'
+      - description: "Filter by a List of MS types. If none is given, all is assumed."
+        in: query
+        name: ms_type
+        required: false
+        schema:
+          $ref: '#/components/schemas/MSType'
+      - description: "Filter by ion mode. If none is given, both is assumed."
+        in: query
+        name: ion_mode
+        required: false
+        schema:
+          $ref: '#/components/schemas/IonMode'
+      - description: Filter by SPLASH.
+        in: query
+        name: splash
+        required: false
+        schema:
+          $ref: '#/components/schemas/Splash'
+      - description: Filter by compound name.
+        in: query
+        name: compound_name
+        required: false
+        schema:
+          $ref: '#/components/schemas/CompoundName'
+      - description: Filter by compound class.
+        in: query
+        name: compound_class
+        required: false
+        schema:
+          $ref: '#/components/schemas/CompoundClass'
+      - description: Filter by exact mass.
+        in: query
+        name: exact_mass
+        schema:
+          $ref: '#/components/schemas/ExactMass'
+      - description: "Tolerance for mass filters. Default: 0.1"
+        in: query
+        name: mass_tolerance
+        schema:
+          $ref: '#/components/schemas/MassTolerance'
+      - description: Filter by molecular formula.
+        in: query
+        name: formula
+        required: false
+        schema:
+          $ref: '#/components/schemas/Formula'
+      - description: Filter by peaks.
+        in: query
+        name: peaks
+        required: false
+        schema:
+          $ref: '#/components/schemas/Peaks'
+      - description: Intensity for peak search. Default is 50.
+        in: query
+        name: intensity
+        required: false
+        schema:
+          $ref: '#/components/schemas/Intensity'
+      - description: Filter by peak differences (neutral losses).
+        in: query
+        name: neutral_loss
+        required: false
+        schema:
+          $ref: '#/components/schemas/Peaks'
+      - description: Filter by peak list (similarity search).
+        in: query
+        name: peak_list
+        required: false
+        schema:
+          $ref: '#/components/schemas/PeakList'
+      - description: Threshold as minimal score for peak list search.
+        in: query
+        name: peak_list_threshold
+        required: false
+        schema:
+          $ref: '#/components/schemas/PeakListThreshold'
+      - description: Filter by InChI
+        in: query
+        name: inchi
+        required: false
+        schema:
+          $ref: '#/components/schemas/InChI'
+      - description: Filter by InChIKey.
+        in: query
+        name: inchi_key
+        required: false
+        schema:
+          $ref: '#/components/schemas/InChIKey'
+      - description: Substructure to search for (SMILES).
         in: query
         name: substructure
         required: false
         schema:
           $ref: '#/components/schemas/Substructure'
-        style: form
       responses:
         "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchResult'
-          description: A list of search results
+          description: A list of search results.
       summary: "Get a list of records as a search result in a specific format (accession,\
         \ similarity score)"
   /records/{accession}:
     get:
       operationId: getRecord
       parameters:
-      - description: The accession id of the record
+      - description: The record by accession id.
         explode: false
         in: path
         name: accession
@@ -492,13 +428,141 @@ paths:
           description: A list of similar records
       summary: Get a list of records with similarity scores
 components:
+  parameters:
+    Contributor:
+      description: Filter by contributors (institutions).
+      in: query
+      name: contributor
+      required: false
+      schema:
+        $ref: '#/components/schemas/Contributor'
+    InstrumentType:
+      description: Filter by a list of instrument types.
+      in: query
+      name: instrument_type
+      required: false
+      schema:
+        $ref: '#/components/schemas/InstrumentType'
+    MsType:
+      description: "Filter by a List of MS types. If none is given, all is assumed."
+      in: query
+      name: ms_type
+      required: false
+      schema:
+        $ref: '#/components/schemas/MSType'
+    IonMode:
+      description: "Filter by ion mode. If none is given, both is assumed."
+      in: query
+      name: ion_mode
+      required: false
+      schema:
+        $ref: '#/components/schemas/IonMode'
+    Splash:
+      description: Filter by SPLASH.
+      in: query
+      name: splash
+      required: false
+      schema:
+        $ref: '#/components/schemas/Splash'
+    CompoundName:
+      description: Filter by compound name.
+      in: query
+      name: compound_name
+      required: false
+      schema:
+        $ref: '#/components/schemas/CompoundName'
+    CompoundClass:
+      description: Filter by compound class.
+      in: query
+      name: compound_class
+      required: false
+      schema:
+        $ref: '#/components/schemas/CompoundClass'
+    ExactMass:
+      description: Filter by exact mass.
+      in: query
+      name: exact_mass
+      schema:
+        $ref: '#/components/schemas/ExactMass'
+    MassTolerance:
+      description: "Tolerance for mass filters. Default: 0.1"
+      in: query
+      name: mass_tolerance
+      schema:
+        $ref: '#/components/schemas/MassTolerance'
+    Formula:
+      description: Filter by molecular formula.
+      in: query
+      name: formula
+      required: false
+      schema:
+        $ref: '#/components/schemas/Formula'
+    Peaks:
+      description: Filter by peaks.
+      in: query
+      name: peaks
+      required: false
+      schema:
+        $ref: '#/components/schemas/Peaks'
+    Intensity:
+      description: Intensity for peak search. Default is 50.
+      in: query
+      name: intensity
+      required: false
+      schema:
+        $ref: '#/components/schemas/Intensity'
+    NeutralLoss:
+      description: Filter by peak differences (neutral losses).
+      in: query
+      name: neutral_loss
+      required: false
+      schema:
+        $ref: '#/components/schemas/Peaks'
+    PeakList:
+      description: Filter by peak list (similarity search).
+      in: query
+      name: peak_list
+      required: false
+      schema:
+        $ref: '#/components/schemas/PeakList'
+    PeakListThreshold:
+      description: Threshold as minimal score for peak list search.
+      in: query
+      name: peak_list_threshold
+      required: false
+      schema:
+        $ref: '#/components/schemas/PeakListThreshold'
+    InChI:
+      description: Filter by InChI
+      in: query
+      name: inchi
+      required: false
+      schema:
+        $ref: '#/components/schemas/InChI'
+    InChIKey:
+      description: Filter by InChIKey.
+      in: query
+      name: inchi_key
+      required: false
+      schema:
+        $ref: '#/components/schemas/InChIKey'
+    Substructure:
+      description: Substructure to search for (SMILES).
+      in: query
+      name: substructure
+      required: false
+      schema:
+        $ref: '#/components/schemas/Substructure'
   schemas:
+    Contributor:
+      items:
+        description: The short version of the contributor name
+        type: string
+      type: array
     InstrumentType:
       items:
         type: string
       type: array
-    Splash:
-      type: string
     MSType:
       items:
         enum:
@@ -510,6 +574,8 @@ components:
       type: array
     IonMode:
       description: "enum: [ POSITIVE, NEGATIVE ]"
+      type: string
+    Splash:
       type: string
     CompoundName:
       type: string
@@ -533,7 +599,7 @@ components:
       items:
         description: "A m/z prefixed with \"and\" or \"or\" before a colon, e.g. \"\
           or:143.0\"."
-        pattern: "(and|or):[0-9]+(\\.[0-9]*)?"
+        pattern: "[0-9]+(\\.[0-9]*)?"
         type: string
       type: array
     Intensity:
@@ -545,18 +611,21 @@ components:
     PeakList:
       items:
         description: "A tuple of m/z and intensity, e.g. (193.4;57)"
-        pattern: "\\([0-9]+(\\.[0-9]*)?;[0-9]+\\)"
+        pattern: "([0-9]+(\\.[0-9]*)?;[0-9]+)"
         type: string
       type: array
+    PeakListThreshold:
+      default: 0.8
+      format: double
+      maximum: 1.0
+      minimum: 0.0
+      type: number
     InChI:
       type: string
     InChIKey:
       type: string
-    Contributor:
-      items:
-        description: The short version of the contributor name
-        type: string
-      type: array
+    Substructure:
+      type: string
     MBRecord:
       example:
         date:
@@ -735,14 +804,6 @@ components:
       - license
       - title
       type: object
-    PeakListThreshold:
-      default: 0.8
-      format: double
-      maximum: 1.0
-      minimum: 0.0
-      type: number
-    Substructure:
-      type: string
     SearchResult:
       example:
         data:
@@ -768,22 +829,6 @@ components:
       type: object
     BrowseOptions:
       example:
-        metadata:
-          git_commit: git_commit
-          compound_count: 0
-          compound_class:
-          - name: name
-            count: 1
-          - name: name
-            count: 1
-          spectra_count: 0
-          version: version
-          timestamp: timestamp
-        compound_start:
-        - count: 0
-          value: value
-        - count: 0
-          value: value
         contributor:
         - count: 0
           value: value
@@ -805,8 +850,6 @@ components:
         - count: 0
           value: value
       properties:
-        metadata:
-          $ref: '#/components/schemas/Metadata'
         contributor:
           items:
             $ref: '#/components/schemas/StringCount_inner'
@@ -823,11 +866,11 @@ components:
           items:
             $ref: '#/components/schemas/StringCount_inner'
           type: array
-        compound_start:
-          items:
-            $ref: '#/components/schemas/StringCount_inner'
-          type: array
       type: object
+    StringCount:
+      items:
+        $ref: '#/components/schemas/StringCount_inner'
+      type: array
     Metadata:
       example:
         git_commit: git_commit
@@ -858,10 +901,6 @@ components:
             $ref: '#/components/schemas/Metadata_compound_class_inner'
           type: array
       type: object
-    StringCount:
-      items:
-        $ref: '#/components/schemas/StringCount_inner'
-      type: array
     Limit:
       default: 20
       maximum: 500
@@ -1433,17 +1472,6 @@ components:
             type: string
           type: array
       type: object
-    Metadata_compound_class_inner:
-      example:
-        name: name
-        count: 1
-      properties:
-        name:
-          type: string
-        count:
-          minimum: 1
-          type: integer
-      type: object
     StringCount_inner:
       example:
         count: 0
@@ -1453,6 +1481,17 @@ components:
           type: string
         count:
           minimum: 0
+          type: integer
+      type: object
+    Metadata_compound_class_inner:
+      example:
+        name: name
+        count: 1
+      properties:
+        name:
+          type: string
+        count:
+          minimum: 1
           type: integer
       type: object
     SimilaritySearchResult_data_inner:

@@ -53,8 +53,6 @@ components:
     BrowseOptions:
       type: object
       properties:
-        metadata:
-          $ref: "#/components/schemas/Metadata"
         contributor:
           $ref: "#/components/schemas/StringCount"
         instrument_type:
@@ -62,8 +60,6 @@ components:
         ms_type:
           $ref: "#/components/schemas/StringCount"
         ion_mode:
-          $ref: "#/components/schemas/StringCount"
-        compound_start:
           $ref: "#/components/schemas/StringCount"
     Metadata:
       type: object

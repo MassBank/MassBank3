@@ -112,51 +112,14 @@ func (c *DefaultAPIController) Routes() Routes {
 	}
 }
 
-// GetRecords - Get a list of records
+// GetRecords - Get all records.
 func (c *DefaultAPIController) GetRecords(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
-	instrumentTypeParam := strings.Split(query.Get("instrument_type"), ",")
-	splashParam := query.Get("splash")
-	msTypeParam := strings.Split(query.Get("ms_type"), ",")
-	ionModeParam := query.Get("ion_mode")
-	compoundNameParam := query.Get("compound_name")
-	compoundClassParam := query.Get("compound_class")
-	exactMassParam := query.Get("exact_mass")
-	massToleranceParam, err := parseFloat64Parameter(query.Get("mass_tolerance"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	formulaParam := query.Get("formula")
-	peaksParam := strings.Split(query.Get("peaks"), ",")
-	intensityParam, err := parseInt32Parameter(query.Get("intensity"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	neutralLossParam := strings.Split(query.Get("neutral_loss"), ",")
-	peakListParam := strings.Split(query.Get("peak_list"), ",")
-	inchiParam := query.Get("inchi")
-	inchiKeyParam := query.Get("inchi_key")
 	contributorParam := strings.Split(query.Get("contributor"), ",")
-	result, err := c.service.GetRecords(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, compoundClassParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, neutralLossParam, peakListParam, inchiParam, inchiKeyParam, contributorParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
-
-}
-
-// GetSearchResults - Get a list of records as a search result in a specific format (accession, similarity score)
-func (c *DefaultAPIController) GetSearchResults(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
 	instrumentTypeParam := strings.Split(query.Get("instrument_type"), ",")
-	splashParam := query.Get("splash")
 	msTypeParam := strings.Split(query.Get("ms_type"), ",")
 	ionModeParam := query.Get("ion_mode")
+	splashParam := query.Get("splash")
 	compoundNameParam := query.Get("compound_name")
 	compoundClassParam := query.Get("compound_class")
 	exactMassParam := query.Get("exact_mass")
@@ -181,9 +144,52 @@ func (c *DefaultAPIController) GetSearchResults(w http.ResponseWriter, r *http.R
 	}
 	inchiParam := query.Get("inchi")
 	inchiKeyParam := query.Get("inchi_key")
-	contributorParam := strings.Split(query.Get("contributor"), ",")
 	substructureParam := query.Get("substructure")
-	result, err := c.service.GetSearchResults(r.Context(), instrumentTypeParam, splashParam, msTypeParam, ionModeParam, compoundNameParam, compoundClassParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, neutralLossParam, peakListParam, peakListThresholdParam, inchiParam, inchiKeyParam, contributorParam, substructureParam)
+	result, err := c.service.GetRecords(r.Context(), contributorParam, instrumentTypeParam, msTypeParam, ionModeParam, splashParam, compoundNameParam, compoundClassParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, neutralLossParam, peakListParam, peakListThresholdParam, inchiParam, inchiKeyParam, substructureParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+
+}
+
+// GetSearchResults - Get a list of records as a search result in a specific format (accession, similarity score)
+func (c *DefaultAPIController) GetSearchResults(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	contributorParam := strings.Split(query.Get("contributor"), ",")
+	instrumentTypeParam := strings.Split(query.Get("instrument_type"), ",")
+	msTypeParam := strings.Split(query.Get("ms_type"), ",")
+	ionModeParam := query.Get("ion_mode")
+	splashParam := query.Get("splash")
+	compoundNameParam := query.Get("compound_name")
+	compoundClassParam := query.Get("compound_class")
+	exactMassParam := query.Get("exact_mass")
+	massToleranceParam, err := parseFloat64Parameter(query.Get("mass_tolerance"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	formulaParam := query.Get("formula")
+	peaksParam := strings.Split(query.Get("peaks"), ",")
+	intensityParam, err := parseInt32Parameter(query.Get("intensity"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	neutralLossParam := strings.Split(query.Get("neutral_loss"), ",")
+	peakListParam := strings.Split(query.Get("peak_list"), ",")
+	peakListThresholdParam, err := parseFloat64Parameter(query.Get("peak_list_threshold"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	inchiParam := query.Get("inchi")
+	inchiKeyParam := query.Get("inchi_key")
+	substructureParam := query.Get("substructure")
+	result, err := c.service.GetSearchResults(r.Context(), contributorParam, instrumentTypeParam, msTypeParam, ionModeParam, splashParam, compoundNameParam, compoundClassParam, exactMassParam, massToleranceParam, formulaParam, peaksParam, intensityParam, neutralLossParam, peakListParam, peakListThresholdParam, inchiParam, inchiKeyParam, substructureParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

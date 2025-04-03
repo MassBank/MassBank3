@@ -10,8 +10,6 @@
 package mb3server
 
 type BrowseOptions struct {
-	Metadata Metadata `json:"metadata,omitempty"`
-
 	Contributor []StringCountInner `json:"contributor,omitempty"`
 
 	InstrumentType []StringCountInner `json:"instrument_type,omitempty"`
@@ -19,15 +17,10 @@ type BrowseOptions struct {
 	MsType []StringCountInner `json:"ms_type,omitempty"`
 
 	IonMode []StringCountInner `json:"ion_mode,omitempty"`
-
-	CompoundStart []StringCountInner `json:"compound_start,omitempty"`
 }
 
 // AssertBrowseOptionsRequired checks if the required fields are not zero-ed
 func AssertBrowseOptionsRequired(obj BrowseOptions) error {
-	if err := AssertMetadataRequired(obj.Metadata); err != nil {
-		return err
-	}
 	for _, el := range obj.Contributor {
 		if err := AssertStringCountInnerRequired(el); err != nil {
 			return err
@@ -44,11 +37,6 @@ func AssertBrowseOptionsRequired(obj BrowseOptions) error {
 		}
 	}
 	for _, el := range obj.IonMode {
-		if err := AssertStringCountInnerRequired(el); err != nil {
-			return err
-		}
-	}
-	for _, el := range obj.CompoundStart {
 		if err := AssertStringCountInnerRequired(el); err != nil {
 			return err
 		}

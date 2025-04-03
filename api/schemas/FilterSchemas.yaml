@@ -21,7 +21,7 @@ components:
     ExactMass:
       description: 'A mass prefixed with "and" or "or" before a colon, e.g. "or:122.0".'
       type: string
-      pattern: "(and|or):[0-9]+(\\.[0-9]*)?"
+      pattern: "[0-9]+(\\.[0-9]*)?"
     MassTolerance:
       type: number
       format: double
@@ -29,13 +29,13 @@ components:
     Formula:
       description: 'A chemical formula prefixed with "and" or "or" before a colon, e.g. "or:C6H7N5".'
       type: string
-      pattern: "(and|or):(([A-Z][a-z]*[0-9]*)|\\*)*"
+      pattern: "(([A-Z][a-z]{0,1}[0-9]*))+"
     Peaks:
       type: array
       items:
         type: string
         description: 'A m/z prefixed with "and" or "or" before a colon, e.g. "or:143.0".'
-        pattern: "(and|or):[0-9]+(\\.[0-9]*)?"
+        pattern: "[0-9]+(\\.[0-9]*)?"
     Intensity:
       description: "Relative intensity for peak search"
       type: integer
@@ -47,18 +47,20 @@ components:
       items:
         type: string
         description: "A tuple of m/z and intensity, e.g. (193.4;57)"
-        pattern: "\\([0-9]+(\\.[0-9]*)?;[0-9]+\\)"
+        pattern: "([0-9]+(\\.[0-9]*)?;[0-9]+)"
     PeakListThreshold:
       type: number
       format: double
       minimum: 0.0
       maximum: 1.0
       default: 0.8
+      required: true
     Limit:
       type: integer
       minimum: 1
       maximum: 500
       default: 20
+      required: false
     InChI:
       type: string
     InChIKey:

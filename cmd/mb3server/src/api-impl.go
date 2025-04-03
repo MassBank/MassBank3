@@ -510,29 +510,32 @@ func GetSimpleRecord(accession string) (*MbRecord, error) {
 	return &result, nil
 }
 
-func GetRecords(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, compoundClass string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, neutralLoss []string, peakList []string, inchi string, inchiKey string, contributor []string) (*[]MbRecord, error) {
+func GetRecords(contributor []string, instrumentType []string, msType []string, ionMode string, splash string, compoundName string, compoundClass string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, neutralLoss []string, peakList []string, peakListThreshold float64, inchi string, inchiKey string, substructure string) (*[]MbRecord, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
 
-	filters, err := buildFilters(instrumentType, splash, msType, ionMode, compoundName, compoundClass, exactMass, massTolerance, formula, peaks, intensity, neutralLoss, inchi, inchiKey, contributor)
-	if err != nil {
-		return nil, err
-	}
-	records, err := db.GetRecords(*filters)
+	searchResult, err := GetSearchResults(contributor, instrumentType, msType, ionMode, splash, compoundName, compoundClass, exactMass, massTolerance, formula, peaks, intensity, neutralLoss, peakList, peakListThreshold, inchi, inchiKey, substructure)
 	if err != nil {
 		return nil, err
 	}
 
 	result := []MbRecord{}
-	for _, record := range *records {
-		result = append(result, *buildMbRecord(&record))
+	for _, searchResultDataInner := range searchResult.Data {
+		record, err := db.GetRecord(&searchResultDataInner.Accession)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, *buildMbRecord(record))
 	}
 
 	return &result, nil
 }
 
 func GetVersion() (string, error) {
+	if err := initDB(); err != nil {
+		return "", err
+	}
 
 	return "test version, test timestamp", nil
 }
@@ -619,7 +622,7 @@ func GetMetadata() (*Metadata, error) {
 	return &result, nil
 }
 
-func GetSearchResults(instrumentType []string, splash string, msType []string, ionMode string, compoundName string, compoundClass string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, neutralLoss []string, peakList []string, peakListThreshold float64, inchi string, inchiKey string, contributor []string, substructure string) (*SearchResult, error) {
+func GetSearchResults(contributor []string, instrumentType []string, msType []string, ionMode string, splash string, compoundName string, compoundClass string, exactMass string, massTolerance float64, formula string, peaks []string, intensity int32, neutralLoss []string, peakList []string, peakListThreshold float64, inchi string, inchiKey string, substructure string) (*SearchResult, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
