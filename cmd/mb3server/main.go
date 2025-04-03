@@ -50,5 +50,5 @@ func addSwaggerEndpoint(router chi.Router) {
 		panic("failed to create sub filesystem: " + err.Error())
 	}
 
-	router.Handle("/swagger-ui/*", http.StripPrefix("/swagger-ui/", http.FileServer(http.FS(fsys))))
+	router.Handle("/ui/*", http.StripPrefix("/ui/", http.FileServer(http.FS(fsys))))
 }
