@@ -1,11 +1,6 @@
 # Overwrite ingress path properties for massbank3-frontend
 host: msbi.ipb-halle.de
-ingress:
-  hosts:
-    - host: msbi.ipb-halle.de
-      paths:
-        - path: /MassBank3(/|$)(.*)
-          pathType: ImplementationSpecific
+pathPrefix: MassBank3
 
 # Overwrite ingress path properties for massbank3-server
 massbank3-server:
