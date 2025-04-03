@@ -6,4 +6,4 @@ metadata:
     {{- include "massbank3-export-service.labels" . | nindent 4 }}
 data:
   MB_DATA_DIRECTORY: "/MassBank-data"
-  CORS_ALLOWED_ORIGINS: "https://msbi.ipb-halle.de/MassBank/"
+  CORS_ALLOWED_ORIGINS: "https://{{ .Values.host }}/{{ .Values.pathPrefix }}/"

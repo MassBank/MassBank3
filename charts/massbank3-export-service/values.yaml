@@ -5,6 +5,9 @@
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
 
+host: "msbi.ipb-halle.de"
+pathPrefix: "MassBank"
+
 image:
   repository: quay.io/massbank/massbank3-export-service
   tag: "v1.4"
@@ -62,9 +65,9 @@ ingress:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
   hosts:
-    - host: msbi.ipb-halle.de
+    - host: "{{ .Values.host }}"
       paths:
-        - path: /MassBank-export(/|$)(.*)
+        - path: "/{{ .Values.pathPrefix }}-export(/|$)(.*)"
           pathType: ImplementationSpecific
   tls: []
   #  - secretName: chart-example-tls

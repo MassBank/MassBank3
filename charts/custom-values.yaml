@@ -2,6 +2,10 @@
 host: msbi.ipb-halle.de
 pathPrefix: MassBank3
 
+massbank3-export-service:
+  host: msbi.ipb-halle.de
+  pathPrefix: MassBank3
+
 # Overwrite ingress path properties for massbank3-server
 massbank3-server:
   ingress:
@@ -11,11 +15,3 @@ massbank3-server:
           - path: /MassBank3-api(/|$)(.*)
             pathType: ImplementationSpecific
 
-# Overwrite ingress path properties for massbank3-export-service
-massbank3-export-service:
-  ingress:
-    hosts:
-      - host: msbi.ipb-halle.de
-        paths:
-          - path: /MassBank3-export(/|$)(.*)
-            pathType: ImplementationSpecific
