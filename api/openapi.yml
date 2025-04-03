@@ -3,7 +3,7 @@ info:
   title: "MassBank3 API"
   version: "3.0"
 # servers:
-#   - url: "https://api.server.test/v1"
+#   - url: "http://localhost:8081"
 paths:
   /records:
     parameters:
