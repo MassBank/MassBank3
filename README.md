@@ -80,4 +80,6 @@ Description is coming soon.
 
 # REST API
 
-Description is coming soon.
+There is a [graphical interface](https://msbi.ipb-halle.de/MassBank-api/ui/) via Swagger UI to have insights into the different API endpoints and their specifications.
+
+Further descriptions will be available soon.
