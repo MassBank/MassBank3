@@ -25,11 +25,11 @@ spec:
   {{- end }}
   rules:
     {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
+    - host: {{ tpl .host $ | quote }}
       http:
         paths:
           {{- range .paths }}
-          - path: {{ .path }}
+          - path: {{ tpl .path $ }}
             {{- with .pathType }}
             pathType: {{ . }}
             {{- end }}
