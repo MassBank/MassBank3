@@ -27,8 +27,8 @@ func NewDefaultApiService() *DefaultAPIService {
 }
 
 // GetBrowseOptions - get browse options
-func (s *DefaultAPIService) GetBrowseOptions(ctx context.Context, instrumentType []string, msType []string, ionMode string, contributor []string) (ImplResponse, error) {
-	opt, err := GetBrowseOptions(instrumentType, msType, ionMode, contributor)
+func (s *DefaultAPIService) GetBrowseOptions(ctx context.Context, contributor []string, instrumentType []string, msType []string, ionMode string) (ImplResponse, error) {
+	opt, err := GetBrowseOptions(contributor, instrumentType, msType, ionMode)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			return Response(http.StatusInternalServerError, nil), err
@@ -103,8 +103,8 @@ func (s *DefaultAPIService) GetStatus(ctx context.Context) (ImplResponse, error)
 }
 
 // GetSimilarity implements DefaultAPIServicer.
-func (s *DefaultAPIService) GetSimilarity(ctx context.Context, peakList []string, referenceSpectraList []string, limit int32, threshold float64) (ImplResponse, error) {
-	result, err := GetSimilarity(peakList, referenceSpectraList, limit, threshold)
+func (s *DefaultAPIService) GetSimilarity(ctx context.Context, peakList []string, threshold float64, referenceSpectraList []string) (ImplResponse, error) {
+	result, err := GetSimilarity(peakList, threshold, referenceSpectraList)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			return Response(http.StatusInternalServerError, nil), err

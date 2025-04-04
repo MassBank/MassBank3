@@ -9,107 +9,116 @@ paths:
     get:
       operationId: getRecords
       parameters:
-      - description: Filter by contributors (institutions).
+      - description: "The short version of the contributor name, e.g. AAFC or UFZ."
+        explode: false
         in: query
         name: contributor
         required: false
         schema:
           $ref: '#/components/schemas/Contributor'
-      - description: Filter by a list of instrument types.
+      - description: "The type of instrument used for the measurement, e.g. ESI-TOF."
+        explode: false
         in: query
         name: instrument_type
         required: false
         schema:
           $ref: '#/components/schemas/InstrumentType'
-      - description: "Filter by a List of MS types. If none is given, all is assumed."
+      - description: "The type of mass spectrometry. ENUM: [MS, MS2, MS3, MS4]."
+        explode: false
         in: query
         name: ms_type
         required: false
         schema:
-          $ref: '#/components/schemas/MSType'
-      - description: "Filter by ion mode. If none is given, both is assumed."
+          $ref: '#/components/schemas/MsType'
+      - description: "The ion mode. ENUM: [POSITIVE, NEGATIVE]"
+        explode: false
         in: query
         name: ion_mode
         required: false
         schema:
           $ref: '#/components/schemas/IonMode'
-      - description: Filter by SPLASH.
+      - description: "The SPLASH string, e.g. splash10-03fr-0900000000-035ec76d23650a15673b."
         in: query
         name: splash
         required: false
         schema:
           $ref: '#/components/schemas/Splash'
-      - description: Filter by compound name.
+      - description: "A compound name, e.g. Rutin."
         in: query
         name: compound_name
         required: false
         schema:
           $ref: '#/components/schemas/CompoundName'
-      - description: Filter by compound class.
+      - description: "A compound class, e.g. Flavonoids or Natural Product."
         in: query
         name: compound_class
         required: false
         schema:
           $ref: '#/components/schemas/CompoundClass'
-      - description: Filter by exact mass.
+      - description: "A m/z value, e.g. 122.02."
         in: query
         name: exact_mass
         schema:
           $ref: '#/components/schemas/ExactMass'
-      - description: "Tolerance for mass filters. Default: 0.1"
+      - description: "A mass tolerance value, e.g. 0.3."
         in: query
         name: mass_tolerance
         schema:
           $ref: '#/components/schemas/MassTolerance'
-      - description: Filter by molecular formula.
+      - description: "A molecular formula, e.g. C6H7N5."
         in: query
         name: formula
         required: false
         schema:
           $ref: '#/components/schemas/Formula'
-      - description: Filter by peaks.
+      - description: "A list of m/z values, e.g. 147.063."
+        explode: false
         in: query
         name: peaks
         required: false
         schema:
           $ref: '#/components/schemas/Peaks'
-      - description: Intensity for peak search. Default is 50.
+      - description: "Relative intensity commonly used for peak search, similarity\
+          \ search and neutral loss search."
         in: query
         name: intensity
         required: false
         schema:
           $ref: '#/components/schemas/Intensity'
-      - description: Filter by peak differences (neutral losses).
+      - description: "A list of m/z values for peak differences (neutral loss) search,\
+          \ e.g. 147.063."
+        explode: false
         in: query
         name: neutral_loss
         required: false
         schema:
           $ref: '#/components/schemas/Peaks'
-      - description: Filter by peak list (similarity search).
+      - description: "A list of tuples of m/z values and (relative) intensities. Both\
+          \ values in a tuple need to be separated by a semi-colon, e.g. '147.063;11'."
+        explode: false
         in: query
         name: peak_list
-        required: false
         schema:
           $ref: '#/components/schemas/PeakList'
-      - description: Threshold as minimal score for peak list search.
+      - description: A threshold value (lowest allowed similarity score) for the similarity
+          search.
         in: query
         name: peak_list_threshold
-        required: false
         schema:
           $ref: '#/components/schemas/PeakListThreshold'
-      - description: Filter by InChI
+      - description: "The InChI string, e.g. InChI=1S/C10H10O3/c1-6-5-7-3-2-4-8(11)9(7)10(12)13-6/h2-4,6,11H,5H2,1H3"
         in: query
         name: inchi
         required: false
         schema:
           $ref: '#/components/schemas/InChI'
-      - description: Filter by InChIKey.
+      - description: "The InChIKey string, e.g. KWILGNNWGSNMPA-UHFFFAOYSA-N."
         in: query
         name: inchi_key
         required: false
         schema:
           $ref: '#/components/schemas/InChIKey'
-      - description: Substructure to search for (SMILES).
+      - description: "A SMILES string for substructure search, e.g. CC1CC2=C(C(=CC=C2)O)C(=O)O1."
         in: query
         name: substructure
         required: false
@@ -124,112 +133,121 @@ paths:
                   $ref: '#/components/schemas/MBRecord'
                 type: array
           description: A list of records.
-      summary: Get all records.
+      summary: "Get records, filtered by the given parameters."
   /records/search:
     get:
       operationId: getSearchResults
       parameters:
-      - description: Filter by contributors (institutions).
+      - description: "The short version of the contributor name, e.g. AAFC or UFZ."
+        explode: false
         in: query
         name: contributor
         required: false
         schema:
           $ref: '#/components/schemas/Contributor'
-      - description: Filter by a list of instrument types.
+      - description: "The type of instrument used for the measurement, e.g. ESI-TOF."
+        explode: false
         in: query
         name: instrument_type
         required: false
         schema:
           $ref: '#/components/schemas/InstrumentType'
-      - description: "Filter by a List of MS types. If none is given, all is assumed."
+      - description: "The type of mass spectrometry. ENUM: [MS, MS2, MS3, MS4]."
+        explode: false
         in: query
         name: ms_type
         required: false
         schema:
-          $ref: '#/components/schemas/MSType'
-      - description: "Filter by ion mode. If none is given, both is assumed."
+          $ref: '#/components/schemas/MsType'
+      - description: "The ion mode. ENUM: [POSITIVE, NEGATIVE]"
+        explode: false
         in: query
         name: ion_mode
         required: false
         schema:
           $ref: '#/components/schemas/IonMode'
-      - description: Filter by SPLASH.
+      - description: "The SPLASH string, e.g. splash10-03fr-0900000000-035ec76d23650a15673b."
         in: query
         name: splash
         required: false
         schema:
           $ref: '#/components/schemas/Splash'
-      - description: Filter by compound name.
+      - description: "A compound name, e.g. Rutin."
         in: query
         name: compound_name
         required: false
         schema:
           $ref: '#/components/schemas/CompoundName'
-      - description: Filter by compound class.
+      - description: "A compound class, e.g. Flavonoids or Natural Product."
         in: query
         name: compound_class
         required: false
         schema:
           $ref: '#/components/schemas/CompoundClass'
-      - description: Filter by exact mass.
+      - description: "A m/z value, e.g. 122.02."
         in: query
         name: exact_mass
         schema:
           $ref: '#/components/schemas/ExactMass'
-      - description: "Tolerance for mass filters. Default: 0.1"
+      - description: "A mass tolerance value, e.g. 0.3."
         in: query
         name: mass_tolerance
         schema:
           $ref: '#/components/schemas/MassTolerance'
-      - description: Filter by molecular formula.
+      - description: "A molecular formula, e.g. C6H7N5."
         in: query
         name: formula
         required: false
         schema:
           $ref: '#/components/schemas/Formula'
-      - description: Filter by peaks.
+      - description: "A list of m/z values, e.g. 147.063."
+        explode: false
         in: query
         name: peaks
         required: false
         schema:
           $ref: '#/components/schemas/Peaks'
-      - description: Intensity for peak search. Default is 50.
+      - description: "Relative intensity commonly used for peak search, similarity\
+          \ search and neutral loss search."
         in: query
         name: intensity
         required: false
         schema:
           $ref: '#/components/schemas/Intensity'
-      - description: Filter by peak differences (neutral losses).
+      - description: "A list of m/z values for peak differences (neutral loss) search,\
+          \ e.g. 147.063."
+        explode: false
         in: query
         name: neutral_loss
         required: false
         schema:
           $ref: '#/components/schemas/Peaks'
-      - description: Filter by peak list (similarity search).
+      - description: "A list of tuples of m/z values and (relative) intensities. Both\
+          \ values in a tuple need to be separated by a semi-colon, e.g. '147.063;11'."
+        explode: false
         in: query
         name: peak_list
-        required: false
         schema:
           $ref: '#/components/schemas/PeakList'
-      - description: Threshold as minimal score for peak list search.
+      - description: A threshold value (lowest allowed similarity score) for the similarity
+          search.
         in: query
         name: peak_list_threshold
-        required: false
         schema:
           $ref: '#/components/schemas/PeakListThreshold'
-      - description: Filter by InChI
+      - description: "The InChI string, e.g. InChI=1S/C10H10O3/c1-6-5-7-3-2-4-8(11)9(7)10(12)13-6/h2-4,6,11H,5H2,1H3"
         in: query
         name: inchi
         required: false
         schema:
           $ref: '#/components/schemas/InChI'
-      - description: Filter by InChIKey.
+      - description: "The InChIKey string, e.g. KWILGNNWGSNMPA-UHFFFAOYSA-N."
         in: query
         name: inchi_key
         required: false
         schema:
           $ref: '#/components/schemas/InChIKey'
-      - description: Substructure to search for (SMILES).
+      - description: "A SMILES string for substructure search, e.g. CC1CC2=C(C(=CC=C2)O)C(=O)O1."
         in: query
         name: substructure
         required: false
@@ -248,7 +266,7 @@ paths:
     get:
       operationId: getRecord
       parameters:
-      - description: The record by accession id.
+      - description: "The accession of a record, e.g. MSBNK-AAFC-AC000001."
         explode: false
         in: path
         name: accession
@@ -262,13 +280,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MBRecord'
-          description: A MassBank record
-      summary: Get a MassBank record
+          description: A MassBank record.
+      summary: Get a MassBank record.
   /records/{accession}/simple:
     get:
       operationId: getSimpleRecord
       parameters:
-      - description: The accession id of the record
+      - description: "The accession of a record, e.g. MSBNK-AAFC-AC000001."
         explode: false
         in: path
         name: accession
@@ -283,7 +301,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/MBRecord'
           description: "A simple MassBank record (accession, title, peaks, smiles)"
-      summary: "Get a MassBank record in simple format (accession, title, peaks, smiles)"
+      summary: "Get a MassBank record in with reduced information level (accession,\
+        \ title, peaks, smiles)."
   /records/count:
     get:
       operationId: getCount
@@ -294,45 +313,39 @@ paths:
               schema:
                 type: string
           description: The record count
-      summary: The number of all records
+      summary: The number of all records in the database.
   /filter/browse:
     get:
       operationId: getBrowseOptions
       parameters:
-      - description: "Filter by a list of instrument type, which will be associated\
-          \ by OR."
-        explode: true
-        in: query
-        name: instrument_type
-        required: false
-        schema:
-          $ref: '#/components/schemas/InstrumentType'
-        style: form
-      - description: "Filter by a List of MS types, which are associated by OR. If\
-          \ none is given, all is assumed."
-        explode: true
-        in: query
-        name: ms_type
-        required: false
-        schema:
-          $ref: '#/components/schemas/MSType'
-        style: form
-      - description: "Filter by ion mode. If none is given, both is assumed."
-        explode: true
-        in: query
-        name: ion_mode
-        required: false
-        schema:
-          $ref: '#/components/schemas/IonMode'
-        style: form
-      - description: a contributor (institution)
-        explode: true
+      - description: "The short version of the contributor name, e.g. AAFC or UFZ."
+        explode: false
         in: query
         name: contributor
         required: false
         schema:
           $ref: '#/components/schemas/Contributor'
-        style: form
+      - description: "The type of instrument used for the measurement, e.g. ESI-TOF."
+        explode: false
+        in: query
+        name: instrument_type
+        required: false
+        schema:
+          $ref: '#/components/schemas/InstrumentType'
+      - description: "The type of mass spectrometry. ENUM: [MS, MS2, MS3, MS4]."
+        explode: false
+        in: query
+        name: ms_type
+        required: false
+        schema:
+          $ref: '#/components/schemas/MsType'
+      - description: "The ion mode. ENUM: [POSITIVE, NEGATIVE]"
+        explode: false
+        in: query
+        name: ion_mode
+        required: false
+        schema:
+          $ref: '#/components/schemas/IonMode'
       responses:
         "200":
           content:
@@ -340,7 +353,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/BrowseOptions'
           description: All browse options
-      summary: get browse options
+      summary: "Get all browse options (contributor, instrument type, ms type, ion\
+        \ mode)."
   /metadata:
     get:
       operationId: getMetadata
@@ -351,7 +365,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Metadata'
           description: Metadata for database and datasets
-      summary: get massbank metadata
+      summary: "Get the metadata of the database and the current dataset in use. It\
+        \ includes the version, timestamp, git commit hash, unique spectra count (SPLASH),\
+        \ unique compound count (InChI) and all compound classes with counts."
   /version:
     get:
       operationId: getVersion
@@ -362,8 +378,8 @@ paths:
               schema:
                 example: "MassBank API service 0.1, 2025-01-22T14:20:57+01:00"
                 type: string
-          description: Version for MassBank API with timestamp of build
-      summary: get API version
+          description: Version for MassBank API with timestamp of build.
+      summary: Get the current API version.
   /status:
     get:
       operationId: getStatus
@@ -373,207 +389,200 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/getStatus_200_response'
-          description: Status of the API and attached services
-      summary: get API status
+          description: Status of the attached services.
+      summary: "Get the status of the attached services (postgres, export service,\
+        \ similarity service)."
   /similarity:
     get:
       operationId: getSimilarity
       parameters:
-      - description: Filter by peak list.
-        explode: true
+      - description: "A list of tuples of m/z values and (relative) intensities. Both\
+          \ values in a tuple need to be separated by a semi-colon, e.g. '147.063;11'."
+        explode: false
         in: query
         name: peak_list
-        required: true
         schema:
           $ref: '#/components/schemas/PeakList'
-        style: form
-      - description: Filter by reference spectra list.
-        explode: true
+      - description: A threshold value (lowest allowed similarity score) for the similarity
+          search.
+        in: query
+        name: peak_list_threshold
+        schema:
+          $ref: '#/components/schemas/PeakListThreshold'
+      - description: A list of reference spectra IDs (accessions) to use during similarity
+          search.
+        explode: false
         in: query
         name: reference_spectra_list
         required: false
         schema:
-          example:
-          - MSBNK-IPB_Halle-PB001341
-          - MSBNK-IPB_Halle-PB006202
-          - MSBNK-IPB_Halle-PB006203
-          - MSBNK-IPB_Halle-PB001342
-          - MSBNK-IPB_Halle-PB001343
-          items:
-            type: string
-          type: array
-        style: form
-      - description: Maximum number of results.
-        explode: true
-        in: query
-        name: limit
-        required: false
-        schema:
-          $ref: '#/components/schemas/Limit'
-        style: form
-      - description: Threshold as minimal score.
-        explode: true
-        in: query
-        name: threshold
-        required: false
-        schema:
-          $ref: '#/components/schemas/PeakListThreshold'
-        style: form
+          $ref: '#/components/schemas/ReferenceSpectraList'
       responses:
         "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SimilaritySearchResult'
-          description: A list of similar records
-      summary: Get a list of records with similarity scores
+          description: A list of records with similarity scores.
+      summary: Get a list of records with similarity scores.
 components:
   parameters:
     Contributor:
-      description: Filter by contributors (institutions).
+      description: "The short version of the contributor name, e.g. AAFC or UFZ."
+      explode: false
       in: query
       name: contributor
       required: false
       schema:
         $ref: '#/components/schemas/Contributor'
     InstrumentType:
-      description: Filter by a list of instrument types.
+      description: "The type of instrument used for the measurement, e.g. ESI-TOF."
+      explode: false
       in: query
       name: instrument_type
       required: false
       schema:
         $ref: '#/components/schemas/InstrumentType'
     MsType:
-      description: "Filter by a List of MS types. If none is given, all is assumed."
+      description: "The type of mass spectrometry. ENUM: [MS, MS2, MS3, MS4]."
+      explode: false
       in: query
       name: ms_type
       required: false
       schema:
-        $ref: '#/components/schemas/MSType'
+        $ref: '#/components/schemas/MsType'
     IonMode:
-      description: "Filter by ion mode. If none is given, both is assumed."
+      description: "The ion mode. ENUM: [POSITIVE, NEGATIVE]"
+      explode: false
       in: query
       name: ion_mode
       required: false
       schema:
         $ref: '#/components/schemas/IonMode'
     Splash:
-      description: Filter by SPLASH.
+      description: "The SPLASH string, e.g. splash10-03fr-0900000000-035ec76d23650a15673b."
       in: query
       name: splash
       required: false
       schema:
         $ref: '#/components/schemas/Splash'
     CompoundName:
-      description: Filter by compound name.
+      description: "A compound name, e.g. Rutin."
       in: query
       name: compound_name
       required: false
       schema:
         $ref: '#/components/schemas/CompoundName'
     CompoundClass:
-      description: Filter by compound class.
+      description: "A compound class, e.g. Flavonoids or Natural Product."
       in: query
       name: compound_class
       required: false
       schema:
         $ref: '#/components/schemas/CompoundClass'
     ExactMass:
-      description: Filter by exact mass.
+      description: "A m/z value, e.g. 122.02."
       in: query
       name: exact_mass
       schema:
         $ref: '#/components/schemas/ExactMass'
     MassTolerance:
-      description: "Tolerance for mass filters. Default: 0.1"
+      description: "A mass tolerance value, e.g. 0.3."
       in: query
       name: mass_tolerance
       schema:
         $ref: '#/components/schemas/MassTolerance'
     Formula:
-      description: Filter by molecular formula.
+      description: "A molecular formula, e.g. C6H7N5."
       in: query
       name: formula
       required: false
       schema:
         $ref: '#/components/schemas/Formula'
     Peaks:
-      description: Filter by peaks.
+      description: "A list of m/z values, e.g. 147.063."
+      explode: false
       in: query
       name: peaks
       required: false
       schema:
         $ref: '#/components/schemas/Peaks'
     Intensity:
-      description: Intensity for peak search. Default is 50.
+      description: "Relative intensity commonly used for peak search, similarity search\
+        \ and neutral loss search."
       in: query
       name: intensity
       required: false
       schema:
         $ref: '#/components/schemas/Intensity'
     NeutralLoss:
-      description: Filter by peak differences (neutral losses).
+      description: "A list of m/z values for peak differences (neutral loss) search,\
+        \ e.g. 147.063."
+      explode: false
       in: query
       name: neutral_loss
       required: false
       schema:
         $ref: '#/components/schemas/Peaks'
     PeakList:
-      description: Filter by peak list (similarity search).
+      description: "A list of tuples of m/z values and (relative) intensities. Both\
+        \ values in a tuple need to be separated by a semi-colon, e.g. '147.063;11'."
+      explode: false
       in: query
       name: peak_list
-      required: false
       schema:
         $ref: '#/components/schemas/PeakList'
     PeakListThreshold:
-      description: Threshold as minimal score for peak list search.
+      description: A threshold value (lowest allowed similarity score) for the similarity
+        search.
       in: query
       name: peak_list_threshold
-      required: false
       schema:
         $ref: '#/components/schemas/PeakListThreshold'
     InChI:
-      description: Filter by InChI
+      description: "The InChI string, e.g. InChI=1S/C10H10O3/c1-6-5-7-3-2-4-8(11)9(7)10(12)13-6/h2-4,6,11H,5H2,1H3"
       in: query
       name: inchi
       required: false
       schema:
         $ref: '#/components/schemas/InChI'
     InChIKey:
-      description: Filter by InChIKey.
+      description: "The InChIKey string, e.g. KWILGNNWGSNMPA-UHFFFAOYSA-N."
       in: query
       name: inchi_key
       required: false
       schema:
         $ref: '#/components/schemas/InChIKey'
     Substructure:
-      description: Substructure to search for (SMILES).
+      description: "A SMILES string for substructure search, e.g. CC1CC2=C(C(=CC=C2)O)C(=O)O1."
       in: query
       name: substructure
       required: false
       schema:
         $ref: '#/components/schemas/Substructure'
+    ReferenceSpectraList:
+      description: A list of reference spectra IDs (accessions) to use during similarity
+        search.
+      explode: false
+      in: query
+      name: reference_spectra_list
+      required: false
+      schema:
+        $ref: '#/components/schemas/ReferenceSpectraList'
   schemas:
     Contributor:
       items:
-        description: The short version of the contributor name
         type: string
       type: array
     InstrumentType:
       items:
         type: string
       type: array
-    MSType:
+    MsType:
       items:
-        enum:
-        - MS
-        - MS2
-        - MS3
-        - MS4
         type: string
       type: array
     IonMode:
-      description: "enum: [ POSITIVE, NEGATIVE ]"
       type: string
     Splash:
       type: string
@@ -582,37 +591,30 @@ components:
     CompoundClass:
       type: string
     ExactMass:
-      description: "A mass prefixed with \"and\" or \"or\" before a colon, e.g. \"\
-        or:122.0\"."
-      pattern: "(and|or):[0-9]+(\\.[0-9]*)?"
+      pattern: "[0-9]+(\\.[0-9]*)?"
       type: string
     MassTolerance:
       default: 0.3
       format: double
       type: number
     Formula:
-      description: "A chemical formula prefixed with \"and\" or \"or\" before a colon,\
-        \ e.g. \"or:C6H7N5\"."
-      pattern: "(and|or):(([A-Z][a-z]*[0-9]*)|\\*)*"
+      pattern: "(([A-Z][a-z]{0,1}[0-9]*))+"
       type: string
     Peaks:
       items:
-        description: "A m/z prefixed with \"and\" or \"or\" before a colon, e.g. \"\
-          or:143.0\"."
         pattern: "[0-9]+(\\.[0-9]*)?"
         type: string
       type: array
     Intensity:
-      default: 100
-      description: Relative intensity for peak search
-      maximum: 100
+      default: 50
+      maximum: 1000
       minimum: 1
       type: integer
     PeakList:
       items:
-        description: "A tuple of m/z and intensity, e.g. (193.4;57)"
-        pattern: "([0-9]+(\\.[0-9]*)?;[0-9]+)"
+        pattern: "[0-9]+(\\.[0-9]*)?;[0-9]+"
         type: string
+      minItems: 1
       type: array
     PeakListThreshold:
       default: 0.8
@@ -621,8 +623,10 @@ components:
       minimum: 0.0
       type: number
     InChI:
+      description: The InChI string.
       type: string
     InChIKey:
+      description: The InChIKey string.
       type: string
     Substructure:
       type: string
@@ -901,11 +905,11 @@ components:
             $ref: '#/components/schemas/Metadata_compound_class_inner'
           type: array
       type: object
-    Limit:
-      default: 20
-      maximum: 500
-      minimum: 1
-      type: integer
+    ReferenceSpectraList:
+      default: []
+      items:
+        type: string
+      type: array
     SimilaritySearchResult:
       example:
         data:

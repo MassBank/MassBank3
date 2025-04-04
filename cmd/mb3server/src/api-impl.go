@@ -28,7 +28,7 @@ func initDB() error {
 	return err
 }
 
-func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, contributor []string) (*BrowseOptions, error) {
+func GetBrowseOptions(contributor []string, instrumentTyoe []string, msType []string, ionMode string) (*BrowseOptions, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
@@ -61,16 +61,6 @@ func GetBrowseOptions(instrumentTyoe []string, msType []string, ionMode string, 
 		return nil, err
 	}
 	var result = BrowseOptions{}
-	// metadata, err := db.GetMetaData()
-	// println(metadata)
-	// result.Metadata = Metadata{
-	// 	Version:       metadata.StoredMetadata.Version,
-	// 	Timestamp:     metadata.StoredMetadata.TimeStamp,
-	// 	GitCommit:     metadata.StoredMetadata.GitCommit,
-	// 	SpectraCount:  int32(metadata.SpectraCount),
-	// 	CompoundCount: int32(metadata.CompoundCount),
-	// 	IsomerCount:   int32(metadata.IsomerCount),
-	// }
 	for _, val := range vals.IonMode {
 		result.IonMode = append(result.IonMode, StringCountInner{
 			Value: val.Val,
@@ -657,7 +647,7 @@ func GetSearchResults(contributor []string, instrumentType []string, msType []st
 	checkSimilarity := len(peakList) > 0 && peakList[0] != ""
 	if checkSimilarity {
 		// fmt.Println(" -> filter by Similarity")
-		similaritySearchResult, err = GetSimilarity(peakList, []string{}, 0, peakListThreshold)
+		similaritySearchResult, err = GetSimilarity(peakList, peakListThreshold, []string{})
 		if err != nil {
 			return nil, err
 		}
@@ -980,7 +970,7 @@ func getEnv(name string, fallback string) string {
 	return fallback
 }
 
-func GetSimilarity(peakList []string, referenceSpectraList []string, limit int32, threshold float64) (*SimilaritySearchResult, error) {
+func GetSimilarity(peakList []string, threshold float64, referenceSpectraList []string) (*SimilaritySearchResult, error) {
 	sort.Slice(peakList, func(i, j int) bool {
 		split1 := strings.Split(peakList[i], ";")
 		split2 := strings.Split(peakList[j], ";")
@@ -1071,18 +1061,12 @@ func GetSimilarity(peakList []string, referenceSpectraList []string, limit int32
 
 	records := SimilaritySearchResult{}
 	records.Data = []SimilaritySearchResultDataInner{}
-	for i, res := range result.SimilarityScoreList {
+	for _, res := range result.SimilarityScoreList {
 		if threshold <= 0 || res.SimilarityScore >= threshold {
 			records.Data = append(records.Data, SimilaritySearchResultDataInner{
 				Accession: res.Accession,
 				Score:     float32(res.SimilarityScore),
 			})
-
-			if limit > 0 {
-				if int32(i) >= limit-1 {
-					break
-				}
-			}
 		}
 	}
 

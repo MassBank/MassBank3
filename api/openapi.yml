@@ -26,7 +26,7 @@ paths:
       - $ref: "./schemas/FilterParams.yaml#/components/parameters/InChIKey"
       - $ref: "./schemas/FilterParams.yaml#/components/parameters/Substructure"
     get:
-      summary: Get all records.
+      summary: Get records, filtered by the given parameters.
       operationId: getRecords
       responses:
         "200":
@@ -37,6 +37,7 @@ paths:
                 type: array
                 items:
                   $ref: "./schemas/MBRecord.yaml"
+
   /records/search:
     parameters:
       - $ref: "./schemas/FilterParams.yaml#/components/parameters/Contributor"
@@ -72,30 +73,31 @@ paths:
     parameters:
       - name: accession
         in: path
-        description: The record by accession id.
+        description: The accession of a record, e.g. MSBNK-AAFC-AC000001.
         required: true
         schema:
           type: string
     get:
-      summary: Get a MassBank record
+      summary: Get a MassBank record.
       operationId: getRecord
       responses:
         "200":
-          description: "A MassBank record"
+          description: "A MassBank record."
           content:
             application/json:
               schema:
                 $ref: "./schemas/MBRecord.yaml"
+
   /records/{accession}/simple:
     parameters:
       - name: accession
         in: path
-        description: The accession id of the record
+        description: The accession of a record, e.g. MSBNK-AAFC-AC000001.
         required: true
         schema:
           type: string
     get:
-      summary: Get a MassBank record in simple format (accession, title, peaks, smiles)
+      summary: Get a MassBank record in with reduced information level (accession, title, peaks, smiles).
       operationId: getSimpleRecord
       responses:
         "200":
@@ -104,9 +106,10 @@ paths:
             application/json:
               schema:
                 $ref: "./schemas/MBRecord.yaml"
+
   /records/count:
     get:
-      summary: The number of all records
+      summary: The number of all records in the database.
       operationId: getCount
       responses:
         "200":
@@ -115,35 +118,16 @@ paths:
             application/json:
               schema:
                 type: string
+
   /filter/browse:
     get:
-      summary: get browse options
+      summary: Get all browse options (contributor, instrument type, ms type, ion mode).
       operationId: getBrowseOptions
       parameters:
-        - in: query
-          name: instrument_type
-          description: Filter by a list of instrument type, which will be associated by OR.
-          schema:
-            $ref: "./schemas/FilterSchemas.yaml#/components/schemas/InstrumentType"
-          required: false
-        - in: query
-          description: Filter by a List of MS types, which are associated by OR. If none is given, all is assumed.
-          name: ms_type
-          schema:
-            $ref: "./schemas/FilterSchemas.yaml#/components/schemas/MSType"
-          required: false
-        - in: query
-          name: ion_mode
-          description: Filter by ion mode. If none is given, both is assumed.
-          schema:
-            $ref: "./schemas/FilterSchemas.yaml#/components/schemas/IonMode"
-          required: false
-        - in: query
-          name: contributor
-          description: a contributor (institution)
-          schema:
-            $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Contributor"
-          required: false
+        - $ref: "./schemas/FilterParams.yaml#/components/parameters/Contributor"
+        - $ref: "./schemas/FilterParams.yaml#/components/parameters/InstrumentType"
+        - $ref: "./schemas/FilterParams.yaml#/components/parameters/MsType"
+        - $ref: "./schemas/FilterParams.yaml#/components/parameters/IonMode"
       responses:
         "200":
           description: "All browse options"
@@ -151,9 +135,10 @@ paths:
             application/json:
               schema:
                 $ref: "./schemas/FilterOptions.yaml#/components/schemas/BrowseOptions"
+
   /metadata:
     get:
-      summary: get massbank metadata
+      summary: Get the metadata of the database and the current dataset in use. It includes the version, timestamp, git commit hash, unique spectra count (SPLASH), unique compound count (InChI) and all compound classes with counts.
       operationId: getMetadata
       responses:
         "200":
@@ -165,11 +150,11 @@ paths:
 
   /version:
     get:
-      summary: get API version
+      summary: Get the current API version.
       operationId: getVersion
       responses:
         "200":
-          description: "Version for MassBank API with timestamp of build"
+          description: "Version for MassBank API with timestamp of build."
           content:
             application/json:
               schema:
@@ -178,11 +163,11 @@ paths:
 
   /status:
     get:
-      summary: get API status
+      summary: Get the status of the attached services (postgres, export service, similarity service).
       operationId: getStatus
       responses:
         "200":
-          description: "Status of the API and attached services"
+          description: "Status of the attached services."
           content:
             application/json:
               schema:
@@ -221,44 +206,15 @@ paths:
 
   /similarity:
     parameters:
-      - in: query
-        name: peak_list
-        description: Filter by peak list.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/PeakList"
-        required: true
-      - in: query
-        name: reference_spectra_list
-        description: Filter by reference spectra list.
-        schema:
-          type: array
-          items:
-            type: string
-          example:
-            - MSBNK-IPB_Halle-PB001341
-            - MSBNK-IPB_Halle-PB006202
-            - MSBNK-IPB_Halle-PB006203
-            - MSBNK-IPB_Halle-PB001342
-            - MSBNK-IPB_Halle-PB001343
-        required: false
-      - in: query
-        name: limit
-        description: "Maximum number of results."
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/Limit"
-        required: false
-      - in: query
-        name: threshold
-        description: Threshold as minimal score.
-        schema:
-          $ref: "./schemas/FilterSchemas.yaml#/components/schemas/PeakListThreshold"
-        required: false
+      - $ref: "./schemas/SimilaritySearchParams.yaml#/components/parameters/PeakList"
+      - $ref: "./schemas/SimilaritySearchParams.yaml#/components/parameters/PeakListThreshold"
+      - $ref: "./schemas/SimilaritySearchParams.yaml#/components/parameters/ReferenceSpectraList"
     get:
-      summary: Get a list of records with similarity scores
+      summary: Get a list of records with similarity scores.
       operationId: getSimilarity
       responses:
         "200":
-          description: "A list of similar records"
+          description: "A list of records with similarity scores."
           content:
             application/json:
               schema:

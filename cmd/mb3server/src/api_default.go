@@ -112,7 +112,7 @@ func (c *DefaultAPIController) Routes() Routes {
 	}
 }
 
-// GetRecords - Get all records.
+// GetRecords - Get records, filtered by the given parameters.
 func (c *DefaultAPIController) GetRecords(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	contributorParam := strings.Split(query.Get("contributor"), ",")
@@ -200,7 +200,7 @@ func (c *DefaultAPIController) GetSearchResults(w http.ResponseWriter, r *http.R
 
 }
 
-// GetRecord - Get a MassBank record
+// GetRecord - Get a MassBank record.
 func (c *DefaultAPIController) GetRecord(w http.ResponseWriter, r *http.Request) {
 	accessionParam := chi.URLParam(r, "accession")
 
@@ -215,7 +215,7 @@ func (c *DefaultAPIController) GetRecord(w http.ResponseWriter, r *http.Request)
 
 }
 
-// GetSimpleRecord - Get a MassBank record in simple format (accession, title, peaks, smiles)
+// GetSimpleRecord - Get a MassBank record in with reduced information level (accession, title, peaks, smiles).
 func (c *DefaultAPIController) GetSimpleRecord(w http.ResponseWriter, r *http.Request) {
 	accessionParam := chi.URLParam(r, "accession")
 
@@ -230,7 +230,7 @@ func (c *DefaultAPIController) GetSimpleRecord(w http.ResponseWriter, r *http.Re
 
 }
 
-// GetCount - The number of all records
+// GetCount - The number of all records in the database.
 func (c *DefaultAPIController) GetCount(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.GetCount(r.Context())
 	// If an error occurred, encode the error with the status code
@@ -243,14 +243,14 @@ func (c *DefaultAPIController) GetCount(w http.ResponseWriter, r *http.Request) 
 
 }
 
-// GetBrowseOptions - get browse options
+// GetBrowseOptions - Get all browse options (contributor, instrument type, ms type, ion mode).
 func (c *DefaultAPIController) GetBrowseOptions(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
+	contributorParam := strings.Split(query.Get("contributor"), ",")
 	instrumentTypeParam := strings.Split(query.Get("instrument_type"), ",")
 	msTypeParam := strings.Split(query.Get("ms_type"), ",")
 	ionModeParam := query.Get("ion_mode")
-	contributorParam := strings.Split(query.Get("contributor"), ",")
-	result, err := c.service.GetBrowseOptions(r.Context(), instrumentTypeParam, msTypeParam, ionModeParam, contributorParam)
+	result, err := c.service.GetBrowseOptions(r.Context(), contributorParam, instrumentTypeParam, msTypeParam, ionModeParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -261,7 +261,7 @@ func (c *DefaultAPIController) GetBrowseOptions(w http.ResponseWriter, r *http.R
 
 }
 
-// GetMetadata - get massbank metadata
+// GetMetadata - Get the metadata of the database and the current dataset in use. It includes the version, timestamp, git commit hash, unique spectra count (SPLASH), unique compound count (InChI) and all compound classes with counts.
 func (c *DefaultAPIController) GetMetadata(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.GetMetadata(r.Context())
 	// If an error occurred, encode the error with the status code
@@ -274,7 +274,7 @@ func (c *DefaultAPIController) GetMetadata(w http.ResponseWriter, r *http.Reques
 
 }
 
-// GetVersion - get API version
+// GetVersion - Get the current API version.
 func (c *DefaultAPIController) GetVersion(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.GetVersion(r.Context())
 	// If an error occurred, encode the error with the status code
@@ -287,7 +287,7 @@ func (c *DefaultAPIController) GetVersion(w http.ResponseWriter, r *http.Request
 
 }
 
-// GetStatus - get API status
+// GetStatus - Get the status of the attached services (postgres, export service, similarity service).
 func (c *DefaultAPIController) GetStatus(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.GetStatus(r.Context())
 	// If an error occurred, encode the error with the status code
@@ -300,22 +300,17 @@ func (c *DefaultAPIController) GetStatus(w http.ResponseWriter, r *http.Request)
 
 }
 
-// GetSimilarity - Get a list of records with similarity scores
+// GetSimilarity - Get a list of records with similarity scores.
 func (c *DefaultAPIController) GetSimilarity(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	peakListParam := strings.Split(query.Get("peak_list"), ",")
+	peakListThresholdParam, err := parseFloat64Parameter(query.Get("peak_list_threshold"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
 	referenceSpectraListParam := strings.Split(query.Get("reference_spectra_list"), ",")
-	limitParam, err := parseInt32Parameter(query.Get("limit"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	thresholdParam, err := parseFloat64Parameter(query.Get("threshold"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	result, err := c.service.GetSimilarity(r.Context(), peakListParam, referenceSpectraListParam, limitParam, thresholdParam)
+	result, err := c.service.GetSimilarity(r.Context(), peakListParam, peakListThresholdParam, referenceSpectraListParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
