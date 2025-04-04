@@ -1,7 +1,7 @@
 components:
   parameters:
     PeakList:
-      description: "A list of tuples of m/z values and (relative) intensities. Both values in a tuple need to be separated by a semi-colon, e.g. '147.063;11'."
+      description: "A list of tuples of m/z values and (relative) intensities used for similarity search. Both values in a tuple need to be separated by a semi-colon, e.g. '147.063;11'. The parameter 'peak_list_threshold' is required for this filter option."
       in: query
       name: peak_list
       schema:
