@@ -50,6 +50,8 @@ func addSwaggerEndpoint(router chi.Router) {
 		panic("failed to create sub filesystem: " + err.Error())
 	}
 
+	// Serve the swagger-ui files
 	router.Handle("/ui/*", http.StripPrefix("/ui/", http.FileServer(http.FS(fsys))))
-	router.Handle("/", http.RedirectHandler("/ui/", http.StatusFound))
+	// Redirect root to the swagger-ui
+	router.Handle("/", http.RedirectHandler(mb3server.ServerConfig.ApiUrl+"/ui/", http.StatusFound))
 }

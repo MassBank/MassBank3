@@ -21,6 +21,7 @@ type ToolConfig struct {
 type ServerConfig struct {
 	database.DBConfig
 	ServerPort uint
+	ApiUrl     string
 }
 
 const (
@@ -85,6 +86,9 @@ func GetServerConfig() *ServerConfig {
 	serverConfig.ServerPort = uint(serverPort)
 	flag.UintVar(&serverConfig.ServerPort, "server_port", serverConfig.ServerPort, "Listen on this port. Overwrites environment variable SERVER_PORT")
 	flag.Parse()
+
+	serverConfig.ApiUrl = getEnv("MB3_API_URL", "")
+
 	return serverConfig
 }
 
