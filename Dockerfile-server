@@ -8,7 +8,7 @@ COPY go.mod .
 RUN wget https://github.com/swagger-api/swagger-ui/archive/refs/tags/v5.20.2.tar.gz && \
     tar -xf v5.20.2.tar.gz && \
     mv swagger-ui-5.20.2/dist ./swagger-ui && \
-    sed -i 's/url: \".*\"/url: \"\.\/openapi.yml\"/' swagger-ui/swagger-initializer.js && \
+    sed -i 's/url: \".*\"/url: \"\.\/openapi.yml\",\n\tsyntaxHighlight: {activated: false}/' swagger-ui/swagger-initializer.js && \
     mv swagger-ui cmd/mb3server/swagger-ui && \
     rm -rf v5.20.2.tar.gz swagger-ui-5.20.2
 
