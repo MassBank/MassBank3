@@ -106,9 +106,9 @@ The result is a set of complete MassBank records in JSON format.
 
 #### Compound Name
 
-To receive all records to the compound class _natural product_ use:
+To receive all records to the compound name _mellein_ use:
 
-    http://localhost:8081/records?compound_class=natural+product
+    http://localhost:8081/records?compound_name=mellein
 
 ### _/records/search_ Endpoint
 
