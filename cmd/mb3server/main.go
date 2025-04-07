@@ -51,4 +51,5 @@ func addSwaggerEndpoint(router chi.Router) {
 	}
 
 	router.Handle("/ui/*", http.StripPrefix("/ui/", http.FileServer(http.FS(fsys))))
+	router.Handle("/", http.RedirectHandler("/ui/", http.StatusFound))
 }
