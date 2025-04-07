@@ -44,7 +44,7 @@ Now use _docker compose_ to start the system (in daemon mode):
 > [!NOTE]
 > Initially, the property _MB_DB_INIT_ is set to _true_. Change that value to _false_ after the database was filled within the first start. The database filling takes some time. The _mb3tool_ service is responsible for that and stops after finishing that task.
 
-The frontend can (by default) be accessed in the webbrowser at http://localhost:8080/MassBank3/.
+The frontend can (by default) be accessed in the webbrowser at http://localhost:8080/MassBank/.
 
 To stop the system use:
 
@@ -80,6 +80,64 @@ Description is coming soon.
 
 # REST API
 
-There is a [graphical interface](https://msbi.ipb-halle.de/MassBank-api/ui/) via Swagger UI to have insights into the different API endpoints and their specifications.
+There is a [graphical interface](https://msbi.ipb-halle.de/MassBank-api/ui/) by means of Swagger UI to have insights into the different API endpoints and their specifications at our test instance.
 
-Further descriptions will be available soon.
+To access this on your running instance, just visit the API URL in the browser. By default it is http://localhost:8081 and is definded by the environment variable _MB3_API_URL_.
+
+## Examples
+
+### _/records_ Endpoint
+
+#### InChIKey
+
+In order to get all records from the running instance at the API URL with an InChIKey of _KWILGNNWGSNMPA-UHFFFAOYSA-N_ call the following URL:
+
+    {MB3_API_URL}/records?inchi_key=KWILGNNWGSNMPA-UHFFFAOYSA-N
+
+The corresponding URL with default value (http://localhost:8081) is:
+
+    http://localhost:8081/records?inchi_key=KWILGNNWGSNMPA-UHFFFAOYSA-N
+
+For example, to obtain the results via cURL use:
+
+    curl -X GET "http://localhost:8081/records?inchi_key=KWILGNNWGSNMPA-UHFFFAOYSA-N"
+
+The result is a set of complete MassBank records in JSON format.
+
+#### Compound Name
+
+To receive all records to the compound class _natural product_ use:
+
+    http://localhost:8081/records?compound_class=natural+product
+
+### _/records/search_ Endpoint
+
+#### Compound Class
+
+To receive all accession belonging to the compound class _natural product_ use:
+
+    http://localhost:8081/records/search?compound_class=natural+product
+
+The result is a set of MassBank record IDs (accessions).
+
+#### MS Type and Ion Mode
+
+A request for searching MS2 spectra and negative ion mode looks like:
+
+    http://localhost:8081/records/search?ms_type=MS2&ion_mode=NEGATIVE
+
+#### Similarity Search
+
+A similarity search request with the semicolon-separated tuples (m/z value, rel. intensity)
+
+    133.0648;225
+    151.0754;94
+    155.9743;112
+    161.0597;999
+    179.0703;750
+
+and threshold value 0.8 looks like:
+
+    http://localhost:8081/records/search?peak_list=133.0648%3B225%2C151.0754%3B94%2C155.9743%3B112%2C161.0597%3B999%2C179.0703%3B750&peak_list_threshold=0.8
+
+The result is a set of MassBank record IDs (accessions) and the corresponding similarity score in JSON format. The calculation is done by the [matchms](https://github.com/matchms/matchms) package used in our [similarity service](https://github.com/MassBank/MassBank3-similarity-service).
