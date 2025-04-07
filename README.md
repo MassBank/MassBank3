@@ -82,7 +82,7 @@ Description is coming soon.
 
 There is a [graphical interface](https://msbi.ipb-halle.de/MassBank-api/ui/) by means of Swagger UI to have insights into the different API endpoints and their specifications at our test instance.
 
-To access this on your running instance, just visit the API URL in the browser. By default it is http://localhost:8081 and is definded by the environment variable _MB3_API_URL_.
+To access this on your running instance, just visit the API URL in the browser. By default it is http://localhost:8081 and is defined by the environment variable _MB3_API_URL_.
 
 ## Examples
 
