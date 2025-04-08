@@ -10,7 +10,7 @@ appVersion: "v0.1"
 dependencies:
   - name: postgresql
     repository: https://charts.bitnami.com/bitnami
-    version: 16.4.9
+    version: 16.6.2
   - name: massbank3-similarity-service
     repository: file://../massbank3-similarity-service
     version: 0.1.0

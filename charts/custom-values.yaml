@@ -1,6 +1,16 @@
-# Overwrite ingress path properties for massbank3-frontend
+# hostneme of the public url serving massbank
 host: msbi.ipb-halle.de
+# base path of the public url serving massbank
 pathPrefix: MassBank3
+# release name of the helm install of massbank3-frontend, required for dbtool
+# to identify the hostname of the postgres database
+massbank3ReleaseName: massbank3
+
+# postgres settings for dbtool
+postgresPassword: "massbank3adminpassword"
+username: "massbank3"
+password: "massbank3password"
+database: "massbank3"
 
 massbank3-export-service:
   host: msbi.ipb-halle.de

@@ -7,10 +7,6 @@ metadata:
 spec:
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
         {{- include "massbank3-dbtool.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
@@ -18,21 +14,8 @@ spec:
         {{- end }}
     spec:
       restartPolicy: Never
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "massbank3-dbtool.serviceAccountName" . }}
-      {{- with .Values.podSecurityContext }}
-      securityContext:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          {{- with .Values.securityContext }}
-          securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
@@ -41,7 +24,7 @@ spec:
             - name: DB_PASSWORD
               value: {{ .Values.password }}
             - name: DB_HOST
-              value: "massbank3-postgresql"
+              value: {{ .Values.massbank3ReleaseName }}-postgresql
             - name: DB_NAME
               value: {{ .Values.database }}
             - name: DB_USER
@@ -56,12 +39,3 @@ spec:
               value: ""
             - name: MB_DROP_ALL
               value: "true"
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-
