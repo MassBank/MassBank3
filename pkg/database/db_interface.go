@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/Code-Hex/dd"
+
 	"github.com/MassBank/MassBank3/pkg/massbank"
 )
 
@@ -138,7 +139,7 @@ type MB3Database interface {
 	// GetRecord gets a single MassBank record by the Accession string.
 	// It should return nil and a [NotFoundError] if the record is not in the
 	// database.
-	GetRecord(*string) (*massbank.MassBank2, error)
+	GetRecord(*string) (*string, error)
 
 	// GetSimpleRecord gets a single simple MassBank record by the Accession string.
 	// It should return nil and a [NotFoundError] if the record is not in the
@@ -187,7 +188,7 @@ type MB3Database interface {
 	//
 	// The second parameter is the database id of the version information. You
 	// can get it from [UpdateMetadata].
-	AddRecord(record *massbank.MassBank2, metaDataId string) error
+	AddRecord(record *massbank.MassBank2, metaDataId string, mb3RecordJson string) error
 
 	// AddRecords adds a list of MassBank records given as an array to the
 	// database. If one of the Accession ids  exists the  function should roll
@@ -195,7 +196,7 @@ type MB3Database interface {
 	//
 	// The second parameter is the database id of the version information. You
 	// can get it from [UpdateMetadata].
-	AddRecords(records []*massbank.MassBank2, metaDataId string) error
+	AddRecords(records []*massbank.MassBank2, metaDataId string, mb3RecordJsons []string) error
 }
 
 var db MB3Database
