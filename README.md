@@ -48,8 +48,10 @@ The path to PostgreSQL via _DB_LOCAL_PATH_ is "/MassBank3/data/postgres-data" by
 
 In order to provide the MassBank data to the similarity service, download the latest release of MassBank data in MSP format and move it the _data_ directoy (default):
 
+    mkdir ../data
+    mkdir ../data/massbank-volume
     wget https://github.com/MassBank/MassBank-data/releases/latest/download/MassBank_NIST.msp
-    mv MassBank_NIST.msp ../data/massbank-volume/
+    mv MassBank_NIST.msp ../data/massbank-volume/MassBank_NIST.msp
 
 Now use _docker compose_ to start the system (in daemon mode):
 
