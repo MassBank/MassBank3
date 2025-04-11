@@ -461,7 +461,7 @@ func buildSimpleMbRecord(record *massbank.MassBank2) *MbRecord {
 	var ints = record.Peak.Peak.Intensity
 	var rels = record.Peak.Peak.Rel
 	var ids = record.Peak.Peak.Id
-	for i := 0; i < len(mzs); i++ {
+	for i := range mzs {
 		result.Peak.Peak.Values = append(result.Peak.Peak.Values, MbRecordPeakPeakValuesInner{
 			Mz:        mzs[i],
 			Intensity: ints[i],
@@ -490,11 +490,12 @@ func GetRecord(accession string) (*MbRecord, error) {
 	if err := initDB(); err != nil {
 		return nil, err
 	}
-	mb3RecordJson, err := db.GetRecord(&accession)
+	resultMb2, err := db.GetRecord(&accession)
 	if err != nil {
 		return nil, err
 	}
-	result, err := ConvertJsonStringToMb3Record(*mb3RecordJson)
+
+	result, err := ConvertMb2RecordToMb3Record(resultMb2)
 	if err != nil {
 		return nil, err
 	}

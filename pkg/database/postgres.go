@@ -7,8 +7,10 @@ import (
 	"log"
 	"math"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"github.com/lib/pq"
@@ -341,464 +343,446 @@ func (p *PostgresSQLDB) GetRecords(s *[]string) (*[]string, error) {
 }
 
 // GetRecord see [MB3Database.GetRecord]
-func (p *PostgresSQLDB) GetRecord(s *string) (*string, error) {
+func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 
-	var mb3RecordJson string
-	var query = "SELECT record_text FROM records WHERE accession = $1;"
+	var result = massbank.MassBank2{}
+
+	var massbankId uint
+	var filename string
+	var accession string
+	var title string
+	var comments []string
+	var copyright sql.NullString
+	var date time.Time
+	var metadataId uint
+	var query = "SELECT * FROM massbank WHERE accession = $1;"
 	stmt, err := p.database.Prepare(query)
 	if err != nil {
 		return nil, err
 	}
 	err = stmt.QueryRow(*s).Scan(
-		&mb3RecordJson,
+		&massbankId,
+		&filename,
+		&accession,
+		&title,
+		(*pq.StringArray)(&comments),
+		&copyright,
+		&date,
+		&metadataId,
 	)
 	stmt.Close()
 	if err != nil {
+		return nil, err
+	}
+
+	result.RecordTitle = &title
+	result.Date = &massbank.RecordDate{Created: date, Updated: date, Modified: date}
+	result.Accession = &accession
+	result.Comments = &[]massbank.SubtagProperty{}
+	for _, comment := range comments {
+		parts := strings.Split(comment, "---")
+		*result.Comments = append(*result.Comments, massbank.SubtagProperty{Subtag: parts[0], Value: parts[1]})
+	}
+
+	// contributors
+	var contributor string
+	query = "SELECT name FROM contributor WHERE id IN (SELECT contributor_id FROM accession_contributor WHERE massbank_id = $1);"
+	stmt, err = p.database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	err = stmt.QueryRow(massbankId).Scan(&contributor)
+	stmt.Close()
+	if err != nil && err != sql.ErrNoRows {
+		return nil, err
+	}
+	result.Contributor = &contributor
+
+	// authors
+	query = "SELECT name FROM author WHERE id IN (SELECT author_id FROM accession_author WHERE massbank_id = $1);"
+	stmt, err = p.database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := stmt.Query(massbankId)
+	stmt.Close()
+	if err == nil {
+		result.Authors = &[]massbank.RecordAuthorName{}
+		for rows.Next() {
+			var author string
+			if err := rows.Scan(&author); err != nil {
+				return nil, err
+			}
+			*result.Authors = append(*result.Authors, massbank.RecordAuthorName{Name: author})
+		}
+		rows.Close()
+	} else {
 		if err != sql.ErrNoRows {
 			return nil, err
 		}
 	}
 
-	return &mb3RecordJson, nil
+	// license
+	query = "SELECT name FROM license WHERE id IN (SELECT license_id FROM accession_license WHERE massbank_id = $1);"
+	stmt, err = p.database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	var license string
+	err = stmt.QueryRow(massbankId).Scan(&license)
+	stmt.Close()
+	if err != nil && err != sql.ErrNoRows {
+		return nil, err
+	}
+	result.License = &license
 
-	// var result = massbank.MassBank2{}
+	// publication (for now only one publication per record)
+	query = "SELECT name FROM publication WHERE id IN (SELECT publication_id FROM accession_publication WHERE massbank_id = $1);"
+	stmt, err = p.database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	var publication string
+	err = stmt.QueryRow(massbankId).Scan(&publication)
+	stmt.Close()
+	if err != nil && err != sql.ErrNoRows {
+		return nil, err
+	}
+	result.Publication = &publication
 
-	// var massbankId uint
-	// var filename string
-	// var accession string
-	// var title string
-	// var comments []string
-	// var copyright sql.NullString
-	// var date time.Time
-	// var metadataId uint
-	// var query = "SELECT * FROM massbank WHERE accession = $1;"
-	// stmt, err := p.database.Prepare(query)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// err = stmt.QueryRow(*s).Scan(
-	// 	&massbankId,
-	// 	&filename,
-	// 	&accession,
-	// 	&title,
-	// 	(*pq.StringArray)(&comments),
-	// 	&copyright,
-	// 	&date,
-	// 	&metadataId,
-	// )
-	// stmt.Close()
-	// if err != nil {
-	// 	return nil, err
-	// }
+	// compound
+	query = "SELECT inchi, formula, smiles, mass FROM compound WHERE id IN (SELECT compound_id FROM compound_name WHERE massbank_id = $1);"
+	stmt, err = p.database.Prepare(query)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, err
+	}
+	var inchi string
+	var formula string
+	var smiles string
+	var mass float64
+	err = stmt.QueryRow(massbankId).Scan(&inchi, &formula, &smiles, &mass)
+	stmt.Close()
+	if err == nil {
+		result.Compound = massbank.CompoundProperties{
+			InChI:   &inchi,
+			Formula: &formula,
+			Smiles:  &smiles,
+			Mass:    &mass,
+		}
+		// compound names
+		result.Compound.Names = &[]string{}
+		query = "SELECT name FROM compound_name WHERE massbank_id = $1;"
+		stmt, err = p.database.Prepare(query)
+		if err != nil {
+			return nil, err
+		}
+		rows, err = stmt.Query(massbankId)
+		stmt.Close()
+		if err == nil {
+			for rows.Next() {
+				var name string
+				if err := rows.Scan(&name); err != nil {
+					return nil, err
+				}
+				*result.Compound.Names = append(*result.Compound.Names, name)
+			}
+			rows.Close()
+		} else {
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
+		}
 
-	// result.RecordTitle = &title
-	// result.Date = &massbank.RecordDate{Created: date, Updated: date, Modified: date}
-	// result.Accession = &accession
-	// result.Comments = &[]massbank.SubtagProperty{}
-	// for _, comment := range comments {
-	// 	parts := strings.Split(comment, "---")
-	// 	*result.Comments = append(*result.Comments, massbank.SubtagProperty{Subtag: parts[0], Value: parts[1]})
-	// }
+		// compound classes
+		result.Compound.Classes = &[]string{}
+		query = "SELECT class FROM compound_class WHERE massbank_id = $1;"
+		stmt, err = p.database.Prepare(query)
+		if err != nil {
+			return nil, err
+		}
+		rows, err = stmt.Query(massbankId)
+		stmt.Close()
+		if err == nil {
+			for rows.Next() {
+				var class string
+				if err := rows.Scan(&class); err != nil {
+					return nil, err
+				}
+				*result.Compound.Classes = append(*result.Compound.Classes, class)
+			}
+			rows.Close()
+		} else {
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
+		}
 
-	// // contributors
-	// var contributor string
-	// query = "SELECT name FROM contributor WHERE id IN (SELECT contributor_id FROM accession_contributor WHERE massbank_id = $1);"
-	// stmt, err = p.database.Prepare(query)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// err = stmt.QueryRow(massbankId).Scan(&contributor)
-	// stmt.Close()
-	// if err != nil && err != sql.ErrNoRows {
-	// 	return nil, err
-	// }
-	// result.Contributor = &contributor
+		// compound link
+		result.Compound.Link = &[]massbank.DatabaseProperty{}
+		query = "SELECT database, identifier FROM compound_link WHERE massbank_id = $1;"
+		stmt, err = p.database.Prepare(query)
+		if err != nil {
+			return nil, err
+		}
+		rows, err = stmt.Query(massbankId)
+		stmt.Close()
+		if err == nil {
+			for rows.Next() {
+				var database string
+				var identifier string
+				if err := rows.Scan(&database, &identifier); err != nil {
+					return nil, err
+				}
+				*result.Compound.Link = append(*result.Compound.Link, massbank.DatabaseProperty{Database: database, Identifier: identifier})
+			}
+			rows.Close()
+		} else {
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
+		}
+	} else {
+		if err != sql.ErrNoRows {
+			return nil, err
+		}
+	}
 
-	// // authors
-	// query = "SELECT name FROM author WHERE id IN (SELECT author_id FROM accession_author WHERE massbank_id = $1);"
-	// stmt, err = p.database.Prepare(query)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// rows, err := stmt.Query(massbankId)
-	// stmt.Close()
-	// if err == nil {
-	// 	result.Authors = &[]massbank.RecordAuthorName{}
-	// 	for rows.Next() {
-	// 		var author string
-	// 		if err := rows.Scan(&author); err != nil {
-	// 			return nil, err
-	// 		}
-	// 		*result.Authors = append(*result.Authors, massbank.RecordAuthorName{Name: author})
-	// 	}
-	// 	rows.Close()
-	// } else {
-	// 	if err != sql.ErrNoRows {
-	// 		return nil, err
-	// 	}
-	// }
+	// acquisition
+	query = "SELECT instrument, instrument_type FROM acquisition_instrument WHERE id IN (SELECT acquisition_instrument_id FROM accession_acquisition WHERE massbank_id = $1);"
+	stmt, err = p.database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	var instrument string
+	var instrumentType string
+	err = stmt.QueryRow(massbankId).Scan(&instrument, &instrumentType)
+	stmt.Close()
+	if err == nil {
+		result.Acquisition = massbank.AcquisitionProperties{
+			Instrument:     &instrument,
+			InstrumentType: &instrumentType,
+		}
+		// acquisition mass spectrometry
+		result.Acquisition.MassSpectrometry = &[]massbank.SubtagProperty{}
+		query = "SELECT subtag, value FROM acquisition_mass_spectrometry WHERE massbank_id = $1;"
+		stmt, err = p.database.Prepare(query)
+		if err != nil {
+			return nil, err
+		}
+		rows, err = stmt.Query(massbankId)
+		stmt.Close()
+		if err == nil {
+			defer rows.Close()
 
-	// // license
-	// query = "SELECT name FROM license WHERE id IN (SELECT license_id FROM accession_license WHERE massbank_id = $1);"
-	// stmt, err = p.database.Prepare(query)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// var license string
-	// err = stmt.QueryRow(massbankId).Scan(&license)
-	// stmt.Close()
-	// if err != nil && err != sql.ErrNoRows {
-	// 	return nil, err
-	// }
-	// result.License = &license
+			for rows.Next() {
+				var subtag string
+				var value string
+				if err := rows.Scan(&subtag, &value); err != nil {
+					return nil, err
+				}
+				*result.Acquisition.MassSpectrometry = append(*result.Acquisition.MassSpectrometry, massbank.SubtagProperty{Subtag: subtag, Value: value})
+			}
+			rows.Close()
+		} else {
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
+		}
+		// acquisition chromatography
+		result.Acquisition.Chromatography = &[]massbank.SubtagProperty{}
+		query = "SELECT subtag, value FROM acquisition_chromatography WHERE massbank_id = $1;"
+		stmt, err = p.database.Prepare(query)
+		if err != nil {
+			return nil, err
+		}
+		rows, err = stmt.Query(massbankId)
+		stmt.Close()
+		if err == nil {
+			for rows.Next() {
+				var subtag string
+				var value string
+				if err := rows.Scan(&subtag, &value); err != nil {
+					return nil, err
+				}
+				*result.Acquisition.Chromatography = append(*result.Acquisition.Chromatography, massbank.SubtagProperty{Subtag: subtag, Value: value})
+			}
+			rows.Close()
+		} else {
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
+		}
 
-	// // publication (for now only one publication per record)
-	// query = "SELECT name FROM publication WHERE id IN (SELECT publication_id FROM accession_publication WHERE massbank_id = $1);"
-	// stmt, err = p.database.Prepare(query)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// var publication string
-	// err = stmt.QueryRow(massbankId).Scan(&publication)
-	// stmt.Close()
-	// if err != nil && err != sql.ErrNoRows {
-	// 	return nil, err
-	// }
-	// result.Publication = &publication
+		// acquisition general
+		result.Acquisition.General = &[]massbank.SubtagProperty{}
+		query = "SELECT subtag, value FROM acquisition_general WHERE massbank_id = $1;"
+		stmt, err = p.database.Prepare(query)
+		if err != nil {
+			return nil, err
+		}
+		rows, err = stmt.Query(massbankId)
+		stmt.Close()
+		if err == nil {
+			for rows.Next() {
+				var subtag string
+				var value string
+				if err := rows.Scan(&subtag, &value); err != nil {
+					return nil, err
+				}
+				*result.Acquisition.General = append(*result.Acquisition.General, massbank.SubtagProperty{Subtag: subtag, Value: value})
+			}
+			rows.Close()
+		} else {
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
+		}
+	} else {
+		if err != sql.ErrNoRows {
+			return nil, err
+		}
+	}
 
-	// // compound
-	// query = "SELECT inchi, formula, smiles, mass FROM compound WHERE id IN (SELECT compound_id FROM compound_name WHERE massbank_id = $1);"
-	// stmt, err = p.database.Prepare(query)
-	// if err != nil && err != sql.ErrNoRows {
-	// 	return nil, err
-	// }
-	// var inchi string
-	// var formula string
-	// var smiles string
-	// var mass float64
-	// err = stmt.QueryRow(massbankId).Scan(&inchi, &formula, &smiles, &mass)
-	// stmt.Close()
-	// if err == nil {
-	// 	result.Compound = massbank.CompoundProperties{
-	// 		InChI:   &inchi,
-	// 		Formula: &formula,
-	// 		Smiles:  &smiles,
-	// 		Mass:    &mass,
-	// 	}
-	// 	// compound names
-	// 	result.Compound.Names = &[]string{}
-	// 	query = "SELECT name FROM compound_name WHERE massbank_id = $1;"
-	// 	stmt, err = p.database.Prepare(query)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	rows, err = stmt.Query(massbankId)
-	// 	stmt.Close()
-	// 	if err == nil {
-	// 		for rows.Next() {
-	// 			var name string
-	// 			if err := rows.Scan(&name); err != nil {
-	// 				return nil, err
-	// 			}
-	// 			*result.Compound.Names = append(*result.Compound.Names, name)
-	// 		}
-	// 		rows.Close()
-	// 	} else {
-	// 		if err != sql.ErrNoRows {
-	// 			return nil, err
-	// 		}
-	// 	}
+	// mass spectrometry
+	query = "SELECT subtag, value FROM mass_spectrometry_focused_ion WHERE massbank_id = $1;"
+	stmt, err = p.database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	result.MassSpectrometry = massbank.MassSpecProperties{}
+	rows, err = stmt.Query(massbankId)
+	stmt.Close()
+	if err == nil {
+		result.MassSpectrometry.FocusedIon = &[]massbank.SubtagProperty{}
+		for rows.Next() {
+			var subtag string
+			var value string
+			if err := rows.Scan(&subtag, &value); err != nil {
+				return nil, err
+			}
 
-	// 	// compound classes
-	// 	result.Compound.Classes = &[]string{}
-	// 	query = "SELECT class FROM compound_class WHERE massbank_id = $1;"
-	// 	stmt, err = p.database.Prepare(query)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	rows, err = stmt.Query(massbankId)
-	// 	stmt.Close()
-	// 	if err == nil {
-	// 		for rows.Next() {
-	// 			var class string
-	// 			if err := rows.Scan(&class); err != nil {
-	// 				return nil, err
-	// 			}
-	// 			*result.Compound.Classes = append(*result.Compound.Classes, class)
-	// 		}
-	// 		rows.Close()
-	// 	} else {
-	// 		if err != sql.ErrNoRows {
-	// 			return nil, err
-	// 		}
-	// 	}
+			*result.MassSpectrometry.FocusedIon = append(*result.MassSpectrometry.FocusedIon, massbank.SubtagProperty{Subtag: subtag, Value: value})
+		}
+		rows.Close()
+	} else {
+		if err != sql.ErrNoRows {
+			return nil, err
+		}
+	}
+	query = "SELECT subtag, value FROM mass_spectrometry_data_processing WHERE massbank_id = $1;"
+	stmt, err = p.database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	rows, err = stmt.Query(massbankId)
+	stmt.Close()
+	if err == nil {
+		result.MassSpectrometry.DataProcessing = &[]massbank.SubtagProperty{}
+		for rows.Next() {
+			var subtag string
+			var value string
+			if err := rows.Scan(&subtag, &value); err != nil {
+				return nil, err
+			}
 
-	// 	// compound link
-	// 	result.Compound.Link = &[]massbank.DatabaseProperty{}
-	// 	query = "SELECT database, identifier FROM compound_link WHERE massbank_id = $1;"
-	// 	stmt, err = p.database.Prepare(query)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	rows, err = stmt.Query(massbankId)
-	// 	stmt.Close()
-	// 	if err == nil {
-	// 		for rows.Next() {
-	// 			var database string
-	// 			var identifier string
-	// 			if err := rows.Scan(&database, &identifier); err != nil {
-	// 				return nil, err
-	// 			}
-	// 			*result.Compound.Link = append(*result.Compound.Link, massbank.DatabaseProperty{Database: database, Identifier: identifier})
-	// 		}
-	// 		rows.Close()
-	// 	} else {
-	// 		if err != sql.ErrNoRows {
-	// 			return nil, err
-	// 		}
-	// 	}
-	// } else {
-	// 	if err != sql.ErrNoRows {
-	// 		return nil, err
-	// 	}
-	// }
+			*result.MassSpectrometry.DataProcessing = append(*result.MassSpectrometry.DataProcessing, massbank.SubtagProperty{Subtag: subtag, Value: value})
+		}
+		rows.Close()
+	} else {
+		if err != sql.ErrNoRows {
+			return nil, err
+		}
+	}
 
-	// // acquisition
-	// query = "SELECT instrument, instrument_type FROM acquisition_instrument WHERE id IN (SELECT acquisition_instrument_id FROM accession_acquisition WHERE massbank_id = $1);"
-	// stmt, err = p.database.Prepare(query)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// var instrument string
-	// var instrumentType string
-	// err = stmt.QueryRow(massbankId).Scan(&instrument, &instrumentType)
-	// stmt.Close()
-	// if err == nil {
-	// 	result.Acquisition = massbank.AcquisitionProperties{
-	// 		Instrument:     &instrument,
-	// 		InstrumentType: &instrumentType,
-	// 	}
-	// 	// acquisition mass spectrometry
-	// 	result.Acquisition.MassSpectrometry = &[]massbank.SubtagProperty{}
-	// 	query = "SELECT subtag, value FROM acquisition_mass_spectrometry WHERE massbank_id = $1;"
-	// 	stmt, err = p.database.Prepare(query)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	rows, err = stmt.Query(massbankId)
-	// 	stmt.Close()
-	// 	if err == nil {
-	// 		defer rows.Close()
+	// peak
+	result.Peak = massbank.PeakProperties{}
+	var spectrumId uint
+	var splash string
+	var numPeak uint
 
-	// 		for rows.Next() {
-	// 			var subtag string
-	// 			var value string
-	// 			if err := rows.Scan(&subtag, &value); err != nil {
-	// 				return nil, err
-	// 			}
-	// 			*result.Acquisition.MassSpectrometry = append(*result.Acquisition.MassSpectrometry, massbank.SubtagProperty{Subtag: subtag, Value: value})
-	// 		}
-	// 		rows.Close()
-	// 	} else {
-	// 		if err != sql.ErrNoRows {
-	// 			return nil, err
-	// 		}
-	// 	}
-	// 	// acquisition chromatography
-	// 	result.Acquisition.Chromatography = &[]massbank.SubtagProperty{}
-	// 	query = "SELECT subtag, value FROM acquisition_chromatography WHERE massbank_id = $1;"
-	// 	stmt, err = p.database.Prepare(query)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	rows, err = stmt.Query(massbankId)
-	// 	stmt.Close()
-	// 	if err == nil {
-	// 		for rows.Next() {
-	// 			var subtag string
-	// 			var value string
-	// 			if err := rows.Scan(&subtag, &value); err != nil {
-	// 				return nil, err
-	// 			}
-	// 			*result.Acquisition.Chromatography = append(*result.Acquisition.Chromatography, massbank.SubtagProperty{Subtag: subtag, Value: value})
-	// 		}
-	// 		rows.Close()
-	// 	} else {
-	// 		if err != sql.ErrNoRows {
-	// 			return nil, err
-	// 		}
-	// 	}
+	query = "SELECT id, splash, num_peak FROM spectrum WHERE massbank_id = $1;"
+	stmt, err = p.database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	err = stmt.QueryRow(massbankId).Scan(&spectrumId, &splash, &numPeak)
+	stmt.Close()
+	if err == nil {
+		result.Peak.Peak = &massbank.PkPeak{}
 
-	// 	// acquisition general
-	// 	result.Acquisition.General = &[]massbank.SubtagProperty{}
-	// 	query = "SELECT subtag, value FROM acquisition_general WHERE massbank_id = $1;"
-	// 	stmt, err = p.database.Prepare(query)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	rows, err = stmt.Query(massbankId)
-	// 	stmt.Close()
-	// 	if err == nil {
-	// 		for rows.Next() {
-	// 			var subtag string
-	// 			var value string
-	// 			if err := rows.Scan(&subtag, &value); err != nil {
-	// 				return nil, err
-	// 			}
-	// 			*result.Acquisition.General = append(*result.Acquisition.General, massbank.SubtagProperty{Subtag: subtag, Value: value})
-	// 		}
-	// 		rows.Close()
-	// 	} else {
-	// 		if err != sql.ErrNoRows {
-	// 			return nil, err
-	// 		}
-	// 	}
-	// } else {
-	// 	if err != sql.ErrNoRows {
-	// 		return nil, err
-	// 	}
-	// }
+		result.Peak.Splash = &splash
+		result.Peak.NumPeak = &numPeak
 
-	// // mass spectrometry
-	// query = "SELECT subtag, value FROM mass_spectrometry_focused_ion WHERE massbank_id = $1;"
-	// stmt, err = p.database.Prepare(query)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// result.MassSpectrometry = massbank.MassSpecProperties{}
-	// rows, err = stmt.Query(massbankId)
-	// stmt.Close()
-	// if err == nil {
-	// 	result.MassSpectrometry.FocusedIon = &[]massbank.SubtagProperty{}
-	// 	for rows.Next() {
-	// 		var subtag string
-	// 		var value string
-	// 		if err := rows.Scan(&subtag, &value); err != nil {
-	// 			return nil, err
-	// 		}
+		query = "SELECT id, mz, intensity, relative_intensity FROM peak WHERE spectrum_id = $1;"
+		stmt, err = p.database.Prepare(query)
+		if err != nil {
+			return nil, err
+		}
+		rows, err = stmt.Query(spectrumId)
+		stmt.Close()
+		if err == nil {
+			result.Peak.Peak.Id = []int32{}
+			result.Peak.Peak.Mz = []float64{}
+			result.Peak.Peak.Intensity = []float64{}
+			result.Peak.Peak.Rel = []int32{}
+			for rows.Next() {
+				var id int32
+				var mz float64
+				var intensity float64
+				var rel int32
+				if err := rows.Scan(&id, &mz, &intensity, &rel); err != nil {
+					return nil, err
+				}
+				result.Peak.Peak.Id = append(result.Peak.Peak.Id, id)
+				result.Peak.Peak.Mz = append(result.Peak.Peak.Mz, mz)
+				result.Peak.Peak.Intensity = append(result.Peak.Peak.Intensity, intensity)
+				result.Peak.Peak.Rel = append(result.Peak.Peak.Rel, rel)
+			}
+			rows.Close()
+		} else {
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
+		}
 
-	// 		*result.MassSpectrometry.FocusedIon = append(*result.MassSpectrometry.FocusedIon, massbank.SubtagProperty{Subtag: subtag, Value: value})
-	// 	}
-	// 	rows.Close()
-	// } else {
-	// 	if err != sql.ErrNoRows {
-	// 		return nil, err
-	// 	}
-	// }
-	// query = "SELECT subtag, value FROM mass_spectrometry_data_processing WHERE massbank_id = $1;"
-	// stmt, err = p.database.Prepare(query)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// rows, err = stmt.Query(massbankId)
-	// stmt.Close()
-	// if err == nil {
-	// 	result.MassSpectrometry.DataProcessing = &[]massbank.SubtagProperty{}
-	// 	for rows.Next() {
-	// 		var subtag string
-	// 		var value string
-	// 		if err := rows.Scan(&subtag, &value); err != nil {
-	// 			return nil, err
-	// 		}
+		query = "SELECT subtag, value FROM peak_annotation WHERE spectrum_id = $1;"
+		stmt, err = p.database.Prepare(query)
+		if err != nil {
+			return nil, err
+		}
+		rows, err = stmt.Query(spectrumId)
+		stmt.Close()
+		if err == nil {
+			result.Peak.Annotation = &massbank.PkAnnotation{}
+			result.Peak.Annotation.Header = []string{}
+			result.Peak.Annotation.Values = map[string][]interface{}{}
+			for rows.Next() {
+				var subtag string
+				var value string
+				if err := rows.Scan(&subtag, &value); err != nil {
+					return nil, err
+				}
+				if !slices.Contains(result.Peak.Annotation.Header, subtag) {
+					result.Peak.Annotation.Header = append(result.Peak.Annotation.Header, subtag)
+				}
+				if _, ok := result.Peak.Annotation.Values[subtag]; !ok {
+					result.Peak.Annotation.Values[subtag] = []interface{}{}
+				}
+				result.Peak.Annotation.Values[subtag] = append(result.Peak.Annotation.Values[subtag], value)
+			}
+			rows.Close()
+		} else {
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
+		}
+	} else {
+		if err != sql.ErrNoRows {
+			return nil, err
+		}
+	}
 
-	// 		*result.MassSpectrometry.DataProcessing = append(*result.MassSpectrometry.DataProcessing, massbank.SubtagProperty{Subtag: subtag, Value: value})
-	// 	}
-	// 	rows.Close()
-	// } else {
-	// 	if err != sql.ErrNoRows {
-	// 		return nil, err
-	// 	}
-	// }
-
-	// // peak
-	// result.Peak = massbank.PeakProperties{}
-	// var spectrumId uint
-	// var splash string
-	// var numPeak uint
-
-	// query = "SELECT id, splash, num_peak FROM spectrum WHERE massbank_id = $1;"
-	// stmt, err = p.database.Prepare(query)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// err = stmt.QueryRow(massbankId).Scan(&spectrumId, &splash, &numPeak)
-	// stmt.Close()
-	// if err == nil {
-	// 	result.Peak.Peak = &massbank.PkPeak{}
-
-	// 	result.Peak.Splash = &splash
-	// 	result.Peak.NumPeak = &numPeak
-
-	// 	query = "SELECT id, mz, intensity, relative_intensity FROM peak WHERE spectrum_id = $1;"
-	// 	stmt, err = p.database.Prepare(query)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	rows, err = stmt.Query(spectrumId)
-	// 	stmt.Close()
-	// 	if err == nil {
-	// 		result.Peak.Peak.Id = []int32{}
-	// 		result.Peak.Peak.Mz = []float64{}
-	// 		result.Peak.Peak.Intensity = []float64{}
-	// 		result.Peak.Peak.Rel = []int32{}
-	// 		for rows.Next() {
-	// 			var id int32
-	// 			var mz float64
-	// 			var intensity float64
-	// 			var rel int32
-	// 			if err := rows.Scan(&id, &mz, &intensity, &rel); err != nil {
-	// 				return nil, err
-	// 			}
-	// 			result.Peak.Peak.Id = append(result.Peak.Peak.Id, id)
-	// 			result.Peak.Peak.Mz = append(result.Peak.Peak.Mz, mz)
-	// 			result.Peak.Peak.Intensity = append(result.Peak.Peak.Intensity, intensity)
-	// 			result.Peak.Peak.Rel = append(result.Peak.Peak.Rel, rel)
-	// 		}
-	// 		rows.Close()
-	// 	} else {
-	// 		if err != sql.ErrNoRows {
-	// 			return nil, err
-	// 		}
-	// 	}
-
-	// 	query = "SELECT subtag, value FROM peak_annotation WHERE spectrum_id = $1;"
-	// 	stmt, err = p.database.Prepare(query)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	rows, err = stmt.Query(spectrumId)
-	// 	stmt.Close()
-	// 	if err == nil {
-	// 		result.Peak.Annotation = &massbank.PkAnnotation{}
-	// 		result.Peak.Annotation.Header = []string{}
-	// 		result.Peak.Annotation.Values = map[string][]interface{}{}
-	// 		for rows.Next() {
-	// 			var subtag string
-	// 			var value string
-	// 			if err := rows.Scan(&subtag, &value); err != nil {
-	// 				return nil, err
-	// 			}
-	// 			if !slices.Contains(result.Peak.Annotation.Header, subtag) {
-	// 				result.Peak.Annotation.Header = append(result.Peak.Annotation.Header, subtag)
-	// 			}
-	// 			if _, ok := result.Peak.Annotation.Values[subtag]; !ok {
-	// 				result.Peak.Annotation.Values[subtag] = []interface{}{}
-	// 			}
-	// 			result.Peak.Annotation.Values[subtag] = append(result.Peak.Annotation.Values[subtag], value)
-	// 		}
-	// 		rows.Close()
-	// 	} else {
-	// 		if err != sql.ErrNoRows {
-	// 			return nil, err
-	// 		}
-	// 	}
-	// } else {
-	// 	if err != sql.ErrNoRows {
-	// 		return nil, err
-	// 	}
-	// }
-
-	// return &result, err
+	return &result, err
 }
 
 // GetSimpleRecord see [MB3Database.GetSimpleRecord]

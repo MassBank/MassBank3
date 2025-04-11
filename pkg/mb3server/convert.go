@@ -119,17 +119,27 @@ func ConvertMb2RecordToMb3Record(record *massbank.MassBank2) (*MbRecord, error) 
 	}
 
 	// insert peak data
-	// var ids = record.Peak.Peak.Id
+	var ids = record.Peak.Peak.Id
 	var mzs = record.Peak.Peak.Mz
 	var ints = record.Peak.Peak.Intensity
 	var rels = record.Peak.Peak.Rel
-	for i := range mzs {
-		result.Peak.Peak.Values = append(result.Peak.Peak.Values, MbRecordPeakPeakValuesInner{
-			// Id:        ids[i],
-			Mz:        mzs[i],
-			Intensity: ints[i],
-			Rel:       rels[i],
-		})
+	if ids != nil && len(ids) > 0 {
+		for i := range mzs {
+			result.Peak.Peak.Values = append(result.Peak.Peak.Values, MbRecordPeakPeakValuesInner{
+				Id:        ids[i],
+				Mz:        mzs[i],
+				Intensity: ints[i],
+				Rel:       rels[i],
+			})
+		}
+	} else {
+		for i := range mzs {
+			result.Peak.Peak.Values = append(result.Peak.Peak.Values, MbRecordPeakPeakValuesInner{
+				Mz:        mzs[i],
+				Intensity: ints[i],
+				Rel:       rels[i],
+			})
+		}
 	}
 
 	if record.Peak.NeutralLoss != nil {
