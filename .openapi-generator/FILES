@@ -1,4 +1,3 @@
-api/openapi.yaml
 pkg/mb3server/api.go
 pkg/mb3server/api_default.go
 pkg/mb3server/error.go

@@ -24,7 +24,7 @@
 
 Dockerfile
 README.md
-
+api/*
 go.mod
 main.go
 pkg/mb3server/db_interface.go
