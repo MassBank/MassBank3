@@ -141,6 +141,8 @@ type MB3Database interface {
 	// database.
 	GetRecord(*string) (*string, error)
 
+	GetRecords(*[]string) (*[]string, error)
+
 	// GetSimpleRecord gets a single simple MassBank record by the Accession string.
 	// It should return nil and a [NotFoundError] if the record is not in the
 	// database.

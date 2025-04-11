@@ -526,12 +526,16 @@ func GetRecords(contributor []string, instrumentType []string, msType []string, 
 	}
 
 	result := []MbRecord{}
+	accessions := []string{}
 	for _, searchResultDataInner := range searchResult.Data {
-		mb3RecordJson, err := db.GetRecord(&searchResultDataInner.Accession)
-		if err != nil {
-			return nil, err
-		}
-		record, err := ConvertJsonStringToMb3Record(*mb3RecordJson)
+		accessions = append(accessions, searchResultDataInner.Accession)
+	}
+	recordStrings, err := db.GetRecords(&accessions)
+	if err != nil {
+		return nil, err
+	}
+	for _, recordString := range *recordStrings {
+		record, err := ConvertJsonStringToMb3Record(recordString)
 		if err != nil {
 			return nil, err
 		}

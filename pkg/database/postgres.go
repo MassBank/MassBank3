@@ -315,6 +315,31 @@ func (p *PostgresSQLDB) GetMetadata() (*massbank.MbMetaData, error) {
 	return result, nil
 }
 
+func (p *PostgresSQLDB) GetRecords(s *[]string) (*[]string, error) {
+
+	var query = "SELECT record_text FROM records WHERE accession = ANY ($1);"
+	stmt, err := p.database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	var recordStrings = []string{}
+	rows, err := stmt.Query(pq.Array(s))
+	stmt.Close()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var record string
+		if err := rows.Scan(&record); err != nil {
+			return nil, err
+		}
+		recordStrings = append(recordStrings, record)
+	}
+
+	return &recordStrings, nil
+}
+
 // GetRecord see [MB3Database.GetRecord]
 func (p *PostgresSQLDB) GetRecord(s *string) (*string, error) {
 
