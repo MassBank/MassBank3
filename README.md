@@ -34,10 +34,22 @@ So navigate to that directory and copy the _env.dist_ file into a new _.env_ fil
     cd MassBank3/compose
     cp env.dist .env
 
-Download the latest release of MassBank data in MSP format and move it the _data_ directoy (default):
+The default structure of the _data_ folder looks like the following:
+
+    /MassBank3
+    |---...
+    |---/compose
+    |---/data
+        |---/massbank-volume
+        |---/postgres-data
+    |---...
+
+The path to PostgreSQL via _DB_LOCAL_PATH_ is "/MassBank3/data/postgres-data" by default. "/MassBank3/data/massbank-volume" is the default directory to store the MSP file needed for the similarity service and can be set via _MSP_LOCAL_PATH_.
+
+In order to provide the MassBank data to the similarity service, download the latest release of MassBank data in MSP format and move it the _data_ directoy (default):
 
     wget https://github.com/MassBank/MassBank-data/releases/latest/download/MassBank_NIST.msp
-    mv MassBank_NIST.msp ../data/MassBank_volume/
+    mv MassBank_NIST.msp ../data/massbank-volume/
 
 Now use _docker compose_ to start the system (in daemon mode):
 
