@@ -1,20 +1,19 @@
-FROM docker.io/golang:1.22 AS build
+FROM docker.io/golang:1.23 AS build
 WORKDIR /go/src
-COPY cmd/mb3server/src ./cmd/mb3server/src
-COPY cmd/mb3server/main.go ./cmd/mb3server
+COPY main.go .
 COPY pkg ./pkg
 COPY go.mod .
 
 RUN wget https://github.com/swagger-api/swagger-ui/archive/refs/tags/v5.20.2.tar.gz && \
     tar -xf v5.20.2.tar.gz && \
     mv swagger-ui-5.20.2/dist ./swagger-ui && \
-    sed -i 's/url: \".*\"/url: \"\.\/openapi.yml\",\n\tsyntaxHighlight: {activated: false}/' swagger-ui/swagger-initializer.js && \
-    mv swagger-ui cmd/mb3server/swagger-ui && \
+    sed -i 's/url: \".*\"/url: \"\.\/openapi.yaml\",\n\tsyntaxHighlight: {activated: false}/' swagger-ui/swagger-initializer.js && \
+    # mv swagger-ui pkg/mb3server/swagger-ui && \
     rm -rf v5.20.2.tar.gz swagger-ui-5.20.2
 
-COPY api/openapi.yml ./cmd/mb3server/swagger-ui/openapi.yml
-COPY api/schemas ./cmd/mb3server/swagger-ui/schemas
-COPY entrypoint-mb3server.sh ./cmd/mb3server/entrypoint-mb3server.sh
+COPY api/openapi.yaml ./swagger-ui/openapi.yaml
+COPY api/schemas ./swagger-ui/schemas
+COPY entrypoint-mb3server.sh ./entrypoint-mb3server.sh
 
 EXPOSE 8080
-ENTRYPOINT cd cmd/mb3server && sh entrypoint-mb3server.sh "${MB3_API_URL}"
+ENTRYPOINT sh entrypoint-mb3server.sh "${MB3_API_URL}"

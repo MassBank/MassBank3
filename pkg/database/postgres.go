@@ -117,6 +117,9 @@ func (db *PostgresSQLDB) GetIndexes() []Index {
 	indexes = append(indexes, Index{IndexName: "peak_differences_peak2_id_index", TableName: "peak_differences", Columns: []string{"peak2_id"}})
 	indexes = append(indexes, Index{IndexName: "peak_differences_min_rel_intensity_index", TableName: "peak_differences", Columns: []string{"min_rel_intensity"}})
 
+	indexes = append(indexes, Index{IndexName: "records_massbank_id_index", TableName: "records", Columns: []string{"massbank_id"}})
+	indexes = append(indexes, Index{IndexName: "records_accession_index", TableName: "records", Columns: []string{"accession"}})
+
 	return indexes
 }
 
@@ -314,8 +317,34 @@ func (p *PostgresSQLDB) GetMetadata() (*massbank.MbMetaData, error) {
 	return result, nil
 }
 
+func (p *PostgresSQLDB) GetRecords(s *[]string) (*[]string, error) {
+
+	var query = "SELECT record_text FROM records WHERE accession = ANY ($1);"
+	stmt, err := p.database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	var recordStrings = []string{}
+	rows, err := stmt.Query(pq.Array(s))
+	stmt.Close()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var record string
+		if err := rows.Scan(&record); err != nil {
+			return nil, err
+		}
+		recordStrings = append(recordStrings, record)
+	}
+
+	return &recordStrings, nil
+}
+
 // GetRecord see [MB3Database.GetRecord]
 func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
+
 	var result = massbank.MassBank2{}
 
 	var massbankId uint
@@ -1484,7 +1513,7 @@ func getAtomCount(formula string) int {
 }
 
 // AddRecord see [MB3Database.AddRecord]
-func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string) error {
+func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string, mb3RecordJson string) error {
 	if err := p.checkDatabase(); err != nil {
 		return err
 	}
@@ -1873,6 +1902,15 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 		}
 	}
 
+	// insert into records table
+	q = `INSERT INTO records (massbank_id, accession, record_text) VALUES ($1, $2, $3);`
+	_, err = tx.Exec(q, massbankId, *record.Accession, mb3RecordJson)
+	if err != nil {
+		if err2 := tx.Rollback(); err2 != nil {
+			return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+		}
+	}
+
 	err = tx.Commit()
 	if err != nil {
 		if err2 := tx.Rollback(); err2 != nil {
@@ -1885,9 +1923,13 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string)
 }
 
 // AddRecords see [MB3Database.AddRecords]
-func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId string) error {
-	for _, record := range records {
-		err := p.AddRecord(record, metaDataId)
+func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId string, mb3RecordJsons []string) error {
+	if len(records) != len(mb3RecordJsons) {
+		return errors.New("records and mb3RecordJsons must have the same length")
+	}
+
+	for i, record := range records {
+		err := p.AddRecord(record, metaDataId, mb3RecordJsons[i])
 		if err != nil {
 			return err
 		}
@@ -1899,7 +1941,7 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId str
 func (p *PostgresSQLDB) Init() error {
 	var err error
 	var query = `
-		DROP TABLE IF EXISTS metadata, massbank, contributor, accession_contributor, author, accession_author, license, accession_license, publication, accession_publication, compound, compound_name, compound_class, compound_link, acquisition_instrument, accession_acquisition, acquisition_mass_spectrometry, acquisition_chromatography, acquisition_general, mass_spectrometry_focused_ion, mass_spectrometry_data_processing, spectrum, peak, peak_annotation, browse_options, peak_differences;		
+		DROP TABLE IF EXISTS metadata, massbank, contributor, accession_contributor, author, accession_author, license, accession_license, publication, accession_publication, compound, compound_name, compound_class, compound_link, acquisition_instrument, accession_acquisition, acquisition_mass_spectrometry, acquisition_chromatography, acquisition_general, mass_spectrometry_focused_ion, mass_spectrometry_data_processing, spectrum, peak, peak_annotation, browse_options, peak_differences, records;		
 
 		CREATE TABLE metadata (
 			id SERIAL PRIMARY KEY,
@@ -2099,6 +2141,13 @@ func (p *PostgresSQLDB) Init() error {
 			peak1_id INT NOT NULL REFERENCES peak(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			peak2_id INT NOT NULL REFERENCES peak(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			min_rel_intensity FLOAT NOT NULL
+		);
+
+		CREATE TABLE IF NOT EXISTS records (
+			id SERIAL NOT NULL PRIMARY KEY,
+			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			accession TEXT NOT NULL,
+			record_text TEXT NOT NULL
 		);
 
 		CREATE TABLE IF NOT EXISTS molecules (

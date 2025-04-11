@@ -1,0 +1,11 @@
+generatorName: go-server
+packageName: mb3server
+packageVersion: 0.1.0
+router: chi
+sourceFolder: pkg/mb3server
+outputDir: .
+inputSpec: api/openapi.yaml
+# templateDir: ./go-server-template
+gitUserId: MassBank
+gitRepoId: MassBank3
+featureCORS: true

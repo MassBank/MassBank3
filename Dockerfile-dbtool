@@ -1,6 +1,6 @@
-FROM docker.io/golang:1.22 AS build
+FROM docker.io/golang:1.23 AS build
 WORKDIR /go/src
-COPY cmd/mb3dbtool/main.go ./cmd/mb3dbtool/
+COPY pkg/mb3dbtool/main.go ./cmd/mb3dbtool/
 COPY pkg/ ./pkg
 COPY go.mod .
 
@@ -13,9 +13,9 @@ FROM docker.io/alpine:3.21 AS runtime
 COPY --from=build /go/src/mb3dbtool ./
 RUN printf 'case $MB_DB_INIT in\n\
   true) echo Initialize database...\n\
-        ./mb3dbtool;;\n\
+  ./mb3dbtool;;\n\
   *) echo Skip database initialization...;;\n\
-esac' > ./entrypoint.sh
+  esac' > ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 
 EXPOSE 8080/tcp

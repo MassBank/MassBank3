@@ -122,6 +122,6 @@ type PkNeutralLoss struct {
 }
 
 type PkAnnotation struct {
-	Header []string                 `json:"header"`
-	Values map[string][]interface{} `json:"values"`
+	Header []string         `json:"header"`
+	Values map[string][]any `json:"values"`
 }
