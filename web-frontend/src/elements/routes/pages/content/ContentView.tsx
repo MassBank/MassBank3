@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
-import ContentChart from './ContentChart';
 import fetchData from '../../../../utils/request/fetchData';
 import buildSearchParams from '../../../../utils/request/buildSearchParams';
 import initFlags from '../../../../utils/initFlags';
@@ -27,6 +26,7 @@ import Segmented from '../../../basic/Segmented';
 import segmentedWidth from '../../../../constants/segmentedWidth';
 import { Suspense, lazy } from 'react';
 
+const ContentChart = lazy(() => import('./ContentChart'));
 const SunburstPlot = lazy(() => import('./SunburstPlot'));
 
 const defaultSearchPanelWidth = 450;

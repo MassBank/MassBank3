@@ -93,7 +93,7 @@ function PropertyFilterOptionsMenuItems({
                 filterOptions={propertyFilterOptions?.ms_type ?? []}
                 filterName="propertyFilterOptions"
                 label="ms_type"
-                height={50}
+                height={80}
                 showCounts={showCounts}
               />
             </Form.Item>
