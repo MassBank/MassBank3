@@ -4,7 +4,7 @@ import { Content } from 'antd/es/layout/layout';
 import ExportableContent from '../common/ExportableContent';
 import { CSSProperties, JSX, useCallback, useMemo } from 'react';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
-import { Table } from 'antd';
+import { Table, Tree, TreeDataNode } from 'antd';
 import Record from '../../types/record/Record';
 import { MF } from 'react-mf';
 import StructureView from '../basic/StructureView';
@@ -95,6 +95,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
         compoundClasses.push(c.trim());
       }
     });
+    compoundClasses.sort((a, b) => a.localeCompare(b));
     dataSource.push({
       key: 'record-view-header-table-classes',
       label: 'Classes',
@@ -130,6 +131,98 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
           ) : (
             <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
           )}
+        </Content>
+      ),
+    });
+
+    // Add ChemOnt classes
+    const chemontClasses: string[] = [];
+    const treeNodes: JSX.Element[] = [];
+    record.compound.link
+      .filter((l) => l.database === 'ChemOnt')
+      .forEach((l) => {
+        l.identifier.split(';').forEach((cc: string, i: number) => {
+          const className = cc.trim();
+          chemontClasses.push(className);
+          treeNodes.push(
+            <ExportableContent
+              key={'class-label-' + className + '-chemont' + i}
+              component={<LabelWrapper value={className} />}
+              mode="copy"
+              onClick={() =>
+                handleOnCopy(`Compound class '${className}'`, className)
+              }
+              title={`Copy compound class '${className}' to clipboard`}
+              enableSearch
+              searchTitle={`Search for compound class '${className}'`}
+              searchUrl={buildSearchUrl(
+                'compound_class',
+                className,
+                baseUrl,
+                frontendUrl,
+              )}
+            />,
+          );
+        });
+      });
+
+    const treeData: TreeDataNode[] =
+      chemontClasses.length >= 3
+        ? [
+            {
+              title: treeNodes[1],
+              key: chemontClasses[1],
+              isLeaf: true,
+              children: [
+                {
+                  title: treeNodes[2],
+                  key: chemontClasses[2],
+                  isLeaf: true,
+                  children:
+                    chemontClasses.length > 3
+                      ? [
+                          {
+                            title: treeNodes[3],
+                            key: chemontClasses[3],
+                            isLeaf: true,
+                            children:
+                              chemontClasses.length > 4
+                                ? [
+                                    {
+                                      title: treeNodes[4],
+                                      key: chemontClasses[4],
+                                    },
+                                  ]
+                                : [],
+                          },
+                        ]
+                      : [],
+                },
+              ],
+            },
+          ]
+        : [];
+
+    dataSource.push({
+      key: 'record-view-header-table-classes-chemont',
+      label: 'Classification (ChemOnt)',
+      value: (
+        <Content
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'left',
+          }}
+        >
+          <Tree
+            showLine
+            defaultExpandAll
+            selectable={false}
+            treeData={treeData}
+          />
         </Content>
       ),
     });
@@ -332,6 +425,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
     record.compound.classes,
     record.compound.formula,
     record.compound.inchi,
+    record.compound.link,
     record.compound.mass,
     record.compound.names,
     record.compound.smiles,
