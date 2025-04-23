@@ -61,6 +61,7 @@ function ContentChart({ content, identifier, width, height }: InputProps) {
         labels,
         values: labels.map((_, i) => counts[i]),
         textinfo: 'label',
+        hoverinfo: 'label',
         insidetextorientation: 'radial',
       },
     ];
