@@ -86,3 +86,13 @@ components:
               count:
                 type: integer
                 minimum: 1
+        compound_class_chemont:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              count:
+                type: integer
+                minimum: 1

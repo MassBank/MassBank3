@@ -5,4 +5,5 @@ export default interface Metadata {
   spectra_count: number;
   compound_count: number;
   compound_class: { name: string; count: number }[];
+  compound_class_chemont: { name: string; count: number }[];
 }
