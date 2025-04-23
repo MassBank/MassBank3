@@ -191,12 +191,32 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
                                     {
                                       title: treeNodes[4],
                                       key: chemontClasses[4],
+                                      isLeaf: true,
+                                      children: [
+                                        {
+                                          title: treeNodes[0],
+                                          key: chemontClasses[0],
+                                          isLeaf: true,
+                                        },
+                                      ],
                                     },
                                   ]
-                                : [],
+                                : [
+                                    {
+                                      title: treeNodes[0],
+                                      key: chemontClasses[0],
+                                      isLeaf: true,
+                                    },
+                                  ],
                           },
                         ]
-                      : [],
+                      : [
+                          {
+                            title: treeNodes[0],
+                            key: chemontClasses[0],
+                            isLeaf: true,
+                          },
+                        ],
                 },
               ],
             },

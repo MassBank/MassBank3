@@ -1073,7 +1073,7 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) (string, []stri
 
 	if filters.CompoundClass != "" {
 		parameters = append(parameters, filters.CompoundClass)
-		subQuery := "massbank_id IN (SELECT DISTINCT(massbank_id) FROM compound_class WHERE LOWER(class) LIKE LOWER(CONCAT('%%',$" + strconv.Itoa(len(parameters)) + "::text,'%%')))"
+		subQuery := "massbank_id IN (SELECT DISTINCT(massbank_id) FROM compound_class WHERE LOWER(class) LIKE LOWER(CONCAT('%%',$" + strconv.Itoa(len(parameters)) + "::text,'%%')) OR massbank_id IN (SELECT DISTINCT(massbank_id) FROM compound_link WHERE database = 'ChemOnt' AND LOWER(identifier) LIKE LOWER(CONCAT('%%',$" + strconv.Itoa(len(parameters)) + "::text,'%%'))))"
 		if addedWhere || addedAnd {
 			query = query + " AND " + subQuery
 			addedAnd = true
