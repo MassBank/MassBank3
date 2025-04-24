@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import Plot, { PlotParams } from 'react-plotly.js';
 import ClassificationData from '../../../../types/ClassificationData';
-import filterClassificationData from '../../../../utils/filterClassificationData';
 
 const colorOptions = ['lightgreen', 'orange', 'red', 'purple'];
 
@@ -18,7 +17,6 @@ function SunburstPlot({ data, onSelect, width, height }: InputProps) {
       if (data) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const label = (e.points[0] as any).label as string;
-        // const selectedData = filterClassificationData(label, data);
         const selectedLabels: string[] = [label];
         if (data.hashmapParents.get(label) !== undefined) {
           const parent = data.hashmapParents.get(label);
