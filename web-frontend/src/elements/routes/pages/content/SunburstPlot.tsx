@@ -1,63 +1,73 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import Plot, { PlotParams } from 'react-plotly.js';
-import Metadata from '../../../../types/Metadata';
+import ClassificationData from '../../../../types/ClassificationData';
+import filterClassificationData from '../../../../utils/filterClassificationData';
 
 const colorOptions = ['lightgreen', 'orange', 'red', 'purple'];
 
 type InputProps = {
-  data: Metadata['compound_class_chemont'];
+  data: ClassificationData | null;
+  onSelect: (selectedLabels: string[]) => void;
   width: number;
   height: number;
 };
 
-function SunburstPlot({ data, width, height }: InputProps) {
-  const plotData: PlotParams['data'] = useMemo(() => {
-    const hashmapCounts: Map<string, number> = new Map();
-    const hashmapParents: Map<string, string> = new Map();
-    const hashmapLevels: Map<string, number> = new Map();
-    const labels: string[] = [];
-
-    data.forEach((d) => {
-      const split = d.name.split('; ');
-      const keys = split.slice(1);
-
-      keys.forEach((key, i) => {
-        if (hashmapCounts.has(key)) {
-          hashmapCounts.set(key, hashmapCounts.get(key)! + d.count);
-        } else {
-          labels.push(key);
-          hashmapCounts.set(key, d.count);
-        }
-        if (!hashmapParents.has(key)) {
-          if (i > 0) {
-            hashmapParents.set(key, keys[i - 1]);
-          } else {
-            hashmapParents.set(key, '');
+function SunburstPlot({ data, onSelect, width, height }: InputProps) {
+  const handleOnClick = useCallback(
+    (e: Plotly.PlotMouseEvent) => {
+      if (data) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const label = (e.points[0] as any).label as string;
+        // const selectedData = filterClassificationData(label, data);
+        const selectedLabels: string[] = [label];
+        if (data.hashmapParents.get(label) !== undefined) {
+          const parent = data.hashmapParents.get(label);
+          if (parent !== undefined) {
+            selectedLabels.unshift(
+              parent === '' ? 'Chemical compounds' : parent,
+            );
+            const parent2 = data.hashmapParents.get(parent);
+            if (parent2 !== undefined) {
+              selectedLabels.unshift(
+                parent2 === '' ? 'Chemical compounds' : parent2,
+              );
+              const parent3 = data.hashmapParents.get(parent2);
+              if (parent3 !== undefined) {
+                selectedLabels.unshift(
+                  parent3 === '' ? 'Chemical compounds' : parent3,
+                );
+                const parent4 = data.hashmapParents.get(parent3);
+                if (parent4 !== undefined) {
+                  selectedLabels.unshift(
+                    parent4 === '' ? 'Chemical compounds' : parent4,
+                  );
+                }
+              }
+            }
           }
         }
-        if (!hashmapLevels.has(key)) {
-          hashmapLevels.set(key, i);
-        }
-      });
-    });
-    const parents: string[] = [];
-    const values: number[] = [];
-    labels.forEach((label) => {
-      parents.push(hashmapParents.get(label) || '');
-      values.push(hashmapCounts.get(label) || 0);
-    });
+
+        onSelect(selectedLabels);
+      }
+    },
+    [data, onSelect],
+  );
+
+  return useMemo(() => {
+    if (!data) {
+      return null;
+    }
     const colors: string[] = [];
-    labels.forEach((label) => {
-      const level = hashmapLevels.get(label)!;
+    data.labels.forEach((label) => {
+      const level = data.hashmapLevels.get(label)!;
       colors.push(colorOptions[level]);
     });
-
-    return [
+    const plotData: PlotParams['data'] = [
       {
         type: 'sunburst',
-        labels,
-        parents,
-        values,
+        labels: data.labels,
+        parents: data.parents,
+        values: data.values,
         insidetextorientation: 'radial',
         branchvalues: 'total',
         marker: {
@@ -67,10 +77,8 @@ function SunburstPlot({ data, width, height }: InputProps) {
           '%{label}<br>%{value} (%{percentEntry:.2%})<extra></extra>',
       },
     ];
-  }, [data]);
 
-  return useMemo(
-    () => (
+    return (
       <Plot
         data={plotData}
         layout={{
@@ -78,10 +86,10 @@ function SunburstPlot({ data, width, height }: InputProps) {
           height,
           margin: { l: 0, r: 0, b: 0, t: 0 },
         }}
+        onClick={handleOnClick}
       />
-    ),
-    [height, plotData, width],
-  );
+    );
+  }, [data, handleOnClick, height, width]);
 }
 
 export default SunburstPlot;

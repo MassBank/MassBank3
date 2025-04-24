@@ -237,12 +237,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
             alignItems: 'left',
           }}
         >
-          <Tree
-            showLine
-            defaultExpandAll
-            selectable={false}
-            treeData={treeData}
-          />
+          <Tree showLine defaultExpandAll treeData={treeData} />
         </Content>
       ),
     });

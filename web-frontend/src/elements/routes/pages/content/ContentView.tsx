@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import fetchData from '../../../../utils/request/fetchData';
 import buildSearchParams from '../../../../utils/request/buildSearchParams';
@@ -24,10 +24,10 @@ import sortHits from '../../../../utils/sortHits';
 import collapseButtonWidth from '../../../../constants/collapseButtonWidth';
 import Segmented from '../../../basic/Segmented';
 import segmentedWidth from '../../../../constants/segmentedWidth';
-import { Suspense, lazy } from 'react';
+import buildClassificationData from '../../../../utils/buildClassificationData';
+import ClassificationPanel from './ClassificationPanel';
 
 const ContentChart = lazy(() => import('./ContentChart'));
-const SunburstPlot = lazy(() => import('./SunburstPlot'));
 
 const defaultSearchPanelWidth = 450;
 
@@ -123,7 +123,7 @@ function ContentView() {
     return {
       chartPanelHeight: height * 0.9,
       searchPanelHeight: height * 0.9,
-      sunburstPlotHeight: height * 0.9,
+      classificationPanelHeight: height * 0.9,
     };
   }, [height]);
 
@@ -249,6 +249,10 @@ function ContentView() {
   ]);
 
   return useMemo(() => {
+    const classificationData = buildClassificationData(
+      metadata?.compound_class_chemont ?? [],
+    );
+
     const elements = [
       searchAndResultPanel,
       <Content>
@@ -256,14 +260,12 @@ function ContentView() {
         {charts}
       </Content>,
       <Content>
-        <SectionDivider label="Compound Classes (ChemOnt)" />
-        <Suspense fallback={<p>LOADING</p>}>
-          <SunburstPlot
-            data={metadata?.compound_class_chemont ?? []}
-            width={width - segmentedWidth}
-            height={heights.sunburstPlotHeight}
-          />
-        </Suspense>
+        <SectionDivider label="Classification (ChemOnt)" />
+        <ClassificationPanel
+          data={classificationData}
+          width={width - segmentedWidth}
+          height={heights.classificationPanelHeight}
+        />
       </Content>,
       <Content>
         <SectionDivider label="Information" />
@@ -307,7 +309,7 @@ function ContentView() {
     );
   }, [
     charts,
-    heights.sunburstPlotHeight,
+    heights.classificationPanelHeight,
     isFetchingContent,
     metadata,
     searchAndResultPanel,
