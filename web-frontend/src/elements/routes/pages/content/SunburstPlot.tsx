@@ -2,29 +2,39 @@ import { useCallback, useMemo } from 'react';
 import Plot, { PlotParams } from 'react-plotly.js';
 import ClassificationData from '../../../../types/ClassificationData';
 
-const colorOptions = ['lightgreen', 'orange', 'red', 'purple'];
+const colorOptions = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'];
 
 type InputProps = {
   data: ClassificationData | null;
-  onSelect: (selectedLabels: string[]) => void;
   width: number;
   height: number;
+  onSelect?: (selectedLabels: string[]) => void;
+  level?: string;
 };
 
-function SunburstPlot({ data, onSelect, width, height }: InputProps) {
+function SunburstPlot({ data, onSelect, width, height, level }: InputProps) {
   const handleOnClick = useCallback(
     (e: Plotly.PlotMouseEvent) => {
-      if (data) {
+      if (data && onSelect) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const label = (e.points[0] as any).label as string;
-        const selectedLabels: string[] = [label];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const entry = (e.points[0] as any).entry as string;
+        const selectedLabels: string[] =
+          entry === label || entry === undefined ? [] : [label];
+        // console.log('entry:"', entry, '"-> label:"', label, '"');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // const parent = (e.points[0] as any).parent as string;
+        // if (entry === undefined && parent === '') {
+        //   selectedLabels.push(label);
+        // }
         if (data.hashmapParents.get(label) !== undefined) {
-          const parent = data.hashmapParents.get(label);
-          if (parent !== undefined) {
+          const parent1 = data.hashmapParents.get(label);
+          if (parent1 !== undefined) {
             selectedLabels.unshift(
-              parent === '' ? 'Chemical compounds' : parent,
+              parent1 === '' ? 'Chemical compounds' : parent1,
             );
-            const parent2 = data.hashmapParents.get(parent);
+            const parent2 = data.hashmapParents.get(parent1);
             if (parent2 !== undefined) {
               selectedLabels.unshift(
                 parent2 === '' ? 'Chemical compounds' : parent2,
@@ -44,6 +54,7 @@ function SunburstPlot({ data, onSelect, width, height }: InputProps) {
             }
           }
         }
+        // console.log(selectedLabels);
 
         onSelect(selectedLabels);
       }
@@ -66,6 +77,7 @@ function SunburstPlot({ data, onSelect, width, height }: InputProps) {
         labels: data.labels,
         parents: data.parents,
         values: data.values,
+        level,
         insidetextorientation: 'radial',
         branchvalues: 'total',
         marker: {
@@ -75,19 +87,14 @@ function SunburstPlot({ data, onSelect, width, height }: InputProps) {
           '%{label}<br>%{value} (%{percentEntry:.2%})<extra></extra>',
       },
     ];
+    const layout: PlotParams['layout'] = {
+      width,
+      height,
+      margin: { l: 0, r: 0, b: 0, t: 0 },
+    };
 
-    return (
-      <Plot
-        data={plotData}
-        layout={{
-          width,
-          height,
-          margin: { l: 0, r: 0, b: 0, t: 0 },
-        }}
-        onClick={handleOnClick}
-      />
-    );
-  }, [data, handleOnClick, height, width]);
+    return <Plot data={plotData} layout={layout} onClick={handleOnClick} />;
+  }, [data, handleOnClick, height, level, width]);
 }
 
 export default SunburstPlot;

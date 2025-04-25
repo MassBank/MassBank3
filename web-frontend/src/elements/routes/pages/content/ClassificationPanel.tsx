@@ -1,12 +1,5 @@
 import { Content } from 'antd/es/layout/layout';
-import {
-  lazy,
-  Suspense,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { lazy, Suspense, useCallback, useMemo, useState } from 'react';
 import ClassificationTree from './ClassificationTree';
 import ClassificationData from '../../../../types/ClassificationData';
 import { Spin } from 'antd';
@@ -20,21 +13,14 @@ type InputProps = {
 };
 
 function ClassificationPanel({ data, width, height }: InputProps) {
-  const [selectedClassification, setSelectedClassification] =
-    useState<ClassificationData | null>(null);
-
   const [selectedClassificationLabels, setSelectedClassificationLabels] =
     useState<string[]>([]);
-
-  useEffect(() => {
-    if (data) {
-      setSelectedClassification(data);
-    }
-  }, [data]);
+  const [selectedLevel, setSelectedLevel] = useState<string | undefined>(
+    undefined,
+  );
 
   const handleOnSelectTreeNode = useCallback(
-    (selectedData: ClassificationData) =>
-      setSelectedClassification(selectedData),
+    (level: string) => setSelectedLevel(level),
     [],
   );
 
@@ -65,7 +51,8 @@ function ClassificationPanel({ data, width, height }: InputProps) {
         />
         <Suspense fallback={<Spin size="large" spinning />}>
           <SunburstPlot
-            data={selectedClassification}
+            data={data}
+            level={selectedLevel}
             onSelect={handleOnSelectPlot}
             width={(width / 3) * 2}
             height={height}
@@ -78,8 +65,8 @@ function ClassificationPanel({ data, width, height }: InputProps) {
       handleOnSelectPlot,
       handleOnSelectTreeNode,
       height,
-      selectedClassification,
       selectedClassificationLabels,
+      selectedLevel,
       width,
     ],
   );

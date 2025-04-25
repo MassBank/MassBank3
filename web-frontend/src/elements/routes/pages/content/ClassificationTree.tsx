@@ -1,3 +1,5 @@
+import './ClassificationTree.scss';
+
 import { useCallback, useMemo, Key, useState, useEffect } from 'react';
 import { Content } from 'antd/es/layout/layout';
 import ClassificationData from '../../../../types/ClassificationData';
@@ -7,14 +9,13 @@ import LabelWrapper from '../../../basic/LabelWrapper';
 import buildSearchUrl from '../../../../utils/buildSearchUrl';
 import copyTextToClipboard from '../../../../utils/copyTextToClipboard';
 import { usePropertiesContext } from '../../../../context/properties/properties';
-import filterClassificationData from '../../../../utils/filterClassificationData';
 import { EventDataNode } from 'antd/es/tree';
 
 type InputProps = {
   data: ClassificationData;
-  onSelect: (data: ClassificationData) => void;
   width: number;
   height: number;
+  onSelect?: (selectedLabel: string) => void;
   selectedExpandedKeys?: string[];
 };
 
@@ -42,10 +43,11 @@ function ClassificationTree({
 
   const handleOnSelectTreeNode = useCallback(
     (selectedKey: string) => {
-      const selectedData = filterClassificationData(selectedKey, data);
-      onSelect(selectedData);
+      if (onSelect) {
+        onSelect(selectedKey);
+      }
     },
-    [data, onSelect],
+    [onSelect],
   );
 
   const handleOnExpand = useCallback(
@@ -266,7 +268,6 @@ function ClassificationTree({
         <Tree
           showLine
           treeData={treeData}
-          //   onSelect={handleOnSelectTreeNode}
           expandedKeys={
             expandedKeys.length > 0
               ? expandedKeys

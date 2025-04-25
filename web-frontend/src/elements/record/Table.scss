@@ -13,9 +13,10 @@
 
     .ant-tree {
       background-color: rgb(239, 249, 254) !important;
-    }
-    .ant-tree-node-content-wrapper {
-      background-color: rgb(239, 249, 254) !important;
+
+      .ant-tree-node-content-wrapper {
+        background-color: rgb(239, 249, 254) !important;
+      }
     }
   }
 }
