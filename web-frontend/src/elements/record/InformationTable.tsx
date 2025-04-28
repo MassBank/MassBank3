@@ -6,6 +6,7 @@ import Record from '../../types/record/Record';
 import ExportableContent from '../common/ExportableContent';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
 import LabelWrapper from '../basic/LabelWrapper';
+import NotAvailableLabel from '../basic/NotAvailableLabel';
 
 type InformationTableType = {
   key: string;
@@ -79,7 +80,7 @@ function InformationTable({ record, width, height }: InputProps) {
             title="Copy publication to clipboard"
           />
         ) : (
-          <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
+          <NotAvailableLabel />
         ),
     });
     dataSource.push({
@@ -94,7 +95,7 @@ function InformationTable({ record, width, height }: InputProps) {
             title="Copy license to clipboard"
           />
         ) : (
-          <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
+          <NotAvailableLabel />
         ),
     });
     dataSource.push({
@@ -109,7 +110,7 @@ function InformationTable({ record, width, height }: InputProps) {
             title="Copy copyright to clipboard"
           />
         ) : (
-          <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
+          <NotAvailableLabel />
         ),
     });
     dataSource.push({
@@ -123,7 +124,7 @@ function InformationTable({ record, width, height }: InputProps) {
           title="Copy date (created) to clipboard"
         />
       ) : (
-        <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
+        <NotAvailableLabel />
       ),
     });
     dataSource.push({
@@ -137,7 +138,7 @@ function InformationTable({ record, width, height }: InputProps) {
           title="Copy date (modified) to clipboard"
         />
       ) : (
-        <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
+        <NotAvailableLabel />
       ),
     });
 

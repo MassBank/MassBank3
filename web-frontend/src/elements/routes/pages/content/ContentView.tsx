@@ -26,6 +26,7 @@ import Segmented from '../../../basic/Segmented';
 import segmentedWidth from '../../../../constants/segmentedWidth';
 import buildClassificationData from '../../../../utils/buildClassificationData';
 import ClassificationPanel from './ClassificationPanel';
+import NotAvailableLabel from '../../../basic/NotAvailableLabel';
 
 const ContentChart = lazy(() => import('./ContentChart'));
 
@@ -261,11 +262,26 @@ function ContentView() {
       </Content>,
       <Content>
         <SectionDivider label="Classification (ChemOnt)" />
-        <ClassificationPanel
-          data={classificationData}
-          width={width - segmentedWidth}
-          height={heights.classificationPanelHeight}
-        />
+        {classificationData.labels.length > 0 ? (
+          <ClassificationPanel
+            data={classificationData}
+            width={width - segmentedWidth}
+            height={heights.classificationPanelHeight}
+          />
+        ) : (
+          <Content
+            style={{
+              width: width - segmentedWidth,
+              height: 50,
+              display: 'flex',
+              justifyContent: 'left',
+              alignItems: 'center',
+              paddingLeft: 20,
+            }}
+          >
+            <NotAvailableLabel />
+          </Content>
+        )}
       </Content>,
       <Content>
         <SectionDivider label="Information" />

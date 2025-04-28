@@ -11,6 +11,7 @@ import StructureView from '../basic/StructureView';
 import LabelWrapper from '../basic/LabelWrapper';
 import { usePropertiesContext } from '../../context/properties/properties';
 import buildSearchUrl from '../../utils/buildSearchUrl';
+import NotAvailableLabel from '../basic/NotAvailableLabel';
 
 const titleHeight = 50;
 const labelWidth = 120;
@@ -129,7 +130,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
               />
             ))
           ) : (
-            <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>
+            <NotAvailableLabel />
           )}
         </Content>
       ),
@@ -237,7 +238,11 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
             alignItems: 'left',
           }}
         >
-          <Tree showLine defaultExpandAll treeData={treeData} />
+          {treeData.length > 0 ? (
+            <Tree showLine defaultExpandAll treeData={treeData} />
+          ) : (
+            <NotAvailableLabel />
+          )}
         </Content>
       ),
     });
