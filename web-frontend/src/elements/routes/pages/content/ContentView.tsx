@@ -1,10 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
-import ContentChart from './ContentChart';
 import fetchData from '../../../../utils/request/fetchData';
 import buildSearchParams from '../../../../utils/request/buildSearchParams';
 import initFlags from '../../../../utils/initFlags';
-
 import SearchResult from '../../../../types/SearchResult';
 import Hit from '../../../../types/Hit';
 import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
@@ -26,6 +24,11 @@ import sortHits from '../../../../utils/sortHits';
 import collapseButtonWidth from '../../../../constants/collapseButtonWidth';
 import Segmented from '../../../basic/Segmented';
 import segmentedWidth from '../../../../constants/segmentedWidth';
+import buildClassificationData from '../../../../utils/buildClassificationData';
+import ClassificationPanel from './ClassificationPanel';
+import NotAvailableLabel from '../../../basic/NotAvailableLabel';
+
+const ContentChart = lazy(() => import('./ContentChart'));
 
 const defaultSearchPanelWidth = 450;
 
@@ -121,6 +124,7 @@ function ContentView() {
     return {
       chartPanelHeight: height * 0.9,
       searchPanelHeight: height * 0.9,
+      classificationPanelHeight: height * 0.9,
     };
   }, [height]);
 
@@ -246,6 +250,10 @@ function ContentView() {
   ]);
 
   return useMemo(() => {
+    const classificationData = buildClassificationData(
+      metadata?.compound_class_chemont ?? [],
+    );
+
     const elements = [
       searchAndResultPanel,
       <Content>
@@ -253,11 +261,39 @@ function ContentView() {
         {charts}
       </Content>,
       <Content>
+        <SectionDivider label="Classification (ChemOnt)" />
+        {classificationData.labels.length > 0 ? (
+          <ClassificationPanel
+            data={classificationData}
+            width={width - segmentedWidth}
+            height={heights.classificationPanelHeight}
+          />
+        ) : (
+          <Content
+            style={{
+              width: width - segmentedWidth,
+              height: 50,
+              display: 'flex',
+              justifyContent: 'left',
+              alignItems: 'center',
+              paddingLeft: 20,
+            }}
+          >
+            <NotAvailableLabel />
+          </Content>
+        )}
+      </Content>,
+      <Content>
         <SectionDivider label="Information" />
         <MetadataPanel metadata={metadata} />
       </Content>,
     ];
-    const elementLabels = ['Filter', 'Charts', 'Information'];
+    const elementLabels = [
+      'Filter',
+      'Charts',
+      'Compound Classes',
+      'Information',
+    ];
 
     return (
       <Layout
@@ -287,7 +323,14 @@ function ContentView() {
         </Content>
       </Layout>
     );
-  }, [charts, isFetchingContent, metadata, searchAndResultPanel]);
+  }, [
+    charts,
+    heights.classificationPanelHeight,
+    isFetchingContent,
+    metadata,
+    searchAndResultPanel,
+    width,
+  ]);
 }
 
 export default ContentView;

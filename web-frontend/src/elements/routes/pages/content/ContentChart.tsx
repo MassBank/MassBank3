@@ -1,6 +1,6 @@
 import './ContentChart.scss';
 
-import { CSSProperties, useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   splitStringAndCapitaliseFirstLetter,
   splitStringAndJoin,
@@ -8,23 +8,14 @@ import {
 import ValueCount from '../../../../types/ValueCount';
 import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
 import { Content } from 'antd/es/layout/layout';
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Colors,
-  Legend,
-  Title,
-  Tooltip,
-} from 'chart.js';
-import { Doughnut } from 'react-chartjs-2';
 
-ChartJS.register(ArcElement, Colors, Legend, Title, Tooltip);
+import Plot, { PlotParams } from 'react-plotly.js';
 
 type InputProps = {
   content: ContentFilterOptions;
   identifier: string;
-  width: CSSProperties['width'];
-  height: CSSProperties['height'];
+  width: number;
+  height: number;
 };
 
 function ContentChart({ content, identifier, width, height }: InputProps) {
@@ -63,14 +54,17 @@ function ContentChart({ content, identifier, width, height }: InputProps) {
     );
     const counts = contentValueCounts.map((vc) => vc.count);
 
-    const data = {
-      labels,
-      datasets: [
-        {
-          data: labels.map((_, i) => counts[i]),
-        },
-      ],
-    };
+    const data: PlotParams['data'] = [
+      {
+        type: 'pie',
+        hole: 0.5,
+        labels,
+        values: labels.map((_, i) => counts[i]),
+        textinfo: 'label',
+        hoverinfo: 'label',
+        insidetextorientation: 'radial',
+      },
+    ];
 
     return (
       <Content
@@ -84,30 +78,17 @@ function ContentChart({ content, identifier, width, height }: InputProps) {
           margin: 0,
         }}
       >
-        <Doughnut
+        <Plot
           data={data}
-          width={width}
-          height={height}
-          options={{
-            maintainAspectRatio: false,
-            aspectRatio: 1,
-            plugins: {
-              title: {
-                display: true,
-                text:
-                  (itemCount > topN ? 'Top ' + topN + ' of ' : '') +
-                  splitStringAndCapitaliseFirstLetter(identifier, '_', ' '),
-                fullSize: true,
-                font: {
-                  size: 18,
-                  weight: 'bold',
-                },
-              },
-              legend: {
-                display: true,
-                position: 'right',
-              },
+          layout={{
+            title: {
+              text:
+                (itemCount > topN ? 'Top ' + topN + ' of ' : '') +
+                splitStringAndCapitaliseFirstLetter(identifier, '_', ' '),
             },
+            width,
+            height,
+            showlegend: false,
           }}
         />
       </Content>

@@ -138,7 +138,7 @@ paths:
 
   /metadata:
     get:
-      summary: Get the metadata of the database and the current dataset in use. It includes the version, timestamp, git commit hash, unique spectra count (SPLASH), unique compound count (InChI) and all compound classes with counts.
+      summary: Get the metadata of the database and the current dataset in use. It includes the version, timestamp, git commit hash, unique spectra count (SPLASH), unique compound count (InChI) and compound classes (free text/ChemOnt) with counts.
       operationId: getMetadata
       responses:
         "200":

@@ -497,7 +497,7 @@ func (c *DefaultAPIController) GetBrowseOptions(w http.ResponseWriter, r *http.R
 	_ = EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GetMetadata - Get the metadata of the database and the current dataset in use. It includes the version, timestamp, git commit hash, unique spectra count (SPLASH), unique compound count (InChI) and all compound classes with counts.
+// GetMetadata - Get the metadata of the database and the current dataset in use. It includes the version, timestamp, git commit hash, unique spectra count (SPLASH), unique compound count (InChI) and compound classes (free text/ChemOnt) with counts.
 func (c *DefaultAPIController) GetMetadata(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.GetMetadata(r.Context())
 	// If an error occurred, encode the error with the status code

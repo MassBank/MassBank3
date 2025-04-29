@@ -16,4 +16,4 @@ COPY api/schemas ./swagger-ui/schemas
 COPY entrypoint-mb3server.sh ./entrypoint-mb3server.sh
 
 EXPOSE 8080
-ENTRYPOINT sh entrypoint-mb3server.sh "${MB3_API_URL}"
+ENTRYPOINT ["sh", "entrypoint-mb3server.sh", "${MB3_API_URL}"]

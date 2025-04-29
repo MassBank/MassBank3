@@ -5,6 +5,7 @@ import { Table } from 'antd';
 import ExportableContent from '../../../common/ExportableContent';
 import LabelWrapper from '../../../basic/LabelWrapper';
 import copyTextToClipboard from '../../../../utils/copyTextToClipboard';
+import NotAvailableLabel from '../../../basic/NotAvailableLabel';
 
 const labelWidth = 180;
 
@@ -113,8 +114,33 @@ function MetadataPanel({ metadata, width = '100%', height }: InputProps) {
       ),
     });
     dataSource.push({
+      key: 'metadata-panel-table-compound-class-count-chemont',
+      label: 'Compound Classes (ChemOnt)',
+      value:
+        metadata.compound_class_chemont &&
+        metadata.compound_class_chemont.length > 0 ? (
+          <ExportableContent
+            component={
+              <LabelWrapper
+                value={String(metadata.compound_class_chemont.length)}
+              />
+            }
+            mode="copy"
+            onClick={() =>
+              copyTextToClipboard(
+                'Compound class count (ChemOnt)',
+                String(metadata.compound_class_chemont.length),
+              )
+            }
+            title="Copy compound class count to clipboard"
+          />
+        ) : (
+          <NotAvailableLabel />
+        ),
+    });
+    dataSource.push({
       key: 'metadata-panel-table-compound-class-count',
-      label: 'Compound Classes',
+      label: 'Compound classes (free text)',
       value: (
         <ExportableContent
           component={
@@ -123,11 +149,11 @@ function MetadataPanel({ metadata, width = '100%', height }: InputProps) {
           mode="copy"
           onClick={() =>
             copyTextToClipboard(
-              'Compound Class Count',
+              'Compound class count (free text)',
               String(metadata.compound_class.length),
             )
           }
-          title="Copy Compound Class Count to clipboard"
+          title="Copy compound class count to clipboard"
         />
       ),
     });

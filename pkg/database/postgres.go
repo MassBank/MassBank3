@@ -287,7 +287,7 @@ func (p *PostgresSQLDB) GetMetadata() (*massbank.MbMetaData, error) {
 	result.SpectraCount = spectraCount
 	result.CompoundCount = compoundCount
 
-	// compound classes
+	// compound classes (free text)
 	query = "SELECT class, COUNT(class) as count FROM compound_class GROUP BY class ORDER BY class;"
 	stmt, err = p.database.Prepare(query)
 	if err != nil {
@@ -306,6 +306,33 @@ func (p *PostgresSQLDB) GetMetadata() (*massbank.MbMetaData, error) {
 			}
 			result.CompoundClass = append(result.CompoundClass, class)
 			result.CompoundClassCount = append(result.CompoundClassCount, count)
+		}
+		rows.Close()
+	} else {
+		if err != sql.ErrNoRows {
+			return nil, err
+		}
+	}
+
+	// compound classes (ClassyFire)
+	query = "SELECT identifier, COUNT(identifier) as count FROM compound_link WHERE database = 'ChemOnt' GROUP BY identifier ORDER BY count DESC;"
+	stmt, err = p.database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	rows, err = stmt.Query()
+	stmt.Close()
+	if err == nil {
+		result.CompoundClassChemOnt = []string{}
+		result.CompoundClassCountChemOnt = []uint{}
+		for rows.Next() {
+			var class string
+			var count uint
+			if err := rows.Scan(&class, &count); err != nil {
+				return nil, err
+			}
+			result.CompoundClassChemOnt = append(result.CompoundClassChemOnt, class)
+			result.CompoundClassCountChemOnt = append(result.CompoundClassCountChemOnt, count)
 		}
 		rows.Close()
 	} else {
@@ -1046,7 +1073,7 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) (string, []stri
 
 	if filters.CompoundClass != "" {
 		parameters = append(parameters, filters.CompoundClass)
-		subQuery := "massbank_id IN (SELECT DISTINCT(massbank_id) FROM compound_class WHERE LOWER(class) LIKE LOWER(CONCAT('%%',$" + strconv.Itoa(len(parameters)) + "::text,'%%')))"
+		subQuery := "massbank_id IN (SELECT DISTINCT(massbank_id) FROM compound_class WHERE LOWER(class) LIKE LOWER(CONCAT('%%',$" + strconv.Itoa(len(parameters)) + "::text,'%%')) OR massbank_id IN (SELECT DISTINCT(massbank_id) FROM compound_link WHERE database = 'ChemOnt' AND LOWER(identifier) LIKE LOWER(CONCAT('%%',$" + strconv.Itoa(len(parameters)) + "::text,'%%'))))"
 		if addedWhere || addedAnd {
 			query = query + " AND " + subQuery
 			addedAnd = true

@@ -30,11 +30,18 @@ type Metadata struct {
 	CompoundCount int32 `json:"compound_count,omitempty"`
 
 	CompoundClass []MetadataCompoundClassInner `json:"compound_class,omitempty"`
+
+	CompoundClassChemont []MetadataCompoundClassInner `json:"compound_class_chemont,omitempty"`
 }
 
 // AssertMetadataRequired checks if the required fields are not zero-ed
 func AssertMetadataRequired(obj Metadata) error {
 	for _, el := range obj.CompoundClass {
+		if err := AssertMetadataCompoundClassInnerRequired(el); err != nil {
+			return err
+		}
+	}
+	for _, el := range obj.CompoundClassChemont {
 		if err := AssertMetadataCompoundClassInnerRequired(el); err != nil {
 			return err
 		}
@@ -51,6 +58,11 @@ func AssertMetadataConstraints(obj Metadata) error {
 		return &ParsingError{Param: "CompoundCount", Err: errors.New(errMsgMinValueConstraint)}
 	}
 	for _, el := range obj.CompoundClass {
+		if err := AssertMetadataCompoundClassInnerConstraints(el); err != nil {
+			return err
+		}
+	}
+	for _, el := range obj.CompoundClassChemont {
 		if err := AssertMetadataCompoundClassInnerConstraints(el); err != nil {
 			return err
 		}

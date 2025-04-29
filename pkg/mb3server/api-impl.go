@@ -618,18 +618,25 @@ func GetMetadata() (*Metadata, error) {
 	}
 
 	result := Metadata{
-		Version:       metadata.Version,
-		Timestamp:     metadata.Timestamp,
-		GitCommit:     metadata.GitCommit,
-		SpectraCount:  int32(metadata.SpectraCount),
-		CompoundCount: int32(metadata.CompoundCount),
-		CompoundClass: []MetadataCompoundClassInner{},
+		Version:              metadata.Version,
+		Timestamp:            metadata.Timestamp,
+		GitCommit:            metadata.GitCommit,
+		SpectraCount:         int32(metadata.SpectraCount),
+		CompoundCount:        int32(metadata.CompoundCount),
+		CompoundClass:        []MetadataCompoundClassInner{},
+		CompoundClassChemont: []MetadataCompoundClassInner{},
 	}
 
 	for i, compoundClass := range metadata.CompoundClass {
 		result.CompoundClass = append(result.CompoundClass, MetadataCompoundClassInner{
 			Name:  compoundClass,
 			Count: int32(metadata.CompoundClassCount[i]),
+		})
+	}
+	for i, compoundClassChemOnt := range metadata.CompoundClassChemOnt {
+		result.CompoundClassChemont = append(result.CompoundClassChemont, MetadataCompoundClassInner{
+			Name:  compoundClassChemOnt,
+			Count: int32(metadata.CompoundClassCountChemOnt[i]),
 		})
 	}
 
