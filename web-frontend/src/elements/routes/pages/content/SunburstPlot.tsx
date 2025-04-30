@@ -22,12 +22,6 @@ function SunburstPlot({ data, onSelect, width, height, level }: InputProps) {
         const entry = (e.points[0] as any).entry as string;
         const selectedLabels: string[] =
           entry === label || entry === undefined ? [] : [label];
-        // console.log('entry:"', entry, '"-> label:"', label, '"');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        // const parent = (e.points[0] as any).parent as string;
-        // if (entry === undefined && parent === '') {
-        //   selectedLabels.push(label);
-        // }
         if (data.hashmapParents.get(label) !== undefined) {
           const parent1 = data.hashmapParents.get(label);
           if (parent1 !== undefined) {
@@ -54,8 +48,6 @@ function SunburstPlot({ data, onSelect, width, height, level }: InputProps) {
             }
           }
         }
-        // console.log(selectedLabels);
-
         onSelect(selectedLabels);
       }
     },
