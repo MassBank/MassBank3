@@ -148,7 +148,7 @@ function ServiceStatusView() {
           disabled={isLoading}
           style={{ marginTop: 20 }}
         >
-          Reload
+          Refresh
         </Button>
       </Content>
     ),
