@@ -4,16 +4,15 @@ COPY main.go .
 COPY pkg ./pkg
 COPY go.mod .
 
-RUN wget https://github.com/swagger-api/swagger-ui/archive/refs/tags/v5.20.2.tar.gz && \
-    tar -xf v5.20.2.tar.gz && \
-    mv swagger-ui-5.20.2/dist ./swagger-ui && \
+RUN wget https://github.com/swagger-api/swagger-ui/archive/refs/tags/v5.21.0.tar.gz && \
+    tar -xf v5.21.0.tar.gz && \
+    mv swagger-ui-5.21.0/dist ./swagger-ui && \
     sed -i 's/url: \".*\"/url: \"\.\/openapi.yaml\",\n\tsyntaxHighlight: {activated: false}/' swagger-ui/swagger-initializer.js && \
-    # mv swagger-ui pkg/mb3server/swagger-ui && \
-    rm -rf v5.20.2.tar.gz swagger-ui-5.20.2
+    rm -rf v5.21.0.tar.gz swagger-ui-5.21.0
 
 COPY api/openapi.yaml ./swagger-ui/openapi.yaml
 COPY api/schemas ./swagger-ui/schemas
 COPY entrypoint-mb3server.sh ./entrypoint-mb3server.sh
 
 EXPOSE 8080
-ENTRYPOINT ["sh", "entrypoint-mb3server.sh", "${MB3_API_URL}"]
+ENTRYPOINT sh entrypoint-mb3server.sh "${MB3_API_URL}"
