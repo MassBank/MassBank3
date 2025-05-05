@@ -17,6 +17,7 @@ global:
 postgresql:
   image:
     tag: "15"
+    debug: true
   auth:
     postgresPassword: "massbank3adminpassword"
     username: "massbank3"
@@ -26,12 +27,7 @@ postgresql:
     initdb:
       user: "postgres"
       password: "massbank3adminpassword"
-      scripts:
-        000_bingo_install.sql: |
-          \i /opt/bingo-postgres/init-scripts/000_bingo_install.sql
-        00_init.sql: |
-          -- update ALLOW_NON_UNIQUE_DEAROMATIZATION to 1 --
-          UPDATE bingo.bingo_config SET cvalue = 1 WHERE cname = 'ALLOW_NON_UNIQUE_DEAROMATIZATION';
+      scriptsConfigMap: "postgres-config"
     initContainers:
       - name: bingo-init
         image: quay.io/massbank/postgres-bingo-init:v15-bingo-1.28.0
@@ -134,14 +130,14 @@ resources:
   #   memory: 128Mi
 
 # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-livenessProbe:
-  httpGet:
-    path: /version
-    port: http
-readinessProbe:
-  httpGet:
-    path: /version
-    port: http
+#livenessProbe:
+#  httpGet:
+#    path: /version
+#    port: http
+#readinessProbe:
+#  httpGet:
+#    path: /version
+#    port: http
 
 # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:
