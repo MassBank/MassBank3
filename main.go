@@ -17,8 +17,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/MassBank/MassBank3/pkg/mb3server"
 	"github.com/MassBank/MassBank3/pkg/config"
+	"github.com/MassBank/MassBank3/pkg/mb3server"
 	"github.com/go-chi/chi/v5"
 )
 
