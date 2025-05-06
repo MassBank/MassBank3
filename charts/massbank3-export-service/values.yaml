@@ -10,7 +10,6 @@ pathPrefix: "MassBank"
 
 image:
   repository: quay.io/massbank/massbank3-export-service
-  tag: "v1.4"
   pullPolicy: IfNotPresent
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
