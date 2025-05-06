@@ -69,8 +69,8 @@ spec:
           command:
             - wget
             - "-O"
-            - "/msp/MassBank_NIST.msp"
-            - https://github.com/MassBank/MassBank-data/releases/latest/download/MassBank_NIST.msp
+            - "/msp/MassBank.msp"
+            - https://github.com/MassBank/MassBank-data/releases/download/2025.05.1/MassBank.msp_NIST
           {{- with .Values.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}

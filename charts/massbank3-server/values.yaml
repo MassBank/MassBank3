@@ -7,7 +7,7 @@ pathPrefix: "MassBank"
 image:
   repository: ipbhalle/massbank3-server
   tag: "dev"
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 # postggresql config
 # for massbank we need a special version of postgres with bingo cartridge
@@ -130,14 +130,14 @@ resources:
   #   memory: 128Mi
 
 # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-#livenessProbe:
-#  httpGet:
-#    path: /version
-#    port: http
-#readinessProbe:
-#  httpGet:
-#    path: /version
-#    port: http
+livenessProbe:
+  httpGet:
+    path: /version
+    port: http
+readinessProbe:
+  httpGet:
+    path: /version
+    port: http
 
 # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:

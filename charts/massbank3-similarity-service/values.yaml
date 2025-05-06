@@ -11,7 +11,6 @@ pathPrefix: "MassBank"
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
   repository: quay.io/massbank/massbank3-similarity-service
-  tag: "v1.1-matchms-0.28.2"
   pullPolicy: IfNotPresent
 
 
