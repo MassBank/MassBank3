@@ -14,10 +14,14 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 /docker/.env
-/.idea/
+.idea/
 /docker/debuglog/
 /scripts/bin/
 /docker/deploy.sh
+/docker/deploy_with_init.sh
 
 # misc
-.DS_Store
+.DS_Store/
+.vscode/
+/compose/.env
+

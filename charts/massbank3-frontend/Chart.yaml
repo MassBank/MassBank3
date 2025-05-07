@@ -1,0 +1,15 @@
+apiVersion: v2
+name: massbank3-frontend
+description: A Helm chart for massbank3-frontend
+
+type: application
+version: 0.1.0
+appVersion: "v0.1"
+
+dependencies:
+  - name: massbank3-server
+    repository: file://../massbank3-server
+    version: 0.1.0
+  - name: massbank3-export-service
+    repository: file://../massbank3-export-service
+    version: 0.1.0

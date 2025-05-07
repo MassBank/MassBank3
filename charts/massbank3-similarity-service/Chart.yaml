@@ -1,0 +1,7 @@
+apiVersion: v2
+name: massbank3-similarity-service
+description: A Helm chart for massbank3-similarity-service
+
+type: application
+version: 0.1.0
+appVersion: "v1.1-matchms-0.28.2"

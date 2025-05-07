@@ -1,0 +1,122 @@
+components:
+  parameters:
+    Contributor:
+      description: "The short version of the contributor name, e.g. AAFC or UFZ."
+      in: query
+      name: contributor
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/Contributor"
+      explode: false
+      required: false
+    InstrumentType:
+      description: "The type of instrument used for the measurement, e.g. ESI-TOF."
+      in: query
+      name: instrument_type
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/InstrumentType"
+      explode: false
+      required: false
+    MsType:
+      description: "The type of mass spectrometry. ENUM: [MS, MS2, MS3, MS4]."
+      in: query
+      name: ms_type
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/MsType"
+      explode: false
+      required: false
+    IonMode:
+      description: "The ion mode. ENUM: [POSITIVE, NEGATIVE]"
+      in: query
+      name: ion_mode
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/IonMode"
+      explode: false
+      required: false
+    Splash:
+      description: "The SPLASH string, e.g. splash10-03fr-0900000000-035ec76d23650a15673b."
+      in: query
+      name: splash
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/Splash"
+      required: false
+    CompoundName:
+      description: "A compound name, e.g. Rutin."
+      in: query
+      name: compound_name
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/CompoundName"
+      required: false
+    CompoundClass:
+      description: "A compound class, e.g. Flavonoids or Natural Product."
+      in: query
+      name: compound_class
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/CompoundClass"
+      required: false
+    ExactMass:
+      description: "A m/z value, e.g. 122.02."
+      in: query
+      name: exact_mass
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/ExactMass"
+    MassTolerance:
+      description: "A mass tolerance value, e.g. 0.3."
+      in: query
+      name: mass_tolerance
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/MassTolerance"
+    Formula:
+      description: "A molecular formula, e.g. C6H7N5."
+      in: query
+      name: formula
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/Formula"
+      required: false
+    Peaks:
+      description: "A list of m/z values, e.g. 147.063."
+      in: query
+      name: peaks
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/Peaks"
+      explode: false
+      required: false
+    Intensity:
+      description: "Relative intensity commonly used for peak search, similarity search and neutral loss search."
+      in: query
+      name: intensity
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/Intensity"
+      required: false
+    NeutralLoss:
+      description: "A list of m/z values for peak differences (neutral loss) search, e.g. 147.063."
+      in: query
+      name: neutral_loss
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/Peaks"
+      explode: false
+      required: false
+    PeakList:
+      $ref: "./SimilaritySearchParams.yaml#/components/parameters/PeakList"
+    PeakListThreshold:
+      $ref: "./SimilaritySearchParams.yaml#/components/parameters/PeakListThreshold"
+    InChI:
+      description: "The InChI string, e.g. InChI=1S/C10H10O3/c1-6-5-7-3-2-4-8(11)9(7)10(12)13-6/h2-4,6,11H,5H2,1H3"
+      in: query
+      name: inchi
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/InChI"
+      required: false
+    InChIKey:
+      description: "The InChIKey string, e.g. KWILGNNWGSNMPA-UHFFFAOYSA-N."
+      in: query
+      name: inchi_key
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/InChIKey"
+      required: false
+    Substructure:
+      description: "A SMILES string for substructure search, e.g. CC1CC2=C(C(=CC=C2)O)C(=O)O1."
+      in: query
+      name: substructure
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/Substructure"
+      required: false

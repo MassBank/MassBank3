@@ -165,9 +165,10 @@ func getPeaks(s string) (*PkPeak, error) {
 	}
 	return &PkPeak{
 		Header:    strings.Split(s, " "),
+		Id:        []int32{},
 		Mz:        []float64{},
 		Intensity: []float64{},
-		Rel:       []uint{},
+		Rel:       []int32{},
 	}, nil
 }
 
@@ -212,11 +213,10 @@ func (mb *MassBank2) readLine(line string) error {
 func (mb *MassBank2) parsePeakValue(line string) error {
 	svals := strings.Split(strings.TrimSpace(line), " ")
 	if len(svals) != 3 {
-		return errors.New("Could not read Peakvalue: " + line)
+		return errors.New("Could not read peak value: " + line)
 	}
 	var mz, intens float64
 	var err error
-	var rel uint64
 
 	if mz, err = strconv.ParseFloat(svals[0], 32); err != nil {
 		return errors.New("could not parse mz Value")
@@ -224,12 +224,14 @@ func (mb *MassBank2) parsePeakValue(line string) error {
 	if intens, err = strconv.ParseFloat(svals[1], 32); err != nil {
 		return errors.New("could not parse intensity Value")
 	}
-	if rel, err = strconv.ParseUint(svals[2], 10, 32); err != nil {
+	relInt64, err := strconv.ParseInt(svals[2], 10, 32)
+	if err != nil {
 		return errors.New("could not parse relative intensity")
 	}
 	mb.Peak.Peak.Mz = append(mb.Peak.Peak.Mz, mz)
 	mb.Peak.Peak.Intensity = append(mb.Peak.Peak.Intensity, intens)
-	mb.Peak.Peak.Rel = append(mb.Peak.Peak.Rel, uint(rel))
+	mb.Peak.Peak.Rel = append(mb.Peak.Peak.Rel, int32(relInt64))
+	
 	return nil
 }
 

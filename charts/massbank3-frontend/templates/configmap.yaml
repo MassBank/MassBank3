@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "massbank3-frontend.fullname" . }}-env-configmap
+  labels:
+    {{- include "massbank3-frontend.labels" . | nindent 4 }}
+data:
+  MB3_API_URL: "https://{{ .Values.host }}/{{ .Values.pathPrefix }}-api"
+  MB3_API_URL_INTERNAL: "http://{{ .Release.Name }}-massbank3-server:8080"
+  MB3_FRONTEND_URL: "https://{{ .Values.host }}"
+  MB3_FRONTEND_BASE_URL: "/{{ .Values.pathPrefix }}/"
+  MB3_FRONTEND_VERSION: "3.0.0 (beta)"
+  EXPORT_SERVICE_URL: "https://{{ .Values.host }}/{{ .Values.pathPrefix }}-export"
+  EXPORT_SERVICE_URL_INTERNAL: "http://{{ .Release.Name }}-massbank3-export-service:8080"
+  GOOGLE_SEARCH_CONSOLE_KEY: "4aoZgYg2lHeh7TlOxtyVzjHa3YJirrsEHPqwSU3luoU"
+  DISTRIBUTOR_TEXT: "This website is hosted and distributed by the Leibniz Institute of Plant Biochemistry, Halle (Saale), Germany."
+  DISTRIBUTOR_URL: "https://www.ipb-halle.de/kontakt/impressum"

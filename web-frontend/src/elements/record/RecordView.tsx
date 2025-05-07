@@ -1,331 +1,169 @@
-import './RecordView.scss';
-
-import Record from '../../types/Record';
-import useContainerDimensions from '../../utils/useContainerDimensions';
-import { useEffect, useMemo, useRef } from 'react';
-import StructureView from '../basic/StructureView';
-import { MF } from 'react-mf';
+import Record from '../../types/record/Record';
+import { useCallback, useMemo } from 'react';
+import Resizable from '../common/Resizable';
+import { Content } from 'antd/es/layout/layout';
 import AnnotationTable from './AnnotationTable';
-import SubTagTableRows from './SubTagTableRows';
-import Resizable from './Resizable';
-
-const borderStyle = '2px solid grey';
+import RecordViewHeader from './RecordViewHeader';
+import AcquisitionTable from './AcquisitionTable';
+import LinksTable from './LinksTable';
+import CommentsTable from './CommentsTable';
+import SpeciesTable from './SpeciesTable';
+import InformationTable from './InformationTable';
+import SectionDivider from '../basic/SectionDivider';
+import Segmented from '../basic/Segmented';
+import segmentedWidth from '../../constants/segmentedWidth';
 
 type inputProps = {
   record: Record;
+  width: number;
+  height: number;
 };
 
-function RecordView({ record }: inputProps) {
-  useEffect(() => {
-    console.log(record);
-  }, [record]);
+function RecordView({ record, width, height }: inputProps) {
+  const imageWidth = 500;
+  const headerHeight = 400;
+  const minChartWidth = useMemo(() => width / 2, [width]);
+  const minPeakTableWith = 400;
+  const chartAndPeakTableHeight = 600;
 
-  const containerRef = useRef(null);
-  const { width: containerWidth, height: containerHeight } =
-    useContainerDimensions(containerRef);
-  const chartAndPeakTableContainerRef = useRef(null);
-  const { width: chartAndPeakTableContainerWidth } = useContainerDimensions(
-    chartAndPeakTableContainerRef,
+  const buildDivider = useCallback(
+    (label: string) => <SectionDivider label={label} />,
+    [],
   );
 
-  const chartAndPeakTableHeight = useMemo(
-    () => containerHeight * 0.6,
-    [containerHeight],
-  );
+  return useMemo(() => {
+    const hasAnnotation =
+      record.peak &&
+      record.peak.annotation &&
+      record.peak.annotation.header &&
+      record.peak.annotation.values;
 
-  const rowSpanAcquisition = useMemo(() => {
-    let count = 1;
-    if (record.acquisition.instrument) {
-      count++;
-    }
-    if (record.acquisition.instrument_type) {
-      count++;
-    }
-    if (record.acquisition.mass_spectrometry.ms_type) {
-      count++;
-    }
-    if (record.acquisition.mass_spectrometry.ion_mode) {
-      count++;
-    }
-    if (record.acquisition.mass_spectrometry.subtags) {
-      count += record.acquisition.mass_spectrometry.subtags.length;
-    }
-    if (record.acquisition.chromatography) {
-      count += record.acquisition.chromatography.length;
+    const hasLinks = record.compound.link && record.compound.link.length > 0;
+    const hasSpecies = record.species && Object.keys(record.species).length > 0;
+    const hasComments = record.comments && record.comments.length > 0;
+
+    const elements: JSX.Element[] = [];
+    const elementLabels: string[] = [];
+
+    const overview = (
+      <RecordViewHeader
+        record={record}
+        width="100%"
+        height={headerHeight}
+        imageWidth={imageWidth}
+      />
+    );
+    elements.push(overview);
+    elementLabels.push('Overview');
+
+    const spectrum = (
+      <Content>
+        {buildDivider('Spectrum')}
+        <Resizable
+          record={record}
+          width={width - segmentedWidth}
+          height={chartAndPeakTableHeight}
+          minChartWidth={minChartWidth}
+          minPeakTableWith={minPeakTableWith}
+          disableNeutralLossTab
+        />
+      </Content>
+    );
+    elements.push(spectrum);
+    elementLabels.push('Spectrum');
+
+    if (hasAnnotation) {
+      const peakAnnotation = (
+        <Content>
+          {buildDivider('Peak Annotation')}
+          {
+            <AnnotationTable
+              annotation={record.peak.annotation}
+              width="100%"
+              height="auto"
+            />
+          }
+        </Content>
+      );
+      elements.push(peakAnnotation);
+      elementLabels.push('Peak Annotation');
     }
 
-    return count;
-  }, [
-    record.acquisition.chromatography,
-    record.acquisition.instrument,
-    record.acquisition.instrument_type,
-    record.acquisition.mass_spectrometry.ion_mode,
-    record.acquisition.mass_spectrometry.ms_type,
-    record.acquisition.mass_spectrometry.subtags,
-  ]);
+    const acquisition = (
+      <Content>
+        {buildDivider('Acquisition')}
+        <AcquisitionTable
+          acquisition={record.acquisition}
+          width="100%"
+          height="auto"
+        />
+      </Content>
+    );
+    elements.push(acquisition);
+    elementLabels.push('Acquisition');
 
-  const rowSpanSpecies = useMemo(() => {
-    let count = 1;
-    if (record.species.name) {
-      count++;
-    }
-    if (record.species.lineage) {
-      count += record.species.lineage.length;
-    }
-    if (record.species.sample) {
-      count += record.species.sample.length;
-    }
-    if (record.species.link) {
-      count += record.species.link.length;
+    if (hasLinks) {
+      const links = (
+        <Content>
+          {buildDivider('Links')}
+          <LinksTable links={record.compound.link} width="100%" height="auto" />
+        </Content>
+      );
+      elements.push(links);
+      elementLabels.push('Links');
     }
 
-    return count;
-  }, [
-    record.species.lineage,
-    record.species.link,
-    record.species.name,
-    record.species.sample,
-  ]);
+    if (hasSpecies) {
+      const species = (
+        <Content>
+          {buildDivider('Species')}
+          <SpeciesTable species={record.species} width="100%" height="auto" />
+        </Content>
+      );
+      elements.push(species);
+      elementLabels.push('Species');
+    }
 
-  const recordView = useMemo(
-    () => (
-      <div className="RecordView" ref={containerRef}>
-        <table>
-          <tbody>
-            <tr>
-              <td>Accession</td>
-              <td>{record.accession}</td>
-              <td rowSpan={6} style={{ width: '100%' }}>
-                <div className="structure-view">
-                  {record.compound.smiles &&
-                  record.compound.smiles !== '' &&
-                  containerWidth > 0 ? (
-                    <StructureView
-                      smiles={record.compound.smiles}
-                      imageWidth={containerWidth * 0.4}
-                      imageHeight={containerHeight / 3}
-                    />
-                  ) : undefined}
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>Title</td>
-              <td className="long-text">{record.title}</td>
-            </tr>
-            <tr>
-              <td>Names</td>
-              <td className="long-text">{record.compound.names.join('; ')}</td>
-            </tr>
-            <tr>
-              <td>Classes</td>
-              <td className="long-text">
-                {record.compound.classes.join('; ')}
-              </td>
-            </tr>
-            <tr>
-              <td>Mass</td>
-              <td>{record.compound.mass}</td>
-            </tr>
-            <tr>
-              <td>Formula</td>
-              <td>
-                <MF mf={record.compound.formula} />{' '}
-              </td>
-            </tr>
-            <tr>
-              <td>Spectrum</td>
-              <td colSpan={2}>
-                <div
-                  className="spectrum-peak-table-view"
-                  ref={chartAndPeakTableContainerRef}
-                  style={{ width: '100%', height: chartAndPeakTableHeight }}
-                >
-                  <Resizable
-                    record={record}
-                    width={chartAndPeakTableContainerWidth}
-                    height={chartAndPeakTableHeight}
-                  />
-                </div>
-              </td>
-            </tr>
-            {record.peak.annotation &&
-              Object.keys(record.peak.annotation).length > 0 && (
-                <tr>
-                  <td>Annotation</td>
-                  <td colSpan={2}>
-                    {
-                      <AnnotationTable
-                        annotation={record.peak.annotation}
-                        width="100%"
-                        height={300}
-                      />
-                    }
-                  </td>
-                </tr>
-              )}
-            <tr>
-              <td>SPLASH</td>
-              <td colSpan={2}>{record.peak.splash}</td>
-            </tr>
-            <tr>
-              <td>InChI</td>
-              <td colSpan={2} className="long-text">
-                {record.compound.inchi}
-              </td>
-            </tr>
-            <tr>
-              <td style={{ borderBottom: borderStyle }}>SMILES</td>
-              <td
-                colSpan={2}
-                className="long-text"
-                style={{ borderBottom: borderStyle }}
-              >
-                {record.compound.smiles}
-              </td>
-            </tr>
-            {record.compound.link && (
-              <tr>
-                <td rowSpan={record.compound.link.length + 1}>Links</td>
-              </tr>
-            )}
-            {/* ########### Links ########### */}
-            {record.compound.link &&
-              record.compound.link.map((link) => (
-                <tr key={'link-' + link.database + '-' + link.identifier}>
-                  <td>{link.database}</td>
-                  <td>{link.identifier}</td>
-                </tr>
-              ))}
-            {/* ########### Acquisition ########### */}
-            <tr>
-              <td
-                rowSpan={rowSpanAcquisition}
-                style={{ borderTop: borderStyle }}
-              >
-                Acquisition
-              </td>
-            </tr>
-            <tr>
-              <td style={{ borderTop: borderStyle }}>Instrument</td>
-              <td className="long-text" style={{ borderTop: borderStyle }}>
-                {record.acquisition.instrument}
-              </td>
-            </tr>
-            <tr>
-              <td>Instrument Type</td>
-              <td className="long-text">
-                {record.acquisition.instrument_type}
-              </td>
-            </tr>
-            <tr>
-              <td>MS Type</td>
-              <td className="long-text">
-                {record.acquisition.mass_spectrometry.ms_type}
-              </td>
-            </tr>
-            <tr>
-              <td>Ion Mode</td>
-              <td className="long-text">
-                {record.acquisition.mass_spectrometry.ion_mode}
-              </td>
-            </tr>
-            {record.acquisition && record.acquisition.mass_spectrometry && (
-              <SubTagTableRows
-                subtags={record.acquisition.mass_spectrometry.subtags}
-              />
-            )}
-            {record.acquisition && record.acquisition.chromatography && (
-              <SubTagTableRows subtags={record.acquisition.chromatography} />
-            )}
-            {/* ########### Species ########### */}
-            {record.species && Object.keys(record.species).length > 0 && (
-              <tr>
-                <td rowSpan={rowSpanSpecies}>Species</td>
-              </tr>
-            )}
-            {record.species && record.species.name && (
-              <tr>
-                <td>Name</td>
-                <td>{record.species.name}</td>
-              </tr>
-            )}
-            {record.species && record.species.lineage && (
-              <tr>
-                <td>Lineage</td>
-                <td>{record.species.lineage.join('; ')}</td>
-              </tr>
-            )}
-            {record.species && record.species.sample && (
-              <tr>
-                <td>Sample</td>
-                <td>{record.species.sample.join('; ')}</td>
-              </tr>
-            )}
-            {record.species && record.species.link && (
-              <tr>
-                <td>Link</td>
-                <td>
-                  {record.species.link
-                    .map((link) => link.database + ': ' + link.identifier)
-                    .join('; ')}
-                </td>
-              </tr>
-            )}
-            {/* ########### Rest ########### */}
-            <tr>
-              <td style={{ borderTop: borderStyle }}>Authors</td>
-              <td
-                style={{ borderTop: borderStyle }}
-                className="long-text"
-                colSpan={2}
-              >
-                {record.authors.map((a) => a.name).join(', ')}
-              </td>
-            </tr>
-            {record.publication && (
-              <tr>
-                <td>Publication</td>
-                <td colSpan={2} className="long-text">
-                  {record.publication}
-                </td>
-              </tr>
-            )}
-            {record.copyright && (
-              <tr>
-                <td>Copyright</td>
-                <td colSpan={2}>{record.copyright}</td>
-              </tr>
-            )}
-            {record.license && (
-              <tr>
-                <td>License</td>
-                <td colSpan={2}>{record.license}</td>
-              </tr>
-            )}
-            {record.date && (
-              <tr>
-                <td>Date</td>
-                <td colSpan={2}>{record.date.created}</td>
-              </tr>
-            )}
-            {record.comments && <SubTagTableRows subtags={record.comments} />}
-          </tbody>
-        </table>
-      </div>
-    ),
-    [
-      record,
-      containerWidth,
-      containerHeight,
-      chartAndPeakTableHeight,
-      chartAndPeakTableContainerWidth,
-      rowSpanAcquisition,
-      rowSpanSpecies,
-    ],
-  );
+    if (hasComments) {
+      const comments = (
+        <Content>
+          {buildDivider('Comments')}
+          <CommentsTable
+            comments={record.comments}
+            width="100%"
+            height="auto"
+          />
+        </Content>
+      );
+      elements.push(comments);
+      elementLabels.push('Comments');
+    }
 
-  return recordView;
+    const furtherInformation = (
+      <Content>
+        {buildDivider('Further Information')}
+        <InformationTable record={record} width="100%" height="auto" />
+      </Content>
+    );
+    elements.push(furtherInformation);
+    elementLabels.push('Further Information');
+
+    return (
+      <Content
+        style={{
+          width,
+          height,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          userSelect: 'none',
+          backgroundColor: 'white',
+        }}
+      >
+        <Segmented elements={elements} elementLabels={elementLabels} />
+      </Content>
+    );
+  }, [buildDivider, height, minChartWidth, record, width]);
 }
 
 export default RecordView;

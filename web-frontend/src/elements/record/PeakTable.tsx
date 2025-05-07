@@ -1,77 +1,115 @@
 import './PeakTable.scss';
 
-import { useMemo } from 'react';
-import PeakTableRow from './PeakTableRow';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Peak from '../../types/peak/Peak';
-import { splitStringAndCapitaliseFirstLetter } from '../../utils/stringUtils';
-import LinkedPeakAnnotation from '../../types/peak/LinkedPeakAnnotation';
-import PeakAnnotation from '../../types/peak/PeakAnnotation';
+import { Table } from 'antd';
+import PeakTableDataType from '../../types/PeakTableDataType';
+import { useHighlightData } from '../../context/highlight/useHighlightData';
+
+const columns = [
+  {
+    title: 'm/z',
+    dataIndex: 'mz',
+    key: 'mz',
+    align: 'center' as const,
+  },
+  {
+    title: 'Intensity',
+    dataIndex: 'intensity',
+    key: 'intensity',
+    align: 'center' as const,
+  },
+  {
+    title: 'Rel. Int.',
+    dataIndex: 'rel',
+    key: 'rel',
+    align: 'center' as const,
+  },
+];
 
 type InputProps = {
   peaks: Peak[];
-  annotations: PeakAnnotation | undefined;
-  linkedAnnotations: LinkedPeakAnnotation[];
   width: number;
   height: number;
 };
 
-function PeakTable({
-  peaks,
-  annotations,
-  linkedAnnotations,
-  width,
-  height,
-}: InputProps) {
-  const rows = useMemo(
+function PeakTable({ peaks, width, height }: InputProps) {
+  const highlightData = useHighlightData();
+  const [activeKey, setActiveKey] = useState<string | undefined>();
+
+  useEffect(() => {
+    const p = peaks.find((p) => highlightData.highlight.highlighted.has(p.id));
+    if (p) {
+      setActiveKey(p.id);
+    } else {
+      setActiveKey(undefined);
+    }
+  }, [activeKey, highlightData.highlight.highlighted, peaks]);
+
+  const dataSource = useMemo(
     () =>
-      peaks.map((p, i) => {
-        if (
-          annotations &&
-          annotations.header &&
-          annotations.header.length > 0 &&
-          linkedAnnotations.length > 0
-        ) {
-          const annoRowIndex = linkedAnnotations[i].annotationIndex;
-          const annotation: string[] = [];
-          annotations.values.forEach((anno, k) => {
-            if (annotations.header[k] !== 'm/z') {
-              annotation.push(anno[annoRowIndex]);
-            }
-          });
-          return <PeakTableRow peak={p} annotation={annotation} key={p.id} />;
-        }
-        return <PeakTableRow peak={p} annotation={undefined} key={p.id} />;
-      }),
-    [annotations, linkedAnnotations, peaks],
+      peaks.map(
+        (p) =>
+          ({
+            key: p.id,
+            mz: p.mz ? p.mz.toFixed(4) : 0,
+            intensity: p.intensity ? p.intensity.toFixed(1) : 0,
+            rel: p.rel ? p.rel : 0,
+          }) as PeakTableDataType,
+      ),
+    [peaks],
   );
 
-  return (
-    <div className="PeakTable" style={{ width, height }}>
-      <table>
-        <thead>
-          <tr>
-            <th>m/z</th>
-            <th>Intensity</th>
-            <th>Relative Intensity</th>
-            {annotations &&
-              annotations.header &&
-              annotations.header.length > 0 &&
-              annotations.header.map(
-                (h) =>
-                  h !== 'm/z' && (
-                    <th key={'anno-header-' + h}>
-                      {splitStringAndCapitaliseFirstLetter(h, '_', ' ')}
-                    </th>
-                  ),
-              )}
-          </tr>
-        </thead>
-        <tbody>
-          {rows}
-          <tr className="auto-height" />
-        </tbody>
-      </table>
-    </div>
+  const handleOnMouseEnter = useCallback(
+    (key: string) => {
+      setActiveKey(key);
+      highlightData.dispatch({
+        type: 'SHOW',
+        payload: { convertedHighlights: new Set<string>([key]) },
+      });
+    },
+    [highlightData],
+  );
+
+  const handleOnMouseLeave = useCallback(
+    (key: string) => {
+      setActiveKey(undefined);
+      highlightData.dispatch({
+        type: 'HIDE',
+        payload: { convertedHighlights: new Set<string>([key]) },
+      });
+    },
+    [highlightData],
+  );
+
+  return useMemo(
+    () => (
+      <Table<PeakTableDataType>
+        className="peak-table"
+        style={{ width, height }}
+        sticky
+        columns={columns}
+        dataSource={dataSource}
+        pagination={false}
+        onRow={(record) => {
+          return {
+            onMouseEnter: () => handleOnMouseEnter(record.key.toString()),
+            onMouseLeave: () => handleOnMouseLeave(record.key.toString()),
+          };
+        }}
+        rowClassName={(record) => {
+          return record.key === activeKey ? 'table-row-highlight' : '';
+        }}
+      />
+    ),
+    [
+      activeKey,
+      dataSource,
+      handleOnMouseEnter,
+      handleOnMouseLeave,
+      height,
+      width,
+    ],
   );
 }
 

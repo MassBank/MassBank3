@@ -1,0 +1,22 @@
+.table {
+  .ant-table-thead > tr > th {
+    border: none !important;
+    text-align: left !important;
+    background-color: rgb(237, 237, 237) !important;
+  }
+  .ant-table-tbody > tr > td {
+    border: none !important;
+    text-align: left !important;
+  }
+  .ant-table-tbody > tr.ant-table-row:hover > td {
+    background-color: rgb(239, 249, 254) !important;
+
+    .ant-tree {
+      background-color: rgb(239, 249, 254) !important;
+
+      .ant-tree-node-content-wrapper {
+        background-color: rgb(239, 249, 254) !important;
+      }
+    }
+  }
+}

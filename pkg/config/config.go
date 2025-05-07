@@ -3,10 +3,11 @@ package config
 import (
 	"errors"
 	"flag"
-	"github.com/MassBank/MassBank3/pkg/database"
 	"log"
 	"os"
 	"strconv"
+
+	"github.com/MassBank/MassBank3/pkg/database"
 )
 
 type ToolConfig struct {
@@ -14,13 +15,13 @@ type ToolConfig struct {
 	GitRepo   string
 	GitBranch string
 	DataDir   string
-	Drop      bool
+	Init      bool
 }
 
 type ServerConfig struct {
 	database.DBConfig
-	ServerPort   uint
-	CdkDepictUrl string
+	ServerPort uint
+	ApiUrl     string
 }
 
 const (
@@ -34,9 +35,8 @@ const (
 	mbGitRepoDefault       = "https://github.com/MassBank/MassBank-data"
 	mbGitBranchDefault     = "main"
 	mbDataDirectoryDefault = ""
-	mbDropAllDefault       = "true"
+	mbDbInitDefault        = "true"
 	serverPortDefault      = "8080"
-	cdkdepictUrlDefault    = "http://cdkdepict"
 )
 
 var toolConfig *ToolConfig = nil
@@ -50,19 +50,23 @@ func GetToolConfig() ToolConfig {
 	var err error
 	toolConfig.GitRepo = getEnv("MB_GIT_REPO", mbGitRepoDefault)
 	toolConfig.GitBranch = getEnv("MB_GIT_BRANCH", mbGitBranchDefault)
-	var drop = getEnv("MB_DROP_ALL", mbDropAllDefault)
+	var init = getEnv("MB_DB_INIT", mbDbInitDefault)
 	toolConfig.DataDir = getEnv("MB_DATA_DIRECTORY", mbDataDirectoryDefault)
-	toolConfig.Drop, err = strconv.ParseBool(drop)
+	toolConfig.Init, err = strconv.ParseBool(init)
 	if err != nil {
 		log.Println(err.Error())
 	}
 	flag.StringVar(&toolConfig.GitRepo, "git", toolConfig.GitRepo, "git repository. Overwrites environment variable MB_GIT_REPO")
 	flag.StringVar(&toolConfig.GitBranch, "branch", toolConfig.GitBranch, "git branch. Overwrites environment variable MB_GIT_BRANCH")
 	flag.StringVar(&toolConfig.DataDir, "dir", toolConfig.DataDir, "data directory. Overwrites environment variable MB_DATA_DIRECTORY")
-	flag.BoolVar(&toolConfig.Drop, "dropall", toolConfig.Drop, "drop all data. Overwrites environment variable MB_DROP_ALL")
+	flag.BoolVar(&toolConfig.Init, "init", toolConfig.Init, "init the database. Overwrites environment variable MB_DB_INIT")
 	flag.Parse()
 	if len(toolConfig.GitRepo) > 0 && len(toolConfig.DataDir) > 0 {
 		println("Git repo and data directory are set. Using data directory as default and git repo as fallback.")
+	} else if len(toolConfig.GitRepo) > 0 {
+		println("Git repo is set. Using git repo as data source.")
+	} else if len(toolConfig.DataDir) > 0 {
+		println("Data directory is set. Using data directory as data source.")
 	}
 	return *toolConfig
 }
@@ -80,10 +84,11 @@ func GetServerConfig() *ServerConfig {
 		panic(errors.New("Could not read port variable: DB_PORT=" + serverPortEnv))
 	}
 	serverConfig.ServerPort = uint(serverPort)
-	serverConfig.CdkDepictUrl = getEnv("CDKDEPICT_URL", cdkdepictUrlDefault)
-	flag.StringVar(&serverConfig.CdkDepictUrl, "cdkdepict_url", serverConfig.CdkDepictUrl, "Base URL of the CDK Depict api server. Overwrites environment variable CDKDEPICT_URL")
 	flag.UintVar(&serverConfig.ServerPort, "server_port", serverConfig.ServerPort, "Listen on this port. Overwrites environment variable SERVER_PORT")
 	flag.Parse()
+
+	serverConfig.ApiUrl = getEnv("MB3_API_URL", "")
+
 	return serverConfig
 }
 
@@ -103,7 +108,7 @@ func getDBConfig() database.DBConfig {
 		log.Panicln(errors.New("Could not read port variable: DB_PORT=" + dbPortEnv))
 	}
 	c.DbPort = uint(dbPort)
-	flag.StringVar(&databaseType, "db_type", databaseType, "Database type must be postgres or mongodb. Overwrites environment variable DB_TYPE")
+	flag.StringVar(&databaseType, "db_type", databaseType, "Database type must be postgres (currently). Overwrites environment variable DB_TYPE")
 	flag.StringVar(&c.DbUser, "db_user", c.DbUser, "database user name. Overwrites environment variable DB_USER")
 	flag.StringVar(&c.DbPwd, "db_pwd", c.DbPwd, "database user password. Overwrites environment variable DB_PASSWORD")
 	flag.StringVar(&c.DbHost, "db_host", c.DbHost, "database host. Overwrites environment variable DB_HOST")
@@ -113,16 +118,12 @@ func getDBConfig() database.DBConfig {
 	flag.Parse()
 	if databaseType == "postgres" {
 		c.Database = database.Postgres
-	} else if databaseType == "mongodb" {
-		c.Database = database.MongoDB
 	} else {
-		panic("Database must be postgres or mongodb")
+		panic("Database must be postgres (currently).")
 	}
 	if c.DbPort == 0 {
 		if c.Database == database.Postgres {
 			c.DbPort = 5432
-		} else {
-			c.DbPort = 27017
 		}
 	}
 	return c

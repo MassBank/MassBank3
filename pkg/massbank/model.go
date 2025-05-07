@@ -5,14 +5,17 @@ import (
 )
 
 type MbMetaData struct {
-	Commit        string `json:"git_commit"`
-	Version       string `json:"Version"`
-	Timestamp     string `json:"timestamp"`
-	SpectraCount  uint   `json:"spectra_count"`
-	CompoundCount uint   `json:"compound_count"`
-	ResultCount   *uint  `json:"result_count"`
-	Page          *uint  `json:"page"`
-	Limit         *uint  `json:"limit"`
+	GitCommit                 string   `json:"git_commit"`
+	Version                   string   `json:"Version"`
+	Timestamp                 string   `json:"timestamp"`
+	SpectraCount              uint     `json:"spectra_count"`
+	CompoundCount             uint     `json:"compound_count"`
+	CompoundName              []string `json:"compound_name"`
+	CompoundNameCount         []uint   `json:"compound_name_count"`
+	CompoundClass             []string `json:"compound_class"`
+	CompoundClassCount        []uint   `json:"compound_class_count"`
+	CompoundClassChemOnt      []string `json:"compound_class_chemont"`
+	CompoundClassCountChemOnt []uint   `json:"compound_class_count_chemont"`
 }
 
 type SubtagProperty struct {
@@ -29,11 +32,11 @@ type CompoundProperties struct {
 	Names     *[]string           `mb2:"CH$NAME" json:"name"`
 	Classes   *[]string           `mb2:"CH$COMPOUND_CLASS" json:"classes"`
 	Formula   *string             `mb2:"CH$FORMULA" json:"formula"`
-	CdkDepict *[]string           `mb2:"CH$CDK_DEPICT" json:"cdk_depict"` // not for productive use
 	Mass      *float64            `mb2:"CH$EXACT_MASS" json:"mass"`
 	Smiles    *string             `mb2:"CH$SMILES" json:"smiles"`
 	InChI     *string             `mb2:"CH$IUPAC" json:"inchi"`
 	Link      *[]DatabaseProperty `mb2:"CH$LINK" optional:"true" json:"link"`
+	AtomCount *uint               `mb2:"CH$ATOM_COUNT" json:"atom_count"`
 }
 
 type SpeciesProperties struct {
@@ -57,10 +60,11 @@ type MassSpecProperties struct {
 }
 
 type PeakProperties struct {
-	Splash     *string       `mb2:"PK$SPLASH" json:"splash"`
-	Annotation *PkAnnotation `mb2:"PK$ANNOTATION" optional:"true" json:"annotation"`
-	NumPeak    *uint         `mb2:"PK$NUM_PEAK" json:"n_Peak"`
-	Peak       *PkPeak       `mb2:"PK$PEAK" json:"peak"`
+	Splash      *string       `mb2:"PK$SPLASH" json:"splash"`
+	Annotation  *PkAnnotation `mb2:"PK$ANNOTATION" optional:"true" json:"annotation"`
+	NumPeak     *uint         `mb2:"PK$NUM_PEAK" json:"n_Peak"`
+	Peak        *PkPeak       `mb2:"PK$PEAK" json:"peak"`
+	NeutralLoss *PkNeutralLoss
 }
 
 type Metadata struct {
@@ -106,12 +110,20 @@ type RecordAuthorName struct {
 
 type PkPeak struct {
 	Header    []string  `json:"header"`
+	Id        []int32   `json:"id"`
 	Mz        []float64 `json:"mz"`
 	Intensity []float64 `json:"intensity"`
-	Rel       []uint    `json:"rel"`
+	Rel       []int32   `json:"rel"`
+}
+
+type PkNeutralLoss struct {
+	Difference      []float64 `json:"difference"`
+	Peak1Id         []int32   `json:"peak1_id"`
+	Peak2Id         []int32   `json:"peak2_id"`
+	MinRelIntensity []int32   `json:"min_rel_intensity"`
 }
 
 type PkAnnotation struct {
-	Header []string                 `json:"header"`
-	Values map[string][]interface{} `json:"values"`
+	Header []string         `json:"header"`
+	Values map[string][]any `json:"values"`
 }

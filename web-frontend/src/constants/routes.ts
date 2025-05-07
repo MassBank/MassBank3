@@ -1,48 +1,75 @@
-import About from '../elements/routes/pages/about/About';
-import Accession from '../elements/routes/pages/accession/Accession';
-import Content from '../elements/routes/pages/content/Content';
+import React from 'react';
+import AboutView from '../elements/routes/pages/about/AboutView';
+import AccessionView from '../elements/routes/pages/accession/AccessionView';
+import ContentView from '../elements/routes/pages/content/ContentView';
+import HomeView from '../elements/routes/pages/home/HomeView';
+import NewsView from '../elements/routes/pages/news/NewsView';
+import NotFoundView from '../elements/routes/pages/notfound/NotFoundView';
+import SearchView from '../elements/routes/pages/search/SearchView';
 import Documentation from '../elements/routes/pages/documentation/Documentation';
-import Download from '../elements/routes/pages/download/Download';
-import Home from '../elements/routes/pages/home/Home';
-import News from '../elements/routes/pages/news/News';
-import NotFound from '../elements/routes/pages/notfound/NotFound';
-import Search from '../elements/routes/pages/search/Search';
 
-const base_url = import.meta.env.VITE_MB3_BASE_URL;
-
-interface ifc1 {
-  path: string;
+type RouteType = {
+  component: React.FC;
   label: string;
-  // eslint-disable-next-line no-unused-vars
-  element: (props) => JSX.Element;
-}
+  id: string;
+  path: string;
+};
 
-interface ifc2 {
-  [key: string]: ifc1;
-}
-
-const routes: ifc2 = {
-  home: { path: base_url, label: 'Home', element: Home },
-  search: { path: base_url + 'search', label: 'Search', element: Search },
-  content: { path: base_url + 'content', label: 'Content', element: Content },
-  download: {
-    path: base_url + 'download',
-    label: 'Download',
-    element: Download,
-  },
-  accession: {
-    path: base_url + 'recordDisplay',
-    label: 'Accession',
-    element: Accession,
-  },
+const routes = {
+  home: {
+    component: HomeView,
+    label: 'Home',
+    id: 'home',
+    path: '/',
+  } as RouteType,
+  search: {
+    component: SearchView,
+    label: 'Search',
+    id: 'search',
+    path: 'search',
+  } as RouteType,
+  content: {
+    component: ContentView,
+    label: 'Content',
+    id: 'content',
+    path: 'content',
+  } as RouteType,
   documentation: {
-    path: base_url + 'documentation',
+    component: Documentation,
     label: 'Documentation',
-    element: Documentation,
-  },
-  about: { path: base_url + 'about', label: 'About', element: About },
-  news: { path: base_url + 'news', label: 'News', element: News },
-  notFound: { path: base_url + '*', label: 'Not Found', element: NotFound },
+    id: 'documentation',
+    path: 'documentation',
+  } as RouteType,
+  accessionNext: {
+    component: AccessionView,
+    label: 'Accession',
+    id: 'accession',
+    path: 'recordDisplay',
+  } as RouteType,
+  accession: {
+    component: AccessionView,
+    label: 'Accession',
+    id: 'accessionPrevious',
+    path: 'RecordDisplay',
+  } as RouteType,
+  news: {
+    component: NewsView,
+    label: 'News',
+    id: 'news',
+    path: 'news',
+  } as RouteType,
+  about: {
+    component: AboutView,
+    label: 'About',
+    id: 'about',
+    path: 'about',
+  } as RouteType,
+  notFound: {
+    component: NotFoundView,
+    label: 'Not Found',
+    id: 'notFound',
+    path: '*',
+  } as RouteType,
 };
 
 export default routes;

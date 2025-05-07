@@ -6,6 +6,10 @@ function splitString(str: string, splitStr: string): string[] {
   return str.split(splitStr);
 }
 
+function splitStringAndJoin(str: string, splitStr: string, joinStr: string) {
+  return splitString(str, splitStr).join(joinStr);
+}
+
 function splitStringAndCapitaliseFirstLetter(
   str: string,
   splitStr: string,
@@ -20,4 +24,5 @@ export {
   capitaliseFirstLetter,
   splitString,
   splitStringAndCapitaliseFirstLetter,
+  splitStringAndJoin,
 };

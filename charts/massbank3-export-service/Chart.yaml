@@ -1,0 +1,7 @@
+apiVersion: v2
+name: massbank3-export-service
+description: A Helm chart for massbank3-export-service
+
+type: application
+version: 0.1.0
+appVersion: "v1.6"

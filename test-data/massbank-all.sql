@@ -141,7 +141,6 @@ values ('/MassBank-data/AAFC/MSBNK-AAFC-AC000005.txt', '{
         "Fungal metabolite"
       ],
     "formula": "C10H10O3",
-    "cdk_depict": null
   },
   "metadata": {
     "file_name": "/MassBank-data/AAFC/MSBNK-AAFC-AC000005.txt",
@@ -398,7 +397,6 @@ values ('/MassBank-data/Athens_Univ/MSBNK-Athens_Univ-AU229201.txt', '{
         "Environmental Standard"
       ],
     "formula": "C11H11N5",
-    "cdk_depict": null
   },
   "metadata": {
     "file_name": "/MassBank-data/Athens_Univ/MSBNK-Athens_Univ-AU229201.txt",
@@ -655,7 +653,6 @@ values ('/MassBank-data/Eawag/MSBNK-Eawag-EA018353.txt', '{
         "Environmental Standard"
       ],
     "formula": "C12H14N4O4S",
-    "cdk_depict": null
   },
   "metadata": {
     "file_name": "/MassBank-data/Eawag/MSBNK-Eawag-EA018353.txt",
@@ -947,7 +944,6 @@ values ('/MassBank-data/Eawag_Additional_Specs/MSBNK-Eawag_Additional_Specs-ET06
         "Environmental Transformation Products"
       ],
     "formula": "C12H14F3NO",
-    "cdk_depict": null
   },
   "metadata": {
     "file_name": "/MassBank-data/Eawag_Additional_Specs/MSBNK-Eawag_Additional_Specs-ET060401.txt",
@@ -1241,7 +1237,6 @@ values ('/MassBank-data/Fac_Eng_Univ_Tokyo/MSBNK-Fac_Eng_Univ_Tokyo-JP009132.txt
         "N/A"
       ],
     "formula": "C7H8S",
-    "cdk_depict": null
   },
   "metadata": {
     "file_name": "/MassBank-data/Fac_Eng_Univ_Tokyo/MSBNK-Fac_Eng_Univ_Tokyo-JP009132.txt",
@@ -1493,7 +1488,6 @@ values ('/MassBank-data/Keio_Univ/MSBNK-Keio_Univ-KO009105.txt', '{
         "N/A"
       ],
     "formula": "C10H18N2O3",
-    "cdk_depict": null
   },
   "metadata": {
     "file_name": "/MassBank-data/Keio_Univ/MSBNK-Keio_Univ-KO009105.txt",
@@ -1677,7 +1671,6 @@ values ('/MassBank-data/MSSJ/MSBNK-MSSJ-MSJ00284.txt', '{
         "Non-natural product"
       ],
     "formula": "C17H17ClFNO4",
-    "cdk_depict": null
   },
   "metadata": {
     "file_name": "/MassBank-data/MSSJ/MSBNK-MSSJ-MSJ00284.txt",
@@ -1865,7 +1858,6 @@ values ('/MassBank-data/RIKEN/MSBNK-RIKEN-PR100978.txt', '{
         "Flavonoid"
       ],
     "formula": "C21H18O13",
-    "cdk_depict": null
   },
   "metadata": {
     "file_name": "/MassBank-data/RIKEN/MSBNK-RIKEN-PR100978.txt",
@@ -2055,7 +2047,6 @@ values ('/MassBank-data/RIKEN/MSBNK-RIKEN-PR309089.txt', '{
         "Oxidized fatty acids"
       ],
     "formula": "C18H32O3",
-    "cdk_depict": null
   },
   "metadata": {
     "file_name": "/MassBank-data/RIKEN/MSBNK-RIKEN-PR309089.txt",
@@ -2240,7 +2231,6 @@ values ('/MassBank-data/Washington_State_Univ/MSBNK-Washington_State_Univ-BML819
         "N/A"
       ],
     "formula": "C15H20O3",
-    "cdk_depict": null
   },
   "metadata": {
     "file_name": "/MassBank-data/Washington_State_Univ/MSBNK-Washington_State_Univ-BML81902.txt",
@@ -2379,7 +2369,6 @@ VALUES ('/MassBank3/test-data/MSBNK-test-TST00001.txt', '{
         "Natural Product"
       ],
     "formula": "C27H29N5O4",
-    "cdk_depict": null
   },
   "metadata": {
     "file_name": "/MassBank3/test-data/MSBNK-test-TST00001.txt",
@@ -2820,7 +2809,6 @@ VALUES ('/MassBank3/test-data/MSBNK-test-TST00002.txt', '{
         "Ganglioside"
       ],
     "formula": "C86H152N4O39",
-    "cdk_depict": null
   },
   "metadata": {
     "file_name": "/MassBank3/test-data/MSBNK-test-TST00002.txt",
@@ -3107,7 +3095,6 @@ VALUES ('/MassBank3/test-data/MSBNK-test-TST00003.txt', '{
         "Lipid Standard"
       ],
     "formula": "C22H32O3",
-    "cdk_depict": null
   },
   "metadata": {
     "file_name": "/MassBank3/test-data/MSBNK-test-TST00003.txt",

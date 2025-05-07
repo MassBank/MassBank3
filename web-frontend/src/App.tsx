@@ -1,22 +1,30 @@
-import './App.scss';
-
-import { BrowserRouter as Router } from 'react-router-dom';
-import Footer from './elements/footer/Footer';
-import Body from './elements/body/Body';
-import Header from './elements/header/Header';
-import { HighlightProvider } from './highlight/Index';
+import { useEffect, useState } from 'react';
+import Routing from './elements/routes/Routing';
+import { HighlightProvider } from './context/highlight/HighlightProvider';
+import { ConfigProvider } from 'antd';
 
 function App() {
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  if (!hydrated) {
+    return null;
+  }
+
   return (
-    <div className="app">
-      <Router>
-        <HighlightProvider>
-          <Header />
-          <Body />
-          <Footer />
-        </HighlightProvider>
-      </Router>
-    </div>
+    <ConfigProvider
+      wave={{ disabled: true }}
+      typography={{
+        style: { fontSize: 15 },
+      }}
+    >
+      <HighlightProvider>
+        <Routing />
+      </HighlightProvider>
+    </ConfigProvider>
   );
 }
 

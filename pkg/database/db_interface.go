@@ -1,31 +1,32 @@
 package database
 
 import (
-	"github.com/Code-Hex/dd"
-	"github.com/MassBank/MassBank3/pkg/massbank"
 	"log"
 	"math"
+
+	"github.com/Code-Hex/dd"
+
+	"github.com/MassBank/MassBank3/pkg/massbank"
 )
 
 // Filters is the abstract description of filters used to find MassBank records
 // in the database
 type Filters struct {
-	InstrumentType    *[]string
-	Splash            string
-	MsType            *[]massbank.MsType
-	IonMode           massbank.IonMode
-	CompoundName      string //regex
-	Mass              *float64
-	MassEpsilon       *float64
-	Formula           string // regex
-	Peaks             *[]float64
-	PeakDifferences   *[]float64
-	InchiKey          string
-	Contributor       *[]string
-	IntensityCutoff   *int64
-	Limit             int64
-	Offset            int64
-	IncludeDeprecated bool
+	InstrumentType *[]string
+	Splash         string
+	MsType         *[]massbank.MsType
+	IonMode        massbank.IonMode
+	CompoundName   string
+	CompoundClass  string
+	Mass           *float64
+	MassEpsilon    *float64
+	Formula        string
+	Peaks          *[]float64
+	NeutralLoss    *[]float64
+	Inchi          string
+	InchiKey       string
+	Contributor    *[]string
+	Intensity      *int64
 }
 
 // DatabaseType is an enum containing the database type
@@ -33,8 +34,7 @@ type DatabaseType int
 
 // The list of supported databases
 const (
-	MongoDB  DatabaseType = 0
-	Postgres              = 1
+	Postgres = 0
 )
 
 // DBConfig is the abstract database configuration which should be used when working
@@ -50,11 +50,10 @@ type DBConfig struct {
 }
 
 var DefaultValues = struct {
-	MassEpsilon     float64
-	IntensityCutoff int64
-	Limit           int64
-	Offset          int64
-}{0.3, 100, math.MaxInt64, 0}
+	MassEpsilon float64
+	Intensity   int64
+	Limit       int64
+}{0.1, 50, math.MaxInt64}
 
 // MBErrorType is an enum for the error types during database operations
 type MBErrorType int
@@ -118,25 +117,6 @@ type MB3MetaData struct {
 	IsomerCount    int
 }
 
-type SearchResult struct {
-	SpectraCount int
-	ResultCount  int
-	Data         map[string]SearchResultData
-}
-
-type SpectrumMetaData struct {
-	Id    string
-	Title string
-}
-
-type SearchResultData struct {
-	Names   []string
-	Formula string
-	Mass    float64
-	Smiles  string
-	Spectra []SpectrumMetaData
-}
-
 // MB3Database This is the Interface which has to be implemented for databases using MassBank3
 //
 // Any database can be used as in the backend as long as it defines the interface.
@@ -153,23 +133,44 @@ type MB3Database interface {
 	// Count MassBank records in the database.
 	Count() (int64, error)
 
-	// DropAllRecords drops all MassBank records in the Database.
-	DropAllRecords() error
+	// Initialises the database.
+	Init() error
 
 	// GetRecord gets a single MassBank record by the Accession string.
 	// It should return nil and a [NotFoundError] if the record is not in the
 	// database.
 	GetRecord(*string) (*massbank.MassBank2, error)
 
-	// GetRecords Get an array of MassBank records by filtering
+	GetRecords(*[]string) (*[]string, error)
+
+	// GetSimpleRecord gets a single simple MassBank record by the Accession string.
+	// It should return nil and a [NotFoundError] if the record is not in the
+	// database.
+	GetSimpleRecord(*string) (*massbank.MassBank2, error)
+
+	// GetSimpleRecords Get an array of MassBank records by filtering
 	//
 	// Will return an empty list if the filter does not match any records.
-	GetRecords(filters Filters) (*SearchResult, error)
+	GetSearchResults(filters Filters) (*[]string, *[]int32, error)
+
+	// GetRecordsBySubstructure Get an array of MassBank accessions by filtering by substructure
+	//
+	// Will return an empty list if the filter does not match any records.
+	GetAccessionsBySubstructure(substructure string) ([]string, []int32, error)
+
+	GetAccessionsByFilterOptions(filters Filters) ([]string, []int32, error)
+
+	NeutralLossSearch(neutralLoss *[]float64, tolerance *float64, minRelIntensity *int64) ([]string, []int32, map[string][]string, error)
+
+	// GetRecordsBySubstructure Get an array of MassBank records by filtering by substructure
+	//
+	// Will return an empty list if the filter does not match any records.
+	GetRecordsBySubstructure(substructure string) (*[]massbank.MassBank2, error)
 
 	// GetUniqueValues is used to get the values for filter frontend
 	GetUniqueValues(filters Filters) (MB3Values, error)
 
-	GetMetaData() (*MB3MetaData, error)
+	GetMetadata() (*massbank.MbMetaData, error)
 
 	// UpdateMetadata updates the metadata describing the MassBank version.
 	// Provides the database id of an existing entry if it is already in the
@@ -178,12 +179,18 @@ type MB3Database interface {
 	// Returns the id of the database entry as string.
 	UpdateMetadata(meta *massbank.MbMetaData) (string, error)
 
+	// RemoveIndexes removes all indexes from the database.
+	RemoveIndexes() error
+
+	//AddIndexes adds indexes to the database.
+	AddIndexes() error
+
 	// AddRecord adds a new MassBank record to the database. If the Accession
 	// id already exists it will return an error.
 	//
 	// The second parameter is the database id of the version information. You
 	// can get it from [UpdateMetadata].
-	AddRecord(record *massbank.MassBank2, metaDataId string) error
+	AddRecord(record *massbank.MassBank2, metaDataId string, mb3RecordJson string) error
 
 	// AddRecords adds a list of MassBank records given as an array to the
 	// database. If one of the Accession ids  exists the  function should roll
@@ -191,30 +198,7 @@ type MB3Database interface {
 	//
 	// The second parameter is the database id of the version information. You
 	// can get it from [UpdateMetadata].
-	AddRecords(records []*massbank.MassBank2, metaDataId string) error
-
-	// UpdateRecord will replace an existing MassBank record. Depending on the
-	// upsert parameter it also inserts the record if it not exists.
-	//
-	// The second parameter is the database id of the version information. You
-	// can get it from [UpdateMetadata].
-	//
-	// This should return number of  modified and inserted records, but this is
-	// not implemented for all databases.
-	UpdateRecord(record *massbank.MassBank2, metaDataId string, upsert bool) (uint64, uint64, error)
-
-	// UpdateRecords will replace existing MassBank record. Depending on the
-	// upsert parameter it also inserts the record if it not exists. This should
-	// roll back the whole transaction if the there is an error.
-	//
-	// The second parameter is the database id of the version information. You
-	// can get it from [UpdateMetadata].
-	//
-	// This should return number of  modified and inserted records, but this is
-	// not implemented for all databases.
-	UpdateRecords(records []*massbank.MassBank2, metaDataId string, upsert bool) (uint64, uint64, error)
-
-	GetSmiles(accession *string) (*string, error)
+	AddRecords(records []*massbank.MassBank2, metaDataId string, mb3RecordJsons []string) error
 }
 
 var db MB3Database
@@ -222,12 +206,7 @@ var db MB3Database
 func InitDb(dbConfig DBConfig) (MB3Database, error) {
 	if db == nil {
 		var err error
-		if dbConfig.Database == MongoDB {
-			db, err = NewMongoDB(dbConfig)
-			if err != nil {
-				panic(err)
-			}
-		} else if dbConfig.Database == Postgres {
+		if dbConfig.Database == Postgres {
 			db, err = NewPostgresSQLDb(dbConfig)
 			log.Println(dd.Dump(db))
 			if err != nil {

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "massbank3-similarity-service.fullname" . }}-env-configmap
+  labels:
+    {{- include "massbank3-similarity-service.labels" . | nindent 4 }}
+data:
+  MSP: "/msp/MassBank.msp"

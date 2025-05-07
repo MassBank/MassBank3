@@ -22,8 +22,8 @@ properties:
         description: "reason for deprecation"
         type: string
   title:
-    description: "Short title of the record. It is composed as 
-        'compound.names[0]; acquisition.instrument_type; acquisition.mass_spectrometry.ms_type'"
+    description: "Short title of the record. It is composed as
+      'compound.names[0]; acquisition.instrument_type; acquisition.mass_spectrometry.ms_type'"
     type: string
   date:
     description: "Date of creation or last modification of record"
@@ -113,12 +113,6 @@ properties:
       formula:
         description: "Chemical formula"
         type: string
-      cdk_depict:
-        description: "Partially defined structures with CDK depict"
-        type: array
-        items:
-          description: "CDK depict structure"
-          type: string
       mass:
         description: "Exact mass"
         type: number
@@ -242,6 +236,10 @@ properties:
               description: "Values for a single peak"
               type: object
               properties:
+                id:
+                  description: "Peak identifier"
+                  type: integer
+                  minimum: 1
                 mz:
                   description: "m/z of the peak"
                   type: number
@@ -255,13 +253,23 @@ properties:
                   type: integer
                   minimum: 1
                   maximum: 999
-
-
-
-
-
-
-
-
-
-
+      neutral_loss:
+        description: "Neutral Losses"
+        type: array
+        items:
+          description: "Values for a single neutral loss"
+          type: object
+          properties:
+            difference:
+              description: "Difference in mass"
+              type: number
+              format: double
+              minimum: 0
+            peak1_id:
+              description: "Peak identifier of the first peak"
+              type: integer
+              minimum: 1
+            peak2_id:
+              description: "Peak identifier of the second peak"
+              type: integer
+              minimum: 1

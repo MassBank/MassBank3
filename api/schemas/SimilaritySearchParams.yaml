@@ -1,0 +1,23 @@
+components:
+  parameters:
+    PeakList:
+      description: "A list of tuples of m/z values and (relative) intensities used for similarity search. Both values in a tuple need to be separated by a semi-colon, e.g. '147.063;11'. The parameter 'peak_list_threshold' is required when using this filter option. This method uses the 'matchms' Python package and the CosineGreedy algorithm for similarity search."
+      in: query
+      name: peak_list
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/PeakList"
+      explode: false
+    PeakListThreshold:
+      description: "A threshold value (lowest allowed similarity score) for the similarity search."
+      in: query
+      name: peak_list_threshold
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/PeakListThreshold"
+    ReferenceSpectraList:
+      description: "A list of reference spectra IDs (accessions) to use during similarity search."
+      in: query
+      name: reference_spectra_list
+      schema:
+        $ref: "./FilterSchemas.yaml#/components/schemas/ReferenceSpectraList"
+      explode: false
+      required: false

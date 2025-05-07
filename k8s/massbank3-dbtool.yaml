@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: massbank3-dbtool-secret
+  namespace: massbank3
+  labels:
+    app: massbank3-dbtool
+data:
+  DB_PORT: "5432"
+  DB_PASSWORD: "massbank3password"
+  DB_HOST: "massbank3-postgres-service"
+  DB_NAME: "massbank3"
+  DB_USER: "massbank3"
+  MB_DB_INIT: "true"
+  MB_GIT_REPO: "https://github.com/MassBank/MassBank-data"
+  MB_GIT_BRANCH: "main"
+  MB_DATA_DIRECTORY: ""
+  MB_DROP_ALL: "true"
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: massbank3-dbtool-deployment # Name des Deployments für uns Nutzer
+  namespace: massbank3
+  labels:
+    app: massbank3-dbtool # Labels des Deployments
+spec:
+  template:
+    metadata:
+      labels:
+        app: massbank3-dbtool  # Label des Pods muss/ sollte mit (*) übereinstimmen
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - massbank3-server
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: massbank3-dbtool
+          image: ipbhalle/massbank3-dbtool:dev
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: massbank3-dbtool-secret
+      restartPolicy: Never 

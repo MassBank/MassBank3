@@ -6,64 +6,62 @@ components:
         type: string
     Splash:
       type: string
-    MSType:
+    MsType:
       type: array
       items:
         type: string
-        enum: [ MS,MS2,MS3,MS4 ]
     IonMode:
       type: string
-      description: "enum: [ POSITIVE, NEGATIVE ]"
     CompoundName:
       type: string
-    ExactMass:
-      description: 'A mass prefixed with "and" or "or" before a colon, e.g. "or:122.0".'
+    CompoundClass:
       type: string
-      pattern: "(and|or):[0-9]+(\\.[0-9]*)?"
+    ExactMass:
+      type: string
+      pattern: "[0-9]+(\\.[0-9]*)?"
     MassTolerance:
       type: number
       format: double
       default: 0.3
     Formula:
-      description: 'A chemical formula prefixed with "and" or "or" before a colon, e.g. "or:C6H7N5".'
       type: string
-      pattern: "(and|or):(([A-Z][a-z]*[0-9]*)|\\*)*"
+      pattern: "(([A-Z][a-z]{0,1}[0-9]*))+"
     Peaks:
       type: array
       items:
         type: string
-        description: 'A m/z prefixed with "and" or "or" before a colon, e.g. "or:143.0".'
-        pattern: "(and|or):[0-9]+(\\.[0-9]*)?"
+        pattern: "[0-9]+(\\.[0-9]*)?"
     Intensity:
-      description: "Relative intensity for peak search"
       type: integer
-      default: 100
+      default: 50
       minimum: 1
-      maximum: 100
+      maximum: 1000
     PeakList:
       type: array
       items:
         type: string
-        description: "A tuple of m/z and intensity, e.g. (193.4,57)"
-        pattern: "\\([0-9]+(\\.[0-9]*)?,[0-9]+\\)"
-    IntensityCutoff:
-      type: integer
-      default: 5
-      minimum: 1
-      maximum: 100
-    Limit:
-      type: integer
-      minimum: 1
-      maximum: 500
-      default: 20
+        pattern: "[0-9]+(\\.[0-9]*)?;[0-9]+"
+      minItems: 1
+    PeakListThreshold:
+      type: number
+      format: double
+      minimum: 0.0
+      maximum: 1.0
+      default: 0.8
+    ReferenceSpectraList:
+      type: array
+      items:
+        type: string
+      default: []
+    InChI:
+      type: string
+      description: "The InChI string."
     InChIKey:
       type: string
-    Page:
-      type: integer
-      minimum: 1
-      default: 1
+      description: "The InChIKey string."
     Contributor:
       type: array
       items:
         type: string
-        description: "The short version of the contributor name"
+    Substructure:
+      type: string

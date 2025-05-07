@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "massbank3-dbtool.fullname" . }}
+  labels:
+    {{- include "massbank3-dbtool.labels" . | nindent 4 }}
+spec:
+  template:
+    metadata:
+      labels:
+        {{- include "massbank3-dbtool.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_PASSWORD
+              value: {{ .Values.password }}
+            - name: DB_HOST
+              value: {{ .Values.massbank3ReleaseName }}-postgresql
+            - name: DB_NAME
+              value: {{ .Values.database }}
+            - name: DB_USER
+              value: {{ .Values.username }}
+            - name: MB_DB_INIT
+              value: "true"
+            - name: MB_GIT_REPO
+              value: "https://github.com/MassBank/MassBank-data"
+            - name: MB_GIT_BRANCH
+              value: "main"
+            - name: MB_DATA_DIRECTORY
+              value: ""
+            - name: MB_DROP_ALL
+              value: "true"

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "massbank3-server.fullname" . }}-env-configmap
+  labels:
+    {{- include "massbank3-server.labels" . | nindent 4 }}
+data:
+  DB_PORT: "5432"
+  DB_PASSWORD: "{{ .Values.postgresql.auth.password }}"
+  DB_HOST: "{{ .Release.Name }}-postgresql"
+  DB_NAME: "{{ .Values.postgresql.auth.database }}"
+  DB_USER: "{{ .Values.postgresql.auth.username }}"
+  MB3_SERVER_PORT: "8080"
+  SIMILARITY_SERVICE_COSINE_HOST: "{{ .Release.Name }}-massbank3-similarity-service"
+  SIMILARITY_SERVICE_COSINE_PORT: "8080"
+  EXPORT_SERVICE_HOST: "{{ .Release.Name }}-massbank3-export-service"
+  EXPORT_SERVICE_PORT: "8080"
+  MB3_API_URL: "https://{{ .Values.host }}/{{ .Values.pathPrefix }}-api"
+

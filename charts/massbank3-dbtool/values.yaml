@@ -1,0 +1,19 @@
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+
+postgresPassword: "massbank3adminpassword"
+username: "massbank3"
+password: "massbank3password"
+database: "massbank3"
+
+massbank3ReleaseName: massbank3
+
+image:
+  repository: ipbhalle/massbank3-dbtool
+  tag: "dev"
+  pullPolicy: IfNotPresent
+
+# This is for setting Kubernetes Labels to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels:
+  app: massbank3-dbtool

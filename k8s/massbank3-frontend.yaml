@@ -1,3 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: massbank3-frontend-secret
+  namespace: massbank3
+  labels:
+    app: massbank3-frontend
+data:
+  MB3_API_URL: "https://msbi.ipb-halle.de/MassBank-api"
+  MB3_API_URL_INTERNAL: "http://massbank3-server-service:8080"
+  MB3_FRONTEND_URL: "https://msbi.ipb-halle.de"
+  MB3_FRONTEND_BASE_URL: "/MassBank/"
+  MB3_FRONTEND_VERSION: "0.4.0 (beta)"
+  EXPORT_SERVICE_URL: "https://msbi.ipb-halle.de/MassBank-export"
+  EXPORT_SERVICE_URL_INTERNAL: "http://massbank3-export-service-service:8080"
+  GOOGLE_SEARCH_CONSOLE_KEY: "4aoZgYg2lHeh7TlOxtyVzjHa3YJirrsEHPqwSU3luoU"
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,14 +32,24 @@ spec:
       labels:
         app: massbank3-frontend # Label des Pods muss/ sollte mit (*) übereinstimmen
     spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - massbank3-server
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: massbank3-frontend
-          image: rmeier/massbank3-frontend:0.0.1 # Container Image
-          env:
-            - name: VITE_MB3_API_URL
-              value: "http://${MB3_API_HOST}:${MB3_API_PORT}"
-            - name: VITE_MB3_BASE_URL
-              value: "${MB3_FRONTEND_BASE_URL}"
+          image: ipbhalle/massbank3-frontend:dev # Container Image
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name:
+                  massbank3-frontend-secret
 ---
 apiVersion: v1
 kind: Service
@@ -45,14 +72,18 @@ metadata:
     app: massbank3-frontend
   name: massbank3-frontend-ingress
   namespace: massbank3
+#  annotations:
+#    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
+  ingressClassName: nginx
   rules:
-    - http:
+    - host: msbi.ipb-halle.de
+      http:
         paths:
-          - path: /frontent
-            pathType: Prefix
-            backend:
+          - backend:
               service:
                 name: massbank3-frontend-service
                 port:
-                  number: 8080
+                  number: 3000
+            path: /MassBank(/|$)(.*)
+            pathType: ImplementationSpecific

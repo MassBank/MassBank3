@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    {{- include "massbank3-server.labels" . | nindent 4 }}
+data:
+  000_bingo_install.sql: |
+    \c {{ .Values.postgresql.auth.database }}
+    \i /opt/bingo-postgres/init-scripts/000_bingo_install.sql
+  00_init.sql: |
+    -- update ALLOW_NON_UNIQUE_DEAROMATIZATION to 1 --
+    \c {{ .Values.postgresql.auth.database }}
+    UPDATE bingo.bingo_config SET cvalue = 1 WHERE cname = 'ALLOW_NON_UNIQUE_DEAROMATIZATION';
+    GRANT ALL PRIVILEGES ON SCHEMA bingo TO "{{ .Values.postgresql.auth.username }}";
+    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA bingo TO "{{ .Values.postgresql.auth.username }}";
