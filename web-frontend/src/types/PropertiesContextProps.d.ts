@@ -6,6 +6,7 @@ interface PropertiesContextProps {
   version: string;
   distributorText: string;
   distributorUrl: string;
+  homepageIntroText: string;
 }
 
 export default PropertiesContextProps;

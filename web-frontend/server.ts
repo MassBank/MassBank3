@@ -29,8 +29,10 @@ const distributorText =
   process.env.DISTRIBUTOR_TEXT ??
   'This website is hosted and distributed by ...';
 const distributorUrl = process.env.DISTRIBUTOR_URL ?? '';
-const frontendBrowserTabTitle =
+const browserTabTitle =
   process.env.MB3_FRONTEND_BROWSER_TAB_TITLE ?? 'MassBank3';
+const homepageIntroText =
+  process.env.MB3_FRONTEND_HOMEPAGE_INTRO_TEXT ?? 'Welcome to MassBank3!';
 
 console.log('\n');
 console.log('isProduction', process.env.NODE_ENV === 'production');
@@ -279,13 +281,14 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       version,
       distributorText,
       distributorUrl,
+      homepageIntroText,
     } as PropertiesContextProps;
     const rendered = await render({
       path,
       props,
     });
 
-    const tabTitle = `<title>${frontendBrowserTabTitle}</title>`;
+    const tabTitle = `<title>${browserTabTitle}</title>`;
     const noFollowLinksMeta = `<meta name="robots" content="nofollow"></meta>`;
     rendered.head = rendered.head
       ? rendered.head
