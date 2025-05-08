@@ -29,6 +29,8 @@ const distributorText =
   process.env.DISTRIBUTOR_TEXT ??
   'This website is hosted and distributed by ...';
 const distributorUrl = process.env.DISTRIBUTOR_URL ?? '';
+const frontendBrowserTabTitle =
+  process.env.MB3_FRONTEND_BROWSER_TAB_TITLE ?? 'MassBank3';
 
 console.log('\n');
 console.log('isProduction', process.env.NODE_ENV === 'production');
@@ -283,9 +285,14 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       props,
     });
 
+    const tabTitle = `<title>${frontendBrowserTabTitle}</title>`;
     const noFollowLinksMeta = `<meta name="robots" content="nofollow"></meta>`;
     rendered.head = rendered.head
-      ? rendered.head.concat('\n\t').concat(noFollowLinksMeta)
+      ? rendered.head
+          .concat('\n\t')
+          .concat(tabTitle)
+          .concat('\n\t')
+          .concat(noFollowLinksMeta)
       : noFollowLinksMeta;
     if (googleSearchConsoleKey && googleSearchConsoleKey.trim().length > 0) {
       const googleSearchConsoleMeta = `<meta name="google-site-verification" content="${googleSearchConsoleKey}"></meta>`;

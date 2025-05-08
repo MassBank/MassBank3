@@ -10,5 +10,6 @@ echo "MB3_API_URL_INTERNAL=$7" >> .env
 echo "EXPORT_SERVICE_URL_INTERNAL=$8" >> .env
 echo "DISTRIBUTOR_TEXT=$9" >> .env
 echo "DISTRIBUTOR_URL=$10" >> .env
+echo "MB3_FRONTEND_BROWSER_TAB_TITLE=$11" >> .env
 
 npm run start
