@@ -80,6 +80,14 @@ The _DISTRIBUTOR_TEXT_ property is a free text field to insert any description o
 
 And _DISTRIBUTOR_URL_ should contain the URL to the distributor's imprint/website.
 
+#### Title in Browser Tab
+
+To customise the title in the web browser change the _MB3_FRONTEND_BROWSER_TAB_TITLE_ property.
+
+#### Introduction/Welcome Text
+
+A substitution of the text below the MassBank logo on the homepage is possible via editing _MB3_FRONTEND_HOMEPAGE_INTRO_TEXT_.
+
 ### Troubleshooting
 
 In case your system is different from linux/amd64 then a warning might appear after starting docker compose:
