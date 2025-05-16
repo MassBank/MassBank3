@@ -38,7 +38,7 @@ function Header({ height }: InputProps) {
             marginRight: 10,
           }}
         >
-          <a href={baseUrl} target="_self">
+          <a href={baseUrl + '/'} target="_self">
             <img
               src={logo}
               alt="MassBank Europe"
