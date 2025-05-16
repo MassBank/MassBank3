@@ -9,7 +9,11 @@ function buildSearchUrl(
   const searchParams = new URLSearchParams();
   searchParams.set(label, value);
   const url =
-    frontendUrl + baseUrl + routes.search.path + `?${searchParams.toString()}`;
+    frontendUrl +
+    baseUrl +
+    '/' +
+    routes.search.path +
+    `?${searchParams.toString()}`;
 
   return url;
 }

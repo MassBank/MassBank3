@@ -11,7 +11,7 @@ function Routing() {
         return (
           <Route
             key={'routing-key-' + route.id}
-            path={baseUrl + route.path}
+            path={baseUrl + '/' + route.path}
             element={<UserInterface body={<route.component />} />}
           />
         );

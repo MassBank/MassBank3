@@ -19,7 +19,11 @@ const backendUrl =
     ? process.env.MB3_API_URL.replace(/\/$/, '')
     : 'http://localhost:8081/MassBank-api';
 const frontendUrl = process.env.MB3_FRONTEND_URL ?? 'http://localhost:8080';
-const frontendBaseUrl = process.env.MB3_FRONTEND_BASE_URL ?? '/MassBank3/';
+const frontendBaseUrl =
+  process.env.MB3_FRONTEND_BASE_URL &&
+  process.env.MB3_FRONTEND_BASE_URL.trim().length > 0
+    ? process.env.MB3_FRONTEND_BASE_URL.replace(/\/$/, '')
+    : '/MassBank3';
 const exportServiceUrl =
   process.env.EXPORT_SERVICE_URL ?? 'http://localhost:8083';
 const version = process.env.MB3_VERSION ?? '0.4.0 (beta)';
@@ -135,9 +139,18 @@ async function getLastmodDate() {
   return lastmodDate;
 }
 
+// Create router for redirecting to the frontend with base URL in case slash is missing
+const redirectRouter = express.Router();
+const regex = new RegExp(`^${frontendBaseUrl}$`);
+app.use(regex, redirectRouter);
+redirectRouter.get('', async (req: Request, res: Response) => {
+  const redirectUrl = frontendUrl + frontendBaseUrl + '/';
+  res.redirect(redirectUrl);
+});
+
 // Create router for base URL
 const baseRouter = express.Router();
-app.use(frontendBaseUrl, baseRouter);
+app.use(frontendBaseUrl + '/', baseRouter);
 
 const nRecords = 40000;
 const prefixUrl = frontendUrl + frontendBaseUrl;
@@ -145,7 +158,7 @@ const prefixUrl = frontendUrl + frontendBaseUrl;
 // serve sitemap index for search engines
 baseRouter.get('/robots.txt', async (req: Request, res: Response) => {
   try {
-    const content = `User-agent: *\nAllow: /\n\nSitemap: ${prefixUrl}sitemap.xml`;
+    const content = `User-agent: *\nAllow: /\n\nSitemap: ${prefixUrl}/sitemap.xml`;
 
     res.status(200).set({ 'Content-Type': 'text/plain' }).send(content);
   } catch (e) {
@@ -173,11 +186,11 @@ baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
     const n = Math.ceil(hitsCount / nRecords);
     for (let i = 0; i < n; i++) {
       xmlContent.push(
-        `<sitemap><loc>${prefixUrl}sitemap_${i}.xml</loc><lastmod>${lastmodDate}</lastmod></sitemap>`,
+        `<sitemap><loc>${prefixUrl}/sitemap_${i}.xml</loc><lastmod>${lastmodDate}</lastmod></sitemap>`,
       );
     }
     xmlContent.push(
-      `<sitemap><loc>${prefixUrl}sitemap_misc.xml</loc></sitemap>`,
+      `<sitemap><loc>${prefixUrl}/sitemap_misc.xml</loc></sitemap>`,
     );
     xmlContent.push('</sitemapindex>');
     const xml = xmlFormat(xmlContent.join(''));
@@ -199,16 +212,16 @@ baseRouter.get('/sitemap_misc.xml', async (req: Request, res: Response) => {
       `<url><loc>${prefixUrl}</loc><changefreq>weekly</changefreq></url>`,
     );
     xmlContent.push(
-      `<url><loc>${prefixUrl}search</loc><changefreq>weekly</changefreq></url>`,
+      `<url><loc>${prefixUrl}/search</loc><changefreq>weekly</changefreq></url>`,
     );
     xmlContent.push(
-      `<url><loc>${prefixUrl}content</loc><changefreq>weekly</changefreq></url>`,
+      `<url><loc>${prefixUrl}/content</loc><changefreq>weekly</changefreq></url>`,
     );
     xmlContent.push(
-      `<url><loc>${prefixUrl}news</loc><changefreq>weekly</changefreq></url>`,
+      `<url><loc>${prefixUrl}/news</loc><changefreq>weekly</changefreq></url>`,
     );
     xmlContent.push(
-      `<url><loc>${prefixUrl}about</loc><changefreq>weekly</changefreq></url>`,
+      `<url><loc>${prefixUrl}/about</loc><changefreq>weekly</changefreq></url>`,
     );
 
     xmlContent.push('</urlset>');
@@ -244,7 +257,7 @@ baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
     const xmlContent: string[] = [xmlHeader];
     hits.slice(index * nRecords, (index + 1) * nRecords).forEach((hit) => {
       xmlContent.push(
-        `<url><loc>${prefixUrl}RecordDisplay?id=${hit.accession}</loc><lastmod>${lastmodDate}</lastmod></url>`,
+        `<url><loc>${prefixUrl}/RecordDisplay?id=${hit.accession}</loc><lastmod>${lastmodDate}</lastmod></url>`,
       );
     });
     xmlContent.push(xmlFooter);

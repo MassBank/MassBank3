@@ -504,6 +504,7 @@ function Chart({
       const url =
         frontendUrl +
         baseUrl +
+        '/' +
         routes.search.path +
         `?${searchParams.toString()}`;
 

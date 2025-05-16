@@ -3,7 +3,7 @@ import './Header.scss';
 import routes from '../../constants/routes';
 import { Button, Menu, MenuProps } from 'antd';
 import { Header as HeaderAntD } from 'antd/es/layout/layout';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { usePropertiesContext } from '../../context/properties/properties';
 import { CSSProperties, useMemo } from 'react';
 import logo from '../../assets/logo.svg';
@@ -38,7 +38,7 @@ function Header({ height }: InputProps) {
             marginRight: 10,
           }}
         >
-          <Link to={baseUrl} target="_self">
+          <a href={baseUrl} target="_self">
             <img
               src={logo}
               alt="MassBank Europe"
@@ -50,7 +50,7 @@ function Header({ height }: InputProps) {
                 padding: 5,
               }}
             />
-          </Link>
+          </a>
         </Button>
       ),
     };
@@ -67,7 +67,7 @@ function Header({ height }: InputProps) {
             route.id !== routes.accessionNext.id,
         )
         .map((route) => {
-          const path = baseUrl + route.path;
+          const path = baseUrl + '/' + route.path;
           return {
             key: path,
             label: (
