@@ -1,7 +1,8 @@
 #!/bin/bash
 
-echo "servers:\n  - url: \"" >> swagger-ui/openapi.yaml
-echo $1 >> swagger-ui/openapi.yaml
+echo -n "servers:\n  - url: \"" >> swagger-ui/openapi.yaml
+echo -n $1 >> swagger-ui/openapi.yaml
+echo -n $2 >> swagger-ui/openapi.yaml
 echo "\"" >> swagger-ui/openapi.yaml
 
 CGO_ENABLED=0

@@ -9,6 +9,7 @@ const emptyState: PropertiesContextProps = {
   version: '',
   distributorText: '',
   distributorUrl: '',
+  homepageIntroText: '',
 };
 
 const propertiesContext = createContext<PropertiesContextProps>(emptyState);

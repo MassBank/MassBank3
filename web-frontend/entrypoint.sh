@@ -2,7 +2,7 @@
 
 echo "MB3_API_URL=$1" > .env
 echo "MB3_FRONTEND_URL=$2" >> .env
-echo "MB3_BASE_URL=$3" >> .env
+echo "MB3_FRONTEND_BASE_URL=$3" >> .env
 echo "MB3_VERSION=$4" >> .env
 echo "EXPORT_SERVICE_URL=$5" >> .env
 echo "GOOGLE_SEARCH_CONSOLE_KEY=$6" >> .env

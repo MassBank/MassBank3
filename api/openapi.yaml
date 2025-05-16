@@ -2,8 +2,6 @@ openapi: 3.0.3
 info:
   title: "MassBank3 API"
   version: "3.0"
-# servers:
-#   - url: "http://localhost:8081"
 paths:
   /records:
     parameters:
