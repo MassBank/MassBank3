@@ -86,6 +86,10 @@ To customise the title in the web browser change the _MB3_FRONTEND_BROWSER_TAB_T
 
 A substitution of the text below the MassBank logo on the homepage is possible via editing _MB3_FRONTEND_HOMEPAGE_INTRO_TEXT_.
 
+#### Replacement of News and Funding Section on Hoempage
+
+Both _MB3_FRONTEND_HOMEPAGE_REPLACEMENT_SECTION_NAME_ and _MB3_FRONTEND_HOMEPAGE_REPLACEMENT_SECTION_TEXT_ need to be non-empty strings to replace the news and funding section on the homepage with a free text. As the names indicate, the first stands for the section name while the latter is the text to fill that section.
+
 ### Troubleshooting
 
 In case your system is different from linux/amd64 then a warning might appear after starting docker compose:
