@@ -48,7 +48,7 @@ function HomeView() {
   } else {
     elements.push(
       <Content>
-        <SectionDivider label="Latext News" />
+        <SectionDivider label="Latest News" />
         <News />
       </Content>,
     );
