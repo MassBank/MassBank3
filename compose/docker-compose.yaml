@@ -44,10 +44,8 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       MB3_SERVER_PORT: ${MB3_SERVER_PORT}
-      SIMILARITY_SERVICE_COSINE_HOST: similarity-service
-      SIMILARITY_SERVICE_COSINE_PORT: 8080
-      EXPORT_SERVICE_HOST: export-service
-      EXPORT_SERVICE_PORT: 8080
+      SIMILARITY_SERVICE_COSINE_URL: http://similarity-service:8080      
+      EXPORT_SERVICE_URL: http://export-service:8080      
       MB3_API_URL: http://${MB3_API_HOST}:${MB3_API_PORT}
       MB3_API_BASE_URL: ${MB3_API_BASE_URL}
 

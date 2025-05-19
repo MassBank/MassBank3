@@ -573,9 +573,8 @@ func GetStatus() (GetStatus200Response, error) {
 		postgresStatus.Error = err.Error()
 	}
 
-	hostname := getEnv("EXPORT_SERVICE_HOST", "export-service")
-	port := getEnv("EXPORT_SERVICE_PORT", "8080")
-	requestURL := "http://" + hostname + ":" + port + "/version"
+	exportServiceUrl := getEnv("EXPORT_SERVICE_URL", "http://export-service:8080")
+	requestURL := exportServiceUrl + "/version"
 	res, err := http.Get(requestURL)
 	if err != nil {
 		export_service_status.Status = "ERROR"
@@ -587,9 +586,8 @@ func GetStatus() (GetStatus200Response, error) {
 		}
 	}
 
-	hostname = getEnv("SIMILARITY_SERVICE_COSINE_HOST", "similarity-service-cosine")
-	port = getEnv("SIMILARITY_SERVICE_COSINE_PORT", "8080")
-	requestURL = "http://" + hostname + ":" + port + "/version"
+	similarityServiceUrl := getEnv("SIMILARITY_SERVICE_COSINE_URL", "http://similarity-service:8080")
+	requestURL = similarityServiceUrl + "/version"
 	res, err = http.Get(requestURL)
 	if err != nil {
 		similarity_service_status.Status = "ERROR"
@@ -1044,9 +1042,8 @@ func GetSimilarity(peakList []string, threshold float64, referenceSpectraList []
 		peakListParam = append(peakListParam, datatype1{Mz: mz, Intensity: rel})
 	}
 
-	hostname := getEnv("SIMILARITY_SERVICE_COSINE_HOST", "similarity-service-cosine")
-	port := getEnv("SIMILARITY_SERVICE_COSINE_PORT", "8080")
-	requestURL := "http://" + hostname + ":" + port + "/similarity"
+	similarityServiceUrl := getEnv("SIMILARITY_SERVICE_COSINE_URL", "http://similarity-service:8080")
+	requestURL := similarityServiceUrl + "/similarity"
 
 	type datatype2 struct {
 		PeakList             []datatype1 `json:"peak_list"`
