@@ -7,8 +7,13 @@ import Segmented from '../../../basic/Segmented';
 import QuickSearch from './QuickSearch';
 import MassBankInfo from './MassBankInfo';
 import FeaturesOverview from './FeaturesOverview';
+import { usePropertiesContext } from '../../../../context/properties/properties';
+import FreeText from '../../../basic/FreeText';
 
 function HomeView() {
+  const { homepageReplacementSectionName, homepageReplacementSectionText } =
+    usePropertiesContext();
+
   const elements: JSX.Element[] = [];
   elements.push(<MassBankInfo />);
   elements.push(
@@ -23,18 +28,36 @@ function HomeView() {
       <QuickSearch />
     </Content>,
   );
-  elements.push(
-    <Content>
-      <SectionDivider label="Latest News" />
-      <News />
-    </Content>,
-  );
-  elements.push(
-    <Content>
-      <SectionDivider label="Funding" />
-      <AcknowledgementNFDI4Chem />
-    </Content>,
-  );
+
+  if (
+    homepageReplacementSectionName !== '' &&
+    homepageReplacementSectionText !== ''
+  ) {
+    elements.push(
+      <Content>
+        <SectionDivider label={homepageReplacementSectionName} />
+        {
+          <FreeText
+            text={homepageReplacementSectionText}
+            style={{ textAlign: 'left' }}
+          />
+        }
+      </Content>,
+    );
+  } else {
+    elements.push(
+      <Content>
+        <SectionDivider label="Latest News" />
+        <News />
+      </Content>,
+    );
+    elements.push(
+      <Content>
+        <SectionDivider label="Funding" />
+        <AcknowledgementNFDI4Chem />
+      </Content>,
+    );
+  }
 
   const elementLabels = [
     'MassBank',

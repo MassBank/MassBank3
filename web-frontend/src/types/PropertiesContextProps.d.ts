@@ -7,6 +7,8 @@ interface PropertiesContextProps {
   distributorText: string;
   distributorUrl: string;
   homepageIntroText: string;
+  homepageReplacementSectionName: string;
+  homepageReplacementSectionText: string;
 }
 
 export default PropertiesContextProps;

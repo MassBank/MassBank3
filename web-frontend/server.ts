@@ -43,21 +43,29 @@ const browserTabTitle =
   process.env.MB3_FRONTEND_BROWSER_TAB_TITLE ?? 'MassBank3';
 const homepageIntroText =
   process.env.MB3_FRONTEND_HOMEPAGE_INTRO_TEXT ?? 'Welcome to MassBank3!';
+const homepageReplacementSectionName =
+  process.env.MB3_FRONTEND_HOMEPAGE_REPLACEMENT_SECTION_NAME ?? '';
+const homepageReplacementSectionText =
+  process.env.MB3_FRONTEND_HOMEPAGE_REPLACEMENT_SECTION_TEXT ?? '';
 
 console.log('\n');
-console.log('isProduction', process.env.NODE_ENV === 'production');
-console.log('port', port);
-console.log('host', host);
-console.log('baseUrl', frontendBaseUrl);
-console.log('frontendUrl', frontendUrl);
-console.log('version', version);
-console.log('backendUrl', backendUrl);
-console.log('backendUrlInternal', backendUrlInternal);
-console.log('exportServiceUrl', exportServiceUrl);
-console.log('exportServiceUrlInternal', exportServiceUrlInternal);
-console.log('googleSearchConsoleKey', googleSearchConsoleKey);
-console.log('distributorText', distributorText);
-console.log('distributorUrl', distributorUrl);
+console.log('isProduction:', process.env.NODE_ENV === 'production');
+console.log('port:', port);
+console.log('host:', host);
+console.log('baseUrl:', frontendBaseUrl);
+console.log('frontendUrl:', frontendUrl);
+console.log('version:', version);
+console.log('backendUrl:', backendUrl);
+console.log('backendUrlInternal:', backendUrlInternal);
+console.log('exportServiceUrl:', exportServiceUrl);
+console.log('exportServiceUrlInternal:', exportServiceUrlInternal);
+console.log('googleSearchConsoleKey:', googleSearchConsoleKey);
+console.log('distributorText:', distributorText);
+console.log('distributorUrl:', distributorUrl);
+console.log('browserTabTitle:', browserTabTitle);
+console.log('homepageIntroText:', homepageIntroText);
+console.log('homepageReplacementSectionName:', homepageReplacementSectionName);
+console.log('homepageReplacementSectionText:', homepageReplacementSectionText);
 console.log('\n');
 
 // Create http server
@@ -301,6 +309,8 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       distributorText,
       distributorUrl,
       homepageIntroText,
+      homepageReplacementSectionName,
+      homepageReplacementSectionText,
     } as PropertiesContextProps;
     const rendered = await render({
       path,
