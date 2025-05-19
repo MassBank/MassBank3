@@ -43,10 +43,14 @@ const browserTabTitle =
   process.env.MB3_FRONTEND_BROWSER_TAB_TITLE ?? 'MassBank3';
 const homepageIntroText =
   process.env.MB3_FRONTEND_HOMEPAGE_INTRO_TEXT ?? 'Welcome to MassBank3!';
-const homepageReplacementSectionName =
-  process.env.MB3_FRONTEND_HOMEPAGE_REPLACEMENT_SECTION_NAME ?? '';
-const homepageReplacementSectionText =
-  process.env.MB3_FRONTEND_HOMEPAGE_REPLACEMENT_SECTION_TEXT ?? '';
+const homepageNewsSectionText =
+  process.env.MB3_FRONTEND_HOMEPAGE_NEWS_SECTION_TEXT ?? '';
+const homepageFundingSectionText =
+  process.env.MB3_FRONTEND_HOMEPAGE_FUNDING_SECTION_TEXT ?? '';
+const homepageAdditionalSectionName =
+  process.env.MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_NAME ?? '';
+const homepageAdditionalSectionText =
+  process.env.MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_TEXT ?? '';
 
 console.log('\n');
 console.log('isProduction:', process.env.NODE_ENV === 'production');
@@ -64,8 +68,10 @@ console.log('distributorText:', distributorText);
 console.log('distributorUrl:', distributorUrl);
 console.log('browserTabTitle:', browserTabTitle);
 console.log('homepageIntroText:', homepageIntroText);
-console.log('homepageReplacementSectionName:', homepageReplacementSectionName);
-console.log('homepageReplacementSectionText:', homepageReplacementSectionText);
+console.log('homepageNewsSectionText:', homepageNewsSectionText);
+console.log('homepageFundingSectionText:', homepageFundingSectionText);
+console.log('homepageAdditionalSectionName:', homepageAdditionalSectionName);
+console.log('homepageAdditionalSectionText:', homepageAdditionalSectionText);
 console.log('\n');
 
 // Create http server
@@ -309,8 +315,10 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       distributorText,
       distributorUrl,
       homepageIntroText,
-      homepageReplacementSectionName,
-      homepageReplacementSectionText,
+      homepageNewsSectionText,
+      homepageFundingSectionText,
+      homepageAdditionalSectionName,
+      homepageAdditionalSectionText,
     } as PropertiesContextProps;
     const rendered = await render({
       path,

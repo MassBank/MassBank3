@@ -86,9 +86,13 @@ To customise the title in the web browser change the _MB3_FRONTEND_BROWSER_TAB_T
 
 A substitution of the text below the MassBank logo on the homepage is possible via editing _MB3_FRONTEND_HOMEPAGE_INTRO_TEXT_.
 
-#### Replacement of News and Funding Section on Hoempage
+#### Overwrite/Disable the News and Funding Section on Homepage
 
-Both _MB3_FRONTEND_HOMEPAGE_REPLACEMENT_SECTION_NAME_ and _MB3_FRONTEND_HOMEPAGE_REPLACEMENT_SECTION_TEXT_ need to be non-empty strings to replace the news and funding section on the homepage with a free text. As the names indicate, the first stands for the section name while the latter is the text to fill that section.
+Both _MB3_FRONTEND_HOMEPAGE_NEWS_SECTION_TEXT_ and _MB3_FRONTEND_HOMEPAGE_FUNDING_SECTION_TEXT_ can be non-empty strings to replace the news and funding section content on the homepage with a free text. Set the value "disabled" to disable a section.
+
+#### Add additional Section to Homepage
+
+To enable a custom section with free text content set the variable _MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_NAME_ and _MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_TEXT_. As the names indicate, the first stands for the section name while the latter is the text to fill that section.
 
 ### Troubleshooting
 

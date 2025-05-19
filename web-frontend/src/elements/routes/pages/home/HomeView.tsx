@@ -11,8 +11,12 @@ import { usePropertiesContext } from '../../../../context/properties/properties'
 import FreeText from '../../../basic/FreeText';
 
 function HomeView() {
-  const { homepageReplacementSectionName, homepageReplacementSectionText } =
-    usePropertiesContext();
+  const {
+    homepageNewsSectionText,
+    homepageFundingSectionText,
+    homepageAdditionalSectionName,
+    homepageAdditionalSectionText,
+  } = usePropertiesContext();
 
   const elements: JSX.Element[] = [];
   elements.push(<MassBankInfo />);
@@ -29,32 +33,59 @@ function HomeView() {
     </Content>,
   );
 
-  if (
-    homepageReplacementSectionName !== '' &&
-    homepageReplacementSectionText !== ''
-  ) {
-    elements.push(
-      <Content>
-        <SectionDivider label={homepageReplacementSectionName} />
-        {
+  if (homepageNewsSectionText !== '') {
+    if (homepageNewsSectionText !== 'disabled') {
+      elements.push(
+        <Content>
+          <SectionDivider label="Latest News" />
           <FreeText
-            text={homepageReplacementSectionText}
+            text={homepageNewsSectionText}
             style={{ textAlign: 'left' }}
           />
-        }
-      </Content>,
-    );
+        </Content>,
+      );
+    }
   } else {
     elements.push(
       <Content>
-        <SectionDivider label="Latest News" />
+        <SectionDivider label="Latext News" />
         <News />
       </Content>,
     );
+  }
+
+  if (homepageFundingSectionText !== '') {
+    if (homepageFundingSectionText !== 'disabled') {
+      elements.push(
+        <Content>
+          <SectionDivider label="Funding" />
+          <FreeText
+            text={homepageFundingSectionText}
+            style={{ textAlign: 'left' }}
+          />
+        </Content>,
+      );
+    }
+  } else {
     elements.push(
       <Content>
         <SectionDivider label="Funding" />
         <AcknowledgementNFDI4Chem />
+      </Content>,
+    );
+  }
+
+  if (
+    homepageAdditionalSectionName !== '' &&
+    homepageAdditionalSectionText !== ''
+  ) {
+    elements.push(
+      <Content>
+        <SectionDivider label={homepageAdditionalSectionName} />
+        <FreeText
+          text={homepageAdditionalSectionText}
+          style={{ textAlign: 'left' }}
+        />
       </Content>,
     );
   }
