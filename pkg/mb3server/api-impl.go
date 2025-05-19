@@ -3,6 +3,7 @@ package mb3server
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"sort"
@@ -575,6 +576,7 @@ func GetStatus() (GetStatus200Response, error) {
 
 	exportServiceUrl := getEnv("EXPORT_SERVICE_URL", "http://export-service:8080")
 	requestURL := exportServiceUrl + "/version"
+	fmt.Println("requestURL EXP: ", requestURL)
 	res, err := http.Get(requestURL)
 	if err != nil {
 		export_service_status.Status = "ERROR"
@@ -588,6 +590,7 @@ func GetStatus() (GetStatus200Response, error) {
 
 	similarityServiceUrl := getEnv("SIMILARITY_SERVICE_COSINE_URL", "http://similarity-service:8080")
 	requestURL = similarityServiceUrl + "/version"
+	fmt.Println("requestURL SIM: ", requestURL)
 	res, err = http.Get(requestURL)
 	if err != nil {
 		similarity_service_status.Status = "ERROR"
@@ -1044,6 +1047,7 @@ func GetSimilarity(peakList []string, threshold float64, referenceSpectraList []
 
 	similarityServiceUrl := getEnv("SIMILARITY_SERVICE_COSINE_URL", "http://similarity-service:8080")
 	requestURL := similarityServiceUrl + "/similarity"
+	fmt.Println("requestURL SIM sim: ", requestURL)
 
 	type datatype2 struct {
 		PeakList             []datatype1 `json:"peak_list"`
