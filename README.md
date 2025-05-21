@@ -40,11 +40,12 @@ The default structure of the _data_ folder looks like the following:
     |---...
     |---/compose
     |---/data
+        |---/massbank-data
         |---/massbank-volume
         |---/postgres-data
     |---...
 
-The path to PostgreSQL via _DB_LOCAL_PATH_ is "/MassBank3/data/postgres-data" by default. "/MassBank3/data/massbank-volume" is the default directory to store the MSP file needed for the similarity service and can be set via _MSP_LOCAL_PATH_.
+The path to PostgreSQL via _DB_LOCAL_PATH_ is "/MassBank3/data/postgres-data" by default. "/MassBank3/data/massbank-volume" is the default directory to store the MSP file needed for the similarity service and can be set via _MSP_LOCAL_PATH_. "/MassBank3/data/massbank-data" is the default directory to store the MassBank data in folders needed for the export service and can be set via _EXPORT_MB_DATA_DIRECTORY_.
 
 In order to provide the MassBank data to the similarity service, download the latest release of MassBank data in MSP format and move it the _data_ directoy (default):
 
@@ -52,6 +53,13 @@ In order to provide the MassBank data to the similarity service, download the la
     mkdir ../data/massbank-volume
     wget https://github.com/MassBank/MassBank-data/releases/latest/download/MassBank_NIST.msp
     mv MassBank_NIST.msp ../data/massbank-volume/MassBank_NIST.msp
+
+And in order to provide the MassBank data to the export service, download the latest release of MassBank data, unzip it and move the contributor's directories into _data_ directoy (default):
+
+    wget https://github.com/MassBank/MassBank-data/archive/refs/heads/main.tar.gz
+    tar -xf main.tar.gz
+    mv MassBank-data-main ../data/massbank-data/
+    rm main.tar.gz
 
 Now use _docker compose_ to start the system (in daemon mode):
 
