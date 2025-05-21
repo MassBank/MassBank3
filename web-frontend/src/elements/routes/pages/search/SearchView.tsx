@@ -149,7 +149,7 @@ function SearchView() {
         const builtSearchParams = buildSearchParamsFromFormData(formData);
 
         navigate({
-          pathname: baseUrl + routes.search.path,
+          pathname: baseUrl + '/' + routes.search.path,
           search: `?${Object.keys(builtSearchParams).length > 0 ? createSearchParams(builtSearchParams) : createSearchParams({ plain: 'true' })}`,
         });
       } else {

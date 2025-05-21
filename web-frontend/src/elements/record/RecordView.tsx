@@ -12,6 +12,7 @@ import InformationTable from './InformationTable';
 import SectionDivider from '../basic/SectionDivider';
 import Segmented from '../basic/Segmented';
 import segmentedWidth from '../../constants/segmentedWidth';
+import MassSpectrometryTable from './MassSpectrometryTable';
 
 type inputProps = {
   record: Record;
@@ -88,6 +89,19 @@ function RecordView({ record, width, height }: inputProps) {
       elements.push(peakAnnotation);
       elementLabels.push('Peak Annotation');
     }
+
+    const massSpectrometry = (
+      <Content>
+        {buildDivider('Mass Spectrometry')}
+        <MassSpectrometryTable
+          massSpectrometry={record.mass_spectrometry}
+          width="100%"
+          height="auto"
+        />
+      </Content>
+    );
+    elements.push(massSpectrometry);
+    elementLabels.push('Mass Spectrometry');
 
     const acquisition = (
       <Content>

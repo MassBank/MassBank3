@@ -126,6 +126,24 @@ function AcquisitionTable({ acquisition, width, height }: InputProps) {
       key: 'key-ion-mode',
     });
 
+    if (acquisition.chromatography) {
+      acquisition.chromatography.forEach((c, i) => {
+        const split = splitStringAndCapitaliseFirstLetter(c.subtag, '_', ' ');
+        dataSource.push({
+          Parameter: split,
+          Value: (
+            <ExportableContent
+              mode="copy"
+              title={`Copy '${split}' to clipboard`}
+              component={c.value}
+              onClick={() => copyTextToClipboard(split, c.value)}
+            />
+          ),
+          key: `key-chromatography-${i}`,
+        });
+      });
+    }
+
     if (acquisition.mass_spectrometry.subtags) {
       acquisition.mass_spectrometry.subtags.forEach((s, i) => {
         const split = splitStringAndCapitaliseFirstLetter(s.subtag, '_', ' ');
@@ -134,7 +152,7 @@ function AcquisitionTable({ acquisition, width, height }: InputProps) {
           Value: (
             <ExportableContent
               mode="copy"
-              title={"Copy '${split}' to clipboard"}
+              title={`Copy '${split}' to clipboard`}
               component={s.value}
               onClick={() => copyTextToClipboard(split, s.value)}
             />

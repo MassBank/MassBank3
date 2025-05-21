@@ -36,9 +36,11 @@ func main() {
 	DefaultApiService := mb3server.NewDefaultApiService()
 	DefaultApiController := mb3server.NewDefaultAPIController(DefaultApiService)
 
-	router := mb3server.NewRouter(DefaultApiController)
+	r := mb3server.NewRouter(DefaultApiController)
+	addSwaggerEndpoint(r)
 
-	addSwaggerEndpoint(router)
+	router := chi.NewRouter()    
+    router.Mount(mb3server.ServerConfig.BaseUrl, r)
 
 	log.Fatal(http.ListenAndServe(":"+strconv.FormatUint(uint64(mb3server.ServerConfig.ServerPort), 10), router))
 
@@ -52,7 +54,7 @@ func addSwaggerEndpoint(router chi.Router) {
 	}
 
 	// Serve the swagger-ui files
-	router.Handle("/ui/*", http.StripPrefix("/ui/", http.FileServer(http.FS(fsys))))
+	router.Handle("/ui/*", http.StripPrefix(mb3server.ServerConfig.BaseUrl+"/ui/", http.FileServer(http.FS(fsys))))
 	// Redirect root to the swagger-ui
-	router.Handle("/", http.RedirectHandler(mb3server.ServerConfig.ApiUrl+"/ui/", http.StatusFound))
+	router.Handle("/", http.RedirectHandler(mb3server.ServerConfig.ApiUrl+mb3server.ServerConfig.BaseUrl+"/ui/", http.StatusFound))
 }

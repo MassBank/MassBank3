@@ -22,6 +22,7 @@ type ServerConfig struct {
 	database.DBConfig
 	ServerPort uint
 	ApiUrl     string
+	BaseUrl    string
 }
 
 const (
@@ -37,6 +38,8 @@ const (
 	mbDataDirectoryDefault = ""
 	mbDbInitDefault        = "true"
 	serverPortDefault      = "8080"
+	apiUrlDefault          = "localhost:8081"
+	baseUrlDefault         = "/MassBank-api"
 )
 
 var toolConfig *ToolConfig = nil
@@ -87,7 +90,13 @@ func GetServerConfig() *ServerConfig {
 	flag.UintVar(&serverConfig.ServerPort, "server_port", serverConfig.ServerPort, "Listen on this port. Overwrites environment variable SERVER_PORT")
 	flag.Parse()
 
-	serverConfig.ApiUrl = getEnv("MB3_API_URL", "")
+	serverConfig.ApiUrl = getEnv("MB3_API_URL", apiUrlDefault)
+	serverConfig.BaseUrl = getEnv("MB3_API_BASE_URL", baseUrlDefault)
+
+	lastChar := serverConfig.BaseUrl[len(serverConfig.BaseUrl)-1:]
+	if lastChar == "/" {
+		serverConfig.BaseUrl = serverConfig.BaseUrl[:len(serverConfig.BaseUrl)-1]
+	}
 
 	return serverConfig
 }

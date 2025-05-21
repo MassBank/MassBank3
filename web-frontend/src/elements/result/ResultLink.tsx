@@ -17,7 +17,12 @@ function ResultLink({ hit, width = '100%', height = '100%' }: InputProps) {
 
   const url = useMemo(
     () =>
-      frontendUrl + baseUrl + routes.accession.path + '?id=' + hit.accession,
+      frontendUrl +
+      baseUrl +
+      '/' +
+      routes.accession.path +
+      '?id=' +
+      hit.accession,
     [baseUrl, frontendUrl, hit.accession],
   );
 

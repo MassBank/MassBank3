@@ -7,8 +7,17 @@ import Segmented from '../../../basic/Segmented';
 import QuickSearch from './QuickSearch';
 import MassBankInfo from './MassBankInfo';
 import FeaturesOverview from './FeaturesOverview';
+import { usePropertiesContext } from '../../../../context/properties/properties';
+import FreeText from '../../../basic/FreeText';
 
 function HomeView() {
+  const {
+    homepageNewsSectionText,
+    homepageFundingSectionText,
+    homepageAdditionalSectionName,
+    homepageAdditionalSectionText,
+  } = usePropertiesContext();
+
   const elements: JSX.Element[] = [];
   elements.push(<MassBankInfo />);
   elements.push(
@@ -23,18 +32,63 @@ function HomeView() {
       <QuickSearch />
     </Content>,
   );
-  elements.push(
-    <Content>
-      <SectionDivider label="Latest News" />
-      <News />
-    </Content>,
-  );
-  elements.push(
-    <Content>
-      <SectionDivider label="Funding" />
-      <AcknowledgementNFDI4Chem />
-    </Content>,
-  );
+
+  if (homepageNewsSectionText !== '') {
+    if (homepageNewsSectionText !== 'disabled') {
+      elements.push(
+        <Content>
+          <SectionDivider label="Latest News" />
+          <FreeText
+            text={homepageNewsSectionText}
+            style={{ textAlign: 'left' }}
+          />
+        </Content>,
+      );
+    }
+  } else {
+    elements.push(
+      <Content>
+        <SectionDivider label="Latest News" />
+        <News />
+      </Content>,
+    );
+  }
+
+  if (homepageFundingSectionText !== '') {
+    if (homepageFundingSectionText !== 'disabled') {
+      elements.push(
+        <Content>
+          <SectionDivider label="Funding" />
+          <FreeText
+            text={homepageFundingSectionText}
+            style={{ textAlign: 'left' }}
+          />
+        </Content>,
+      );
+    }
+  } else {
+    elements.push(
+      <Content>
+        <SectionDivider label="Funding" />
+        <AcknowledgementNFDI4Chem />
+      </Content>,
+    );
+  }
+
+  if (
+    homepageAdditionalSectionName !== '' &&
+    homepageAdditionalSectionText !== ''
+  ) {
+    elements.push(
+      <Content>
+        <SectionDivider label={homepageAdditionalSectionName} />
+        <FreeText
+          text={homepageAdditionalSectionText}
+          style={{ textAlign: 'left' }}
+        />
+      </Content>,
+    );
+  }
 
   const elementLabels = [
     'MassBank',

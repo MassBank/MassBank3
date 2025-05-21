@@ -60,8 +60,6 @@ Now use _docker compose_ to start the system (in daemon mode):
 > [!NOTE]
 > Initially, the property _MB_DB_INIT_ is set to _true_. Change that value to _false_ after the database was filled within the first start. The database filling takes some time. The _mb3tool_ service is responsible for that and stops after finishing that task.
 
-The frontend can (by default) be accessed in the webbrowser at http://localhost:8080/MassBank/.
-
 To stop the system use:
 
     docker compose down -v
@@ -80,6 +78,22 @@ The _DISTRIBUTOR_TEXT_ property is a free text field to insert any description o
 
 And _DISTRIBUTOR_URL_ should contain the URL to the distributor's imprint/website.
 
+#### Title in Browser Tab
+
+To customise the title in the web browser change the _MB3_FRONTEND_BROWSER_TAB_TITLE_ property.
+
+#### Introduction/Welcome Text
+
+A substitution of the text below the MassBank logo on the homepage is possible via editing _MB3_FRONTEND_HOMEPAGE_INTRO_TEXT_.
+
+#### Overwrite/Disable the News and Funding Section on Homepage
+
+Both _MB3_FRONTEND_HOMEPAGE_NEWS_SECTION_TEXT_ and _MB3_FRONTEND_HOMEPAGE_FUNDING_SECTION_TEXT_ can be non-empty strings to replace the news and funding section content on the homepage with a free text. Set the value "disabled" to disable a section.
+
+#### Add additional Section to Homepage
+
+To enable a custom section with free text content set the variable _MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_NAME_ and _MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_TEXT_. As the names indicate, the first stands for the section name while the latter is the text to fill that section.
+
 ### Troubleshooting
 
 In case your system is different from linux/amd64 then a warning might appear after starting docker compose:
@@ -94,11 +108,19 @@ Add the following properties to _postgres_, _similarity-service_ and _export-ser
 
 Description is coming soon.
 
+# Frontend
+
+The frontend can by default be accessed in the webbrowser at http://localhost:8080/MassBank and is composed via:
+
+    http://${MB3_FRONTEND_HOST}:${MB3_FRONTEND_PORT}${MB3_FRONTEND_BASE_URL}
+
 # REST API
 
 There is a [graphical interface](https://msbi.ipb-halle.de/MassBank-api/ui/) by means of Swagger UI to have insights into the different API endpoints and their specifications at our test instance.
 
-To access this on your running instance, just visit the API URL in the browser. By default it is http://localhost:8081 and is defined by the environment variable _MB3_API_URL_.
+To access this on your running instance, just visit the API URL in the browser. By default it is http://localhost:8081/MassBank-api and is defined by the environment variable _MB3_API_URL_ and concatenated via:
+
+    http://${MB3_API_HOST}:${MB3_API_PORT}${MB3_API_BASE_URL}
 
 ## Examples
 
@@ -110,13 +132,13 @@ In order to get all records from the running instance at the API URL with an InC
 
     {MB3_API_URL}/records?inchi_key=KWILGNNWGSNMPA-UHFFFAOYSA-N
 
-The corresponding URL with default value (http://localhost:8081) is:
+The corresponding URL with default value (http://localhost:8081/MassBank-api) is:
 
-    http://localhost:8081/records?inchi_key=KWILGNNWGSNMPA-UHFFFAOYSA-N
+    http://localhost:8081/MassBank-api/records?inchi_key=KWILGNNWGSNMPA-UHFFFAOYSA-N
 
 For example, to obtain the results via cURL use:
 
-    curl -X GET "http://localhost:8081/records?inchi_key=KWILGNNWGSNMPA-UHFFFAOYSA-N"
+    curl -X GET "http://localhost:8081/MassBank-api/records?inchi_key=KWILGNNWGSNMPA-UHFFFAOYSA-N"
 
 The result is a set of complete MassBank records in JSON format.
 
@@ -124,7 +146,7 @@ The result is a set of complete MassBank records in JSON format.
 
 To receive all records to the compound name _mellein_ use:
 
-    http://localhost:8081/records?compound_name=mellein
+    http://localhost:8081/MassBank-api/records?compound_name=mellein
 
 ### _/records/search_ Endpoint
 
@@ -132,7 +154,7 @@ To receive all records to the compound name _mellein_ use:
 
 To receive all accession belonging to the compound class _natural product_ use:
 
-    http://localhost:8081/records/search?compound_class=natural+product
+    http://localhost:8081/MassBank-api/records/search?compound_class=natural+product
 
 The result is a set of MassBank record IDs (accessions).
 
@@ -140,7 +162,7 @@ The result is a set of MassBank record IDs (accessions).
 
 A request for searching MS2 spectra and negative ion mode looks like:
 
-    http://localhost:8081/records/search?ms_type=MS2&ion_mode=NEGATIVE
+    http://localhost:8081/MassBank-api/records/search?ms_type=MS2&ion_mode=NEGATIVE
 
 #### Similarity Search
 
@@ -154,6 +176,6 @@ A similarity search request with the semicolon-separated tuples (m/z value, rel.
 
 and threshold value 0.8 looks like:
 
-    http://localhost:8081/records/search?peak_list=133.0648%3B225%2C151.0754%3B94%2C155.9743%3B112%2C161.0597%3B999%2C179.0703%3B750&peak_list_threshold=0.8
+    http://localhost:8081/MassBank-api/records/search?peak_list=133.0648%3B225%2C151.0754%3B94%2C155.9743%3B112%2C161.0597%3B999%2C179.0703%3B750&peak_list_threshold=0.8
 
 The result is a set of MassBank record IDs (accessions) and the corresponding similarity score in JSON format. The calculation is done by the [matchms](https://github.com/matchms/matchms) package used in our [similarity service](https://github.com/MassBank/MassBank3-similarity-service).

@@ -14,36 +14,64 @@ const port = 3000;
 const host = '0.0.0.0';
 
 const isProduction = process.env.NODE_ENV === 'production';
-const backendUrl = process.env.MB3_API_URL ?? 'http://localhost:8081';
+const backendUrl =
+  process.env.MB3_API_URL && process.env.MB3_API_URL.trim().length > 0
+    ? process.env.MB3_API_URL.replace(/\/$/, '')
+    : 'http://localhost:8081/MassBank-api';
 const frontendUrl = process.env.MB3_FRONTEND_URL ?? 'http://localhost:8080';
-const baseUrl = process.env.MB3_BASE_URL ?? '/MassBank3/';
+const frontendBaseUrl =
+  process.env.MB3_FRONTEND_BASE_URL &&
+  process.env.MB3_FRONTEND_BASE_URL.trim().length > 0
+    ? process.env.MB3_FRONTEND_BASE_URL.replace(/\/$/, '')
+    : '/MassBank3';
 const exportServiceUrl =
   process.env.EXPORT_SERVICE_URL ?? 'http://localhost:8083';
 const version = process.env.MB3_VERSION ?? '0.4.0 (beta)';
 const googleSearchConsoleKey = process.env.GOOGLE_SEARCH_CONSOLE_KEY ?? '';
 const backendUrlInternal =
-  process.env.MB3_API_URL_INTERNAL ?? 'http://mb3server:8080';
+  process.env.MB3_API_URL_INTERNAL &&
+  process.env.MB3_API_URL_INTERNAL.trim().length > 0
+    ? process.env.MB3_API_URL_INTERNAL.replace(/\/$/, '')
+    : 'http://mb3server:8080/MassBank-api';
 const exportServiceUrlInternal =
   process.env.EXPORT_SERVICE_URL_INTERNAL ?? 'http://export-service:8080';
 const distributorText =
   process.env.DISTRIBUTOR_TEXT ??
   'This website is hosted and distributed by ...';
 const distributorUrl = process.env.DISTRIBUTOR_URL ?? '';
+const browserTabTitle =
+  process.env.MB3_FRONTEND_BROWSER_TAB_TITLE ?? 'MassBank3';
+const homepageIntroText =
+  process.env.MB3_FRONTEND_HOMEPAGE_INTRO_TEXT ?? 'Welcome to MassBank3!';
+const homepageNewsSectionText =
+  process.env.MB3_FRONTEND_HOMEPAGE_NEWS_SECTION_TEXT ?? '';
+const homepageFundingSectionText =
+  process.env.MB3_FRONTEND_HOMEPAGE_FUNDING_SECTION_TEXT ?? '';
+const homepageAdditionalSectionName =
+  process.env.MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_NAME ?? '';
+const homepageAdditionalSectionText =
+  process.env.MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_TEXT ?? '';
 
 console.log('\n');
-console.log('isProduction', process.env.NODE_ENV === 'production');
-console.log('port', port);
-console.log('host', host);
-console.log('baseUrl', baseUrl);
-console.log('frontendUrl', frontendUrl);
-console.log('version', version);
-console.log('backendUrl', backendUrl);
-console.log('backendUrlInternal', backendUrlInternal);
-console.log('exportServiceUrl', exportServiceUrl);
-console.log('exportServiceUrlInternal', exportServiceUrlInternal);
-console.log('googleSearchConsoleKey', googleSearchConsoleKey);
-console.log('distributorText', distributorText);
-console.log('distributorUrl', distributorUrl);
+console.log('isProduction:', process.env.NODE_ENV === 'production');
+console.log('port:', port);
+console.log('host:', host);
+console.log('baseUrl:', frontendBaseUrl);
+console.log('frontendUrl:', frontendUrl);
+console.log('version:', version);
+console.log('backendUrl:', backendUrl);
+console.log('backendUrlInternal:', backendUrlInternal);
+console.log('exportServiceUrl:', exportServiceUrl);
+console.log('exportServiceUrlInternal:', exportServiceUrlInternal);
+console.log('googleSearchConsoleKey:', googleSearchConsoleKey);
+console.log('distributorText:', distributorText);
+console.log('distributorUrl:', distributorUrl);
+console.log('browserTabTitle:', browserTabTitle);
+console.log('homepageIntroText:', homepageIntroText);
+console.log('homepageNewsSectionText:', homepageNewsSectionText);
+console.log('homepageFundingSectionText:', homepageFundingSectionText);
+console.log('homepageAdditionalSectionName:', homepageAdditionalSectionName);
+console.log('homepageAdditionalSectionText:', homepageAdditionalSectionText);
 console.log('\n');
 
 // Create http server
@@ -63,7 +91,7 @@ if (!isProduction) {
   const compression = (await import('compression')).default;
   const sirv = (await import('sirv')).default;
   app.use(compression());
-  app.use(baseUrl, sirv('./dist/client', { extensions: [] }));
+  app.use(frontendBaseUrl, sirv('./dist/client', { extensions: [] }));
 }
 
 const buildRecordMetadata = async (_accession: string) => {
@@ -125,17 +153,26 @@ async function getLastmodDate() {
   return lastmodDate;
 }
 
+// Create router for redirecting to the frontend with base URL in case slash is missing
+const redirectRouter = express.Router();
+const regex = new RegExp(`^${frontendBaseUrl}$`);
+app.use(regex, redirectRouter);
+redirectRouter.get('', async (req: Request, res: Response) => {
+  const redirectUrl = frontendUrl + frontendBaseUrl + '/';
+  res.redirect(redirectUrl);
+});
+
 // Create router for base URL
 const baseRouter = express.Router();
-app.use(baseUrl, baseRouter);
+app.use(frontendBaseUrl + '/', baseRouter);
 
 const nRecords = 40000;
-const prefixUrl = frontendUrl + baseUrl;
+const prefixUrl = frontendUrl + frontendBaseUrl;
 
 // serve sitemap index for search engines
 baseRouter.get('/robots.txt', async (req: Request, res: Response) => {
   try {
-    const content = `User-agent: *\nAllow: /\n\nSitemap: ${prefixUrl}sitemap.xml`;
+    const content = `User-agent: *\nAllow: /\n\nSitemap: ${prefixUrl}/sitemap.xml`;
 
     res.status(200).set({ 'Content-Type': 'text/plain' }).send(content);
   } catch (e) {
@@ -163,11 +200,11 @@ baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
     const n = Math.ceil(hitsCount / nRecords);
     for (let i = 0; i < n; i++) {
       xmlContent.push(
-        `<sitemap><loc>${prefixUrl}sitemap_${i}.xml</loc><lastmod>${lastmodDate}</lastmod></sitemap>`,
+        `<sitemap><loc>${prefixUrl}/sitemap_${i}.xml</loc><lastmod>${lastmodDate}</lastmod></sitemap>`,
       );
     }
     xmlContent.push(
-      `<sitemap><loc>${prefixUrl}sitemap_misc.xml</loc></sitemap>`,
+      `<sitemap><loc>${prefixUrl}/sitemap_misc.xml</loc></sitemap>`,
     );
     xmlContent.push('</sitemapindex>');
     const xml = xmlFormat(xmlContent.join(''));
@@ -189,16 +226,16 @@ baseRouter.get('/sitemap_misc.xml', async (req: Request, res: Response) => {
       `<url><loc>${prefixUrl}</loc><changefreq>weekly</changefreq></url>`,
     );
     xmlContent.push(
-      `<url><loc>${prefixUrl}search</loc><changefreq>weekly</changefreq></url>`,
+      `<url><loc>${prefixUrl}/search</loc><changefreq>weekly</changefreq></url>`,
     );
     xmlContent.push(
-      `<url><loc>${prefixUrl}content</loc><changefreq>weekly</changefreq></url>`,
+      `<url><loc>${prefixUrl}/content</loc><changefreq>weekly</changefreq></url>`,
     );
     xmlContent.push(
-      `<url><loc>${prefixUrl}news</loc><changefreq>weekly</changefreq></url>`,
+      `<url><loc>${prefixUrl}/news</loc><changefreq>weekly</changefreq></url>`,
     );
     xmlContent.push(
-      `<url><loc>${prefixUrl}about</loc><changefreq>weekly</changefreq></url>`,
+      `<url><loc>${prefixUrl}/about</loc><changefreq>weekly</changefreq></url>`,
     );
 
     xmlContent.push('</urlset>');
@@ -234,7 +271,7 @@ baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
     const xmlContent: string[] = [xmlHeader];
     hits.slice(index * nRecords, (index + 1) * nRecords).forEach((hit) => {
       xmlContent.push(
-        `<url><loc>${prefixUrl}RecordDisplay?id=${hit.accession}</loc><lastmod>${lastmodDate}</lastmod></url>`,
+        `<url><loc>${prefixUrl}/RecordDisplay?id=${hit.accession}</loc><lastmod>${lastmodDate}</lastmod></url>`,
       );
     });
     xmlContent.push(xmlFooter);
@@ -255,7 +292,7 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
     let render;
     if (!isProduction) {
       // Always read fresh template in development
-      const url = req.originalUrl.replace(baseUrl, '');
+      const url = req.originalUrl.replace(frontendBaseUrl, '');
       template = await fs.readFile('./index.html', 'utf-8');
       template = await vite.transformIndexHtml(url, template);
       render = (await vite.ssrLoadModule('./src/ServerApp.tsx')).render;
@@ -270,22 +307,32 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
 
     const path = req.originalUrl.split('?')[0];
     const props = {
-      baseUrl,
+      baseUrl: frontendBaseUrl,
       backendUrl,
       frontendUrl,
       exportServiceUrl,
       version,
       distributorText,
       distributorUrl,
+      homepageIntroText,
+      homepageNewsSectionText,
+      homepageFundingSectionText,
+      homepageAdditionalSectionName,
+      homepageAdditionalSectionText,
     } as PropertiesContextProps;
     const rendered = await render({
       path,
       props,
     });
 
+    const tabTitle = `<title>${browserTabTitle}</title>`;
     const noFollowLinksMeta = `<meta name="robots" content="nofollow"></meta>`;
     rendered.head = rendered.head
-      ? rendered.head.concat('\n\t').concat(noFollowLinksMeta)
+      ? rendered.head
+          .concat('\n\t')
+          .concat(tabTitle)
+          .concat('\n\t')
+          .concat(noFollowLinksMeta)
       : noFollowLinksMeta;
     if (googleSearchConsoleKey && googleSearchConsoleKey.trim().length > 0) {
       const googleSearchConsoleMeta = `<meta name="google-site-verification" content="${googleSearchConsoleKey}"></meta>`;
@@ -294,7 +341,7 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
         : googleSearchConsoleMeta;
     }
 
-    const pageRoute = path.replace(baseUrl, '');
+    const pageRoute = path.replace(frontendBaseUrl, '');
     if (
       (pageRoute === 'recordDisplay' || pageRoute === 'RecordDisplay') &&
       req.query.id
@@ -335,5 +382,5 @@ app.listen(port, host, (err) => {
     console.error(err);
     return;
   }
-  console.log(`Server started at http://${host}:${port}`);
+  console.log(`Server started at http://${host}:${port}${frontendBaseUrl}`);
 });
