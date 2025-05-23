@@ -73,6 +73,19 @@ function RecordView({ record, width, height }: inputProps) {
     elements.push(spectrum);
     elementLabels.push('Spectrum');
 
+    const massSpectrometry = (
+      <Content>
+        {buildDivider('Mass Spectrometry')}
+        <MassSpectrometryTable
+          massSpectrometry={record.mass_spectrometry}
+          width="100%"
+          height="auto"
+        />
+      </Content>
+    );
+    elements.push(massSpectrometry);
+    elementLabels.push('Mass Spectrometry');
+
     if (hasAnnotation) {
       const peakAnnotation = (
         <Content>
@@ -89,19 +102,6 @@ function RecordView({ record, width, height }: inputProps) {
       elements.push(peakAnnotation);
       elementLabels.push('Peak Annotation');
     }
-
-    const massSpectrometry = (
-      <Content>
-        {buildDivider('Mass Spectrometry')}
-        <MassSpectrometryTable
-          massSpectrometry={record.mass_spectrometry}
-          width="100%"
-          height="auto"
-        />
-      </Content>
-    );
-    elements.push(massSpectrometry);
-    elementLabels.push('Mass Spectrometry');
 
     const acquisition = (
       <Content>
