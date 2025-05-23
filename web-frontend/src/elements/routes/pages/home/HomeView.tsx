@@ -19,19 +19,24 @@ function HomeView() {
   } = usePropertiesContext();
 
   const elements: JSX.Element[] = [];
+  const elementLabels: string[] = [];
+
   elements.push(<MassBankInfo />);
+  elementLabels.push('MassBank');
   elements.push(
     <Content>
       <SectionDivider label="Features" />
       <FeaturesOverview />
     </Content>,
   );
+  elementLabels.push('Features');
   elements.push(
     <Content>
       <SectionDivider label="Quick Search" />
       <QuickSearch />
     </Content>,
   );
+  elementLabels.push('Quick Search');
 
   if (homepageNewsSectionText !== '') {
     if (homepageNewsSectionText !== 'disabled') {
@@ -44,6 +49,7 @@ function HomeView() {
           />
         </Content>,
       );
+      elementLabels.push('Latest News');
     }
   } else {
     elements.push(
@@ -52,6 +58,7 @@ function HomeView() {
         <News />
       </Content>,
     );
+    elementLabels.push('Latest News');
   }
 
   if (homepageFundingSectionText !== '') {
@@ -65,6 +72,7 @@ function HomeView() {
           />
         </Content>,
       );
+      elementLabels.push('Funding');
     }
   } else {
     elements.push(
@@ -73,6 +81,7 @@ function HomeView() {
         <AcknowledgementNFDI4Chem />
       </Content>,
     );
+    elementLabels.push('Funding');
   }
 
   if (
@@ -88,15 +97,8 @@ function HomeView() {
         />
       </Content>,
     );
+    elementLabels.push(homepageAdditionalSectionName);
   }
-
-  const elementLabels = [
-    'MassBank',
-    'Features',
-    'Quick Search',
-    'Latest News',
-    'Funding',
-  ];
 
   return (
     <Layout
