@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"math"
 	"regexp"
 	"slices"
 	"strconv"
@@ -112,10 +111,10 @@ func (db *PostgresSQLDB) GetIndexes() []Index {
 	indexes = append(indexes, Index{IndexName: "browse_options_atomcount_index", TableName: "browse_options", Columns: []string{"atomcount"}})
 
 	indexes = append(indexes, Index{IndexName: "peak_differences_spectrum_id_index", TableName: "peak_differences", Columns: []string{"spectrum_id"}})
+	indexes = append(indexes, Index{IndexName: "peak_differences_peak_id_index", TableName: "peak_differences", Columns: []string{"peak_id"}})
+	indexes = append(indexes, Index{IndexName: "peak_differences_precursor_mass_id_index", TableName: "peak_differences", Columns: []string{"precursor_mass"}})
 	indexes = append(indexes, Index{IndexName: "peak_differences_difference_index", TableName: "peak_differences", Columns: []string{"difference"}})
-	indexes = append(indexes, Index{IndexName: "peak_differences_peak1_id_index", TableName: "peak_differences", Columns: []string{"peak1_id"}})
-	indexes = append(indexes, Index{IndexName: "peak_differences_peak2_id_index", TableName: "peak_differences", Columns: []string{"peak2_id"}})
-	indexes = append(indexes, Index{IndexName: "peak_differences_min_rel_intensity_index", TableName: "peak_differences", Columns: []string{"min_rel_intensity"}})
+	indexes = append(indexes, Index{IndexName: "peak_differences_rel_intensity_index", TableName: "peak_differences", Columns: []string{"rel_intensity"}})
 
 	indexes = append(indexes, Index{IndexName: "records_massbank_id_index", TableName: "records", Columns: []string{"massbank_id"}})
 	indexes = append(indexes, Index{IndexName: "records_accession_index", TableName: "records", Columns: []string{"accession"}})
@@ -1147,10 +1146,10 @@ func (p *PostgresSQLDB) NeutralLossSearch(neutralLoss *[]float64, tolerance *flo
 		for i := 0; i < neutralLossesCount; i++ {
 			parameters = append(parameters, strconv.FormatFloat((*neutralLoss)[i]-*tolerance, 'f', -1, 64))
 			parameters = append(parameters, strconv.FormatFloat((*neutralLoss)[i]+*tolerance, 'f', -1, 64))
-			with = with + "t" + strconv.Itoa(i+1) + " AS (SELECT spectrum_id, array_agg(ARRAY[peak1_id, peak2_id]) AS agg FROM peak_differences WHERE difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
+			with = with + "t" + strconv.Itoa(i+1) + " AS (SELECT spectrum_id, array_agg(ARRAY[peak_id, precursor_mass]) AS agg FROM peak_differences WHERE difference BETWEEN $" + strconv.Itoa(len(parameters)-1) + " AND $" + strconv.Itoa(len(parameters))
 			if minRelIntensity != nil {
 				parameters = append(parameters, strconv.FormatInt(*minRelIntensity, 10))
-				with = with + " AND min_rel_intensity >= $" + strconv.Itoa(len(parameters))
+				with = with + " AND rel_intensity >= $" + strconv.Itoa(len(parameters))
 			}
 			with = with + " GROUP BY spectrum_id)"
 			if i > 0 {
@@ -1167,6 +1166,7 @@ func (p *PostgresSQLDB) NeutralLossSearch(neutralLoss *[]float64, tolerance *flo
 		selectAggregations = selectAggregations + ")::json"
 
 		query = with + " SELECT " + selectAggregations + ", browse_options.accession, browse_options.atomcount " + from + " JOIN spectrum ON spectrum.id = t1.spectrum_id JOIN browse_options ON browse_options.massbank_id = spectrum.massbank_id;"
+
 		stmt, err := p.database.Prepare(query)
 		if err != nil {
 			return nil, nil, nil, err
@@ -1880,40 +1880,43 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string,
 		return err
 	}
 
-	if (msType == "MS2" || msType == "MS3" || msType == "MS4") && *record.Peak.NumPeak > 1 {
-		var sb strings.Builder
-		sb.WriteString("INSERT INTO peak_differences (spectrum_id, difference, peak1_id, peak2_id, min_rel_intensity) VALUES")
-		var diff float64
-		var toInsert = false
-		for i := 0; i < len(insertedPeaks.Id); i++ {
-			for j := i + 1; j < len(insertedPeaks.Id); j++ {
-				if insertedPeaks.Mz[i] >= insertedPeaks.Mz[j] {
-					diff = insertedPeaks.Mz[i] - insertedPeaks.Mz[j]
-				} else {
-					diff = insertedPeaks.Mz[j] - insertedPeaks.Mz[i]
-				}
-				if diff > 11.5 {
-					sb.WriteString(fmt.Sprintf(" (%d, %f, %d, %d, %f)", spectrumId, diff, insertedPeaks.Id[i], insertedPeaks.Id[j], math.Min(float64(insertedPeaks.Rel[i]), float64(insertedPeaks.Rel[j]))))
-					if j < len(insertedPeaks.Id)-1 {
+	if (msType == "MS2" || msType == "MS3" || msType == "MS4") && *record.Peak.NumPeak > 1 && record.MassSpectrometry.FocusedIon != nil {
+		var precursorStr = ""
+		for _, subProp := range *record.MassSpectrometry.FocusedIon {
+			if subProp.Subtag == "PRECURSOR_M/Z" {
+				precursorStr = subProp.Value
+				break
+			}
+		}
+		if precursorStr != "" {
+			precursorMass, err := strconv.ParseFloat(precursorStr, 64)
+			if err == nil {
+				var sb strings.Builder
+				sb.WriteString("INSERT INTO peak_differences (spectrum_id, peak_id, precursor_mass, difference, rel_intensity) VALUES")
+				var diff float64
+				var toInsert = false
+				for i := 0; i < len(insertedPeaks.Id); i++ {
+					if insertedPeaks.Mz[i] >= precursorMass {
+						diff = insertedPeaks.Mz[i] - precursorMass
+					} else {
+						diff = precursorMass - insertedPeaks.Mz[i]
+					}
+					sb.WriteString(fmt.Sprintf(" (%d, %d, %f, %f, %f)", spectrumId, insertedPeaks.Id[i], precursorMass, diff, float64(insertedPeaks.Rel[i])))
+					if i < len(insertedPeaks.Id)-1 {
 						sb.WriteString(",")
 					}
 					toInsert = true
-				} else {
-					toInsert = false
 				}
-			}
-			if toInsert && i < len(insertedPeaks.Id)-2 {
-				sb.WriteString(",")
-			}
-		}
-		if toInsert {
-			sb.WriteString(";")
-			_, err = tx.Exec(sb.String())
-			if err != nil {
-				if err2 := tx.Rollback(); err2 != nil {
-					return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+				if toInsert {
+					sb.WriteString(";")
+					_, err = tx.Exec(sb.String())
+					if err != nil {
+						if err2 := tx.Rollback(); err2 != nil {
+							return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
+						}
+						return err
+					}
 				}
-				return err
 			}
 		}
 	}
@@ -1936,6 +1939,7 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string,
 		if err2 := tx.Rollback(); err2 != nil {
 			return errors.New("Could not rollback after error: " + err2.Error() + "\n:" + err.Error())
 		}
+		return err
 	}
 
 	err = tx.Commit()
@@ -1955,12 +1959,18 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId str
 		return errors.New("records and mb3RecordJsons must have the same length")
 	}
 
+	start := time.Now()
+
 	for i, record := range records {
 		err := p.AddRecord(record, metaDataId, mb3RecordJsons[i])
 		if err != nil {
 			return err
 		}
 	}
+
+	elapsed := time.Since(start)
+	fmt.Printf("\n -> AddRecord function took %s", elapsed)
+	fmt.Println()
 
 	return nil
 }
@@ -2163,11 +2173,11 @@ func (p *PostgresSQLDB) Init() error {
 		);
 
 		CREATE TABLE peak_differences (
-			spectrum_id INT NOT NULL REFERENCES spectrum(id) ON UPDATE CASCADE ON DELETE CASCADE,
-			difference FLOAT NOT NULL,	
-			peak1_id INT NOT NULL REFERENCES peak(id) ON UPDATE CASCADE ON DELETE CASCADE,
-			peak2_id INT NOT NULL REFERENCES peak(id) ON UPDATE CASCADE ON DELETE CASCADE,
-			min_rel_intensity FLOAT NOT NULL
+			spectrum_id INT NOT NULL REFERENCES spectrum(id) ON UPDATE CASCADE ON DELETE CASCADE,			
+			peak_id INT NOT NULL REFERENCES peak(id) ON UPDATE CASCADE ON DELETE CASCADE,
+			precursor_mass FLOAT NOT NULL,
+			difference FLOAT NOT NULL,			
+			rel_intensity FLOAT NOT NULL
 		);
 
 		CREATE TABLE IF NOT EXISTS records (

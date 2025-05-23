@@ -125,10 +125,8 @@ function Chart({
 
   const filteredNeutralLossData = useMemo(
     () =>
-      neutralLossData.filter(
-        (nl) =>
-          filteredPeakData.some((p) => p.id === nl.peak1_id) &&
-          filteredPeakData.some((p) => p.id === nl.peak2_id),
+      neutralLossData.filter((nl) =>
+        filteredPeakData.some((p) => p.id === nl.peak_id),
       ),
     [filteredPeakData, neutralLossData],
   );
@@ -401,7 +399,6 @@ function Chart({
             xScale={xScale}
             yScale={yScale}
             showLabel={isShowLabel}
-            strokeColour="red"
             disableOnHover={disableOnHover}
           />
         ))

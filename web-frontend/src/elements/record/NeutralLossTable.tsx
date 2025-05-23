@@ -25,10 +25,10 @@ function NeutralLossTable({ neutralLosses, peaks, width, height }: InputProps) {
         .sort((nl1, nl2) => nl1.difference - nl2.difference)
         .map((nl) => {
           return {
-            key: nl.peak1_id + '_' + nl.peak2_id,
+            key: nl.peak_id + '_' + nl.precursor_mass,
             difference: nl.difference.toFixed(4),
-            peak1: peaks.find((p) => p.id === nl.peak1_id)?.mz.toFixed(4) ?? '',
-            peak2: peaks.find((p) => p.id === nl.peak2_id)?.mz.toFixed(4) ?? '',
+            peak1: peaks.find((p) => p.id === nl.peak_id)?.mz.toFixed(4) ?? '',
+            peak2: nl.precursor_mass.toFixed(4) ?? '',
           } as NeutralLossTableDataType;
         }),
     [neutralLosses, peaks],
@@ -39,7 +39,12 @@ function NeutralLossTable({ neutralLosses, peaks, width, height }: InputProps) {
       setActiveKey(key);
       highlightData.dispatch({
         type: 'SHOW',
-        payload: { convertedHighlights: new Set<string>(key.split('_')) },
+        payload: {
+          convertedHighlights: new Set<string>([
+            key.split('_')[0],
+            'precursor',
+          ]),
+        },
       });
     },
     [highlightData],
@@ -50,7 +55,12 @@ function NeutralLossTable({ neutralLosses, peaks, width, height }: InputProps) {
       setActiveKey(undefined);
       highlightData.dispatch({
         type: 'HIDE',
-        payload: { convertedHighlights: new Set<string>(key.split('_')) },
+        payload: {
+          convertedHighlights: new Set<string>([
+            key.split('_')[0],
+            'precursor',
+          ]),
+        },
       });
     },
     [highlightData],

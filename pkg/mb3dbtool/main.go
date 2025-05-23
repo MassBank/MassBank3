@@ -90,6 +90,7 @@ func main() {
 
 		err = db.AddRecords(mbfiles, metaId, mb3RecordStrings)
 		if err != nil {
+			println("Could not add records: " + err.Error())
 			panic(err)
 		}
 

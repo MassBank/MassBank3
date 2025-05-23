@@ -8,6 +8,7 @@ import { Content } from 'antd/es/layout/layout';
 import { Splitter, Tabs, TabsProps } from 'antd';
 import NeutralLossTable from '../record/NeutralLossTable';
 import NeutralLoss from '../../types/peak/NeutralLoss';
+import getRecordPeakListWithPrecursor from '../../utils/getRecordPeakListWithPrecursor';
 
 const sidebarWidth = 7;
 const tabsHeight = 55;
@@ -44,7 +45,7 @@ function Resizable({
   }, [minPeakTableWith, width]);
 
   const [filteredPeakData, setFilteredPeakData] = useState<Peak[]>(
-    record.peak.peak.values,
+    getRecordPeakListWithPrecursor(record),
   );
 
   const [filteredPeakData2, setFilteredPeakData2] = useState<
@@ -82,7 +83,7 @@ function Resizable({
   const chart = useMemo(
     () => (
       <Chart
-        peakData={record.peak.peak.values}
+        peakData={getRecordPeakListWithPrecursor(record)}
         peakData2={record2 ? record2.peak.peak.values : undefined}
         neutralLossData={record.peak.neutral_loss}
         onZoom={handleOnZoom}
@@ -91,15 +92,7 @@ function Resizable({
         disableExport={disableExport}
       />
     ),
-    [
-      chartWidth,
-      disableExport,
-      handleOnZoom,
-      height,
-      record.peak.neutral_loss,
-      record.peak.peak.values,
-      record2,
-    ],
+    [chartWidth, disableExport, handleOnZoom, height, record, record2],
   );
 
   const peakTable = useMemo(() => {

@@ -52,9 +52,9 @@ function PeakTable({ peaks, width, height }: InputProps) {
         (p) =>
           ({
             key: p.id,
-            mz: p.mz ? p.mz.toFixed(4) : 0,
-            intensity: p.intensity ? p.intensity.toFixed(1) : 0,
-            rel: p.rel ? p.rel : 0,
+            mz: p.mz ? p.mz.toFixed(4) : '',
+            intensity: p.intensity ? p.intensity.toFixed(1) : '',
+            rel: p.rel ? p.rel : '',
           }) as PeakTableDataType,
       ),
     [peaks],

@@ -27,22 +27,19 @@ function SpectralHitsViewComponent({
     const record = { peak: { peak: { values: reference } } } as Record;
     if (hit.peakPairs && hit.peakPairs.length > 0) {
       const _neutralLossPeakPairs = hit.peakPairs?.map((nlp) => {
-        const [peak1_id, peak2_id] = nlp.split('_').map((p) => 'peak-' + p);
-        return { peak1_id, peak2_id };
+        const split = nlp.split('_');
+        return { peakId: 'peak-' + split[0], precursor_mass: Number(split[1]) };
       });
       const neutralLossData: NeutralLoss[] = [];
       for (const nlp of _neutralLossPeakPairs) {
-        const peak1 = hit.record.peak.peak.values.find(
-          (p) => p.id === nlp.peak1_id,
+        const peak = hit.record.peak.peak.values.find(
+          (p: Peak) => p.id === nlp.peakId,
         );
-        const peak2 = hit.record.peak.peak.values.find(
-          (p) => p.id === nlp.peak2_id,
-        );
-        if (peak1 && peak2) {
-          const difference = Math.abs(peak1.mz - peak2.mz);
+        if (peak) {
+          const difference = Math.abs(peak.mz - nlp.precursor_mass);
           neutralLossData.push({
-            peak1_id: peak1.id,
-            peak2_id: peak2.id,
+            peak_id: peak.id,
+            precursor_mass: nlp.precursor_mass,
             difference,
           });
         }

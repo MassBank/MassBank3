@@ -20,7 +20,7 @@ function ChartElement({
   xScale,
   yScale,
   showLabel = false,
-  strokeColour = 'red',
+  strokeColour,
   disableOnHover = false,
 }: InputProps) {
   const highlight = useHighlight([pd.id]);
@@ -74,27 +74,44 @@ function ChartElement({
         style={
           highlight.isActive
             ? { opacity: 1, stroke: 'black', strokeWidth: 2 }
-            : { stroke: strokeColour }
+            : {
+                stroke: strokeColour
+                  ? strokeColour
+                  : pd.id === 'precursor'
+                    ? 'blue'
+                    : 'red',
+              }
         }
       >
         <line
           x1={xScaled}
           x2={xScaled}
           y1={yScale.range()[0]}
-          y2={yScale(pd.rel || 0)}
+          y2={yScale(pd.rel ?? 0)}
         />
         {highlight.isActive && (
-          <circle cx={xScaled} cy={yScale(pd.rel || 0)} r={3} />
+          <circle cx={xScaled} cy={yScale(pd.rel ?? 0)} r={3} />
         )}
-        {((!disableShowLabel && showLabel) || highlight.isActive) && (
+        {pd.id === 'precursor' ? (
           <text
             className="hover-label"
-            transform={`translate(${xScale(pd.mz)} ${
-              pd.rel < 0 ? yScale(pd.rel || 0) + 20 : yScale(pd.rel || 0) - 10
-            }) rotate(-30)`}
+            transform={`translate(${xScale(pd.mz) - 50} ${
+              pd.rel < 0 ? yScale(pd.rel ?? 0) + 20 : yScale(pd.rel ?? 0) - 10
+            })`}
           >
-            {pd.mz.toFixed(4)}
+            {'precursor: ' + pd.mz.toFixed(4)}
           </text>
+        ) : (
+          ((!disableShowLabel && showLabel) || highlight.isActive) && (
+            <text
+              className="hover-label"
+              transform={`translate(${xScale(pd.mz)} ${
+                pd.rel < 0 ? yScale(pd.rel ?? 0) + 20 : yScale(pd.rel ?? 0) - 10
+              }) rotate(-30)`}
+            >
+              {pd.mz.toFixed(4)}
+            </text>
+          )
         )}
       </g>
     ),
@@ -104,6 +121,7 @@ function ChartElement({
       handleOnMouseEnter,
       handleOnMouseLeave,
       highlight.isActive,
+      pd.id,
       pd.mz,
       pd.rel,
       showLabel,
