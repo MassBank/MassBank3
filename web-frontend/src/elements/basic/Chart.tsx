@@ -17,6 +17,7 @@ import copyTextToClipboard from '../../utils/copyTextToClipboard';
 import routes from '../../constants/routes';
 import { usePropertiesContext } from '../../context/properties/properties';
 import NeutralLoss from '../../types/peak/NeutralLoss';
+import Slider from './Slider';
 
 const toolButtonStyle = {
   width: 20,
@@ -30,7 +31,7 @@ type InputProps = {
   peakData: Peak[];
   peakData2?: Peak[];
   neutralLossData?: NeutralLoss[];
-  onZoom?: ({
+  onFilter?: ({
     fpd1,
     nld,
     fpd2,
@@ -51,7 +52,7 @@ function Chart({
   peakData,
   peakData2 = [],
   neutralLossData = [],
-  onZoom = () => {},
+  onFilter = () => {},
   width = 400,
   height = 300,
   disableLabels = false,
@@ -64,6 +65,7 @@ function Chart({
   const { baseUrl, frontendUrl } = usePropertiesContext();
 
   const [isShowLabel, setIsShowLabel] = useState<boolean>(false);
+  const [minRelIntensity, setMinRelativeIntensity] = useState<number>(0);
 
   const MARGIN = useMemo(() => {
     const defaultMargin = 5;
@@ -91,7 +93,7 @@ function Chart({
 
   const getFilteredPeakData = useCallback(
     (peakDataTemp: Peak[]) => {
-      let _peakData = peakDataTemp;
+      let _peakData = peakDataTemp.filter((pd) => pd.rel >= minRelIntensity);
       if (brushXDomains) {
         _peakData = peakDataTemp.filter(
           (pd) =>
@@ -102,7 +104,7 @@ function Chart({
 
       return _peakData;
     },
-    [brushXDomains],
+    [brushXDomains, minRelIntensity],
   );
 
   const filteredPeakData = useMemo(
@@ -140,13 +142,13 @@ function Chart({
           rel: -1 * p.rel,
         } as Peak;
       });
-      onZoom({
+      onFilter({
         fpd1: _filteredPeakData,
         fpd2: _filteredPeakData2_temp,
         nld: filteredNeutralLossData,
       });
     },
-    [filteredNeutralLossData, onZoom],
+    [filteredNeutralLossData, onFilter],
   );
 
   useEffect(
@@ -510,6 +512,29 @@ function Chart({
     [baseUrl, frontendUrl],
   );
 
+  const handleOnSetMinRelativeIntensity = useCallback(
+    (value: number) => {
+      setMinRelativeIntensity(value);
+      const _filteredPeakData = peakData.filter((p) => p.rel >= value);
+      const _filteredPeakData2 = peakData2
+        ? peakData2
+            .filter((p) => p.rel >= value)
+            .map((p) => {
+              const _p: Peak = { ...p };
+              _p.intensity = -1 * _p.intensity;
+              _p.rel = -1 * _p.rel;
+              return _p;
+            })
+        : undefined;
+      onFilter({
+        fpd1: _filteredPeakData,
+        fpd2: _filteredPeakData2,
+        nld: filteredNeutralLossData,
+      });
+    },
+    [filteredNeutralLossData, onFilter, peakData, peakData2],
+  );
+
   return useMemo(
     () => (
       <Content
@@ -564,7 +589,7 @@ function Chart({
                 height: MARGIN.button,
                 marginLeft: 5,
                 display: 'flex',
-                justifyContent: 'flex-start',
+                justifyContent: 'left',
                 alignItems: 'center',
               }}
             >
@@ -589,7 +614,7 @@ function Chart({
               {!disableExport && (
                 <Content
                   style={{
-                    width: '100%',
+                    width: 80,
                     height: MARGIN.button,
                     display: 'flex',
                     justifyContent: 'left',
@@ -616,6 +641,25 @@ function Chart({
                   />
                 </Content>
               )}
+              <Content
+                style={{
+                  width: '100%',
+                  height: MARGIN.button,
+                  display: 'flex',
+                  justifyContent: 'left',
+                  alignItems: 'center',
+                  marginLeft: 20,
+                }}
+              >
+                <Slider
+                  width={150}
+                  height={MARGIN.button}
+                  min={0}
+                  max={999}
+                  value={0}
+                  onChange={handleOnSetMinRelativeIntensity}
+                />
+              </Content>
             </Content>
             <Content
               style={{
@@ -656,6 +700,7 @@ function Chart({
       filteredPeakData2,
       handleOnCopy,
       handleOnDownload,
+      handleOnSetMinRelativeIntensity,
       height,
       isShowLabel,
       peakData.length,

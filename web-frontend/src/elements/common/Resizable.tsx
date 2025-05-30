@@ -56,7 +56,7 @@ function Resizable({
     NeutralLoss[]
   >(record.peak.neutral_loss);
 
-  const handleOnZoom = useCallback(
+  const handleOnFilter = useCallback(
     ({
       fpd1,
       nld,
@@ -86,13 +86,13 @@ function Resizable({
         peakData={getRecordPeakListWithPrecursor(record)}
         peakData2={record2 ? record2.peak.peak.values : undefined}
         neutralLossData={record.peak.neutral_loss}
-        onZoom={handleOnZoom}
+        onFilter={handleOnFilter}
         width={chartWidth}
         height={height}
         disableExport={disableExport}
       />
     ),
-    [chartWidth, disableExport, handleOnZoom, height, record, record2],
+    [chartWidth, disableExport, handleOnFilter, height, record, record2],
   );
 
   const peakTable = useMemo(() => {
