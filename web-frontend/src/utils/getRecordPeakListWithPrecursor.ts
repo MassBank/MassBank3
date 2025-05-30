@@ -6,7 +6,7 @@ function getRecordPeakListWithPrecursor(record: Record): Peak[] {
     ? record.peak.peak.values.concat({
         id: 'precursor',
         mz: record.peak.neutral_loss[0].precursor_mass,
-        rel: 1000,
+        rel: 999,
       } as Peak)
     : record.peak.peak.values;
 }

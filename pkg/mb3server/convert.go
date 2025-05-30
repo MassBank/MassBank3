@@ -147,20 +147,20 @@ func ConvertMb2RecordToMb3Record(record *massbank.MassBank2) (*MbRecord, error) 
 
 		var diffs []float64
 		diffs = append(diffs, record.Peak.NeutralLoss.Difference...)
-		var peak1_ids []int32
-		peak1_ids = append(peak1_ids, record.Peak.NeutralLoss.Peak1Id...)
-		var peak2_ids []int32
-		peak2_ids = append(peak2_ids, record.Peak.NeutralLoss.Peak2Id...)
+		var peak_ids []int32
+		peak_ids = append(peak_ids, record.Peak.NeutralLoss.PeakId...)
+		var precursor_masses []float64
+		precursor_masses = append(precursor_masses, record.Peak.NeutralLoss.PrecursorMass...)
 		// var min_rel_intensities []int32
 		// for _, min_rel_intensity := range *&record.Peak.NeutralLoss.MinRelIntensity {
 		// 	min_rel_intensities = append(min_rel_intensities, min_rel_intensity)
 		// }
 
-		for i := 0; i < len(diffs); i++ {
+		for i := range diffs {
 			result.Peak.NeutralLoss = append(result.Peak.NeutralLoss, MbRecordPeakNeutralLossInner{
-				Difference: diffs[i],
-				Peak1Id:    peak1_ids[i],
-				Peak2Id:    peak2_ids[i],
+				Difference:    diffs[i],
+				PeakId:        peak_ids[i],
+				PrecursorMass: precursor_masses[i],
 				// MinRelIntensity: min_rel_intensities[i],
 			})
 		}

@@ -43,7 +43,13 @@ func AssertMbRecordPeakPeakValuesInnerConstraints(obj MbRecordPeakPeakValuesInne
 	if obj.Id < 1 {
 		return &ParsingError{Param: "Id", Err: errors.New(errMsgMinValueConstraint)}
 	}
-	if obj.Rel < 1 {
+	if obj.Mz < 0 {
+		return &ParsingError{Param: "Mz", Err: errors.New(errMsgMinValueConstraint)}
+	}
+	if obj.Intensity < 0 {
+		return &ParsingError{Param: "Intensity", Err: errors.New(errMsgMinValueConstraint)}
+	}
+	if obj.Rel < 0 {
 		return &ParsingError{Param: "Rel", Err: errors.New(errMsgMinValueConstraint)}
 	}
 	if obj.Rel > 999 {

@@ -244,14 +244,16 @@ properties:
                   description: "m/z of the peak"
                   type: number
                   format: double
+                  minimum: 0
                 intensity:
                   description: "intensity of the peak"
                   type: number
                   format: double
+                  minimum: 0
                 rel:
                   description: "Relative intensity of the peak"
                   type: integer
-                  minimum: 1
+                  minimum: 0
                   maximum: 999
       neutral_loss:
         description: "Neutral Losses"
@@ -265,11 +267,12 @@ properties:
               type: number
               format: double
               minimum: 0
-            peak1_id:
-              description: "Peak identifier of the first peak"
+            peak_id:
+              description: "Peak identifier of the peak in spectrum"
               type: integer
               minimum: 1
-            peak2_id:
-              description: "Peak identifier of the second peak"
-              type: integer
-              minimum: 1
+            precursor_mass:
+              description: "Precursor mass"
+              type: number
+              format: double
+              minimum: 0

@@ -105,7 +105,7 @@ function SearchView() {
             return {
               mz: peak.mz,
               intensity: 0,
-              rel: 1000,
+              rel: 999,
               id: generateID(),
             } as Peak;
           });

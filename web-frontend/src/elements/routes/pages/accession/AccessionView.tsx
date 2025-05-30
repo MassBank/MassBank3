@@ -5,10 +5,10 @@ import { Layout, Spin } from 'antd';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import { Content, Header } from 'antd/es/layout/layout';
 import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
-import searchAccession from '../../../../utils/request/searchAccession';
 import { useSearchParams } from 'react-router-dom';
 import { usePropertiesContext } from '../../../../context/properties/properties';
 import accessionSearchInputFieldHeight from '../../../../constants/accessionSearchInputFieldHeight';
+import getRecord from '../../../../utils/request/fetchRecord';
 
 function AccessionView() {
   const ref = useRef(null);
@@ -26,7 +26,7 @@ function AccessionView() {
       setIsRequesting(true);
       setRequestedAccession(acc);
 
-      setRecord(await searchAccession(acc, backendUrl));
+      setRecord(await getRecord(acc, backendUrl));
 
       setIsRequesting(false);
     },

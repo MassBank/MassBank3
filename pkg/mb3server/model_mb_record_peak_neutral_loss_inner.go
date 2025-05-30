@@ -23,11 +23,11 @@ type MbRecordPeakNeutralLossInner struct {
 	// Difference in mass
 	Difference float64 `json:"difference,omitempty"`
 
-	// Peak identifier of the first peak
-	Peak1Id int32 `json:"peak1_id,omitempty"`
+	// Peak identifier of the peak in spectrum
+	PeakId int32 `json:"peak_id,omitempty"`
 
-	// Peak identifier of the second peak
-	Peak2Id int32 `json:"peak2_id,omitempty"`
+	// Precursor mass
+	PrecursorMass float64 `json:"precursor_mass,omitempty"`
 }
 
 // AssertMbRecordPeakNeutralLossInnerRequired checks if the required fields are not zero-ed
@@ -40,11 +40,11 @@ func AssertMbRecordPeakNeutralLossInnerConstraints(obj MbRecordPeakNeutralLossIn
 	if obj.Difference < 0 {
 		return &ParsingError{Param: "Difference", Err: errors.New(errMsgMinValueConstraint)}
 	}
-	if obj.Peak1Id < 1 {
-		return &ParsingError{Param: "Peak1Id", Err: errors.New(errMsgMinValueConstraint)}
+	if obj.PeakId < 1 {
+		return &ParsingError{Param: "PeakId", Err: errors.New(errMsgMinValueConstraint)}
 	}
-	if obj.Peak2Id < 1 {
-		return &ParsingError{Param: "Peak2Id", Err: errors.New(errMsgMinValueConstraint)}
+	if obj.PrecursorMass < 0 {
+		return &ParsingError{Param: "PrecursorMass", Err: errors.New(errMsgMinValueConstraint)}
 	}
 	return nil
 }

@@ -118,8 +118,8 @@ type PkPeak struct {
 
 type PkNeutralLoss struct {
 	Difference      []float64 `json:"difference"`
-	Peak1Id         []int32   `json:"peak1_id"`
-	Peak2Id         []int32   `json:"peak2_id"`
+	PeakId          []int32   `json:"peak_id"`
+	PrecursorMass   []float64 `json:"precursor_mass"`
 	MinRelIntensity []int32   `json:"min_rel_intensity"`
 }
 

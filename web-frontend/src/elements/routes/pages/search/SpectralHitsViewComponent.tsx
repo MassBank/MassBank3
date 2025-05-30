@@ -47,6 +47,14 @@ function SpectralHitsViewComponent({
       hit.record.peak.neutral_loss = neutralLossData;
     }
 
+    // in case of missing relative intensity values
+    hit.record.peak.peak.values = hit.record.peak.peak.values.map((p: Peak) => {
+      const _p = p;
+      _p.rel = _p.rel ?? 0;
+      return _p;
+    });
+    console.log(hit);
+
     return (
       <Content
         style={{
