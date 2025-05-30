@@ -218,7 +218,10 @@ function Chart({
     let labelValues: number[] = [];
     let precision: number | undefined;
 
-    if (range > 200) {
+    if (range === 0) {
+      labelValues = [minX];
+      precision = 4;
+    } else if (range > 200) {
       const stepSize = 50;
       labelValues = buildLabelValues(minX, maxX, stepSize);
       precision = 0;
