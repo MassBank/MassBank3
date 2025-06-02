@@ -154,13 +154,13 @@ async function getLastmodDate() {
 }
 
 // Create router for redirecting to the frontend with base URL in case slash is missing
-const redirectRouter = express.Router();
-const regex = new RegExp(`^${frontendBaseUrl}$`);
-app.use(regex, redirectRouter);
-redirectRouter.get('', async (req: Request, res: Response) => {
-  const redirectUrl = frontendUrl + frontendBaseUrl + '/';
-  res.redirect(redirectUrl);
-});
+// const redirectRouter = express.Router();
+// const regex = new RegExp(`^${frontendBaseUrl}$`);
+// app.use(regex, redirectRouter);
+// redirectRouter.get('', async (req: Request, res: Response) => {
+//   const redirectUrl = frontendUrl + frontendBaseUrl + '/';
+//   res.redirect(redirectUrl);
+// });
 
 // Create router for base URL
 const baseRouter = express.Router();
