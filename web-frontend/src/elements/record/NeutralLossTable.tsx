@@ -75,13 +75,13 @@ function NeutralLossTable({ neutralLosses, peaks, width, height }: InputProps) {
         align: 'center' as const,
       },
       {
-        title: <label>Peak 1{<br />}[m/z]</label>,
+        title: <label>Peak{<br />}[m/z]</label>,
         dataIndex: 'peak1',
         key: 'peak1',
         align: 'center' as const,
       },
       {
-        title: <label>Peak 2{<br />}[m/z]</label>,
+        title: <label>Precursor{<br />}[m/z]</label>,
         dataIndex: 'peak2',
         key: 'peak2',
         align: 'center' as const,
