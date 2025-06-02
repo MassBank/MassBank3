@@ -95,7 +95,7 @@ function Chart({
     (peakDataTemp: Peak[]) => {
       let _peakData = peakDataTemp.filter((pd) => pd.rel >= minRelIntensity);
       if (brushXDomains) {
-        _peakData = peakDataTemp.filter(
+        _peakData = _peakData.filter(
           (pd) =>
             pd.mz >= brushXDomains[brushXDomains.length - 1].min &&
             pd.mz <= brushXDomains[brushXDomains.length - 1].max,
