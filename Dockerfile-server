@@ -1,4 +1,4 @@
-FROM docker.io/golang:1.23 AS build
+FROM docker.io/golang:1.24-alpine
 WORKDIR /go/src
 COPY main.go .
 COPY pkg ./pkg
@@ -13,6 +13,8 @@ RUN wget https://github.com/swagger-api/swagger-ui/archive/refs/tags/v5.21.0.tar
 COPY api/openapi.yaml ./swagger-ui/openapi.yaml
 COPY api/schemas ./swagger-ui/schemas
 COPY entrypoint-mb3server.sh ./entrypoint-mb3server.sh
+
+RUN apk add --update nodejs npm && npm i -g swagger-cli && swagger-cli bundle swagger-ui/openapi.yaml -o swagger-ui/openapi.json -t json
 
 EXPOSE 8080
 ENTRYPOINT sh entrypoint-mb3server.sh "${MB3_API_URL}" "${MB3_API_BASE_URL}"
