@@ -1,0 +1,1579 @@
+{
+  "openapi" : "3.0.3",
+  "info" : {
+    "title" : "MassBank3 API",
+    "version" : "3.0"
+  },
+  "servers" : [ {
+    "url" : "/"
+  } ],
+  "paths" : {
+    "/records" : {
+      "get" : {
+        "operationId" : "getRecords",
+        "parameters" : [ {
+          "description" : "The short version of the contributor name, e.g. AAFC or UFZ.",
+          "explode" : false,
+          "in" : "query",
+          "name" : "contributor",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Contributor"
+          }
+        }, {
+          "description" : "The type of instrument used for the measurement, e.g. ESI-TOF.",
+          "explode" : false,
+          "in" : "query",
+          "name" : "instrument_type",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/InstrumentType"
+          }
+        }, {
+          "description" : "The type of mass spectrometry. ENUM: [MS, MS2, MS3, MS4].",
+          "explode" : false,
+          "in" : "query",
+          "name" : "ms_type",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/MsType"
+          }
+        }, {
+          "description" : "The ion mode. ENUM: [POSITIVE, NEGATIVE]",
+          "explode" : false,
+          "in" : "query",
+          "name" : "ion_mode",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/IonMode"
+          }
+        }, {
+          "description" : "The SPLASH string, e.g. splash10-03fr-0900000000-035ec76d23650a15673b.",
+          "in" : "query",
+          "name" : "splash",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Splash"
+          }
+        }, {
+          "description" : "A compound name, e.g. Rutin.",
+          "in" : "query",
+          "name" : "compound_name",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/CompoundName"
+          }
+        }, {
+          "description" : "A compound class, e.g. Flavonoids or Natural Product.",
+          "in" : "query",
+          "name" : "compound_class",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/CompoundClass"
+          }
+        }, {
+          "description" : "A m/z value, e.g. 122.02.",
+          "in" : "query",
+          "name" : "exact_mass",
+          "schema" : {
+            "$ref" : "#/components/schemas/ExactMass"
+          }
+        }, {
+          "description" : "A mass tolerance value, e.g. 0.3.",
+          "in" : "query",
+          "name" : "mass_tolerance",
+          "schema" : {
+            "$ref" : "#/components/schemas/MassTolerance"
+          }
+        }, {
+          "description" : "A molecular formula, e.g. C6H7N5.",
+          "in" : "query",
+          "name" : "formula",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Formula"
+          }
+        }, {
+          "description" : "A list of m/z values, e.g. 147.063.",
+          "explode" : false,
+          "in" : "query",
+          "name" : "peaks",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Peaks"
+          }
+        }, {
+          "description" : "Relative intensity commonly used for peak search, similarity search and neutral loss search.",
+          "in" : "query",
+          "name" : "intensity",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Intensity"
+          }
+        }, {
+          "description" : "A list of m/z values for peak differences (neutral loss) search, e.g. 147.063.",
+          "explode" : false,
+          "in" : "query",
+          "name" : "neutral_loss",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Peaks"
+          }
+        }, {
+          "description" : "A list of tuples of m/z values and (relative) intensities used for similarity search. Both values in a tuple need to be separated by a semi-colon, e.g. '147.063;11'. The parameter 'peak_list_threshold' is required when using this filter option. This method uses the 'matchms' Python package and the CosineGreedy algorithm for similarity search.",
+          "explode" : false,
+          "in" : "query",
+          "name" : "peak_list",
+          "schema" : {
+            "$ref" : "#/components/schemas/PeakList"
+          }
+        }, {
+          "description" : "A threshold value (lowest allowed similarity score) for the similarity search.",
+          "in" : "query",
+          "name" : "peak_list_threshold",
+          "schema" : {
+            "$ref" : "#/components/schemas/PeakListThreshold"
+          }
+        }, {
+          "description" : "The InChI string, e.g. InChI=1S/C10H10O3/c1-6-5-7-3-2-4-8(11)9(7)10(12)13-6/h2-4,6,11H,5H2,1H3",
+          "in" : "query",
+          "name" : "inchi",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/InChI"
+          }
+        }, {
+          "description" : "The InChIKey string, e.g. KWILGNNWGSNMPA-UHFFFAOYSA-N.",
+          "in" : "query",
+          "name" : "inchi_key",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/InChIKey"
+          }
+        }, {
+          "description" : "A SMILES string for substructure search, e.g. CC1CC2=C(C(=CC=C2)O)C(=O)O1.",
+          "in" : "query",
+          "name" : "substructure",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Substructure"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/MBRecord"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "A list of records."
+          }
+        },
+        "summary" : "Get records, filtered by the given parameters."
+      }
+    },
+    "/records/search" : {
+      "get" : {
+        "operationId" : "getSearchResults",
+        "parameters" : [ {
+          "description" : "The short version of the contributor name, e.g. AAFC or UFZ.",
+          "explode" : false,
+          "in" : "query",
+          "name" : "contributor",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Contributor"
+          }
+        }, {
+          "description" : "The type of instrument used for the measurement, e.g. ESI-TOF.",
+          "explode" : false,
+          "in" : "query",
+          "name" : "instrument_type",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/InstrumentType"
+          }
+        }, {
+          "description" : "The type of mass spectrometry. ENUM: [MS, MS2, MS3, MS4].",
+          "explode" : false,
+          "in" : "query",
+          "name" : "ms_type",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/MsType"
+          }
+        }, {
+          "description" : "The ion mode. ENUM: [POSITIVE, NEGATIVE]",
+          "explode" : false,
+          "in" : "query",
+          "name" : "ion_mode",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/IonMode"
+          }
+        }, {
+          "description" : "The SPLASH string, e.g. splash10-03fr-0900000000-035ec76d23650a15673b.",
+          "in" : "query",
+          "name" : "splash",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Splash"
+          }
+        }, {
+          "description" : "A compound name, e.g. Rutin.",
+          "in" : "query",
+          "name" : "compound_name",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/CompoundName"
+          }
+        }, {
+          "description" : "A compound class, e.g. Flavonoids or Natural Product.",
+          "in" : "query",
+          "name" : "compound_class",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/CompoundClass"
+          }
+        }, {
+          "description" : "A m/z value, e.g. 122.02.",
+          "in" : "query",
+          "name" : "exact_mass",
+          "schema" : {
+            "$ref" : "#/components/schemas/ExactMass"
+          }
+        }, {
+          "description" : "A mass tolerance value, e.g. 0.3.",
+          "in" : "query",
+          "name" : "mass_tolerance",
+          "schema" : {
+            "$ref" : "#/components/schemas/MassTolerance"
+          }
+        }, {
+          "description" : "A molecular formula, e.g. C6H7N5.",
+          "in" : "query",
+          "name" : "formula",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Formula"
+          }
+        }, {
+          "description" : "A list of m/z values, e.g. 147.063.",
+          "explode" : false,
+          "in" : "query",
+          "name" : "peaks",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Peaks"
+          }
+        }, {
+          "description" : "Relative intensity commonly used for peak search, similarity search and neutral loss search.",
+          "in" : "query",
+          "name" : "intensity",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Intensity"
+          }
+        }, {
+          "description" : "A list of m/z values for peak differences (neutral loss) search, e.g. 147.063.",
+          "explode" : false,
+          "in" : "query",
+          "name" : "neutral_loss",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Peaks"
+          }
+        }, {
+          "description" : "A list of tuples of m/z values and (relative) intensities used for similarity search. Both values in a tuple need to be separated by a semi-colon, e.g. '147.063;11'. The parameter 'peak_list_threshold' is required when using this filter option. This method uses the 'matchms' Python package and the CosineGreedy algorithm for similarity search.",
+          "explode" : false,
+          "in" : "query",
+          "name" : "peak_list",
+          "schema" : {
+            "$ref" : "#/components/schemas/PeakList"
+          }
+        }, {
+          "description" : "A threshold value (lowest allowed similarity score) for the similarity search.",
+          "in" : "query",
+          "name" : "peak_list_threshold",
+          "schema" : {
+            "$ref" : "#/components/schemas/PeakListThreshold"
+          }
+        }, {
+          "description" : "The InChI string, e.g. InChI=1S/C10H10O3/c1-6-5-7-3-2-4-8(11)9(7)10(12)13-6/h2-4,6,11H,5H2,1H3",
+          "in" : "query",
+          "name" : "inchi",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/InChI"
+          }
+        }, {
+          "description" : "The InChIKey string, e.g. KWILGNNWGSNMPA-UHFFFAOYSA-N.",
+          "in" : "query",
+          "name" : "inchi_key",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/InChIKey"
+          }
+        }, {
+          "description" : "A SMILES string for substructure search, e.g. CC1CC2=C(C(=CC=C2)O)C(=O)O1.",
+          "in" : "query",
+          "name" : "substructure",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Substructure"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SearchResult"
+                }
+              }
+            },
+            "description" : "A list of search results."
+          }
+        },
+        "summary" : "Get a list of records as a search result in a specific format (accession, similarity score)"
+      }
+    },
+    "/records/{accession}" : {
+      "get" : {
+        "operationId" : "getRecord",
+        "parameters" : [ {
+          "description" : "The accession of a record, e.g. MSBNK-AAFC-AC000001.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "accession",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MBRecord"
+                }
+              }
+            },
+            "description" : "A MassBank record."
+          }
+        },
+        "summary" : "Get a MassBank record."
+      }
+    },
+    "/records/{accession}/simple" : {
+      "get" : {
+        "operationId" : "getSimpleRecord",
+        "parameters" : [ {
+          "description" : "The accession of a record, e.g. MSBNK-AAFC-AC000001.",
+          "explode" : false,
+          "in" : "path",
+          "name" : "accession",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MBRecord"
+                }
+              }
+            },
+            "description" : "A simple MassBank record (accession, title, peaks, smiles)"
+          }
+        },
+        "summary" : "Get a MassBank record in with reduced information level (accession, title, peaks, smiles)."
+      }
+    },
+    "/records/count" : {
+      "get" : {
+        "operationId" : "getCount",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "The record count"
+          }
+        },
+        "summary" : "The number of all records in the database."
+      }
+    },
+    "/filter/browse" : {
+      "get" : {
+        "operationId" : "getBrowseOptions",
+        "parameters" : [ {
+          "description" : "The short version of the contributor name, e.g. AAFC or UFZ.",
+          "explode" : false,
+          "in" : "query",
+          "name" : "contributor",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/Contributor"
+          }
+        }, {
+          "description" : "The type of instrument used for the measurement, e.g. ESI-TOF.",
+          "explode" : false,
+          "in" : "query",
+          "name" : "instrument_type",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/InstrumentType"
+          }
+        }, {
+          "description" : "The type of mass spectrometry. ENUM: [MS, MS2, MS3, MS4].",
+          "explode" : false,
+          "in" : "query",
+          "name" : "ms_type",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/MsType"
+          }
+        }, {
+          "description" : "The ion mode. ENUM: [POSITIVE, NEGATIVE]",
+          "explode" : false,
+          "in" : "query",
+          "name" : "ion_mode",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/IonMode"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BrowseOptions"
+                }
+              }
+            },
+            "description" : "All browse options"
+          }
+        },
+        "summary" : "Get all browse options (contributor, instrument type, ms type, ion mode)."
+      }
+    },
+    "/metadata" : {
+      "get" : {
+        "operationId" : "getMetadata",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Metadata"
+                }
+              }
+            },
+            "description" : "Metadata for database and datasets"
+          }
+        },
+        "summary" : "Get the metadata of the database and the current dataset in use. It includes the version, timestamp, git commit hash, unique spectra count (SPLASH), unique compound count (InChI) and compound classes (free text/ChemOnt) with counts."
+      }
+    },
+    "/version" : {
+      "get" : {
+        "operationId" : "getVersion",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "example" : "MassBank API service 0.1, 2025-01-22T14:20:57+01:00",
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Version for MassBank API with timestamp of build."
+          }
+        },
+        "summary" : "Get the current API version."
+      }
+    },
+    "/status" : {
+      "get" : {
+        "operationId" : "getStatus",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/getStatus_200_response"
+                }
+              }
+            },
+            "description" : "Status of the attached services."
+          }
+        },
+        "summary" : "Get the status of the attached services (postgres, export service, similarity service)."
+      }
+    },
+    "/similarity" : {
+      "get" : {
+        "operationId" : "getSimilarity",
+        "parameters" : [ {
+          "description" : "A list of tuples of m/z values and (relative) intensities used for similarity search. Both values in a tuple need to be separated by a semi-colon, e.g. '147.063;11'. The parameter 'peak_list_threshold' is required when using this filter option. This method uses the 'matchms' Python package and the CosineGreedy algorithm for similarity search.",
+          "explode" : false,
+          "in" : "query",
+          "name" : "peak_list",
+          "schema" : {
+            "$ref" : "#/components/schemas/PeakList"
+          }
+        }, {
+          "description" : "A threshold value (lowest allowed similarity score) for the similarity search.",
+          "in" : "query",
+          "name" : "peak_list_threshold",
+          "schema" : {
+            "$ref" : "#/components/schemas/PeakListThreshold"
+          }
+        }, {
+          "description" : "A list of reference spectra IDs (accessions) to use during similarity search.",
+          "explode" : false,
+          "in" : "query",
+          "name" : "reference_spectra_list",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/ReferenceSpectraList"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SimilaritySearchResult"
+                }
+              }
+            },
+            "description" : "A list of records with similarity scores."
+          }
+        },
+        "summary" : "Get a list of records with similarity scores."
+      }
+    }
+  },
+  "components" : {
+    "parameters" : {
+      "Contributor" : {
+        "description" : "The short version of the contributor name, e.g. AAFC or UFZ.",
+        "explode" : false,
+        "in" : "query",
+        "name" : "contributor",
+        "required" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/Contributor"
+        }
+      },
+      "InstrumentType" : {
+        "description" : "The type of instrument used for the measurement, e.g. ESI-TOF.",
+        "explode" : false,
+        "in" : "query",
+        "name" : "instrument_type",
+        "required" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/InstrumentType"
+        }
+      },
+      "MsType" : {
+        "description" : "The type of mass spectrometry. ENUM: [MS, MS2, MS3, MS4].",
+        "explode" : false,
+        "in" : "query",
+        "name" : "ms_type",
+        "required" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/MsType"
+        }
+      },
+      "IonMode" : {
+        "description" : "The ion mode. ENUM: [POSITIVE, NEGATIVE]",
+        "explode" : false,
+        "in" : "query",
+        "name" : "ion_mode",
+        "required" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/IonMode"
+        }
+      },
+      "Splash" : {
+        "description" : "The SPLASH string, e.g. splash10-03fr-0900000000-035ec76d23650a15673b.",
+        "in" : "query",
+        "name" : "splash",
+        "required" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/Splash"
+        }
+      },
+      "CompoundName" : {
+        "description" : "A compound name, e.g. Rutin.",
+        "in" : "query",
+        "name" : "compound_name",
+        "required" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/CompoundName"
+        }
+      },
+      "CompoundClass" : {
+        "description" : "A compound class, e.g. Flavonoids or Natural Product.",
+        "in" : "query",
+        "name" : "compound_class",
+        "required" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/CompoundClass"
+        }
+      },
+      "ExactMass" : {
+        "description" : "A m/z value, e.g. 122.02.",
+        "in" : "query",
+        "name" : "exact_mass",
+        "schema" : {
+          "$ref" : "#/components/schemas/ExactMass"
+        }
+      },
+      "MassTolerance" : {
+        "description" : "A mass tolerance value, e.g. 0.3.",
+        "in" : "query",
+        "name" : "mass_tolerance",
+        "schema" : {
+          "$ref" : "#/components/schemas/MassTolerance"
+        }
+      },
+      "Formula" : {
+        "description" : "A molecular formula, e.g. C6H7N5.",
+        "in" : "query",
+        "name" : "formula",
+        "required" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/Formula"
+        }
+      },
+      "Peaks" : {
+        "description" : "A list of m/z values, e.g. 147.063.",
+        "explode" : false,
+        "in" : "query",
+        "name" : "peaks",
+        "required" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/Peaks"
+        }
+      },
+      "Intensity" : {
+        "description" : "Relative intensity commonly used for peak search, similarity search and neutral loss search.",
+        "in" : "query",
+        "name" : "intensity",
+        "required" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/Intensity"
+        }
+      },
+      "NeutralLoss" : {
+        "description" : "A list of m/z values for peak differences (neutral loss) search, e.g. 147.063.",
+        "explode" : false,
+        "in" : "query",
+        "name" : "neutral_loss",
+        "required" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/Peaks"
+        }
+      },
+      "PeakList" : {
+        "description" : "A list of tuples of m/z values and (relative) intensities used for similarity search. Both values in a tuple need to be separated by a semi-colon, e.g. '147.063;11'. The parameter 'peak_list_threshold' is required when using this filter option. This method uses the 'matchms' Python package and the CosineGreedy algorithm for similarity search.",
+        "explode" : false,
+        "in" : "query",
+        "name" : "peak_list",
+        "schema" : {
+          "$ref" : "#/components/schemas/PeakList"
+        }
+      },
+      "PeakListThreshold" : {
+        "description" : "A threshold value (lowest allowed similarity score) for the similarity search.",
+        "in" : "query",
+        "name" : "peak_list_threshold",
+        "schema" : {
+          "$ref" : "#/components/schemas/PeakListThreshold"
+        }
+      },
+      "InChI" : {
+        "description" : "The InChI string, e.g. InChI=1S/C10H10O3/c1-6-5-7-3-2-4-8(11)9(7)10(12)13-6/h2-4,6,11H,5H2,1H3",
+        "in" : "query",
+        "name" : "inchi",
+        "required" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/InChI"
+        }
+      },
+      "InChIKey" : {
+        "description" : "The InChIKey string, e.g. KWILGNNWGSNMPA-UHFFFAOYSA-N.",
+        "in" : "query",
+        "name" : "inchi_key",
+        "required" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/InChIKey"
+        }
+      },
+      "Substructure" : {
+        "description" : "A SMILES string for substructure search, e.g. CC1CC2=C(C(=CC=C2)O)C(=O)O1.",
+        "in" : "query",
+        "name" : "substructure",
+        "required" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/Substructure"
+        }
+      },
+      "ReferenceSpectraList" : {
+        "description" : "A list of reference spectra IDs (accessions) to use during similarity search.",
+        "explode" : false,
+        "in" : "query",
+        "name" : "reference_spectra_list",
+        "required" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/ReferenceSpectraList"
+        }
+      }
+    },
+    "schemas" : {
+      "Contributor" : {
+        "items" : {
+          "type" : "string"
+        },
+        "type" : "array"
+      },
+      "InstrumentType" : {
+        "items" : {
+          "type" : "string"
+        },
+        "type" : "array"
+      },
+      "MsType" : {
+        "items" : {
+          "type" : "string"
+        },
+        "type" : "array"
+      },
+      "IonMode" : {
+        "type" : "string"
+      },
+      "Splash" : {
+        "type" : "string"
+      },
+      "CompoundName" : {
+        "type" : "string"
+      },
+      "CompoundClass" : {
+        "type" : "string"
+      },
+      "ExactMass" : {
+        "pattern" : "[0-9]+(\\.[0-9]*)?",
+        "type" : "string"
+      },
+      "MassTolerance" : {
+        "default" : 0.3,
+        "format" : "double",
+        "type" : "number"
+      },
+      "Formula" : {
+        "pattern" : "(([A-Z][a-z]{0,1}[0-9]*))+",
+        "type" : "string"
+      },
+      "Peaks" : {
+        "items" : {
+          "pattern" : "[0-9]+(\\.[0-9]*)?",
+          "type" : "string"
+        },
+        "type" : "array"
+      },
+      "Intensity" : {
+        "default" : 50,
+        "maximum" : 1000,
+        "minimum" : 1,
+        "type" : "integer"
+      },
+      "PeakList" : {
+        "items" : {
+          "pattern" : "[0-9]+(\\.[0-9]*)?;[0-9]+",
+          "type" : "string"
+        },
+        "minItems" : 1,
+        "type" : "array"
+      },
+      "PeakListThreshold" : {
+        "default" : 0.8,
+        "format" : "double",
+        "maximum" : 1.0,
+        "minimum" : 0.0,
+        "type" : "number"
+      },
+      "InChI" : {
+        "description" : "The InChI string.",
+        "type" : "string"
+      },
+      "InChIKey" : {
+        "description" : "The InChIKey string.",
+        "type" : "string"
+      },
+      "Substructure" : {
+        "type" : "string"
+      },
+      "MBRecord" : {
+        "properties" : {
+          "accession" : {
+            "description" : "Record identifier",
+            "pattern" : "MSBNK-[A-Z0–9_]{1,32}-[A-Z0–9_]{1,64}",
+            "type" : "string"
+          },
+          "deprecated" : {
+            "$ref" : "#/components/schemas/MBRecord_deprecated"
+          },
+          "title" : {
+            "description" : "Short title of the record. It is composed as 'compound.names[0]; acquisition.instrument_type; acquisition.mass_spectrometry.ms_type'",
+            "type" : "string"
+          },
+          "date" : {
+            "$ref" : "#/components/schemas/MBRecord_date"
+          },
+          "authors" : {
+            "$ref" : "#/components/schemas/Authors"
+          },
+          "license" : {
+            "description" : "Creative Commons License or its compatible terms",
+            "enum" : [ "CC0", "CC BY", "CC BY-NC", "CC BY-NC-SA", "CC BY-SA" ],
+            "type" : "string"
+          },
+          "copyright" : {
+            "description" : "Copyright",
+            "type" : "string"
+          },
+          "publication" : {
+            "description" : "Bibliographic information of reference",
+            "type" : "string"
+          },
+          "project" : {
+            "description" : "Information on a related project",
+            "type" : "string"
+          },
+          "comments" : {
+            "description" : "Comments",
+            "items" : {
+              "$ref" : "#/components/schemas/MBRecord_comments_inner"
+            },
+            "type" : "array"
+          },
+          "compound" : {
+            "$ref" : "#/components/schemas/MBRecord_compound"
+          },
+          "species" : {
+            "$ref" : "#/components/schemas/MBRecord_species"
+          },
+          "acquisition" : {
+            "$ref" : "#/components/schemas/MBRecord_acquisition"
+          },
+          "mass_spectrometry" : {
+            "$ref" : "#/components/schemas/MBRecord_mass_spectrometry"
+          },
+          "peak" : {
+            "$ref" : "#/components/schemas/MBRecord_peak"
+          }
+        },
+        "required" : [ "accession", "authors", "date", "license", "title" ],
+        "type" : "object"
+      },
+      "SearchResult" : {
+        "properties" : {
+          "data" : {
+            "description" : "A list of records as a search result with similarity score (if requested).",
+            "items" : {
+              "$ref" : "#/components/schemas/SearchResult_data_inner"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      },
+      "BrowseOptions" : {
+        "properties" : {
+          "contributor" : {
+            "$ref" : "#/components/schemas/StringCount"
+          },
+          "instrument_type" : {
+            "$ref" : "#/components/schemas/StringCount"
+          },
+          "ms_type" : {
+            "$ref" : "#/components/schemas/StringCount"
+          },
+          "ion_mode" : {
+            "$ref" : "#/components/schemas/StringCount"
+          }
+        },
+        "type" : "object"
+      },
+      "StringCount" : {
+        "items" : {
+          "$ref" : "#/components/schemas/StringCount_inner"
+        },
+        "type" : "array"
+      },
+      "Metadata" : {
+        "properties" : {
+          "version" : {
+            "type" : "string"
+          },
+          "timestamp" : {
+            "type" : "string"
+          },
+          "git_commit" : {
+            "type" : "string"
+          },
+          "spectra_count" : {
+            "minimum" : 0,
+            "type" : "integer"
+          },
+          "compound_count" : {
+            "minimum" : 0,
+            "type" : "integer"
+          },
+          "compound_class" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Metadata_compound_class_inner"
+            },
+            "type" : "array"
+          },
+          "compound_class_chemont" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Metadata_compound_class_inner"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      },
+      "ReferenceSpectraList" : {
+        "default" : [ ],
+        "items" : {
+          "type" : "string"
+        },
+        "type" : "array"
+      },
+      "SimilaritySearchResult" : {
+        "properties" : {
+          "data" : {
+            "description" : "A ranked list of records with similarity scores.",
+            "items" : {
+              "$ref" : "#/components/schemas/SimilaritySearchResult_data_inner"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      },
+      "Authors" : {
+        "items" : {
+          "$ref" : "#/components/schemas/Authors_inner"
+        },
+        "type" : "array"
+      },
+      "DatabaseObject" : {
+        "description" : "A database entry",
+        "properties" : {
+          "database" : {
+            "description" : "Abbreviation for Database",
+            "enum" : [ "CAS", "CAYMAN", "CHEBI", "CHEMBL", "CHEMPDB", "CHEMSPIDER", "COMPTOX", "HMDB", "INCHIKEY", "KAPPAVIEW", "KEGG", "KNAPSACK", "LIPIDBANK", "LIPIDMAPS", "NIKKAJI", "PUBCHEM", "ZINC" ],
+            "type" : "string"
+          },
+          "identifier" : {
+            "description" : "Identifier of the database record",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "AcMassSpec" : {
+        "properties" : {
+          "ms_type" : {
+            "enum" : [ "MS", "MS2", "MS3", "MS4" ],
+            "type" : "string"
+          },
+          "ion_mode" : {
+            "enum" : [ "POSITIVE", "NEGATIVE" ],
+            "type" : "string"
+          },
+          "subtags" : {
+            "items" : {
+              "$ref" : "#/components/schemas/AcMassSpec_subtags_inner"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      },
+      "AcChromatography" : {
+        "items" : {
+          "$ref" : "#/components/schemas/AcChromatography_inner"
+        },
+        "type" : "array"
+      },
+      "AcGeneral" : {
+        "items" : {
+          "$ref" : "#/components/schemas/AcGeneral_inner"
+        },
+        "type" : "array"
+      },
+      "AcIonMobility" : {
+        "items" : {
+          "$ref" : "#/components/schemas/AcIonMobility_inner"
+        },
+        "type" : "array"
+      },
+      "MsFocusedIon" : {
+        "items" : {
+          "$ref" : "#/components/schemas/MsFocusedIon_inner"
+        },
+        "type" : "array"
+      },
+      "MsDataProcessing" : {
+        "items" : {
+          "$ref" : "#/components/schemas/MsDataProcessing_inner"
+        },
+        "type" : "array"
+      },
+      "getStatus_200_response_postgres" : {
+        "description" : "The status of the postgres database.",
+        "properties" : {
+          "status" : {
+            "description" : "The status of the postgres database.",
+            "type" : "string"
+          },
+          "error" : {
+            "description" : "The error message if the postgres database is not running.",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "getStatus_200_response_export_service" : {
+        "description" : "The status of the export service.",
+        "properties" : {
+          "status" : {
+            "description" : "The status of the export service.",
+            "type" : "string"
+          },
+          "error" : {
+            "description" : "The error message if the export service is not running.",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "getStatus_200_response_similarity_service" : {
+        "description" : "The status of the similarity service.",
+        "properties" : {
+          "status" : {
+            "description" : "The status of the similarity service.",
+            "type" : "string"
+          },
+          "error" : {
+            "description" : "The error message if the similarity service is not running.",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "getStatus_200_response" : {
+        "properties" : {
+          "postgres" : {
+            "$ref" : "#/components/schemas/getStatus_200_response_postgres"
+          },
+          "export_service" : {
+            "$ref" : "#/components/schemas/getStatus_200_response_export_service"
+          },
+          "similarity_service" : {
+            "$ref" : "#/components/schemas/getStatus_200_response_similarity_service"
+          }
+        },
+        "type" : "object"
+      },
+      "MBRecord_deprecated" : {
+        "description" : "Mark the record as deprecated",
+        "properties" : {
+          "date" : {
+            "description" : "Date of deprecation",
+            "format" : "date",
+            "type" : "string"
+          },
+          "reason" : {
+            "description" : "reason for deprecation",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "MBRecord_date" : {
+        "description" : "Date of creation or last modification of record",
+        "properties" : {
+          "updated" : {
+            "description" : "Date of last update to record",
+            "format" : "date",
+            "type" : "string"
+          },
+          "created" : {
+            "description" : "Date of record creation",
+            "format" : "date",
+            "type" : "string"
+          },
+          "modified" : {
+            "description" : "Date of last (automatic) modification to record",
+            "format" : "date",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "MBRecord_comments_inner_oneOf" : {
+        "description" : "A annotated comment",
+        "properties" : {
+          "subtag" : {
+            "description" : "The subtag to describe the comment",
+            "enum" : [ "[MS2]", "[Merging]", "[Merged]", "[Mass spectrometry]", "[Chromatography]", "[Profile]", "CONFIDENCE", "INTERNAL_ID" ],
+            "type" : "string"
+          },
+          "value" : {
+            "description" : "The comment",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "MBRecord_comments_inner" : {
+        "oneOf" : [ {
+          "description" : "A pure comment string",
+          "type" : "string"
+        }, {
+          "$ref" : "#/components/schemas/MBRecord_comments_inner_oneOf"
+        } ]
+      },
+      "MBRecord_compound" : {
+        "description" : "Information of Chemical Compound Analyzed",
+        "properties" : {
+          "names" : {
+            "description" : "Chemical names",
+            "items" : {
+              "description" : "Chemical name",
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "classes" : {
+            "description" : "Chemical category",
+            "items" : {
+              "description" : "Compound class",
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "formula" : {
+            "description" : "Chemical formula",
+            "type" : "string"
+          },
+          "mass" : {
+            "description" : "Exact mass",
+            "format" : "double",
+            "type" : "number"
+          },
+          "smiles" : {
+            "description" : "SMILES code",
+            "type" : "string"
+          },
+          "inchi" : {
+            "description" : "InChI code",
+            "type" : "string"
+          },
+          "link" : {
+            "description" : "External database name with identifier",
+            "items" : {
+              "$ref" : "#/components/schemas/DatabaseObject"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "classes", "formula", "inchi", "mass", "names", "smiles" ],
+        "type" : "object"
+      },
+      "MBRecord_species" : {
+        "description" : "Information of Biological Sample",
+        "properties" : {
+          "name" : {
+            "description" : "Scientific name of biological species",
+            "type" : "string"
+          },
+          "lineage" : {
+            "description" : "Lineage of species",
+            "items" : {
+              "description" : "A lineage class item",
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "link" : {
+            "description" : "External database name with identifier",
+            "items" : {
+              "$ref" : "#/components/schemas/DatabaseObject"
+            },
+            "type" : "array"
+          },
+          "sample" : {
+            "description" : "Information of sample preparation",
+            "items" : {
+              "description" : "Tissue or Cell, from which Sample was Prepared",
+              "type" : "string"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      },
+      "MBRecord_acquisition" : {
+        "description" : "",
+        "properties" : {
+          "instrument" : {
+            "description" : "Commercial name and manufacturer of instrument",
+            "type" : "string"
+          },
+          "instrument_type" : {
+            "description" : "Type of instrument",
+            "pattern" : "((CE|GC|LC)-)?(APCI|APPI|EI|ESI|FAB|MALDI,FD|CI|FISIMS)-(B|E|FT|IT|Q|TOF)(B|E|FT|IT|Q|TOF)?",
+            "type" : "string"
+          },
+          "mass_spectrometry" : {
+            "$ref" : "#/components/schemas/AcMassSpec"
+          },
+          "chromatography" : {
+            "$ref" : "#/components/schemas/AcChromatography"
+          },
+          "general" : {
+            "$ref" : "#/components/schemas/AcGeneral"
+          },
+          "ion_mobility" : {
+            "$ref" : "#/components/schemas/AcIonMobility"
+          }
+        },
+        "required" : [ "instrument", "instrument_type", "mass_spectrometry" ],
+        "type" : "object"
+      },
+      "MBRecord_mass_spectrometry" : {
+        "properties" : {
+          "focused_ion" : {
+            "$ref" : "#/components/schemas/MsFocusedIon"
+          },
+          "data_processing" : {
+            "$ref" : "#/components/schemas/MsDataProcessing"
+          }
+        },
+        "type" : "object"
+      },
+      "MBRecord_peak_annotation" : {
+        "description" : "Chemical Annotation of Peaks with Molecular Formula",
+        "properties" : {
+          "header" : {
+            "description" : "Record format of the annotation blocks",
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "values" : {
+            "description" : "Annotation blocks",
+            "items" : {
+              "description" : "Values corresponding to header",
+              "items" : {
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      },
+      "MBRecord_peak_peak_values_inner" : {
+        "description" : "Values for a single peak",
+        "properties" : {
+          "id" : {
+            "description" : "Peak identifier",
+            "minimum" : 1,
+            "type" : "integer"
+          },
+          "mz" : {
+            "description" : "m/z of the peak",
+            "format" : "double",
+            "minimum" : 0,
+            "type" : "number"
+          },
+          "intensity" : {
+            "description" : "intensity of the peak",
+            "format" : "double",
+            "minimum" : 0,
+            "type" : "number"
+          },
+          "rel" : {
+            "description" : "Relative intensity of the peak",
+            "maximum" : 999,
+            "minimum" : 0,
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "MBRecord_peak_peak" : {
+        "description" : "Peak Data",
+        "properties" : {
+          "header" : {
+            "description" : "Fixed header",
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "values" : {
+            "description" : "Peak values",
+            "items" : {
+              "$ref" : "#/components/schemas/MBRecord_peak_peak_values_inner"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      },
+      "MBRecord_peak_neutral_loss_inner" : {
+        "description" : "Values for a single neutral loss",
+        "properties" : {
+          "difference" : {
+            "description" : "Difference in mass",
+            "format" : "double",
+            "minimum" : 0,
+            "type" : "number"
+          },
+          "peak_id" : {
+            "description" : "Peak identifier of the peak in spectrum",
+            "minimum" : 1,
+            "type" : "integer"
+          },
+          "precursor_mass" : {
+            "description" : "Precursor mass",
+            "format" : "double",
+            "minimum" : 0,
+            "type" : "number"
+          }
+        },
+        "type" : "object"
+      },
+      "MBRecord_peak" : {
+        "properties" : {
+          "splash" : {
+            "description" : "Hashed Identifier of Mass Spectra",
+            "type" : "string"
+          },
+          "annotation" : {
+            "$ref" : "#/components/schemas/MBRecord_peak_annotation"
+          },
+          "numPeak" : {
+            "description" : "Total Number of Peaks",
+            "minimum" : 1,
+            "type" : "integer"
+          },
+          "peak" : {
+            "$ref" : "#/components/schemas/MBRecord_peak_peak"
+          },
+          "neutral_loss" : {
+            "description" : "Neutral Losses",
+            "items" : {
+              "$ref" : "#/components/schemas/MBRecord_peak_neutral_loss_inner"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "numPeak", "peak", "splash" ],
+        "type" : "object"
+      },
+      "SearchResult_data_inner" : {
+        "properties" : {
+          "accession" : {
+            "description" : "The accession id of the record.",
+            "type" : "string"
+          },
+          "score" : {
+            "description" : "Similarity score to the query spectrum.",
+            "type" : "number"
+          },
+          "atomcount" : {
+            "description" : "The number of atoms in the compound.",
+            "minimum" : 1,
+            "type" : "integer"
+          },
+          "peakPairs" : {
+            "description" : "A list of peak pairs from neutral loss search, combined with \"_\".",
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      },
+      "StringCount_inner" : {
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "count" : {
+            "minimum" : 0,
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "Metadata_compound_class_inner" : {
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "count" : {
+            "minimum" : 1,
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "SimilaritySearchResult_data_inner" : {
+        "description" : "A record with similarity score.",
+        "properties" : {
+          "accession" : {
+            "description" : "MassBank accession id.",
+            "type" : "string"
+          },
+          "score" : {
+            "description" : "Similarity score to the query spectrum.",
+            "type" : "number"
+          },
+          "atomcount" : {
+            "description" : "The number of atoms in the compound.",
+            "minimum" : 1,
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "Authors_inner" : {
+        "description" : "Name of the author or affiliation",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "marc-relator" : {
+            "description" : "Marc relator to describe contribution of author or affiliation",
+            "enum" : [ "abr", "acp", "act", "adi", "adp", "aft", "anl", "anm", "ann", "ant", "ape", "apl", "app", "aqt", "arc", "ard", "arr", "art", "asg", "asn", "ato", "att", "auc", "aud", "aui", "aus", "aut", "bdd", "bjd", "bkd", "bkp", "blw", "bnd", "bpd", "brd", "brl", "bsl", "cas", "ccp", "chr", "clb", "cli", "cll", "clr", "clt", "cmm", "cmp", "cmt", "cnd", "cng", "cns", "coe", "col", "com", "con", "cor", "cos", "cot", "cou", "cov", "cpc", "cpe", "cph", "cpl", "cpt", "cre", "crp", "crr", "crt", "csl", "csp", "cst", "ctb", "cte", "ctg", "ctr", "cts", "ctt", "cur", "cwt", "dbp", "dfd", "dfe", "dft", "dgc", "dgg", "dgs", "dis", "dln", "dnc", "dnr", "dpc", "dpt", "drm", "drt", "dsr", "dst", "dtc", "dte", "dtm", "dto", "dub", "edc", "edm", "edt", "egr", "elg", "elt", "eng", "enj", "etr", "evp", "exp", "fac", "fds", "fld", "flm", "fmd", "fmk", "fmo", "fmp", "fnd", "fpy", "frg", "gis", "grt", "his", "hnr", "hst", "ill", "ilu", "ins", "inv", "isb", "itr", "ive", "ivr", "jud", "jug", "lbr", "lbt", "ldr", "led", "lee", "lel", "len", "let", "lgd", "lie", "lil", "lit", "lsa", "lse", "lso", "ltg", "lyr", "mcp", "mdc", "med", "mfp", "mfr", "mod", "mon", "mrb", "mrk", "msd", "mte", "mtk", "mus", "nrt", "opn", "org", "orm", "osp", "oth", "own", "pad", "pan", "pat", "pbd", "pbl", "pdr", "pfr", "pht", "plt", "pma", "pmn", "pop", "ppm", "ppt", "pra", "prc", "prd", "pre", "prf", "prg", "prm", "prn", "pro", "prp", "prs", "prt", "prv", "pta", "pte", "ptf", "pth", "ptt", "pup", "rbr", "rcd", "rce", "rcp", "rdd", "red", "ren", "res", "rev", "rpc", "rps", "rpt", "rpy", "rse", "rsg", "rsp", "rsr", "rst", "rth", "rtm", "sad", "sce", "scl", "scr", "sds", "sec", "sgd", "sgn", "sht", "sll", "sng", "spk", "spn", "spy", "srv", "std", "stg", "stl", "stm", "stn", "str", "tcd", "tch", "ths", "tld", "tlp", "trc", "trl", "tyd", "tyg", "uvp", "vac", "vdg", "voc", "wac", "wal", "wam", "wat", "wdc", "wde", "win", "wit", "wpr", "wst" ],
+            "type" : "string"
+          }
+        },
+        "required" : [ "name" ],
+        "type" : "object"
+      },
+      "AcMassSpec_subtags_inner" : {
+        "properties" : {
+          "subtag" : {
+            "enum" : [ "MS_TYPE", "ION_MODE", "COLLISION_ENERGY", "COLLISION_GAS", "DATE", "DESOLVATION_GAS_FLOW", "DESOLVATION_TEMPERATURE", "FRAGMENTATION_MODE", "IONIZATION", "IONIZATION_ENERGY", "LASER", "MATRIX", "MASS_ACCURACY", "MASS_RANGE_M/Z", "REAGENT_GAS", "RESOLUTION", "SCANNING_SETTING", "SOURCE_TEMPERATURE", "ACTIVATION_PARAMETER", "ACTIVATION_TIME", "ATOM_GUN_CURRENT", "AUTOMATIC_GAIN_CONTROL", "BOMBARDMENT", "CAPILLARY_TEMPERATURE", "CAPILLARY_VOLTAGE", "CDL_SIDE_OCTOPOLES_BIAS_VOLTAGE", "CDL_TEMPERATURE", "DATAFORMAT", "DRY_GAS_FLOW", "DRY_GAS_TEMP", "GAS_PRESSURE", "HELIUM_FLOW", "INTERFACE_VOLTAGE", "ION_GUIDE_PEAK_VOLTAGE", "ION_GUIDE_VOLTAGE", "ION_SPRAY_VOLTAGE", "IT_SIDE_OCTOPOLES_BIAS_VOLTAGE", "LENS_VOLTAGE", "NEBULIZER", "NEBULIZING_GAS", "NEEDLE_VOLTAGE", "OCTPOLE_VOLTAGE", "ORIFICE_TEMP", "ORIFICE_TEMPERATURE", "ORIFICE_VOLTAGE", "PROBE_TIP", "RING_VOLTAGE", "SAMPLE_DRIPPING", "SKIMMER_VOLTAGE", "SPRAY_VOLTAGE", "TUBE_LENS_VOLTAGE" ],
+            "type" : "string"
+          },
+          "value" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "AcChromatography_inner" : {
+        "properties" : {
+          "subtag" : {
+            "enum" : [ "CARRIER_GAS", "COLUMN_NAME", "COLUMN_TEMPERATURE", "COLUMN_TEMPERATURE_GRADIENT", "FLOW_GRADIENT", "FLOW_RATE", "INJECTION_TEMPERATURE", "INJECTION_TEMPERATURE_GRADIENT", "INLET_TYPE", "KOVATS_RTI", "LEE_RTI", "NAPS_RTI", "UOA_RTI", "UOA_PREDICTED_RTI", "RETENTION_TIME", "UOA_PREDICTED_RETENTION_TIME", "SOLVENT", "TRANSFERLINE_TEMPERATURE" ],
+            "type" : "string"
+          },
+          "value" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "AcGeneral_inner" : {
+        "properties" : {
+          "subtag" : {
+            "enum" : [ "CONCENTRATION", "ANALYTICAL_TIME", "COLUMN_PRESSURE", "INTERNAL_STANDARD", "INTERNAL_STANDARD_MT", "MIGRATION_TIME", "PRECONDITIONING", "RUNNING_BUFFER", "RUNNING_VOLTAGE", "SAMPLE_INJECTION", "SAMPLING_CONE", "SHEATH_LIQUID", "TIME_PROGRAM", "WASHING_BUFFER" ],
+            "type" : "string"
+          },
+          "value" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "AcIonMobility_inner" : {
+        "properties" : {
+          "subtag" : {
+            "enum" : [ "CCS", "DRIFT_GAS", "DRIFT_TIME", "INSTRUMENT_TYPE", "INVERSE_REDUCED_ION_MOBILITY" ],
+            "type" : "string"
+          },
+          "value" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "MsFocusedIon_inner" : {
+        "description" : "A list of subtag value pairs",
+        "properties" : {
+          "subtag" : {
+            "description" : "Subtag describing the value",
+            "enum" : [ "BASE_PEAK", "DERIVATIVE_FORM", "DERIVATIVE_MASS", "DERIVATIVE_TYPE", "ION_TYPE", "PRECURSOR_INT", "PRECURSOR_M/Z", "PRECURSOR_TYPE", "FULL_SCAN_FRAGMENT_ION_PEAK" ],
+            "type" : "string"
+          },
+          "value" : {
+            "description" : "The value for the subtag",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "MsDataProcessing_inner" : {
+        "description" : "A list of subtag value pairs",
+        "properties" : {
+          "subtag" : {
+            "description" : "Subtag describing the value",
+            "enum" : [ "COMMENT", "DEPROFILE", "FIND_PEAK", "REANALYZE", "RECALIBRATE", "WHOLE" ],
+            "type" : "string"
+          },
+          "value" : {
+            "description" : "The value for the subtag",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      }
+    }
+  }
+}

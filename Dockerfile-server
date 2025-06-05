@@ -11,10 +11,9 @@ RUN wget https://github.com/swagger-api/swagger-ui/archive/refs/tags/v5.21.0.tar
     rm -rf v5.21.0.tar.gz swagger-ui-5.21.0
 
 COPY api/openapi.yaml ./swagger-ui/openapi.yaml
+COPY api/openapi.json ./swagger-ui/openapi.json
 COPY api/schemas ./swagger-ui/schemas
 COPY entrypoint-mb3server.sh ./entrypoint-mb3server.sh
-
-RUN apk add --update nodejs npm && npm i -g swagger-cli
 
 EXPOSE 8080
 ENTRYPOINT sh entrypoint-mb3server.sh "${MB3_API_URL}" "${MB3_API_BASE_URL}"

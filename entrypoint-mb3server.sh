@@ -5,7 +5,9 @@ echo -n $1 >> swagger-ui/openapi.yaml
 echo -n $2 >> swagger-ui/openapi.yaml
 echo "\"" >> swagger-ui/openapi.yaml
 
-swagger-cli bundle swagger-ui/openapi.yaml -o swagger-ui/openapi.json -t json
+url1=$(cat swagger-ui/openapi.yaml | grep "url" | sed 's/.*url: //')
+url2=$(echo $url1 | sed 's/\//\\\//g')
+sed -i "s/\"url\" : \"\/\"/\"url\" : $url2/g" swagger-ui/openapi.json
 
 CGO_ENABLED=0
 go get -d -v ./...
