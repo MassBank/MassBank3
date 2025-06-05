@@ -14,7 +14,7 @@ COPY api/openapi.yaml ./swagger-ui/openapi.yaml
 COPY api/schemas ./swagger-ui/schemas
 COPY entrypoint-mb3server.sh ./entrypoint-mb3server.sh
 
-RUN apk add --update nodejs npm && npm i -g swagger-cli && swagger-cli bundle swagger-ui/openapi.yaml -o swagger-ui/openapi.json -t json
+RUN apk add --update nodejs npm && npm i -g swagger-cli
 
 EXPOSE 8080
 ENTRYPOINT sh entrypoint-mb3server.sh "${MB3_API_URL}" "${MB3_API_BASE_URL}"
