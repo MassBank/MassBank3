@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+title: "MassBank3: the spectral reference library's next generation software product."
+message: "If you use this software, please cite it using these metadata."
+abstract: "MassBank is an open-source mass spectral library containing high-resolution data for the identification of small chemical molecules of metabolomics, exposomics and environmental relevance."
+authors:
+  - family-names: Neumann
+    given-names: Steffen
+    orcid: https://orcid.org/0000-0002-7899-7192
+    affiliation: "Leibniz Institute of Plant Biochemistry, Halle (Saale), Germany"
+  - family-names: Schymanski
+    given-names: Emma L.
+    orcid: https://orcid.org/0000-0001-6868-8145
+    affiliation: "University of Luxembourg, Luxembourg"
+  - family-names: Meier
+    given-names: René
+    orcid: https://orcid.org/0000-0002-1501-1349
+    affiliation: "Leibniz Institute of Plant Biochemistry, Halle (Saale), Germany"
+  - family-names: Wenk
+    given-names: Michael
+    orcid: https://orcid.org/0000-0002-7868-2473
+    affiliation: "Leibniz Institute of Plant Biochemistry, Halle (Saale), Germany"
+
+version: 3.0.0 (beta)
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.1234
+date-released: 2025-05-21
+license: GPL-3.0
