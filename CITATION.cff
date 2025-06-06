@@ -19,6 +19,9 @@ authors:
     given-names: Michael
     orcid: https://orcid.org/0000-0002-7868-2473
     affiliation: "Leibniz Institute of Plant Biochemistry, Halle (Saale), Germany"
+  - family-names: Rauh
+    given-names: David
+    orcid: https://orcid.org/0000-0001-7499-1693
 
 version: 3.0.0 (beta)
 identifiers:
