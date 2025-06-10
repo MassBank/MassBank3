@@ -53,7 +53,6 @@ function SpectralHitsViewComponent({
       _p.rel = _p.rel ?? 0;
       return _p;
     });
-    console.log(hit);
 
     return (
       <Content
