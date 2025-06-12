@@ -1,5 +1,5 @@
 import { ChangeEvent, useCallback, useMemo } from 'react';
-import calculateMolecularMass from '../../../../../../utils/mass/calculateMolecularMass';
+import calculateMolecularMass from '../../../../../../utils/calculateMolecularMass';
 import { Col, Form, Input, InputNumber, Row } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import SearchFields from '../../../../../../types/filterOptions/SearchFields';

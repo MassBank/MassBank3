@@ -1,5 +1,5 @@
-import getAtomCounts from '../getAtomCounts';
-import atomicMass from './atomicMass';
+import getAtomCounts from './getAtomCounts';
+import atomicMass from '../constants/atomicMass';
 
 /**
  * Calculates the molecular mass of a chemical formula.
