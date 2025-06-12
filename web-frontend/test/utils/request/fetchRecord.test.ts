@@ -2,7 +2,7 @@ import { expect, expectTypeOf, test } from 'vitest';
 import fetchRecord from '../../../src/utils/request/fetchRecord';
 import Record from '../../../src/types/record/Record';
 
-test('fetchRecord MSBNK-AAFC-AC000001', async () => {
+test('fetchRecord with MSBNK-AAFC-AC000001', async () => {
   const accession = 'MSBNK-AAFC-AC000001';
   const backendUrl = 'http://localhost:8081/MassBank-api';
   const record = await fetchRecord(accession, backendUrl);

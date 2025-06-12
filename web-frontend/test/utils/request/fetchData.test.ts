@@ -5,7 +5,7 @@ import ContentFilterOptions from '../../../src/types/filterOptions/ContentFilter
 
 const backendUrl = 'http://localhost:8081/MassBank-api';
 
-test('fetchData: filter/browse without searchParams', async () => {
+test('fetchData with filter/browse without searchParams', async () => {
   const url = backendUrl + '/filter/browse';
   const data = await fetchData(url);
   expect(data).toBeDefined();
@@ -15,19 +15,16 @@ test('fetchData: filter/browse without searchParams', async () => {
   expect(data).toHaveProperty('ion_mode');
 });
 
-test('fetchData: filter/browse with searchParams', async () => {
-  const browseOptions: ContentFilterOptions = {
+test('fetchData with filter/browse with searchParams', async () => {
+  const contentFilterOptions: ContentFilterOptions = {
     contributor: [{ value: 'AAFC' }],
     instrument_type: [{ value: 'LC-ESI-ITFT' }],
     ms_type: [{ value: 'MS2' }],
     ion_mode: [{ value: 'POSITIVE' }],
   };
-  const searchParams = buildSearchParams(browseOptions);
-  console.log(searchParams);
-
+  const searchParams = buildSearchParams(contentFilterOptions);
   const url = backendUrl + '/filter/browse';
   const data = await fetchData(url, searchParams);
-  console.log(data);
 
   expect(data).toBeDefined();
   expect(data).toHaveProperty('contributor');
@@ -68,7 +65,7 @@ test('fetchData: filter/browse with searchParams', async () => {
   );
 });
 
-test('fetchData: metadata', async () => {
+test('fetchData with metadata', async () => {
   const url = backendUrl + '/metadata';
   const metadata = await fetchData(url);
 
