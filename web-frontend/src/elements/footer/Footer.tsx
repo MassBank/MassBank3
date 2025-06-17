@@ -1,6 +1,13 @@
-import { Col, Layout, Row } from 'antd';
+import { Button, Col, Layout, Row } from 'antd';
 import { usePropertiesContext } from '../../context/properties/properties';
-import { CSSProperties, useMemo } from 'react';
+import {
+  CSSProperties,
+  MouseEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 const { Footer: FooterAntD } = Layout;
 
@@ -8,10 +15,36 @@ const backgroundColor: CSSProperties['backgroundColor'] = 'rgb(223, 223, 223)';
 
 type InputProps = {
   height: CSSProperties['height'];
+  enableDataPrivacyButton?: boolean;
+  onClickDataPrivacy?: () => void;
 };
 
-function Footer({ height }: InputProps) {
+function Footer({
+  height,
+  enableDataPrivacyButton = false,
+  onClickDataPrivacy = () => {},
+}: InputProps) {
   const { version } = usePropertiesContext();
+
+  const [colSpan, setColSpan] = useState<number>(8);
+
+  useEffect(() => {
+    if (enableDataPrivacyButton) {
+      setColSpan(6);
+    } else {
+      setColSpan(8);
+    }
+  }, [enableDataPrivacyButton]);
+
+  const handleOnClickDataPrivacy = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      onClickDataPrivacy();
+    },
+    [onClickDataPrivacy],
+  );
 
   return useMemo(
     () => (
@@ -39,9 +72,9 @@ function Footer({ height }: InputProps) {
             backgroundColor,
           }}
         >
-          <Col span={8}>&copy; 2025 MassBank Team</Col>
-          <Col span={8}>Version: {version}</Col>
-          <Col span={8}>
+          <Col span={colSpan}>&copy; 2025 MassBank Team</Col>
+          <Col span={colSpan}>Version: {version}</Col>
+          <Col span={colSpan}>
             <a href="https://github.com/MassBank/MassBank3" target="_blank">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -56,10 +89,30 @@ function Footer({ height }: InputProps) {
               </svg>
             </a>
           </Col>
+          {enableDataPrivacyButton && (
+            <Col span={colSpan}>
+              <Button
+                style={{
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  boxShadow: 'none',
+                }}
+                onClick={handleOnClickDataPrivacy}
+              >
+                Data Privacy
+              </Button>
+            </Col>
+          )}
         </Row>
       </FooterAntD>
     ),
-    [height, version],
+    [
+      colSpan,
+      enableDataPrivacyButton,
+      handleOnClickDataPrivacy,
+      height,
+      version,
+    ],
   );
 }
 

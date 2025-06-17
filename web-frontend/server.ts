@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import { readFileSync } from 'fs';
 import express, { Request, Response } from 'express';
 import { ViteDevServer } from 'vite';
 import axios from 'axios';
@@ -27,7 +28,8 @@ const frontendBaseUrl =
 const exportServiceUrl =
   process.env.EXPORT_SERVICE_URL ?? 'http://localhost:8083';
 const version = process.env.MB3_VERSION ?? '0.4.0 (beta)';
-const googleSearchConsoleKey = process.env.GOOGLE_SEARCH_CONSOLE_KEY ?? '';
+const pathToHtmlHeadFile = process.env.HTML_HEAD_FILE ?? '';
+const pathToHtmlBodyFile = process.env.HTML_BODY_FILE ?? '';
 const backendUrlInternal =
   process.env.MB3_API_URL_INTERNAL &&
   process.env.MB3_API_URL_INTERNAL.trim().length > 0
@@ -63,7 +65,8 @@ console.log('backendUrl:', backendUrl);
 console.log('backendUrlInternal:', backendUrlInternal);
 console.log('exportServiceUrl:', exportServiceUrl);
 console.log('exportServiceUrlInternal:', exportServiceUrlInternal);
-console.log('googleSearchConsoleKey:', googleSearchConsoleKey);
+console.log('pathToHtmlHeadFile:', pathToHtmlHeadFile);
+console.log('pathToHtmlBodyFile:', pathToHtmlBodyFile);
 console.log('distributorText:', distributorText);
 console.log('distributorUrl:', distributorUrl);
 console.log('browserTabTitle:', browserTabTitle);
@@ -334,11 +337,11 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
           .concat('\n\t')
           .concat(noFollowLinksMeta)
       : noFollowLinksMeta;
-    if (googleSearchConsoleKey && googleSearchConsoleKey.trim().length > 0) {
-      const googleSearchConsoleMeta = `<meta name="google-site-verification" content="${googleSearchConsoleKey}"></meta>`;
+    if (pathToHtmlHeadFile && pathToHtmlHeadFile.trim().length > 0) {
+      const customHeadConfiguration = readFileSync(pathToHtmlHeadFile, 'utf-8');
       rendered.head = rendered.head
-        ? rendered.head.concat('\n\t').concat(googleSearchConsoleMeta)
-        : googleSearchConsoleMeta;
+        ? rendered.head.concat('\n\t').concat(customHeadConfiguration)
+        : customHeadConfiguration;
     }
 
     const pageRoute = path.replace(frontendBaseUrl, '');
@@ -359,6 +362,13 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
     rendered.html = rendered.html
       ? rendered.html.concat('\n').concat(initDataScript)
       : initDataScript;
+
+    if (pathToHtmlBodyFile && pathToHtmlBodyFile.trim().length > 0) {
+      const customBodyConfiguration = readFileSync(pathToHtmlBodyFile, 'utf-8');
+      rendered.html = rendered.html
+        ? rendered.html.concat('\n\t').concat(customBodyConfiguration)
+        : customBodyConfiguration;
+    }
 
     // console.log('rendered', rendered);
 

@@ -7,6 +7,7 @@ import {
 } from '@ant-design/icons';
 import {
   CSSProperties,
+  JSX,
   MouseEvent,
   useCallback,
   useMemo,

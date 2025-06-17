@@ -15,6 +15,8 @@ echo "MB3_FRONTEND_HOMEPAGE_INTRO_TEXT=${12:-"Welcome to MassBank, an open-sourc
 echo "MB3_FRONTEND_HOMEPAGE_NEWS_SECTION_TEXT=${13:-""}" >> .env
 echo "MB3_FRONTEND_HOMEPAGE_FUNDING_SECTION_TEXT=${14:-""}" >> .env
 echo "MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_NAME=${15:-""}" >> .env
-echo "MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_TEXT=${16:-""}" >> .env
+echo "HTML_HEAD_FILE=${16:-""}" >> .env
+echo "HTML_BODY_FILE=${17:-""}" >> .env
+
 
 npm run start
