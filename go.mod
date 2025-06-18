@@ -1,4 +1,4 @@
-module github.com/MassBank/MassBank3
+module github.com/MassBank/MassBank3/v2025.06.1
 
 go 1.23.0
 
