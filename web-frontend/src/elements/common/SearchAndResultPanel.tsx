@@ -1,5 +1,5 @@
 import { Content } from 'antd/es/layout/layout';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { JSX, useCallback, useEffect, useMemo, useState } from 'react';
 import ResultTableSortOptionType from '../../types/ResultTableSortOptionType';
 import resultTableSortOptionValues from '../../constants/resultTableSortOptionValues';
 import ResultPanel from '../result/ResultPanel';

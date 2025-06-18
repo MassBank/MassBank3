@@ -35,7 +35,7 @@ function buildFormDataFromSearchParams(searchParams: URLSearchParams) {
     const peak_list_threshold =
       similarityPeakListThreshold !== undefined
         ? Number(similarityPeakListThreshold)
-        : defaultSearchFieldValues.spectralSearchFilterOptions?.similarity
+        : defaultSearchFieldValues.spectralSearchFilterOptions!.similarity!
             .threshold;
     if (formData.spectralSearchFilterOptions) {
       formData.spectralSearchFilterOptions.similarity = {
@@ -111,8 +111,8 @@ function buildFormDataFromSearchParams(searchParams: URLSearchParams) {
 
   const peaks = searchParams.get('peaks');
   if (peaks && peaks.length > 0) {
-    const peak_list = peaks.split(',').map((p) => {
-      return { mz: Number(p) };
+    const peak_list: PeakSearchPeakType[] = peaks.split(',').map((p) => {
+      return { mz: Number(p), formula: undefined };
     });
     const mass_tolerance = searchParams.get('mass_tolerance');
     const intensity = searchParams.get('intensity');
@@ -122,11 +122,12 @@ function buildFormDataFromSearchParams(searchParams: URLSearchParams) {
       peaks: peak_list,
       massTolerance: mass_tolerance
         ? Number(mass_tolerance)
-        : defaultSearchFieldValues.spectralSearchFilterOptions?.peaks
+        : defaultSearchFieldValues.spectralSearchFilterOptions!.peaks!
             .massTolerance,
       intensity: intensity
         ? Number(intensity)
-        : defaultSearchFieldValues.spectralSearchFilterOptions?.peaks.intensity,
+        : defaultSearchFieldValues.spectralSearchFilterOptions!.peaks!
+            .intensity,
     };
     containsValues = true;
   }
@@ -144,11 +145,11 @@ function buildFormDataFromSearchParams(searchParams: URLSearchParams) {
       neutralLosses,
       massTolerance: mass_tolerance
         ? Number(mass_tolerance)
-        : defaultSearchFieldValues.spectralSearchFilterOptions?.neutralLoss
+        : defaultSearchFieldValues.spectralSearchFilterOptions!.neutralLoss!
             .massTolerance,
       intensity: intensity
         ? Number(intensity)
-        : defaultSearchFieldValues.spectralSearchFilterOptions?.neutralLoss
+        : defaultSearchFieldValues.spectralSearchFilterOptions!.neutralLoss!
             .intensity,
     };
     containsValues = true;

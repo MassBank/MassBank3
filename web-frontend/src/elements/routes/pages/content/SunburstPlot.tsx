@@ -70,6 +70,8 @@ function SunburstPlot({ data, onSelect, width, height, level }: InputProps) {
         parents: data.parents,
         values: data.values,
         level,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         insidetextorientation: 'radial',
         branchvalues: 'total',
         marker: {

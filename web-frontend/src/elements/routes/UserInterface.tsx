@@ -28,6 +28,8 @@ function UserInterface({ body }: InputProps) {
           <div dangerouslySetInnerHTML={{ __html: container.innerHTML }} />
         ) : null,
       );
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       if (window.showDataPrivacyModal === true) {
         setShowDataPrivacyModal(true);
       }

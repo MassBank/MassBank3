@@ -1,7 +1,7 @@
 import './Table.scss';
 
 import { Table } from 'antd';
-import { CSSProperties, useMemo } from 'react';
+import { CSSProperties, JSX, useMemo } from 'react';
 import { splitStringAndCapitaliseFirstLetter } from '../../utils/stringUtils';
 import ExportableContent from '../common/ExportableContent';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';

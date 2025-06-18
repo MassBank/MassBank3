@@ -1,4 +1,11 @@
-import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  JSX,
+  MouseEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import PeakSearchRow from './PeakSearchRow';
 import { Button, Col, Row } from 'antd';
 import { MinusCircleFilled, PlusCircleFilled } from '@ant-design/icons';

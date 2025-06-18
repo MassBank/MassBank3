@@ -1,5 +1,5 @@
 import Layout, { Content } from 'antd/es/layout/layout';
-import { memo } from 'react';
+import { JSX, memo } from 'react';
 import News from '../../../common/News';
 import SectionDivider from '../../../basic/SectionDivider';
 import AcknowledgementNFDI4Chem from '../../../common/AcknowledgementNFDI4Chem';

@@ -6,6 +6,7 @@ import { SegmentedOptions } from 'antd/es/segmented';
 import {
   createRef,
   CSSProperties,
+  JSX,
   useCallback,
   useEffect,
   useMemo,
@@ -35,6 +36,8 @@ function Segmented({
     () => elements.map(() => createRef<HTMLDivElement>()),
     [elements],
   );
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const isVisibles = elementRefs.map(useIsVisible);
 
   useEffect(() => {

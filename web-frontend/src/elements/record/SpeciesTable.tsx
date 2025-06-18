@@ -1,7 +1,7 @@
 import './Table.scss';
 
 import { CSSProperties, useMemo } from 'react';
-import Species from '../../types/Species';
+import Species from '../../types/record/Species';
 import { Table } from 'antd';
 import LinksTable from './LinksTable';
 import { Content } from 'antd/es/layout/layout';

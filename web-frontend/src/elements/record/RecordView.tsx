@@ -1,5 +1,5 @@
 import Record from '../../types/record/Record';
-import { useCallback, useMemo } from 'react';
+import { JSX, useCallback, useMemo } from 'react';
 import Resizable from '../common/Resizable';
 import { Content } from 'antd/es/layout/layout';
 import AnnotationTable from './AnnotationTable';
