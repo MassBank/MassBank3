@@ -329,7 +329,7 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
     });
 
     const tabTitle = `<title>${browserTabTitle}</title>`;
-    const noFollowLinksMeta = `<meta name="robots" content="nofollow"></meta>`;
+    const noFollowLinksMeta = `<meta name="robots" content="nofollow">`;
     rendered.head = rendered.head
       ? rendered.head
           .concat('\n\t')
