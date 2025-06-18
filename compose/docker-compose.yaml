@@ -52,9 +52,7 @@ services:
   similarity-service:
     # platform: linux/amd64
     image: quay.io/massbank/massbank3-similarity-service:latest
-    restart: always
-    #    ports:
-    #      - "${SIMILARITY_SERVICE_PORT}:8080"
+    restart: always    
     environment:
       - MSP
       - VERBOSE=${SIMILARITY_SERVICE_VERBOSE}
@@ -110,8 +108,8 @@ services:
     restart: always
     ports:
       - "${MB3_FRONTEND_PORT}:3000"
-    volumes:
-      - "${HTML_LOCAL_DIR}:/app/analytics-html"
+    # volumes:
+    #   - "${HTML_LOCAL_DIR}:/app/analytics-html"
 
   mb3tool:
     build:

@@ -74,12 +74,6 @@ To stop the system use:
 
 ### Advanced Settings
 
-#### Google Search Console
-
-This optional feature enables the verification of your MassBank instance by Google search console.
-
-If the _.env_ file contains a non-empty _GOOGLE_SEARCH_CONSOLE_KEY_ property then this key will be used as meta-tag in every HTML document of the web interface.
-
 #### Distributor's Information
 
 The _DISTRIBUTOR_TEXT_ property is a free text field to insert any description of the distributor of a running MassBank instance.
@@ -101,6 +95,26 @@ Both _MB3_FRONTEND_HOMEPAGE_NEWS_SECTION_TEXT_ and _MB3_FRONTEND_HOMEPAGE_FUNDIN
 #### Add additional Section to Homepage
 
 To enable a custom section with free text content set the variable _MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_NAME_ and _MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_TEXT_. As the names indicate, the first stands for the section name while the latter is the text to fill that section.
+
+#### Extended HTML Head and Body
+
+##### Head File
+
+This optional feature enables to import of custom content in every webpage's HTML head of MassBank. This can be useful for the verification of your MassBank instance by Google search console or Bing, for example, or if the import of external libraries is needed when executing custom HTML body file content (see below).
+
+If the _.env_ file contains a non-empty _HTML_HEAD_FILE_ property then its file content will be included in the head section of every HTML document of the web interface.
+
+##### Body File
+
+This optional feature enables the import of custom content in every webpage's HTML body of MassBank. This feature can be useful to implement a customised data privacy management, e.g. tracking. To display a data privacy section in every webpage's footer, the root element needs to have the id "_data-privacy-container_".
+
+If the _.env_ file contains a non-empty _HTML_BODY_FILE_ property then its file content will be included in the body section of every HTML document of the web interface to enable the data privacy management button. The HTML file content is responsible for what is shown in the graphical interface and for the executed code. The MassBank implementation does not influence or control that.
+
+##### Mount Local Directory
+
+In order to mount the HTML files, the variable _HTML_LOCAL_DIR_ needs to be set to a local directory. For example in the root of the project.
+
+Additionally, the volume needs to be mounted. Therefore, firstly, the directory (_HTML_LOCAL_DIR_) needs to be created and contain the head or both HTML files. Secondly, the _volumes_ tag in the frontend section in the docker-compose file has to be re-activated.
 
 ### Troubleshooting
 
