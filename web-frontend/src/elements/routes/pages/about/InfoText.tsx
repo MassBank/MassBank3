@@ -179,6 +179,18 @@ function InfoText() {
           }
           .
         </Paragraph>
+        <Paragraph>
+          Please contact us in case of questions, suggestions or issues via{' '}
+          {
+            <a
+              href="mailto:massbank@massbank.eu"
+              style={{ color: 'black', textDecoration: 'underline' }}
+            >
+              massbank@massbank.eu
+            </a>
+          }
+          .
+        </Paragraph>
       </Content>
     </Content>
   );
