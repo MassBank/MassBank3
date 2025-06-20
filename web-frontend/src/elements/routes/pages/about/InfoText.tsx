@@ -180,7 +180,17 @@ function InfoText() {
           .
         </Paragraph>
         <Paragraph>
-          Please contact us in case of questions, suggestions or issues via{' '}
+          Technical issues and ideas can be reported via{' '}
+          {
+            <a
+              href="https://github.com/MassBank/MassBank3"
+              target="_blank"
+              style={{ color: 'black', textDecoration: 'underline' }}
+            >
+              GitHub
+            </a>
+          }
+          . In case of general questions contact us via{' '}
           {
             <a
               href="mailto:massbank@massbank.eu"
