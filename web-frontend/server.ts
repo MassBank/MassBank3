@@ -26,7 +26,6 @@ const frontendBaseUrl =
     : '/MassBank3';
 const exportServiceUrl =
   process.env.EXPORT_SERVICE_URL ?? 'http://localhost:8083';
-const version = process.env.MB3_VERSION ?? '0.4.0 (beta)';
 const pathToHtmlHeadFile = process.env.HTML_HEAD_FILE ?? '';
 const pathToHtmlBodyFile = process.env.HTML_BODY_FILE ?? '';
 const backendUrlInternal =
@@ -52,6 +51,12 @@ const homepageAdditionalSectionName =
   process.env.MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_NAME ?? '';
 const homepageAdditionalSectionText =
   process.env.MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_TEXT ?? '';
+
+const versionFileContent = readFileSync('version.txt', 'utf-8');
+const version =
+  !versionFileContent || versionFileContent.trim().length === 0
+    ? 'v3.0.0'
+    : versionFileContent.trim();
 
 console.log('\n');
 console.log('isProduction:', process.env.NODE_ENV === 'production');

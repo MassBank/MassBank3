@@ -7,7 +7,7 @@ if [ -z "$NEW_VERSION" ]; then
   exit 1
 fi
 
-# Set version in go.mod
-sed -i "s/^module .*/module github.com\/MassBank\/MassBank3\/$NEW_VERSION/" go.mod
+echo $NEW_VERSION > version.txt
+echo $NEW_VERSION > web-frontend/version.txt
 
-echo "Set version in go.mod to auf $NEW_VERSION:."
+echo "Set version in version.txt and web-frontend/version.txt to $NEW_VERSION."

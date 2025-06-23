@@ -547,11 +547,16 @@ func GetRecords(contributor []string, instrumentType []string, msType []string, 
 }
 
 func GetVersion() (string, error) {
-	if err := initDB(); err != nil {
+
+	content, err := os.ReadFile("version.txt")
+	if err != nil {
 		return "", err
 	}
-
-	return "test version, test timestamp", nil
+	version := strings.TrimSpace(string(content))
+	if version == "" {
+		return "v3.0.0", nil
+	}
+	return version, nil
 }
 
 func GetStatus() (GetStatus200Response, error) {
