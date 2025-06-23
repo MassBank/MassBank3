@@ -102,25 +102,23 @@ if (!isProduction) {
 }
 
 // Create router for redirecting to the frontend in case of hostname is given without base URL
-const redirectRouterToBaseUrl = express.Router();
-const regexToBaseUrl = new RegExp(`^/$`);
-app.use(regexToBaseUrl, redirectRouterToBaseUrl);
-redirectRouterToBaseUrl.get('', async (req: Request, res: Response) => {
+app.get('', (req: Request, res: Response) => {
   const redirectUrl = frontendUrl + frontendBaseUrl + '/';
+  console.log(
+    `"${req.originalUrl}" -> Redirecting to the frontend in case of hostname is given without base URL -> Redirecting to: ${redirectUrl}`,
+  );
   res.redirect(301, redirectUrl);
 });
 
 // Create router for redirecting to the frontend with base URL in case slash is missing
-const redirectRouterBaseUrlWithoutSlash = express.Router();
 const regexBaseUrlWithoutSlash = new RegExp(`^${frontendBaseUrl}$`);
-app.use(regexBaseUrlWithoutSlash, redirectRouterBaseUrlWithoutSlash);
-redirectRouterBaseUrlWithoutSlash.get(
-  '',
-  async (req: Request, res: Response) => {
-    const redirectUrl = frontendUrl + frontendBaseUrl + '/';
-    res.redirect(301, redirectUrl);
-  },
-);
+app.get(regexBaseUrlWithoutSlash, (req: Request, res: Response) => {
+  const redirectUrl = frontendUrl + frontendBaseUrl + '/';
+  console.log(
+    `"${req.originalUrl}" -> Redirecting to the frontend with base URL in case slash is missing -> Redirecting to: ${redirectUrl}`,
+  );
+  res.redirect(301, redirectUrl);
+});
 
 // Create router for base URL
 const baseRouter = express.Router();
@@ -130,7 +128,8 @@ const nRecords = 40000;
 const prefixUrl = frontendUrl + frontendBaseUrl;
 
 // serve sitemap index for search engines
-baseRouter.get('/robots.txt', async (req: Request, res: Response) => {
+baseRouter.get('/robots.txt', (req: Request, res: Response) => {
+  console.log(`"${req.originalUrl}" -> just route to "${req.originalUrl}"`);
   try {
     const content = `User-agent: *\nAllow: /\n\nSitemap: ${prefixUrl}/sitemap.xml`;
 
@@ -144,6 +143,7 @@ baseRouter.get('/robots.txt', async (req: Request, res: Response) => {
 
 // serve sitemap index for search engines
 baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
+  console.log(`"${req.originalUrl}" -> just route to "${req.originalUrl}"`);
   try {
     const url: string = backendUrlInternal + '/records/count';
     const searchResultRecordCount: number | undefined = await fetchData(url);
@@ -180,7 +180,8 @@ baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
   }
 });
 
-baseRouter.get('/sitemap_misc.xml', async (req: Request, res: Response) => {
+baseRouter.get('/sitemap_misc.xml', (req: Request, res: Response) => {
+  console.log(`"${req.originalUrl}" -> just route to "${req.originalUrl}"`);
   try {
     const xmlHeader =
       '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
@@ -214,6 +215,7 @@ baseRouter.get('/sitemap_misc.xml', async (req: Request, res: Response) => {
 
 // serve individual sitemaps for search engines
 baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
+  console.log(`"${req.originalUrl}" -> just route to "${req.originalUrl}"`);
   try {
     const index = Number(req.originalUrl.split('_')[1].split('.')[0]);
 
@@ -253,6 +255,7 @@ baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
 
 // serve index.html for all other routes
 baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
+  console.log(`"${req.originalUrl}" -> just route to "${req.originalUrl}"`);
   try {
     let template: string;
     let render;
