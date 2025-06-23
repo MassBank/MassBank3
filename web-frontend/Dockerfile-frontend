@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package.json ./
 RUN npm run clean-install
 # Then copy in the actual sources we need and build
-COPY tsconfig.json tsconfig.node.json vite.config.ts vite-env.d.ts server.ts index.html entrypoint.sh ./
+COPY tsconfig.json tsconfig.node.json vite.config.ts vite-env.d.ts server.ts server-utils.ts index.html entrypoint.sh ./
 COPY src/ ./src/
 COPY public/ ./public/
 RUN npm run build
@@ -16,7 +16,7 @@ COPY --from=build /app/node_modules ./node_modules/
 COPY --from=build /app/dist ./dist/
 COPY --from=build /app/src ./src/
 COPY --from=build /app/public ./public/
-COPY --from=build /app/package.json /app/package-lock.json /app/server.ts /app/entrypoint.sh ./
+COPY --from=build /app/package.json /app/package-lock.json /app/server.ts /app/server-utils.ts /app/entrypoint.sh ./
 
 ENTRYPOINT sh entrypoint.sh "${MB3_API_URL}" "${MB3_FRONTEND_URL}" "${MB3_FRONTEND_BASE_URL}" "${MB3_FRONTEND_VERSION}" "${EXPORT_SERVICE_URL}" "${MB3_API_URL_INTERNAL}" "${EXPORT_SERVICE_URL_INTERNAL}" "${DISTRIBUTOR_TEXT}" "${DISTRIBUTOR_URL}" "${MB3_FRONTEND_BROWSER_TAB_TITLE}" "${MB3_FRONTEND_HOMEPAGE_INTRO_TEXT}" "${MB3_FRONTEND_HOMEPAGE_NEWS_SECTION_TEXT}" "${MB3_FRONTEND_HOMEPAGE_FUNDING_SECTION_TEXT}" "${MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_NAME}" "${MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_TEXT}" "${HTML_HEAD_FILE}" "${HTML_BODY_FILE}"
 EXPOSE 3000

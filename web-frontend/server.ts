@@ -2,13 +2,12 @@ import fs from 'node:fs/promises';
 import { readFileSync } from 'fs';
 import express, { Request, Response } from 'express';
 import { ViteDevServer } from 'vite';
-import axios from 'axios';
 import xmlFormat from 'xml-formatter';
 import Hit from './src/types/Hit';
 import SearchResult from './src/types/SearchResult';
 import fetchData from './src/utils/request/fetchData';
 import PropertiesContextProps from './src/types/PropertiesContextProps';
-import Metadata from './src/types/Metadata';
+import { buildRecordMetadata, getLastmodDate } from './server-utils.js';
 
 // Constants
 const port = 3000;
@@ -97,73 +96,26 @@ if (!isProduction) {
   app.use(frontendBaseUrl, sirv('./dist/client', { extensions: [] }));
 }
 
-const buildRecordMetadata = async (_accession: string) => {
-  try {
-    const url = `${exportServiceUrlInternal}/metadata/${_accession}`;
-    const resp = await axios.get(url, {
-      headers: {
-        Accept: 'application/ld+json',
-      },
-    });
-    if (resp.status === 200) {
-      const data = await resp.data;
-      if (data) {
-        const json =
-          '[' +
-          (data as object[])
-            .map((d) => JSON.stringify(d, null, 2))
-            .join(',\n') +
-          ']';
-
-        return json;
-      }
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (err) {
-    // console.error('buildRecordMetadata failed', e);
-  }
-
-  return null;
-};
-
-async function getLastmodDate() {
-  let url = backendUrlInternal + '/metadata';
-  const searchResultMetadata: Metadata | undefined = await fetchData(url);
-  const timestampMetadata = searchResultMetadata?.timestamp;
-  url = exportServiceUrlInternal + '/version';
-  const searchResultExportServiceVersion: string | undefined =
-    await fetchData(url);
-  const timestampExportService = searchResultExportServiceVersion
-    ?.split(',')[1]
-    .trim();
-
-  const dateMetadata = timestampMetadata
-    ? new Date(timestampMetadata).toISOString()
-    : undefined;
-  const dateExportService = timestampExportService
-    ? new Date(timestampExportService).toISOString()
-    : undefined;
-
-  let lastmodDate = new Date().toISOString();
-  if (dateMetadata && dateExportService) {
-    lastmodDate =
-      dateMetadata > dateExportService ? dateMetadata : dateExportService;
-  } else if (dateMetadata) {
-    lastmodDate = dateMetadata;
-  } else if (dateExportService) {
-    lastmodDate = dateExportService;
-  }
-  return lastmodDate;
-}
+// Create router for redirecting to the frontend in case of hostname is given without base URL
+const redirectRouterToBaseUrl = express.Router();
+const regexToBaseUrl = new RegExp(`^/$`);
+app.use(regexToBaseUrl, redirectRouterToBaseUrl);
+redirectRouterToBaseUrl.get('', async (req: Request, res: Response) => {
+  const redirectUrl = frontendUrl + frontendBaseUrl + '/';
+  res.redirect(301, redirectUrl);
+});
 
 // Create router for redirecting to the frontend with base URL in case slash is missing
-// const redirectRouter = express.Router();
-// const regex = new RegExp(`^${frontendBaseUrl}$`);
-// app.use(regex, redirectRouter);
-// redirectRouter.get('', async (req: Request, res: Response) => {
-//   const redirectUrl = frontendUrl + frontendBaseUrl + '/';
-//   res.redirect(redirectUrl);
-// });
+const redirectRouterBaseUrlWithoutSlash = express.Router();
+const regexBaseUrlWithoutSlash = new RegExp(`^${frontendBaseUrl}$`);
+app.use(regexBaseUrlWithoutSlash, redirectRouterBaseUrlWithoutSlash);
+redirectRouterBaseUrlWithoutSlash.get(
+  '',
+  async (req: Request, res: Response) => {
+    const redirectUrl = frontendUrl + frontendBaseUrl + '/';
+    res.redirect(301, redirectUrl);
+  },
+);
 
 // Create router for base URL
 const baseRouter = express.Router();
@@ -194,7 +146,10 @@ baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
       ? searchResultRecordCount
       : 0;
 
-    const lastmodDate = await getLastmodDate();
+    const lastmodDate = await getLastmodDate(
+      backendUrlInternal,
+      exportServiceUrlInternal,
+    );
 
     const xmlContent: string[] = [
       '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
@@ -266,7 +221,10 @@ baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
       return;
     }
 
-    const lastmodDate = await getLastmodDate();
+    const lastmodDate = await getLastmodDate(
+      backendUrlInternal,
+      exportServiceUrlInternal,
+    );
 
     const xmlHeader =
       '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
@@ -349,7 +307,10 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       (pageRoute === 'recordDisplay' || pageRoute === 'RecordDisplay') &&
       req.query.id
     ) {
-      const metadata = await buildRecordMetadata(req.query.id as string);
+      const metadata = await buildRecordMetadata(
+        req.query.id as string,
+        exportServiceUrlInternal,
+      );
       if (metadata) {
         const metadataScript = `<script type="application/ld+json">${metadata}</script>`;
         rendered.head = rendered.head
