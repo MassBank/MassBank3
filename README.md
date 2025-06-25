@@ -5,6 +5,10 @@
 
 MassBank3 is the spectral reference library's next generation software product. The system consists of a modern software architecture and provides a new REST API with different services and a completely redesigned user interface.
 
+This software is running at https://massbank.eu. It also provides a [graphical interface](https://massbank.eu/MassBank-api) using Swagger UI to get insights into the different REST API endpoints and their specifications.
+
+There is a parallel instance at https://msbi.ipb-halle.de/MassBank. You can find the API's graphical interface [here](https://msbi.ipb-halle.de/MassBank-api/ui/).
+
 # Installation
 
 There are currently two ways to run MassBank:
@@ -132,8 +136,6 @@ The frontend can by default be accessed in the webbrowser at http://localhost:80
     http://${MB3_FRONTEND_HOST}:${MB3_FRONTEND_PORT}${MB3_FRONTEND_BASE_URL}
 
 # REST API
-
-There is a [graphical interface](https://msbi.ipb-halle.de/MassBank-api/ui/) by means of Swagger UI to have insights into the different API endpoints and their specifications at our test instance.
 
 To access this on your running instance, just visit the API URL in the browser. By default it is http://localhost:8081/MassBank-api and is defined by the environment variable _MB3_API_URL_ and concatenated via:
 
