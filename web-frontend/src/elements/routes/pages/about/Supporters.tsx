@@ -11,16 +11,16 @@ import hbm4euLogo from '../../../../assets/HBM4EU_logo.png';
 import nfdi4chemLogo from '../../../../assets/nfdi4chem_logo.png';
 import ufzLogo from '../../../../assets/UFZ.png';
 
-const logos = [
-  denbiLogo,
-  eawagLogo,
-  fnrLogo,
-  ipbLogo,
-  normanLogo,
-  ufzLogo,
-  uniLuxLogo,
-  hbm4euLogo,
-  nfdi4chemLogo,
+const logos: { name: string; src: string }[] = [
+  { name: 'deNBI', src: denbiLogo },
+  { name: 'Eawag', src: eawagLogo },
+  { name: 'FNR', src: fnrLogo },
+  { name: 'IPB Halle', src: ipbLogo },
+  { name: 'NORMAN', src: normanLogo },
+  { name: 'UFZ Leipzig', src: ufzLogo },
+  { name: 'UniLux', src: uniLuxLogo },
+  { name: 'HBM4EU', src: hbm4euLogo },
+  { name: 'NFDI4Chem', src: nfdi4chemLogo },
 ];
 
 function Supporters() {
@@ -47,7 +47,12 @@ function Supporters() {
         }}
       >
         {logos.map((logo, i) => (
-          <img src={logo} style={{ width: 200 }} key={'supporter-logo-' + i} />
+          <img
+            src={logo.src}
+            style={{ width: 200 }}
+            key={'supporter-logo-' + i + '-' + logo.name}
+            alt={logo.name + ' supporter logo'}
+          />
         ))}
       </Content>
     </Content>

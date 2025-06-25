@@ -1,5 +1,6 @@
 import { Button, Input } from 'antd';
 import { Content } from 'antd/es/layout/layout';
+import Text from 'antd/es/typography/Text';
 import {
   ChangeEvent,
   CSSProperties,
@@ -65,9 +66,9 @@ function AccessionSearchInputField({
         ...style,
       }}
     >
-      <text style={{ marginRight: 20, fontWeight: 'bold' }}>
+      <Text style={{ marginRight: 20, fontWeight: 'bold' }}>
         Go to accession:
-      </text>
+      </Text>
       <Input
         type="text"
         placeholder="e.g. MSBNK-AAFC-AC000114"
