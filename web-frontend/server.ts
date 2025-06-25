@@ -299,7 +299,7 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
         : customHeadConfiguration;
     }
 
-    const pageRoute = path.replace(frontendBaseUrl, '');
+    const pageRoute = path.replace(frontendBaseUrl, '').replace(/^\//, '');
     if (
       (pageRoute === 'recordDisplay' || pageRoute === 'RecordDisplay') &&
       req.query.id
