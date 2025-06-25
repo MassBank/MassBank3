@@ -5,12 +5,7 @@
 
 MassBank3 is the spectral reference library's next generation software product. The system consists of a modern software architecture and provides a new REST API with different services and a completely redesigned user interface.
 
-A current test instance is running at https://msbi.ipb-halle.de/MassBank/.
-
 # Installation
-
-> [!NOTE]
-> Although this version of MassBank is already considered as fully functional, it is still work in progress and in a testing phase! </br> Please create a new issue in case of observing any bug or discrepancy.
 
 There are currently two ways to run MassBank:
 
