@@ -25,9 +25,9 @@ function SectionDivider({
       }}
       orientation={orientation}
     >
-      <label style={{ fontWeight: 'bold', fontSize: 18, ...labelStyle }}>
+      <text style={{ fontWeight: 'bold', fontSize: 18, ...labelStyle }}>
         {label}
-      </label>
+      </text>
     </DividerAntD>
   );
 }

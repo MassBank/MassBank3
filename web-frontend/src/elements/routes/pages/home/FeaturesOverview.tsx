@@ -72,6 +72,7 @@ function FeaturesOverview() {
           maxHeight: 300,
           maxWidth: '40%',
         }}
+        alt="A mass spectrum with a magnifying glass and a chemical structure as result from spectral search."
       />
     </Content>
   );

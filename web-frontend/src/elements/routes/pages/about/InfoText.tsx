@@ -19,6 +19,7 @@ function InfoText() {
         src={massbankLogo}
         style={{ width: 300, marginTop: 10, marginBottom: 10 }}
         key={'massbank-logo-overview'}
+        alt="MassBank logo"
       />
       <Content style={{ padding: 10 }}>
         <Paragraph>

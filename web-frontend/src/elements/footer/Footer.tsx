@@ -75,7 +75,11 @@ function Footer({
           <Col span={colSpan}>&copy; 2025 MassBank Team</Col>
           <Col span={colSpan}>Version: {version}</Col>
           <Col span={colSpan}>
-            <a href="https://github.com/MassBank/MassBank3" target="_blank">
+            <a
+              href="https://github.com/MassBank/MassBank3"
+              target="_blank"
+              title="Find us on GitHub"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="22"

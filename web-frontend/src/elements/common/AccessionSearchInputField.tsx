@@ -65,9 +65,9 @@ function AccessionSearchInputField({
         ...style,
       }}
     >
-      <label style={{ marginRight: 20, fontWeight: 'bold' }}>
+      <text style={{ marginRight: 20, fontWeight: 'bold' }}>
         Go to accession:
-      </label>
+      </text>
       <Input
         type="text"
         placeholder="e.g. MSBNK-AAFC-AC000114"

@@ -27,7 +27,8 @@ function MassBankInfo() {
             marginTop: 10,
             marginBottom: 40,
           }}
-          key={'massbank-logo-overview'}
+          key="massbank-logo-overview"
+          alt="MassBank logo"
         />
         {<FreeText text={homepageIntroText} />}
       </Content>

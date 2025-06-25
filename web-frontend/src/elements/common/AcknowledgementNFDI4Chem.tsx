@@ -14,7 +14,7 @@ function AcknowledgementNFDI4Chem() {
         alignItems: 'center',
       }}
     >
-      <img src={nfdi4chemLogo} style={{ height: 250 }} />
+      <img src={nfdi4chemLogo} style={{ height: 250 }} alt="NFDI4Chem logo" />
       <Paragraph style={{ fontWeight: 'bolder' }}>
         This project is funded by the DFG (
         {
