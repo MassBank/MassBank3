@@ -134,17 +134,6 @@ function InfoText() {
               Leibniz Institute of Plant Biochemistry, Halle/Saale, Germany
             </a>
           }
-          ), Michael Stravs (
-          {
-            <a
-              href="https://www.eawag.ch/en/about-us/portrait/organisation/staff/profile/michael-stravs/show/"
-              target="_blank"
-              style={{ color: 'black', textDecoration: 'underline' }}
-            >
-              Swiss Federal Institute of Aquatic Science and Technology, EAWAG,
-              Dübendorf, Switzerland
-            </a>
-          }
           ), Emma Schymanski (
           <a
             href="https://www.uni.lu/lcsb-en/people/emma-schymanski/"
