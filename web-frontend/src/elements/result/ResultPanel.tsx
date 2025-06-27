@@ -1,3 +1,5 @@
+import './Pagination.scss';
+
 import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import ResultTable from './ResultTable';
 import Hit from '../../types/Hit';
@@ -287,6 +289,7 @@ function ResultPanel({
         }}
       >
         <Pagination
+          className="result-panel-pagination"
           total={hits.length}
           pageSize={pageLimit}
           showTotal={(total) => (
@@ -323,7 +326,7 @@ function ResultPanel({
           <Select
             defaultValue={selectedSortOption}
             style={{ width: 200 }}
-            placeholder="Sort by"
+            placeholder={<p style={{ color: 'black' }}>Sort by</p>}
             optionFilterProp="label"
             filterSort={(optionA, optionB) =>
               (optionA?.label ?? '')
@@ -389,7 +392,7 @@ function ResultPanel({
               <label
                 style={{ marginTop: 20, fontSize: 16, fontWeight: 'bolder' }}
               >
-                Preparing download file...
+                Preparing download...
               </label>
             </Content>
           ) : (

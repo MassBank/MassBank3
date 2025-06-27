@@ -1,5 +1,5 @@
 function NotAvailableLabel() {
-  return <label style={{ color: 'grey', fontStyle: 'italic' }}>N/A</label>;
+  return <p style={{ fontStyle: 'italic' }}>N/A</p>;
 }
 
 export default NotAvailableLabel;

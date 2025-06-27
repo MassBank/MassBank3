@@ -1,5 +1,4 @@
 import { Divider as DividerAntD, DividerProps } from 'antd';
-import Text from 'antd/es/typography/Text';
 import { CSSProperties } from 'react';
 
 type InputProps = {
@@ -26,7 +25,7 @@ function SectionDivider({
       }}
       orientation={orientation}
     >
-      <Text
+      <p
         style={{
           fontWeight: 'bold',
           fontSize: 18,
@@ -35,7 +34,7 @@ function SectionDivider({
         }}
       >
         {label}
-      </Text>
+      </p>
     </DividerAntD>
   );
 }

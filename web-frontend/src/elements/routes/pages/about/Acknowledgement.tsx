@@ -27,7 +27,11 @@ function Acknowledgement() {
             molecular formulas, and substructure searching. J Cheminform 9, 33
             (2017).
           </label>{' '}
-          <a href="https://doi.org/10.1186/s13321-017-0220-4" target="_blank">
+          <a
+            href="https://doi.org/10.1186/s13321-017-0220-4"
+            target="_blank"
+            style={linkStyle}
+          >
             https://doi.org/10.1186/s13321-017-0220-4
           </a>
         </>
@@ -46,7 +50,11 @@ function Acknowledgement() {
             of mass spectrometry data.. Journal of Open Source Software, 5(52).
             2411.
           </label>{' '}
-          <a href="https://doi.org/10.21105/joss.02411" target="_blank">
+          <a
+            href="https://doi.org/10.21105/joss.02411"
+            target="_blank"
+            style={linkStyle}
+          >
             https://doi.org/10.21105/joss.02411
           </a>
         </>
@@ -69,7 +77,11 @@ function Acknowledgement() {
             chemistry cartridge for Oracle database. J Cheminform 2 (Suppl 1),
             F1 (2010).
           </label>{' '}
-          <a href="https://doi.org/10.1186/1758-2946-2-S1-F1" target="_blank">
+          <a
+            href="https://doi.org/10.1186/1758-2946-2-S1-F1"
+            target="_blank"
+            style={linkStyle}
+          >
             https://doi.org/10.1186/1758-2946-2-S1-F1
           </a>
         </>
@@ -92,7 +104,11 @@ function Acknowledgement() {
             library to manipulate chemical structures and reactions in
             JavaScript [Computer software].
           </label>{' '}
-          <a href="https://doi.org/10.5281/zenodo.5139988" target="_blank">
+          <a
+            href="https://doi.org/10.5281/zenodo.5139988"
+            target="_blank"
+            style={linkStyle}
+          >
             https://doi.org/10.5281/zenodo.5139988
           </a>
         </>

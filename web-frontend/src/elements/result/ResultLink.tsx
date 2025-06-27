@@ -42,8 +42,13 @@ function ResultLink({ hit, width = '100%', height = '100%' }: InputProps) {
             className="link"
             href={hit.accession && hit.accession !== '' ? url : '?'}
             target="_blank"
+            style={{
+              cursor: 'pointer',
+              color: 'black',
+              textDecoration: 'underline',
+            }}
           >
-            <label style={{ cursor: 'pointer' }}>{hit.accession}</label>
+            {hit.accession}
           </a>
         </Content>
       ),

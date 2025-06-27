@@ -93,9 +93,11 @@ function ServiceStatusView() {
             <Result
               title="MassBank API"
               subTitle={
-                errorApi && errorApi.length > 0
-                  ? errorApi
-                  : 'Successfully connected'
+                <p style={{ color: 'black' }}>
+                  {errorApi && errorApi.length > 0
+                    ? errorApi
+                    : 'Successfully connected'}
+                </p>
               }
               status={errorApi && errorApi.length > 0 ? 'error' : 'success'}
               style={resultStyle}
@@ -103,9 +105,11 @@ function ServiceStatusView() {
             <Result
               title="Postgres Database"
               subTitle={
-                errorPostgres && errorPostgres.length > 0
-                  ? errorPostgres
-                  : 'Successfully connected'
+                <p style={{ color: 'black' }}>
+                  {errorPostgres && errorPostgres.length > 0
+                    ? errorPostgres
+                    : 'Successfully connected'}
+                </p>
               }
               status={
                 errorPostgres && errorPostgres.length > 0 ? 'error' : 'success'
@@ -115,9 +119,11 @@ function ServiceStatusView() {
             <Result
               title="Similarity Service"
               subTitle={
-                errorSimilarityService && errorSimilarityService.length > 0
-                  ? errorSimilarityService
-                  : 'Successfully connected'
+                <p style={{ color: 'black' }}>
+                  {errorSimilarityService && errorSimilarityService.length > 0
+                    ? errorSimilarityService
+                    : 'Successfully connected'}
+                </p>
               }
               status={
                 errorSimilarityService && errorSimilarityService.length > 0
@@ -129,9 +135,11 @@ function ServiceStatusView() {
             <Result
               title="Export Service"
               subTitle={
-                errorExportService && errorExportService.length > 0
-                  ? errorExportService
-                  : 'Successfully connected'
+                <p style={{ color: 'black' }}>
+                  {errorExportService && errorExportService.length > 0
+                    ? errorExportService
+                    : 'Successfully connected'}
+                </p>
               }
               status={
                 errorExportService && errorExportService.length > 0
@@ -146,7 +154,11 @@ function ServiceStatusView() {
           type="primary"
           onClick={handleOnCheckServiceStatus}
           disabled={isLoading}
-          style={{ marginTop: 20 }}
+          style={{
+            marginTop: 20,
+            backgroundColor: 'lightgrey',
+            color: 'black',
+          }}
         >
           Refresh
         </Button>
