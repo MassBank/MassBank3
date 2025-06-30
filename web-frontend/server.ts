@@ -243,6 +243,51 @@ baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
   }
 });
 
+// Redirect previous Result.jsp requests to the frontend search page
+// This is a workaround for the old MassBank frontend which used Result.jsp
+// to display search results. Redirect of requests to the new frontend search page.
+baseRouter.get(/\/(R|r)esult\.jsp/, (req: Request, res: Response) => {
+  // console.log('Result.jsp request:', req.originalUrl);
+  // console.log(
+  //   'Query parameters:',
+  //   req.query,
+  //   ' -> ',
+  //   Object.keys(req.query).length,
+  // );
+
+  try {
+    const redirectUrl = frontendUrl + frontendBaseUrl + '/search';
+    // Redirect to the frontend search page with the query parameter
+    if (!req.query || Object.keys(req.query).length === 0) {
+      res.redirect(301, redirectUrl);
+      return;
+    }
+    const inputParams = new URLSearchParams(
+      req.query as Record<string, string>,
+    );
+    const params = new URLSearchParams();
+    // Map the old Result.jsp parameters to the new search parameters
+    if (inputParams.has('compound')) {
+      params.set('compound_name', inputParams.get('compound') ?? '');
+    }
+
+    // console.log(
+    //   'Redirecting to:',
+    //   redirectUrl,
+    //   'with parameters:',
+    //   params.toString(),
+    //   ' -> ',
+    //   redirectUrl + '?' + params.toString(),
+    // );
+
+    res.redirect(301, redirectUrl + '?' + params.toString());
+  } catch (e) {
+    vite?.ssrFixStacktrace(e);
+    console.log(e.stack);
+    res.status(500).end(e.stack);
+  }
+});
+
 // serve index.html for all other routes
 baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
   try {
