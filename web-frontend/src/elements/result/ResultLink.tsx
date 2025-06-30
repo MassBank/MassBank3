@@ -44,9 +44,9 @@ function ResultLink({ hit, width = '100%', height = '100%' }: InputProps) {
             target="_blank"
             style={{
               cursor: 'pointer',
-              color: 'black',
-              textDecoration: 'underline',
+              color: 'darkblue',
             }}
+            title="Click to view the record"
           >
             {hit.accession}
           </a>

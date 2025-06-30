@@ -75,7 +75,8 @@ function Header({ height }: InputProps) {
                 type="link"
                 key={path + '-li'}
                 style={{
-                  color: path == location.pathname ? 'blue' : 'black',
+                  color: path === location.pathname ? 'blue' : 'black',
+                  fontWeight: path === location.pathname ? 600 : 'inherit',
                   height:
                     typeof height === 'number'
                       ? height - 5
