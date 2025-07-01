@@ -67,4 +67,99 @@ async function getLastmodDate(
   return lastmodDate;
 }
 
-export { buildRecordMetadata, getLastmodDate };
+function convertMassBank2QueryParams(
+  inputParams: URLSearchParams,
+): URLSearchParams {
+  const params = new URLSearchParams();
+  // Map the old Result.jsp parameters to the new search parameters
+  if (inputParams.has('compound')) {
+    const compoundName = inputParams.get('compound')?.trim() ?? '';
+    if (compoundName.length > 0) {
+      params.set('compound_name', compoundName);
+    }
+  }
+  if (inputParams.has('mz')) {
+    const mzValue = inputParams.get('mz')?.trim() ?? '';
+    if (mzValue.length > 0) {
+      params.set('exact_mass', mzValue);
+    }
+  }
+  if (inputParams.has('tol')) {
+    const tolerance = inputParams.get('tol')?.trim() ?? '0.1';
+    if (tolerance.length > 0) {
+      params.set('mass_tolerance', tolerance);
+    } else {
+      params.set('mass_tolerance', '0.1'); // default value
+    }
+  }
+  if (inputParams.has('formula')) {
+    const formula = inputParams.get('formula')?.trim() ?? '';
+    if (formula.length > 0) {
+      params.set('formula', formula);
+    }
+  }
+  if (inputParams.has('inchikey')) {
+    const inchiKey = inputParams.get('inchikey')?.trim() ?? '';
+    if (inchiKey.length > 0) {
+      params.set('inchi_key', inchiKey);
+    }
+  }
+  if (inputParams.has('splash')) {
+    const splash = inputParams.get('splash')?.trim() ?? '';
+    if (splash.length > 0) {
+      params.set('splash', splash);
+    }
+  }
+  // peak search (not similiarity search)
+  if (inputParams.has('mz0')) {
+    const mzValues: string[] = [];
+    for (let i = 0; i < 6; i++) {
+      const mzKey = `mz${i}`;
+      if (inputParams.has(mzKey) && inputParams.get(mzKey)?.trim() !== '') {
+        mzValues.push(inputParams.get(mzKey) ?? '');
+      }
+    }
+    if (mzValues.length > 0) {
+      params.set('peaks', mzValues.join(','));
+    }
+  }
+  if (inputParams.has('int')) {
+    const intensity = inputParams.get('int')?.trim() ?? '50';
+    if (intensity.length > 0) {
+      params.set('intensity', intensity);
+    } else {
+      params.set('intensity', '50'); // default value
+    }
+  }
+  // instrument types
+  if (inputParams.has('inst')) {
+    const instrumentTypes = inputParams.get('inst')?.trim() ?? '';
+    if (instrumentTypes.length > 0) {
+      params.set('instrument_type', instrumentTypes);
+    }
+  }
+  // MS types
+  if (inputParams.has('ms')) {
+    const msTypes = inputParams.get('ms')?.trim() ?? '';
+    if (msTypes.length > 0) {
+      params.set('ms_type', msTypes);
+    }
+  }
+  // ion mode
+  if (inputParams.has('ion')) {
+    const ionMode = inputParams.get('ion')?.trim() ?? '';
+    if (ionMode.length > 0) {
+      if (ionMode === '1') {
+        params.set('ion_mode', 'POSITIVE');
+      } else if (ionMode === '-1') {
+        params.set('ion_mode', 'NEGATIVE');
+      } else if (ionMode === '0') {
+        params.set('ion_mode', 'POSITIVE,NEGATIVE');
+      }
+    }
+  }
+
+  return params;
+}
+
+export { buildRecordMetadata, convertMassBank2QueryParams, getLastmodDate };

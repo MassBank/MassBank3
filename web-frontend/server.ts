@@ -7,7 +7,11 @@ import Hit from './src/types/Hit';
 import SearchResult from './src/types/SearchResult';
 import fetchData from './src/utils/request/fetchData';
 import PropertiesContextProps from './src/types/PropertiesContextProps';
-import { buildRecordMetadata, getLastmodDate } from './server-utils.js';
+import {
+  buildRecordMetadata,
+  convertMassBank2QueryParams,
+  getLastmodDate,
+} from './server-utils.js';
 
 // Constants
 const port = 3000;
@@ -247,14 +251,6 @@ baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
 // This is a workaround for the old MassBank frontend which used Result.jsp
 // to display search results. Redirect of requests to the new frontend search page.
 baseRouter.get(/\/(R|r)esult\.jsp/, (req: Request, res: Response) => {
-  // console.log('Result.jsp request:', req.originalUrl);
-  // console.log(
-  //   'Query parameters:',
-  //   req.query,
-  //   ' -> ',
-  //   Object.keys(req.query).length,
-  // );
-
   try {
     const redirectUrl = frontendUrl + frontendBaseUrl + '/search';
     // Redirect to the frontend search page with the query parameter
@@ -265,22 +261,11 @@ baseRouter.get(/\/(R|r)esult\.jsp/, (req: Request, res: Response) => {
     const inputParams = new URLSearchParams(
       req.query as Record<string, string>,
     );
-    const params = new URLSearchParams();
-    // Map the old Result.jsp parameters to the new search parameters
-    if (inputParams.has('compound')) {
-      params.set('compound_name', inputParams.get('compound') ?? '');
-    }
-
-    // console.log(
-    //   'Redirecting to:',
-    //   redirectUrl,
-    //   'with parameters:',
-    //   params.toString(),
-    //   ' -> ',
-    //   redirectUrl + '?' + params.toString(),
-    // );
-
-    res.redirect(301, redirectUrl + '?' + params.toString());
+    const params = convertMassBank2QueryParams(inputParams);
+    res.redirect(
+      301,
+      params.size > 0 ? redirectUrl + '?' + params.toString() : redirectUrl,
+    );
   } catch (e) {
     vite?.ssrFixStacktrace(e);
     console.log(e.stack);
