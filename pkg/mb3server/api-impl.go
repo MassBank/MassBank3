@@ -550,11 +550,11 @@ func GetVersion() (string, error) {
 
 	content, err := os.ReadFile("version.txt")
 	if err != nil {
-		return "", err
+		return "v1.0.0 (default)", nil
 	}
 	version := strings.TrimSpace(string(content))
 	if version == "" {
-		return "v3.0.0", nil
+		return "v1.0.0 (default)", nil
 	}
 	return version, nil
 }
