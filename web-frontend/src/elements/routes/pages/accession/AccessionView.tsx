@@ -1,13 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import RecordView from '../../../record/RecordView';
 import Record from '../../../../types/record/Record';
-import { Layout, Spin } from 'antd';
+import { Spin } from 'antd';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
-import { Content, Header } from 'antd/es/layout/layout';
-import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
+import { Content } from 'antd/es/layout/layout';
 import { useSearchParams } from 'react-router-dom';
 import { usePropertiesContext } from '../../../../context/properties/properties';
-import accessionSearchInputFieldHeight from '../../../../constants/accessionSearchInputFieldHeight';
 import getRecord from '../../../../utils/request/fetchRecord';
 
 function AccessionView() {
@@ -42,11 +40,7 @@ function AccessionView() {
   const recordView = useMemo(
     () =>
       record ? (
-        <RecordView
-          record={record}
-          width={width}
-          height={height - accessionSearchInputFieldHeight}
-        />
+        <RecordView record={record} width={width} height={height} />
       ) : requestedAccession !== '' ? (
         <p style={{ fontWeight: 'bolder', fontSize: 'larger' }}>
           No database entry found for "{requestedAccession}"
@@ -57,36 +51,20 @@ function AccessionView() {
 
   return useMemo(
     () => (
-      <Layout ref={ref} style={{ width: '100%', height: '100%' }}>
-        <Header
-          style={{
-            width: '100%',
-            height: accessionSearchInputFieldHeight,
-            padding: 0,
-          }}
-        >
-          <AccessionSearchInputField
-            accession={accession ?? ''}
-            style={{
-              height: accessionSearchInputFieldHeight,
-              backgroundColor: 'rgb(223, 223, 223)',
-            }}
-          />
-        </Header>
-        <Content
-          style={{
-            width: '100%',
-            height: height - accessionSearchInputFieldHeight,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          {isRequesting ? <Spin size="large" /> : recordView}
-        </Content>
-      </Layout>
+      <Content
+        ref={ref}
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {isRequesting ? <Spin size="large" /> : recordView}
+      </Content>
     ),
-    [accession, height, isRequesting, recordView],
+    [isRequesting, recordView],
   );
 }
 

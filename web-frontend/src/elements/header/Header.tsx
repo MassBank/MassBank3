@@ -7,6 +7,7 @@ import { useLocation } from 'react-router-dom';
 import { usePropertiesContext } from '../../context/properties/properties';
 import { CSSProperties, useMemo } from 'react';
 import logo from '../../assets/logo.svg';
+import AccessionSearchInputField from '../common/AccessionSearchInputField';
 
 const backgroundColor: CSSProperties['backgroundColor'] = 'rgb(223, 223, 223)';
 
@@ -34,8 +35,7 @@ function Header({ height }: InputProps) {
             height:
               typeof height === 'number' ? height - 5 : `calc(${height} - 5px)`,
             backgroundColor,
-            marginLeft: 10,
-            marginRight: 10,
+            marginRight: 5,
           }}
         >
           <a href={baseUrl + '/'} target="_self">
@@ -76,14 +76,12 @@ function Header({ height }: InputProps) {
                 key={path + '-li'}
                 style={{
                   color: path === location.pathname ? 'blue' : 'black',
-                  fontWeight: path === location.pathname ? 600 : 'inherit',
+                  fontWeight: path === location.pathname ? 550 : 'inherit',
                   height:
                     typeof height === 'number'
                       ? height - 5
                       : `calc(${height} - 5px)`,
                   backgroundColor,
-                  marginLeft: 10,
-                  marginRight: 10,
                 }}
               >
                 <a href={path} target="_self">
@@ -92,7 +90,22 @@ function Header({ height }: InputProps) {
               </Button>
             ),
           } as MenuItem;
-        }),
+        })
+        .concat({
+          key: 'accession-search-field',
+          style: { cursor: 'default' },
+          label: (
+            <AccessionSearchInputField
+              disableLabel
+              placeholderText="Search by Accession ID"
+              inputStyle={{ width: '300px' }}
+              style={{
+                width: '320px',
+                backgroundColor: 'transparent',
+              }}
+            />
+          ),
+        }) as MenuItem[],
     [baseUrl, height, location.pathname],
   );
 

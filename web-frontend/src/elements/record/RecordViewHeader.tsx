@@ -52,6 +52,19 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
   return useMemo(() => {
     const dataSource: HeaderTableType[] = [];
     dataSource.push({
+      key: 'record-view-header-table-accession',
+      label: 'Accession ID',
+      value: (
+        <ExportableContent
+          component={<LabelWrapper value={record.accession} />}
+          mode="copy"
+          onClick={() => handleOnCopy('Accession', record.accession)}
+          title="Copy Accession to clipboard"
+        />
+      ),
+    });
+
+    dataSource.push({
       key: 'record-view-header-table-names',
       label: 'Names',
       value: (
