@@ -1,4 +1,11 @@
-import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  KeyboardEvent,
+  MouseEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { StructureEditor } from 'react-ocl/full';
 import { Molecule } from 'openchemlib';
 
@@ -14,9 +21,18 @@ interface InputProps {
   initialSMILES?: string;
   width?: number;
   height?: number;
+  insertPlaceholder?: (
+    e: KeyboardEvent<HTMLElement>,
+    values: SearchFields,
+  ) => void;
 }
 
-function StructuralEditor({ initialSMILES, width, height }: InputProps) {
+function StructuralEditor({
+  initialSMILES,
+  width,
+  height,
+  insertPlaceholder = () => {},
+}: InputProps) {
   const formInstance = Form.useFormInstance<SearchFields>();
   const { getFieldValue, setFieldValue } = formInstance;
 
@@ -142,16 +158,24 @@ function StructuralEditor({ initialSMILES, width, height }: InputProps) {
             />
           }
           value={smiles}
-          placeholder='e.g. "C=O"'
+          placeholder="C[C@H]([C@H]([C@@H]([C@H]1O)O)O)O[C@H]1OC1=C(c(cc2O)ccc2O)Oc2cc(O)cc(O)c2C1=O"
           style={{
             width: '100%',
             backgroundColor: 'transparent',
           }}
           allowClear
+          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+            insertPlaceholder(e, {
+              compoundSearchFilterOptions: {
+                structure:
+                  'C[C@H]([C@H]([C@@H]([C@H]1O)O)O)O[C@H]1OC1=C(c(cc2O)ccc2O)Oc2cc(O)cc(O)c2C1=O',
+              },
+            })
+          }
         />
       </Form.Item>
     ),
-    [errorSmiles, handleOnClickSetSmiles, smiles],
+    [errorSmiles, handleOnClickSetSmiles, insertPlaceholder, smiles],
   );
 
   const onDrop = useCallback(

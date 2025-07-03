@@ -14,6 +14,7 @@ import StructuralEditor from '../../../basic/StructuralEditor';
 import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterOtions';
 import defaultSearchFieldValues from '../../../../constants/defaultSearchFieldValues';
 import { ItemType, MenuItemType } from 'antd/es/menu/interface';
+import { KeyboardEvent } from 'react';
 
 const peakListPattern =
   /^(\d+(\.\d+){0,1} \d+(\.\d+){0,1}( \d+(\.\d+){0,1}){0,1})(\n\d+(\.\d+){0,1} \d+(\.\d+){0,1}( \d+(\.\d+){0,1}){0,1})*$/;
@@ -21,11 +22,16 @@ const peakListPattern =
 type InputProps = {
   propertyFilterOptions?: ContentFilterOptions | undefined;
   initialStructure?: string;
+  insertPlaceholder?: (
+    e: KeyboardEvent<HTMLElement>,
+    values: SearchFields,
+  ) => void;
 };
 
 function SearchPanelMenuItems({
   propertyFilterOptions = defaultSearchFieldValues.propertyFilterOptions,
   initialStructure = '',
+  insertPlaceholder = () => {},
 }: InputProps) {
   const buildPeakBasedSearchFields = (type: 'peaks' | 'neutralLoss') => [
     {
@@ -125,7 +131,18 @@ function SearchPanelMenuItems({
               labelCol={{ span: 8 }}
               wrapperCol={{ span: 16 }}
             >
-              <Input type="text" placeholder="Rutin" allowClear />
+              <Input
+                type="text"
+                placeholder="Rutin"
+                allowClear
+                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+                  insertPlaceholder(e, {
+                    compoundSearchFilterOptions: {
+                      compoundName: 'Rutin',
+                    },
+                  })
+                }
+              />
             </Form.Item>
           ),
         },
@@ -152,7 +169,18 @@ function SearchPanelMenuItems({
               labelCol={{ span: 8 }}
               wrapperCol={{ span: 16 }}
             >
-              <Input type="text" placeholder="Natural Product" allowClear />
+              <Input
+                type="text"
+                placeholder="Natural Product"
+                allowClear
+                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+                  insertPlaceholder(e, {
+                    compoundSearchFilterOptions: {
+                      compoundClass: 'Natural Product',
+                    },
+                  })
+                }
+              />
             </Form.Item>
           ),
         },
@@ -179,7 +207,18 @@ function SearchPanelMenuItems({
               labelCol={{ span: 8 }}
               wrapperCol={{ span: 16 }}
             >
-              <Input type="text" placeholder="C27H30O16" allowClear />
+              <Input
+                type="text"
+                placeholder="C27H30O16"
+                allowClear
+                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+                  insertPlaceholder(e, {
+                    compoundSearchFilterOptions: {
+                      formula: 'C27H30O16',
+                    },
+                  })
+                }
+              />
             </Form.Item>
           ),
         },
@@ -206,7 +245,18 @@ function SearchPanelMenuItems({
               labelCol={{ span: 8 }}
               wrapperCol={{ span: 16 }}
             >
-              <InputNumber placeholder="610.15338" step={0.01} min={0} />
+              <InputNumber
+                placeholder="610.15338"
+                step={0.01}
+                min={0}
+                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+                  insertPlaceholder(e, {
+                    compoundSearchFilterOptions: {
+                      exactMass: 610.15338,
+                    },
+                  })
+                }
+              />
             </Form.Item>
           ),
         },
@@ -262,6 +312,13 @@ function SearchPanelMenuItems({
                     type="text"
                     placeholder="IKGXIBQEEMLURG-NVPNHPEKSA-N"
                     allowClear
+                    onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+                      insertPlaceholder(e, {
+                        compoundSearchFilterOptions: {
+                          inchi: 'IKGXIBQEEMLURG-NVPNHPEKSA-N',
+                        },
+                      })
+                    }
                   />
                 </Form.Item>
               ),
@@ -281,7 +338,12 @@ function SearchPanelMenuItems({
                 marginLeft: 0,
                 overflow: 'scroll',
               },
-              label: <StructuralEditor initialSMILES={initialStructure} />,
+              label: (
+                <StructuralEditor
+                  initialSMILES={initialStructure}
+                  insertPlaceholder={insertPlaceholder}
+                />
+              ),
             },
           ],
         },
@@ -324,9 +386,19 @@ function SearchPanelMenuItems({
                   wrapperCol={{ span: 17 }}
                 >
                   <Input.TextArea
-                    placeholder="m/z and intensity, delimited by a space. &#10;&#10;147.063 11&#10;303.05 999&#10;449.108 64&#10;465.102 588&#10;611.161 670"
+                    placeholder="m/z and intensity, delimited by a space. &#10;&#10;147.063 11&#10;303.05 999&#10;449.108 64&#10;465.102 587&#10;611.161 669"
                     autoSize={{ minRows: 5 }}
                     allowClear
+                    onKeyDown={(e: KeyboardEvent<HTMLTextAreaElement>) =>
+                      insertPlaceholder(e, {
+                        spectralSearchFilterOptions: {
+                          similarity: {
+                            peakList:
+                              '147.063 11\n303.05 999\n449.108 64\n465.102 587\n611.161 669',
+                          },
+                        },
+                      })
+                    }
                   />
                 </Form.Item>
               ),
@@ -399,6 +471,14 @@ function SearchPanelMenuItems({
                     type="text"
                     placeholder="splash10-0wmi-0009506000-98ca7f7c8f3072af4481"
                     allowClear
+                    onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+                      insertPlaceholder(e, {
+                        spectralSearchFilterOptions: {
+                          splash:
+                            'splash10-0wmi-0009506000-98ca7f7c8f3072af4481',
+                        },
+                      })
+                    }
                   />
                 </Form.Item>
               ),

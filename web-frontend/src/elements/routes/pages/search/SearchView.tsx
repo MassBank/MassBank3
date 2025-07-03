@@ -1,6 +1,13 @@
 import './SearchView.scss';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  KeyboardEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import Peak from '../../../../types/peak/Peak';
 
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
@@ -201,6 +208,18 @@ function SearchView() {
     );
   }, []);
 
+  const handleOnInsertPlaceholder = useCallback(
+    (e: KeyboardEvent<HTMLElement>, values: SearchFields) => {
+      if (e.ctrlKey && e.key === ' ') {
+        e.preventDefault();
+        e.stopPropagation();
+
+        setInitialValues(values);
+      }
+    },
+    [],
+  );
+
   const searchPanel = useMemo(
     () => (
       <CommonSearchPanel
@@ -208,6 +227,7 @@ function SearchView() {
           propertyFilterOptions,
           initialStructure:
             initialValues?.compoundSearchFilterOptions?.structure ?? '',
+          insertPlaceholder: handleOnInsertPlaceholder,
         })}
         initialValues={
           initialValues ??
@@ -223,6 +243,7 @@ function SearchView() {
     ),
     [
       handleOnCollapse,
+      handleOnInsertPlaceholder,
       handleOnSubmit,
       height,
       initialValues,
