@@ -1,5 +1,3 @@
-import './AccessionSearchInputField.scss';
-
 import { Button, Input } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import {
