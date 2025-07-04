@@ -1,8 +1,9 @@
-import { Form, Input, InputNumber } from 'antd';
+import { Form, FormItemProps, Input, InputNumber } from 'antd';
 import {
   BarChartOutlined,
   BarcodeOutlined,
   DatabaseOutlined,
+  QuestionCircleTwoTone,
   ShareAltOutlined,
   SignatureOutlined,
   SlidersOutlined,
@@ -15,8 +16,11 @@ import ContentFilterOptions from '../../../../types/filterOptions/ContentFilterO
 import defaultSearchFieldValues from '../../../../constants/defaultSearchFieldValues';
 import { ItemType, MenuItemType } from 'antd/es/menu/interface';
 import { KeyboardEvent } from 'react';
+import Tooltip from '../../../basic/Tooltip';
+import { Content } from 'antd/es/layout/layout';
+import defaultTooltipText from '../../../../constants/defaultTooltipText';
 
-const peakListPattern =
+const peakListPattern: RegExp =
   /^(\d+(\.\d+){0,1} \d+(\.\d+){0,1}( \d+(\.\d+){0,1}){0,1})(\n\d+(\.\d+){0,1} \d+(\.\d+){0,1}( \d+(\.\d+){0,1}){0,1})*$/;
 
 type InputProps = {
@@ -33,6 +37,55 @@ function SearchPanelMenuItems({
   initialStructure = '',
   insertPlaceholder = () => {},
 }: InputProps) {
+  const buildFormItemWithTootip = (
+    label: string | undefined,
+    name: FormItemProps<SearchFields>['name'],
+    required: boolean,
+    pattern: RegExp | undefined,
+    labelColSpan: number,
+    wrapperColSpan: number,
+    children: React.ReactNode,
+    tooltipText: string | undefined,
+  ) => (
+    <Content
+      style={{
+        width: '100%',
+        height: '100%',
+        textAlign: 'center',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Content style={{ width: 'calc(100% - 25px)' }}>
+        <Form.Item<SearchFields>
+          label={label}
+          name={name}
+          rules={[pattern ? { required, pattern } : { required }]}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+          labelAlign="left"
+          labelCol={{ span: labelColSpan }}
+          wrapperCol={{ span: wrapperColSpan }}
+        >
+          {children}
+        </Form.Item>
+      </Content>
+      <Tooltip title={tooltipText}>
+        <QuestionCircleTwoTone
+          style={{
+            width: '25px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        />
+      </Tooltip>
+    </Content>
+  );
+
   const buildPeakBasedSearchFields = (type: 'peaks' | 'neutralLoss') => [
     {
       key: type + '_panel',
@@ -56,21 +109,32 @@ function SearchPanelMenuItems({
         alignItems: 'center',
         marginLeft: 0,
       },
-      label: (
-        <Form.Item<SearchFields>
-          label="Mass Tolerance"
-          name={['spectralSearchFilterOptions', type, 'massTolerance']}
-          rules={[{ required: false }]}
-          style={{
-            width: '100%',
-            height: '100%',
-          }}
-          labelAlign="left"
-          labelCol={{ span: 7 }}
-          wrapperCol={{ span: 17 }}
-        >
-          <InputNumber placeholder="0.1" step={0.01} min={0} max={1} />
-        </Form.Item>
+      label: buildFormItemWithTootip(
+        'Tolerance',
+        ['spectralSearchFilterOptions', type, 'massTolerance'],
+        false,
+        undefined,
+        7,
+        17,
+        <InputNumber
+          placeholder="0.1"
+          step={0.01}
+          min={0}
+          max={1}
+          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+            insertPlaceholder(e, {
+              spectralSearchFilterOptions: {
+                [type]: {
+                  massTolerance: 0.1,
+                },
+              },
+            })
+          }
+          style={{ width: '100%' }}
+        />,
+        `This parameter is used as mass tolerance value (+/-) during the search by ${type === 'peaks' ? 'peak masses' : 'peak differences (neutral losses)'}, e.g. 0.1.` +
+          ' ' +
+          defaultTooltipText,
       ),
     },
     {
@@ -83,21 +147,31 @@ function SearchPanelMenuItems({
         alignItems: 'center',
         marginLeft: 0,
       },
-      label: (
-        <Form.Item<SearchFields>
-          label="Min. Intensity"
-          name={['spectralSearchFilterOptions', type, 'intensity']}
-          rules={[{ required: false }]}
-          style={{
-            width: '100%',
-            height: '100%',
-          }}
-          labelAlign="left"
-          labelCol={{ span: 7 }}
-          wrapperCol={{ span: 17 }}
-        >
-          <InputNumber placeholder="50" step={5} min={0} />
-        </Form.Item>
+      label: buildFormItemWithTootip(
+        'Min. Intensity',
+        ['spectralSearchFilterOptions', type, 'intensity'],
+        false,
+        undefined,
+        7,
+        17,
+        <InputNumber
+          placeholder="50"
+          step={5}
+          min={0}
+          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+            insertPlaceholder(e, {
+              spectralSearchFilterOptions: {
+                [type]: {
+                  intensity: 50,
+                },
+              },
+            })
+          }
+          style={{ width: '100%' }}
+        />,
+        `This parameter forms the lower peak intensity limit during the search by ${type === 'peaks' ? 'peak masses' : 'peak differences (neutral losses)'}, e.g. 50.` +
+          ' ' +
+          defaultTooltipText,
       ),
     },
   ];
@@ -118,32 +192,28 @@ function SearchPanelMenuItems({
             alignItems: 'center',
             marginLeft: 0,
           },
-          label: (
-            <Form.Item<SearchFields>
-              label="Name"
-              name={['compoundSearchFilterOptions', 'compoundName']}
-              rules={[{ required: false }]}
-              style={{
-                width: '100%',
-                height: '100%',
-              }}
-              labelAlign="left"
-              labelCol={{ span: 8 }}
-              wrapperCol={{ span: 16 }}
-            >
-              <Input
-                type="text"
-                placeholder="Rutin"
-                allowClear
-                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
-                  insertPlaceholder(e, {
-                    compoundSearchFilterOptions: {
-                      compoundName: 'Rutin',
-                    },
-                  })
-                }
-              />
-            </Form.Item>
+          label: buildFormItemWithTootip(
+            'Name',
+            ['compoundSearchFilterOptions', 'compoundName'],
+            false,
+            undefined,
+            8,
+            16,
+            <Input
+              type="text"
+              placeholder="Rutin"
+              allowClear
+              onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+                insertPlaceholder(e, {
+                  compoundSearchFilterOptions: {
+                    compoundName: 'Rutin',
+                  },
+                })
+              }
+            />,
+            'Search by the name of the compound (e.g. Rutin). This value is used during a substring search.' +
+              ' ' +
+              defaultTooltipText,
           ),
         },
         {
@@ -156,32 +226,28 @@ function SearchPanelMenuItems({
             alignItems: 'center',
             marginLeft: 0,
           },
-          label: (
-            <Form.Item<SearchFields>
-              label="Class"
-              name={['compoundSearchFilterOptions', 'compoundClass']}
-              rules={[{ required: false }]}
-              style={{
-                width: '100%',
-                height: '100%',
-              }}
-              labelAlign="left"
-              labelCol={{ span: 8 }}
-              wrapperCol={{ span: 16 }}
-            >
-              <Input
-                type="text"
-                placeholder="Natural Product"
-                allowClear
-                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
-                  insertPlaceholder(e, {
-                    compoundSearchFilterOptions: {
-                      compoundClass: 'Natural Product',
-                    },
-                  })
-                }
-              />
-            </Form.Item>
+          label: buildFormItemWithTootip(
+            'Class',
+            ['compoundSearchFilterOptions', 'compoundClass'],
+            false,
+            undefined,
+            8,
+            16,
+            <Input
+              type="text"
+              placeholder="Flavonoid glycosides"
+              allowClear
+              onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+                insertPlaceholder(e, {
+                  compoundSearchFilterOptions: {
+                    compoundClass: 'Flavonoid glycosides',
+                  },
+                })
+              }
+            />,
+            'Search by the class of the compound. This can either be based on free text (e.g. Natural product) or an ChemOnt class name or ID (e.g. Flavonoid glycosides, CHEMONTID:0001111). This value is used during a substring search.' +
+              ' ' +
+              defaultTooltipText,
           ),
         },
         {
@@ -194,32 +260,28 @@ function SearchPanelMenuItems({
             alignItems: 'center',
             marginLeft: 0,
           },
-          label: (
-            <Form.Item<SearchFields>
-              label="Formula"
-              name={['compoundSearchFilterOptions', 'formula']}
-              rules={[{ required: false }]}
-              style={{
-                width: '100%',
-                height: '100%',
-              }}
-              labelAlign="left"
-              labelCol={{ span: 8 }}
-              wrapperCol={{ span: 16 }}
-            >
-              <Input
-                type="text"
-                placeholder="C27H30O16"
-                allowClear
-                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
-                  insertPlaceholder(e, {
-                    compoundSearchFilterOptions: {
-                      formula: 'C27H30O16',
-                    },
-                  })
-                }
-              />
-            </Form.Item>
+          label: buildFormItemWithTootip(
+            'Formula',
+            ['compoundSearchFilterOptions', 'formula'],
+            false,
+            undefined,
+            8,
+            16,
+            <Input
+              type="text"
+              placeholder="C27H30O16"
+              allowClear
+              onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+                insertPlaceholder(e, {
+                  compoundSearchFilterOptions: {
+                    formula: 'C27H30O16',
+                  },
+                })
+              }
+            />,
+            'Search by a molecular formula of a compound, e.g. C27H30O16.' +
+              ' ' +
+              defaultTooltipText,
           ),
         },
         {
@@ -232,32 +294,29 @@ function SearchPanelMenuItems({
             alignItems: 'center',
             marginLeft: 0,
           },
-          label: (
-            <Form.Item<SearchFields>
-              label="Exact Mass"
-              name={['compoundSearchFilterOptions', 'exactMass']}
-              rules={[{ required: false }]}
-              style={{
-                width: '100%',
-                height: '100%',
-              }}
-              labelAlign="left"
-              labelCol={{ span: 8 }}
-              wrapperCol={{ span: 16 }}
-            >
-              <InputNumber
-                placeholder="610.15338"
-                step={0.01}
-                min={0}
-                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
-                  insertPlaceholder(e, {
-                    compoundSearchFilterOptions: {
-                      exactMass: 610.15338,
-                    },
-                  })
-                }
-              />
-            </Form.Item>
+          label: buildFormItemWithTootip(
+            'Exact Mass',
+            ['compoundSearchFilterOptions', 'exactMass'],
+            false,
+            undefined,
+            8,
+            16,
+            <InputNumber
+              placeholder="610.15338"
+              step={0.01}
+              min={0}
+              onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+                insertPlaceholder(e, {
+                  compoundSearchFilterOptions: {
+                    exactMass: 610.15338,
+                  },
+                })
+              }
+              style={{ width: '100%' }}
+            />,
+            'Search by a molecular mass of a compound, e.g. 610.15338.' +
+              ' ' +
+              defaultTooltipText,
           ),
         },
         {
@@ -270,21 +329,29 @@ function SearchPanelMenuItems({
             alignItems: 'center',
             marginLeft: 0,
           },
-          label: (
-            <Form.Item<SearchFields>
-              label="Mass Tolerance"
-              name={['compoundSearchFilterOptions', 'massTolerance']}
-              rules={[{ required: false }]}
-              style={{
-                width: '100%',
-                height: '100%',
-              }}
-              labelAlign="left"
-              labelCol={{ span: 8 }}
-              wrapperCol={{ span: 16 }}
-            >
-              <InputNumber placeholder="0.1" step={0.01} min={0} />
-            </Form.Item>
+          label: buildFormItemWithTootip(
+            'Mass Tolerance',
+            ['compoundSearchFilterOptions', 'massTolerance'],
+            false,
+            undefined,
+            8,
+            16,
+            <InputNumber
+              placeholder="0.1"
+              step={0.01}
+              min={0}
+              onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+                insertPlaceholder(e, {
+                  compoundSearchFilterOptions: {
+                    massTolerance: 0.1,
+                  },
+                })
+              }
+              style={{ width: '100%' }}
+            />,
+            'This parameter is used as tolerance value (+/-) during the search by a molecular mass, e.g. 0.1.' +
+              ' ' +
+              defaultTooltipText,
           ),
         },
         {
@@ -299,28 +366,28 @@ function SearchPanelMenuItems({
                 height: '100%',
                 marginLeft: 0,
               },
-              label: (
-                <Form.Item<SearchFields>
-                  name={['compoundSearchFilterOptions', 'inchi']}
-                  rules={[{ required: false }]}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                  }}
-                >
-                  <Input
-                    type="text"
-                    placeholder="IKGXIBQEEMLURG-NVPNHPEKSA-N"
-                    allowClear
-                    onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
-                      insertPlaceholder(e, {
-                        compoundSearchFilterOptions: {
-                          inchi: 'IKGXIBQEEMLURG-NVPNHPEKSA-N',
-                        },
-                      })
-                    }
-                  />
-                </Form.Item>
+              label: buildFormItemWithTootip(
+                undefined,
+                ['compoundSearchFilterOptions', 'inchi'],
+                false,
+                undefined,
+                0,
+                24,
+                <Input
+                  type="text"
+                  placeholder="IKGXIBQEEMLURG-NVPNHPEKSA-N"
+                  allowClear
+                  onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+                    insertPlaceholder(e, {
+                      compoundSearchFilterOptions: {
+                        inchi: 'IKGXIBQEEMLURG-NVPNHPEKSA-N',
+                      },
+                    })
+                  }
+                />,
+                'Search by InChI or InChIKey of a compound (e.g. IKGXIBQEEMLURG-NVPNHPEKSA-N).' +
+                  ' ' +
+                  defaultTooltipText,
               ),
             },
           ],
@@ -334,7 +401,7 @@ function SearchPanelMenuItems({
               key: 'structure',
               style: {
                 width: '100%',
-                height: 700,
+                height: 750,
                 marginLeft: 0,
                 overflow: 'scroll',
               },
@@ -368,39 +435,31 @@ function SearchPanelMenuItems({
                 alignItems: 'center',
                 marginLeft: 0,
               },
-              label: (
-                <Form.Item<SearchFields>
-                  label="Peak List"
-                  name={[
-                    'spectralSearchFilterOptions',
-                    'similarity',
-                    'peakList',
-                  ]}
-                  rules={[{ required: false, pattern: peakListPattern }]}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                  }}
-                  labelAlign="left"
-                  labelCol={{ span: 7 }}
-                  wrapperCol={{ span: 17 }}
-                >
-                  <Input.TextArea
-                    placeholder="m/z and intensity, delimited by a space. &#10;&#10;147.063 11&#10;303.05 999&#10;449.108 64&#10;465.102 587&#10;611.161 669"
-                    autoSize={{ minRows: 5 }}
-                    allowClear
-                    onKeyDown={(e: KeyboardEvent<HTMLTextAreaElement>) =>
-                      insertPlaceholder(e, {
-                        spectralSearchFilterOptions: {
-                          similarity: {
-                            peakList:
-                              '147.063 11\n303.05 999\n449.108 64\n465.102 587\n611.161 669',
-                          },
+              label: buildFormItemWithTootip(
+                'Peak List',
+                ['spectralSearchFilterOptions', 'similarity', 'peakList'],
+                false,
+                peakListPattern,
+                7,
+                17,
+                <Input.TextArea
+                  placeholder="147.063 11&#10;303.05 999&#10;449.108 64&#10;465.102 587&#10;611.161 669"
+                  autoSize={{ minRows: 5 }}
+                  allowClear
+                  onKeyDown={(e: KeyboardEvent<HTMLTextAreaElement>) =>
+                    insertPlaceholder(e, {
+                      spectralSearchFilterOptions: {
+                        similarity: {
+                          peakList:
+                            '147.063 11\n303.05 999\n449.108 64\n465.102 587\n611.161 669',
                         },
-                      })
-                    }
-                  />
-                </Form.Item>
+                      },
+                    })
+                  }
+                />,
+                'Enter m/z and intensity values, delimited by a space, to be used during spectral similarity search.' +
+                  ' ' +
+                  defaultTooltipText,
               ),
             },
             {
@@ -413,25 +472,32 @@ function SearchPanelMenuItems({
                 alignItems: 'center',
                 marginLeft: 0,
               },
-              label: (
-                <Form.Item<SearchFields>
-                  label="Score Threshold"
-                  name={[
-                    'spectralSearchFilterOptions',
-                    'similarity',
-                    'threshold',
-                  ]}
-                  rules={[{ required: false }]}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                  }}
-                  labelAlign="left"
-                  labelCol={{ span: 7 }}
-                  wrapperCol={{ span: 17 }}
-                >
-                  <InputNumber placeholder="0.8" step={0.05} min={0} max={1} />
-                </Form.Item>
+              label: buildFormItemWithTootip(
+                'Threshold',
+                ['spectralSearchFilterOptions', 'similarity', 'threshold'],
+                false,
+                undefined,
+                7,
+                17,
+                <InputNumber
+                  placeholder="0.8"
+                  step={0.05}
+                  min={0}
+                  max={1}
+                  onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+                    insertPlaceholder(e, {
+                      spectralSearchFilterOptions: {
+                        similarity: {
+                          threshold: 0.8,
+                        },
+                      },
+                    })
+                  }
+                  style={{ width: '100%' }}
+                />,
+                'This parameter limits the number of results by setting this similarity score threshold value. It ranges from 0 to 1 (lowest to highest similarity).' +
+                  ' ' +
+                  defaultTooltipText,
               ),
             },
           ],
@@ -458,29 +524,28 @@ function SearchPanelMenuItems({
                 height: '100%',
                 marginLeft: 0,
               },
-              label: (
-                <Form.Item<SearchFields>
-                  name={['spectralSearchFilterOptions', 'splash']}
-                  rules={[{ required: false }]}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                  }}
-                >
-                  <Input
-                    type="text"
-                    placeholder="splash10-0wmi-0009506000-98ca7f7c8f3072af4481"
-                    allowClear
-                    onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
-                      insertPlaceholder(e, {
-                        spectralSearchFilterOptions: {
-                          splash:
-                            'splash10-0wmi-0009506000-98ca7f7c8f3072af4481',
-                        },
-                      })
-                    }
-                  />
-                </Form.Item>
+              label: buildFormItemWithTootip(
+                undefined,
+                ['spectralSearchFilterOptions', 'splash'],
+                false,
+                undefined,
+                0,
+                24,
+                <Input
+                  type="text"
+                  placeholder="splash10-0wmi-0009506000-98ca7f7c8f3072af4481"
+                  allowClear
+                  onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+                    insertPlaceholder(e, {
+                      spectralSearchFilterOptions: {
+                        splash: 'splash10-0wmi-0009506000-98ca7f7c8f3072af4481',
+                      },
+                    })
+                  }
+                />,
+                "Search by SPLASH code of a record's mass spectrum (e.g. splash10-0wmi-0009506000-98ca7f7c8f3072af4481)." +
+                  ' ' +
+                  defaultTooltipText,
               ),
             },
           ],

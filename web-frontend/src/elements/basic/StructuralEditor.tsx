@@ -9,13 +9,16 @@ import {
 import { StructureEditor } from 'react-ocl/full';
 import { Molecule } from 'openchemlib';
 
-import { UploadOutlined } from '@ant-design/icons';
+import { QuestionCircleTwoTone, UploadOutlined } from '@ant-design/icons';
 import { Form, UploadProps } from 'antd';
-import { Button, Col, Divider, Input, Row } from 'antd';
+import { Button, Divider, Input } from 'antd';
 import { RcFile } from 'antd/es/upload';
 import { Content } from 'antd/es/layout/layout';
 import SearchFields from '../../types/filterOptions/SearchFields';
 import Dragger from 'antd/es/upload/Dragger';
+import Tooltip from './Tooltip';
+import Text from 'antd/es/typography/Text';
+import defaultTooltipText from '../../constants/defaultTooltipText';
 
 interface InputProps {
   initialSMILES?: string;
@@ -116,64 +119,92 @@ function StructuralEditor({
 
   const input = useMemo(
     () => (
-      <Form.Item
-        name={['compoundSearchFilterOptions', 'structure']}
+      <Content
         style={{
           width: '100%',
           height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
-        rules={[
-          {
-            required: false,
-            validator: async (_, value) => {
-              if (value && value.trim().length > 0) {
-                try {
-                  Molecule.fromSmiles(value);
-                  setErrorSmiles(undefined);
-                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                } catch (err) {
-                  setErrorSmiles('Invalid SMILES');
-                  return Promise.reject(new Error('Invalid SMILES'));
-                }
-              }
-              return Promise.resolve();
-            },
-          },
-        ]}
       >
-        <Input
-          type="text"
-          addonBefore="SMILES:"
-          addonAfter={
-            <Button
-              children={'Set'}
-              onClick={handleOnClickSetSmiles}
+        <Content style={{ width: 'calc(100% - 25px)' }}>
+          <Form.Item<SearchFields>
+            name={['compoundSearchFilterOptions', 'structure']}
+            style={{
+              width: '100%',
+              height: '100%',
+            }}
+            rules={[
+              {
+                required: false,
+                validator: async (_, value) => {
+                  if (value && value.trim().length > 0) {
+                    try {
+                      Molecule.fromSmiles(value);
+                      setErrorSmiles(undefined);
+                      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    } catch (err) {
+                      setErrorSmiles('Invalid SMILES');
+                      return Promise.reject(new Error('Invalid SMILES'));
+                    }
+                  }
+                  return Promise.resolve();
+                },
+              },
+            ]}
+          >
+            <Input
+              type="text"
+              addonBefore="SMILES:"
+              addonAfter={
+                <Button
+                  children={'Set'}
+                  onClick={handleOnClickSetSmiles}
+                  style={{
+                    width: '100%',
+                    height: 30,
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                  }}
+                  disabled={errorSmiles !== undefined}
+                />
+              }
+              value={smiles}
+              placeholder="C[C@H]([C@H]([C@@H]([C@H]1O)O)O)O[C@H]1OC1=C(c(cc2O)ccc2O)Oc2cc(O)cc(O)c2C1=O"
               style={{
                 width: '100%',
-                height: 30,
                 backgroundColor: 'transparent',
-                border: 'none',
               }}
-              disabled={errorSmiles !== undefined}
+              allowClear
+              onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+                insertPlaceholder(e, {
+                  compoundSearchFilterOptions: {
+                    structure:
+                      'C[C@H]([C@H]([C@@H]([C@H]1O)O)O)O[C@H]1OC1=C(c(cc2O)ccc2O)Oc2cc(O)cc(O)c2C1=O',
+                  },
+                })
+              }
             />
+          </Form.Item>
+        </Content>
+        <Tooltip
+          title={
+            'Enter a SMILES to be used during a substructure search.' +
+            ' ' +
+            defaultTooltipText
           }
-          value={smiles}
-          placeholder="C[C@H]([C@H]([C@@H]([C@H]1O)O)O)O[C@H]1OC1=C(c(cc2O)ccc2O)Oc2cc(O)cc(O)c2C1=O"
-          style={{
-            width: '100%',
-            backgroundColor: 'transparent',
-          }}
-          allowClear
-          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
-            insertPlaceholder(e, {
-              compoundSearchFilterOptions: {
-                structure:
-                  'C[C@H]([C@H]([C@@H]([C@H]1O)O)O)O[C@H]1OC1=C(c(cc2O)ccc2O)Oc2cc(O)cc(O)c2C1=O',
-              },
-            })
-          }
-        />
-      </Form.Item>
+        >
+          <QuestionCircleTwoTone
+            style={{
+              width: '25px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          />
+        </Tooltip>
+      </Content>
     ),
     [errorSmiles, handleOnClickSetSmiles, insertPlaceholder, smiles],
   );
@@ -230,10 +261,13 @@ function StructuralEditor({
   return useMemo(
     () => (
       <Content style={{ width: '100%', height: '100%' }}>
+        <Divider style={{ borderColor: 'grey', marginTop: 0 }}>
+          Draw Structure
+        </Divider>
         {structureEditor}
-        <Divider style={{ borderColor: 'grey' }}>OR</Divider>
+        <Divider style={{ borderColor: 'grey' }}>Enter SMILES</Divider>
         {input}
-        <Divider style={{ borderColor: 'grey' }}>OR</Divider>
+        <Divider style={{ borderColor: 'grey' }}>Upload MOL/SDF</Divider>
         <Content
           style={{
             width: '100%',
@@ -242,12 +276,8 @@ function StructuralEditor({
           }}
         >
           <Dragger {...props}>
-            <Row>
-              <Col span={4}>
-                <UploadOutlined />
-              </Col>
-              <Col span={20}>Upload MOL/SDF (Drag&Drop or Click)</Col>
-            </Row>
+            <UploadOutlined />
+            <Text>Drag&Drop or click here</Text>
           </Dragger>
           {errorMolfileImport && (
             <label style={{ color: 'red' }}>{errorMolfileImport}</label>

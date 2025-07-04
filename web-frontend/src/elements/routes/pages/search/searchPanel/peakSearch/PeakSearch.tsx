@@ -8,11 +8,16 @@ import {
 } from 'react';
 import PeakSearchRow from './PeakSearchRow';
 import { Button, Col, Row } from 'antd';
-import { MinusCircleFilled, PlusCircleFilled } from '@ant-design/icons';
+import {
+  MinusCircleFilled,
+  PlusCircleFilled,
+  QuestionCircleTwoTone,
+} from '@ant-design/icons';
 import SearchFields from '../../../../../../types/filterOptions/SearchFields';
 import PeakSearchPeakType from '../../../../../../types/filterOptions/PeakSearchPeakType';
 import useFormInstance from 'antd/es/form/hooks/useFormInstance';
 import { Content } from 'antd/es/layout/layout';
+import Tooltip from '../../../../../basic/Tooltip';
 
 type peaks = ['spectralSearchFilterOptions', 'peaks', 'peaks'];
 type neutralLoss = [
@@ -158,15 +163,32 @@ function PeakSearch({ type }: InputProps): JSX.Element {
           width: '100%',
           height: '100%',
           textAlign: 'center',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
-        <Row key="peak-search-header">
-          <Col span={4}>{type === 'peaks' ? 'Peak' : 'Loss'}</Col>
-          <Col span={9}>Mass</Col>
-          <Col span={4}></Col>
-          <Col span={7}>Formula</Col>
-        </Row>
-        {rows}
+        <Content style={{ width: 'calc(100% - 25px)' }}>
+          <Row key="peak-search-header">
+            <Col span={4}>{type === 'peaks' ? 'Peak' : 'Loss'}</Col>
+            <Col span={9}>Mass</Col>
+            <Col span={4}></Col>
+            <Col span={7}>Formula</Col>
+          </Row>
+          {rows}
+        </Content>
+        <Tooltip
+          title={`Search by ${type === 'peaks' ? 'specific masses' : 'peak differences (neutral losses)'}. Every row represents a single ${type === 'peaks' ? 'peak' : 'neutral loss'} and needs to be present in a database record. Masses are calculated automatically by entering a valid molecular formula (e.g. CH3) in the formula field.`}
+        >
+          <QuestionCircleTwoTone
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '25px',
+            }}
+          />
+        </Tooltip>
       </Content>
     );
   }, [handleOnAdd, handleOnDelete, peakSearchRows, type]);
