@@ -1,5 +1,5 @@
 import { Content } from 'antd/es/layout/layout';
-import { useCallback, useMemo } from 'react';
+import { KeyboardEvent, useCallback, useMemo } from 'react';
 import AccessionSearchInputField from '../../../common/AccessionSearchInputField';
 import accessionSearchInputFieldHeight from '../../../../constants/accessionSearchInputFieldHeight';
 import SearchPanelForm from '../../../common/SearchPanelForm';
@@ -17,6 +17,18 @@ function QuickSearch() {
   const [form] = useForm<SearchFields>();
   const { baseUrl } = usePropertiesContext();
   const navigate = useNavigate();
+
+  const handleOnInsertPlaceholder = useCallback(
+    (e: KeyboardEvent<HTMLElement>, values: SearchFields) => {
+      if (e.ctrlKey && e.key === ' ') {
+        e.preventDefault();
+        e.stopPropagation();
+
+        form.setFieldsValue(values);
+      }
+    },
+    [form],
+  );
 
   const handleOnSubmit = useCallback(
     async (formData: SearchFields) => {
@@ -56,13 +68,15 @@ function QuickSearch() {
         </Text>
         <SearchPanelForm
           form={form}
-          items={SearchPanelMenuItems({})}
+          items={SearchPanelMenuItems({
+            insertPlaceholder: handleOnInsertPlaceholder,
+          })}
           initialValues={defaultSearchFieldValues}
           onSubmit={handleOnSubmit}
           collapsed={false}
           collapseButtonWidth={0}
           style={{
-            width: '75%',
+            width: '80%',
             border: '1px solid lightgrey',
             borderRadius: 5,
             backgroundColor: 'rgb(250, 250, 250)',
@@ -70,7 +84,7 @@ function QuickSearch() {
         />
       </Content>
     );
-  }, [form, handleOnSubmit]);
+  }, [form, handleOnInsertPlaceholder, handleOnSubmit]);
 }
 
 export default QuickSearch;
