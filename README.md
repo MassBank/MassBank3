@@ -127,7 +127,7 @@ Add the following properties to _postgres_, _similarity-service_ and _export-ser
 
 ## Kubernetes/Helm Charts
 
-Description is coming soon.
+A description is available at https://github.com/MassBank/MassBank-charts.
 
 # Frontend
 
