@@ -156,7 +156,6 @@ function StructuralEditor({
           >
             <Input
               type="text"
-              addonBefore="SMILES:"
               addonAfter={
                 <Button
                   children={'Set'}
