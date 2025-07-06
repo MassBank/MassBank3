@@ -23,6 +23,8 @@ import axios from 'axios';
 import FileSaver from 'file-saver';
 import { usePropertiesContext } from '../../context/properties/properties';
 import ResultTableSortOption from '../../types/ResultTableSortOption';
+import Tooltip from '../basic/Tooltip';
+import { QuestionCircleTwoTone } from '@ant-design/icons';
 const { saveAs } = FileSaver;
 
 type InputProps = {
@@ -299,7 +301,7 @@ function ResultPanel({
                 textAlign: 'center',
                 fontWeight: 'bold',
                 color: 'brown',
-                width: 200,
+                width: 150,
                 height: '100%',
                 display: 'flex',
                 justifyContent: 'center',
@@ -337,18 +339,34 @@ function ResultPanel({
             onSelect={handleOnSelect}
           />
         )}
-
         <Dropdown menu={{ items }} trigger={['click']}>
           <Button
             style={{
               width: 100,
-              marginRight: 30,
-              marginLeft: 20,
+              marginLeft: 10,
             }}
           >
             Download
           </Button>
         </Dropdown>
+        <Tooltip
+          title={
+            'Double click on a row in the result table to open the carousel view. In addition to clicking through the results, it also offers an interactive chart or mirror chart (similarity/peak search). In case of a neutral loss search it provides an additional interactive result table.'
+          }
+          placement="left"
+        >
+          <QuestionCircleTwoTone
+            style={{
+              width: '50px',
+              fontSize: '18px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginLeft: 10,
+              marginRight: 20,
+            }}
+          />
+        </Tooltip>
       </Content>
     );
   }, [
