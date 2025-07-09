@@ -3,7 +3,7 @@ import './Header.scss';
 import routes from '../../constants/routes';
 import { Button, Menu, MenuProps } from 'antd';
 import { Header as HeaderAntD } from 'antd/es/layout/layout';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { usePropertiesContext } from '../../context/properties/properties';
 import { CSSProperties, useMemo } from 'react';
 import logo from '../../assets/logo.svg';
@@ -18,6 +18,9 @@ type InputProps = {
 function Header({ height }: InputProps) {
   const location = useLocation();
   const { baseUrl } = usePropertiesContext();
+
+  const [searchParams] = useSearchParams();
+  const accession = searchParams.get('id');
 
   type MenuItem = Required<MenuProps>['items'][number];
 
@@ -96,17 +99,18 @@ function Header({ height }: InputProps) {
           style: { cursor: 'default' },
           label: (
             <AccessionSearchInputField
+              accession={accession ?? ''}
               disableLabel
               placeholderText="Search by Accession ID"
               inputStyle={{ width: '300px' }}
               style={{
-                width: '320px',
+                width: '350px',
                 backgroundColor: 'transparent',
               }}
             />
           ),
         }) as MenuItem[],
-    [baseUrl, height, location.pathname],
+    [accession, baseUrl, height, location.pathname],
   );
 
   return useMemo(() => {

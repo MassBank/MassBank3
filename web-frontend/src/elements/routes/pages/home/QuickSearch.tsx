@@ -53,13 +53,18 @@ function QuickSearch() {
           padding: 10,
         }}
       >
-        <AccessionSearchInputField
+        <Content
           style={{
-            width: '75%',
+            width: '700px',
             height: accessionSearchInputFieldHeight,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             marginBottom: 30,
           }}
-        />
+        >
+          <AccessionSearchInputField />
+        </Content>
         <Text
           strong
           style={{ width: '100%', marginBottom: 10, textAlign: 'center' }}
