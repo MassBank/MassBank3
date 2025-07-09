@@ -8,6 +8,7 @@ import Imprint from './Imprint';
 import Acknowledgement from './Acknowledgement';
 import InfoText from './InfoText';
 import Supporters from './Supporters';
+import Text from 'antd/es/typography/Text';
 
 function AboutView() {
   const elements = useMemo(() => {
@@ -34,6 +35,21 @@ function AboutView() {
       </Content>
     );
 
+    const accessibilty = (
+      <Content>
+        <SectionDivider label="Accessibility" />
+        <Content style={{ width: '100%', padding: 20 }}>
+          <Text>
+            These websites are currently in a re-design process to make it
+            accessible to all users. The aim is to follow the Web Content
+            Accessibility Guidelines (WCAG 2.1/2.2 AA) to ensure that all
+            people, including those with disabilities, are able to use this
+            service without restriction.
+          </Text>
+        </Content>
+      </Content>
+    );
+
     const imprint = (
       <Content>
         <SectionDivider label="Imprint" />
@@ -41,7 +57,14 @@ function AboutView() {
       </Content>
     );
 
-    return [infoText, serviceStatus, acknowledgement, supporters, imprint];
+    return [
+      infoText,
+      serviceStatus,
+      acknowledgement,
+      supporters,
+      accessibilty,
+      imprint,
+    ];
   }, []);
 
   const elementLabels = useMemo(
@@ -50,6 +73,7 @@ function AboutView() {
       'Service Status',
       'Acknowledgement',
       'Supporters',
+      'Accessibilty',
       'Imprint',
     ],
     [],
