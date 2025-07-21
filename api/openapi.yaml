@@ -2,6 +2,8 @@ openapi: 3.0.3
 info:
   title: "MassBank3 API"
   version: "3.0"
+  description: "The MassBank3 API allows retrieval and filtering of records by chemical or experimental parameters, 
+  similarity search on peak lists, and access to individual record details, metadata, service status, and available filter options."
 paths:
   /records:
     parameters:
