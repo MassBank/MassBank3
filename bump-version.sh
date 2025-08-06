@@ -11,3 +11,8 @@ echo $NEW_VERSION > version.txt
 echo $NEW_VERSION > web-frontend/version.txt
 
 echo "Set version in version.txt and web-frontend/version.txt to $NEW_VERSION."
+
+# Add the version files to git and commit the changes
+git add version.txt
+git add web-frontend/version.txt
+git commit -m "chore: increase version to $NEW_VERSION"
