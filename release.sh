@@ -1,12 +1,11 @@
 #!/bin/bash
 
 version=$(head -n 1 version.txt)
-git commit --allow-empty -m "chore: release $version" -m "release-as: $version"
-
 # Push the changes to the main branch (remote)
-git checkout main 
-git merge dev
+git checkout main
+git merge dev --no-ff -m "chore: release $version" -m "release-as: $version"
 git push origin main
-
 # Switch back to the development branch
 git checkout dev
+git merge main --no-commit --no-ff
+git push origin dev
