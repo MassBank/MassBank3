@@ -9,6 +9,7 @@ import {
   DownloadOutlined,
   EyeInvisibleOutlined,
   EyeOutlined,
+  QuestionCircleTwoTone,
   SearchOutlined,
 } from '@ant-design/icons';
 import FileSaver from 'file-saver';
@@ -18,6 +19,7 @@ import routes from '../../constants/routes';
 import { usePropertiesContext } from '../../context/properties/properties';
 import NeutralLoss from '../../types/peak/NeutralLoss';
 import Slider from './Slider';
+import Tooltip from './Tooltip';
 
 const toolButtonStyle = {
   width: 20,
@@ -646,10 +648,10 @@ function Chart({
               )}
               <Content
                 style={{
-                  width: '100%',
+                  width: 150,
                   height: MARGIN.button,
                   display: 'flex',
-                  justifyContent: 'left',
+                  justifyContent: 'center',
                   alignItems: 'center',
                   marginLeft: 20,
                 }}
@@ -663,6 +665,34 @@ function Chart({
                   onChange={handleOnSetMinRelativeIntensity}
                 />
               </Content>
+              {!disableZoom && (
+                <Content
+                  style={{
+                    width: '100%',
+                    height: MARGIN.button,
+                    display: 'flex',
+                    justifyContent: 'left',
+                    alignItems: 'center',
+                    marginLeft: 20,
+                    marginRight: 10,
+                  }}
+                >
+                  <Tooltip
+                    title={
+                      'Select an area in the spectrum to zoom in (Click + Drag). Double-click to return to the previous zoom level. The peaks in the peak table(s) and peak count(s) will be updated accordingly. This also happens in case of changing the minimal relative intensity.'
+                    }
+                  >
+                    <QuestionCircleTwoTone
+                      style={{
+                        fontSize: '18px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    />
+                  </Tooltip>
+                </Content>
+              )}
             </Content>
             <Content
               style={{
