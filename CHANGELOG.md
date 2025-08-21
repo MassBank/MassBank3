@@ -1,5 +1,17 @@
 # Changelog
 
+## [2025.8.2](https://github.com/MassBank/MassBank3/compare/v2025.8.1...v2025.8.2) (2025-08-21)
+
+
+### Bug Fixes
+
+* add missing mkdir  command in README ([00d889d](https://github.com/MassBank/MassBank3/commit/00d889d31e448e24a8890e3d5635fd5844d04d56))
+
+
+### Miscellaneous Chores
+
+* release v2025.8.2 ([7737ba6](https://github.com/MassBank/MassBank3/commit/7737ba6d4070bece7ea33632c47049491fca09c7))
+
 ## [2025.8.1](https://github.com/MassBank/MassBank3/compare/v2025.8.0...v2025.8.1) (2025-08-19)
 
 
