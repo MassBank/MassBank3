@@ -30,7 +30,7 @@ The directory _MassBank/compose_ contains the _env.dist_ file which serves as a 
 
 So navigate to that directory and copy the _env.dist_ file into a new _.env_ file.
 
-    cd MassBank3/compose
+    cd MassBank3/compose && \
     cp env.dist .env
 
 The default structure of the _data_ folder looks like the following:
@@ -47,6 +47,7 @@ The path to PostgreSQL via _DB_LOCAL_PATH_ is "/MassBank3/data/postgres-data" by
 
 And in order to provide the MassBank data to the services, download the latest release of MassBank data, unpack it and move the contributor's directories into _data_ directoy (default):
 
+    mkdir ../data && \
     wget https://github.com/MassBank/MassBank-data/archive/refs/heads/main.tar.gz && \
     tar -xf main.tar.gz && \
     mv MassBank-data-main ../data/MassBank-data/ && \
