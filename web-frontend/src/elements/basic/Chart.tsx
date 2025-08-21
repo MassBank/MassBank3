@@ -684,7 +684,7 @@ function Chart({
                   >
                     <QuestionCircleTwoTone
                       style={{
-                        fontSize: '18px',
+                        fontSize: '16px',
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',

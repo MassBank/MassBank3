@@ -30,7 +30,7 @@ The directory _MassBank/compose_ contains the _env.dist_ file which serves as a 
 
 So navigate to that directory and copy the _env.dist_ file into a new _.env_ file.
 
-    cd MassBank3/compose
+    cd MassBank3/compose && \
     cp env.dist .env
 
 The default structure of the _data_ folder looks like the following:
@@ -39,25 +39,18 @@ The default structure of the _data_ folder looks like the following:
     |---...
     |---/compose
     |---/data
-        |---/massbank-data
-        |---/massbank-volume
+        |---/MassBank-data
         |---/postgres-data
     |---...
 
-The path to PostgreSQL via _DB_LOCAL_PATH_ is "/MassBank3/data/postgres-data" by default. "/MassBank3/data/massbank-volume" is the default directory to store the MSP file needed for the similarity service and can be set via _MSP_LOCAL_PATH_. "/MassBank3/data/massbank-data" is the default directory to store the MassBank data in folders needed for the export service and can be set via _EXPORT_MB_DATA_DIRECTORY_.
+The path to PostgreSQL via _DB_LOCAL_PATH_ is "/MassBank3/data/postgres-data" by default. "/MassBank3/data/MassBank-data" is the default directory to store the MassBank data in record file format needed import data to different services and can be set via _MB_DATA_DIRECTORY_.
 
-In order to provide the MassBank data to the similarity service, download the latest release of MassBank data in MSP format and move it the _data_ directoy (default):
+And in order to provide the MassBank data to the services, download the latest release of MassBank data, unpack it and move the contributor's directories into _data_ directoy (default):
 
-    mkdir ../data
-    mkdir ../data/massbank-volume
-    wget https://github.com/MassBank/MassBank-data/releases/latest/download/MassBank_NIST.msp
-    mv MassBank_NIST.msp ../data/massbank-volume/MassBank_NIST.msp
-
-And in order to provide the MassBank data to the export service, download the latest release of MassBank data, unzip it and move the contributor's directories into _data_ directoy (default):
-
-    wget https://github.com/MassBank/MassBank-data/archive/refs/heads/main.tar.gz
-    tar -xf main.tar.gz
-    mv MassBank-data-main ../data/massbank-data/
+    mkdir ../data && \
+    wget https://github.com/MassBank/MassBank-data/archive/refs/heads/main.tar.gz && \
+    tar -xf main.tar.gz && \
+    mv MassBank-data-main ../data/MassBank-data/ && \
     rm main.tar.gz
 
 Now use _docker compose_ to start the system (in daemon mode):

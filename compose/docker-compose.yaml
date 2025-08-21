@@ -1,6 +1,6 @@
 services:
   postgres:
-    # platform: linux/amd64
+    platform: linux/amd64
     image: quay.io/massbank/postgres-bingo:v15-bingo-1.26.0
     restart: always
     ports:
@@ -50,14 +50,14 @@ services:
       MB3_API_BASE_URL: ${MB3_API_BASE_URL}
 
   similarity-service:
-    # platform: linux/amd64
-    image: quay.io/massbank/massbank3-similarity-service:latest
+    platform: linux/amd64
+    image: quay.io/massbank/massbank-similarity-api:latest
     restart: always    
     environment:
-      - MSP
-      - VERBOSE=${SIMILARITY_SERVICE_VERBOSE}
+      DATA_DIR: "/MassBank-data"
+      VERBOSE: ${SIMILARITY_SERVICE_VERBOSE}
     volumes:
-      - "${MSP_LOCAL_PATH}${MSP}:${MSP}"
+      - "${MB_DATA_DIRECTORY}:/MassBank-data"
     deploy:
       replicas: 2
 
@@ -72,7 +72,7 @@ services:
       - similarity-service
 
   export-service:
-    # platform: linux/amd64
+    platform: linux/amd64
     image: quay.io/massbank/massbank3-export-service:latest
     restart: always
     ports:
@@ -81,7 +81,7 @@ services:
       MB_DATA_DIRECTORY: "/MassBank-data"
       CORS_ALLOWED_ORIGINS: ${MB3_FRONTEND_URL}"
     volumes:
-      - "${EXPORT_MB_DATA_DIRECTORY}:/MassBank-data"
+      - "${MB_DATA_DIRECTORY}:/MassBank-data"
 
   mb3frontend:
     build:
@@ -126,5 +126,7 @@ services:
       - MB_DB_INIT
       - MB_GIT_REPO
       - MB_GIT_BRANCH
-      - MB_DATA_DIRECTORY
+      - MB_DATA_DIRECTORY=/MassBank-data
       - MB_DROP_ALL
+    volumes:
+      - "${MB_DATA_DIRECTORY}:/MassBank-data"

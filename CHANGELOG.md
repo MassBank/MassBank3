@@ -1,5 +1,23 @@
 # Changelog
 
+## [2025.8.1](https://github.com/MassBank/MassBank3/compare/v2025.8.0...v2025.8.1) (2025-08-19)
+
+
+### Features
+
+* added tooltip to the Chart component describing the zoom and min rel intensity ([f46de46](https://github.com/MassBank/MassBank3/commit/f46de46e318f2bb2305a4575c10177c507bd4973))
+
+
+### Bug Fixes
+
+* pull before merging dev into main branch ([f659c69](https://github.com/MassBank/MassBank3/commit/f659c696495df6b87a58c4b32dfd5ea194263048))
+
+
+### Miscellaneous Chores
+
+* release v2025.08.0 ([89a8e07](https://github.com/MassBank/MassBank3/commit/89a8e077209feb12fe922401f9062357258487b4))
+* release v2025.8.1 ([a41124c](https://github.com/MassBank/MassBank3/commit/a41124cfee5ece233803631243395b58aeb7f23d))
+
 ## [2025.8.0](https://github.com/MassBank/MassBank3/compare/v2025.7.1...v2025.8.0) (2025-08-18)
 
 
