@@ -1,5 +1,17 @@
 # Changelog
 
+## [2025.8.3](https://github.com/MassBank/MassBank3/compare/v2025.8.2...v2025.8.3) (2025-08-21)
+
+
+### Bug Fixes
+
+* use correct DOI (Zenodo) ([1bf309f](https://github.com/MassBank/MassBank3/commit/1bf309f39808e5b3c84c11bdf35dd52a87439783))
+
+
+### Miscellaneous Chores
+
+* **main:** release v2025.8.3 ([6d52c70](https://github.com/MassBank/MassBank3/commit/6d52c70c5a2b7fd8f88bc80973c144e81c36e284))
+
 ## [2025.8.2](https://github.com/MassBank/MassBank3/compare/v2025.8.1...v2025.8.2) (2025-08-21)
 
 
