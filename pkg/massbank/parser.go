@@ -16,10 +16,10 @@ import (
 
 func ParseFile(fileName string) (mb *MassBank2, err error) {
 	file, err := os.Open(fileName)
-	defer file.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer file.Close()
 	mb, err = ScanMbFile(file, fileName)
 	if err != nil {
 		return nil, err
@@ -37,6 +37,9 @@ func ScanMbFile(mb2Reader io.Reader, fileName string) (*MassBank2, error) {
 	lineNum := 0
 	for scanner.Scan() {
 		line := scanner.Text()
+		if strings.Contains(line, "DEPRECATED:") {
+			return nil, errors.New("Record is deprecated")
+		}
 		lineNum++
 		err := mb.readLine(line)
 		if err != nil {
@@ -231,7 +234,7 @@ func (mb *MassBank2) parsePeakValue(line string) error {
 	mb.Peak.Peak.Mz = append(mb.Peak.Peak.Mz, mz)
 	mb.Peak.Peak.Intensity = append(mb.Peak.Peak.Intensity, intens)
 	mb.Peak.Peak.Rel = append(mb.Peak.Peak.Rel, int32(relInt64))
-	
+
 	return nil
 }
 

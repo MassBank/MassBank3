@@ -64,7 +64,7 @@ func main() {
 				panic(err)
 			}
 		}
-		println("Start updating database...")
+		fmt.Println("Start updating database with", len(mbfiles), "MassBank records...")
 		println("Updating metadata...")
 		metaId, err := db.UpdateMetadata(versionData)
 		if err != nil {
@@ -156,9 +156,12 @@ func readDirectoryData(dir string) ([]*massbank.MassBank2, *massbank.MbMetaData,
 		}
 		mb, err := massbank.ScanMbFile(file, name)
 		file.Close()
-		mbfiles = append(mbfiles, mb)
+		if err == nil {
+			mbfiles = append(mbfiles, mb)
+		}
 	}
-	println("Reading of data finished.")
+	fmt.Println("Reading of data finished: ", len(mbfiles), " valid files.")
+
 	return mbfiles, &mbmeta, nil
 }
 
@@ -195,7 +198,10 @@ func readGitData(repo string, branch string) ([]*massbank.MassBank2, *massbank.M
 				return nil, nil, err
 			}
 			mb, err := massbank.ScanMbFile(file, zFile.Name)
-			mbfiles = append(mbfiles, mb)
+			file.Close()
+			if err == nil {
+				mbfiles = append(mbfiles, mb)
+			}
 		}
 	}
 	println("Reading of data finished.")
