@@ -58,13 +58,19 @@ Now use _docker compose_ to start the system (in daemon mode):
     docker compose up -d
 
 > [!NOTE]
-> Initially, the property _MB_DB_INIT_ is set to _true_. Change that value to _false_ after the database was filled within the first start. The database filling takes some time. The _mb3tool_ service is responsible for that and stops after finishing that task.
+> Initially, the property _MB_DB_INIT_ is set to _true_. Change that value to _false_ after the database was filled within the first start. The database filling takes some time (circa 30 minutes on Apple's M3 Pro chip and a Docker environment with 4 CPUs and 8GB RAM allowed). The _mb3tool_ service is responsible for that and stops running after finishing that task. Meanwhile you can check the amount of already imported data via the content page (frontend) or via following command line:
+
+    curl http://localhost:8081/MassBank-api/records/count
 
 To stop the system use:
 
     docker compose down -v
 
 ### Advanced Settings
+
+#### Add Custom MassBank Data
+
+It's possible to add custom MassBank record data to your own MassBank instance. Simply add your MassBank files as subdirectory (or multiple directories) to the directory which was previously set via _MB_DATA_DIRECTORY_ (default is "/MassBank3/data/MassBank-data"). The _mb3tool_ recursively recognises text files starting with _MSBNK-_ and ending with _.txt_.
 
 #### Distributor's Information
 
