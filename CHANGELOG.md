@@ -1,5 +1,12 @@
 # Changelog
 
+## [2025.8.5](https://github.com/MassBank/MassBank3/compare/v2025.8.4...v2025.8.5) (2025-08-25)
+
+
+### Miscellaneous Chores
+
+* release 2025.8.5 ([c83ce20](https://github.com/MassBank/MassBank3/commit/c83ce20941ea3e2dc6625c12ae5c7561d020f398))
+
 ## [2025.8.4](https://github.com/MassBank/MassBank3/compare/v2025.8.3...v2025.8.4) (2025-08-25)
 
 
