@@ -1,5 +1,12 @@
 # Changelog
 
+## [2025.8.7](https://github.com/MassBank/MassBank3/compare/v2025.8.6...v2025.8.7) (2025-08-25)
+
+
+### Bug Fixes
+
+* do not import deprecated MassBank records into Postgres database; close [#108](https://github.com/MassBank/MassBank3/issues/108) ([0724a23](https://github.com/MassBank/MassBank3/commit/0724a23cb19f56513119c655fc5a9c95f30deb45))
+
 ## [2025.8.5](https://github.com/MassBank/MassBank3/compare/v2025.8.4...v2025.8.5) (2025-08-25)
 
 
