@@ -72,6 +72,9 @@ To stop the system use:
 
 It's possible to add custom MassBank record data to your own MassBank instance. Simply add your MassBank files as subdirectory (or multiple directories) to the directory which was previously set via _MB_DATA_DIRECTORY_ (default is "/MassBank3/data/MassBank-data"). The _mb3tool_ recursively recognises text files starting with _MSBNK-_ and ending with _.txt_.
 
+> [!NOTE]
+> The MassBank files need to be in the specified MassBank format. That means, every file should contain its own accession ID, peaks etc., see [MassBank Record Format](https://github.com/MassBank/MassBank-web/blob/main/Documentation/MassBankRecordFormat.md). In addition, each file name should contain the same accession and end with „.txt“.
+
 #### Distributor's Information
 
 The _DISTRIBUTOR_TEXT_ property is a free text field to insert any description of the distributor of a running MassBank instance.
