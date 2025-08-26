@@ -6,7 +6,7 @@ on:
       - "main"
       - "dev"
   release:
-    types: [ published ]
+    types: [published]
 
 jobs:
   build-and-push-images:
@@ -37,14 +37,22 @@ jobs:
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_TOKEN }}
 
+      # Extract tag name for tag events (not release)
+      - name: Extract tag name
+        if: startsWith(github.ref, 'refs/tags/')
+        id: extract_tag
+        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ matrix.image }}
           tags: |
-            # Release-Tag direkt übernehmen
+            # Use release tag if available
             type=raw,value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' }}
+            # Use extracted tag for tag events (in case of tag push, e.g. please-release)
+            type=raw,value=${{ env.TAG_NAME }},enable=${{ startsWith(github.ref, 'refs/tags/') }}
             # set latest tag for main branch and tags
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
             # set dev tag for dev branch
