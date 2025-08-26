@@ -23,9 +23,9 @@ authors:
     given-names: David
     orcid: https://orcid.org/0000-0001-7499-1693
 
-version: 2025.8.3
+version: v2025.8.8
 identifiers:
   - type: doi
     value: 10.5281/zenodo.16923315
-date-released: 2025-08-22
+date-released: 2025-08-26
 license: GPL-3.0
