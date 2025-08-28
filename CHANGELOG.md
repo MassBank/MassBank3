@@ -1,5 +1,18 @@
 # Changelog
 
+## [2025.8.9](https://github.com/MassBank/MassBank3/compare/v2025.8.8...v2025.8.9) (2025-08-28)
+
+
+### Bug Fixes
+
+* added KAKENHI and MSSJ to list of supporters ([d12681c](https://github.com/MassBank/MassBank3/commit/d12681c58a5861af5cc372e4e0520e37abb3260a))
+* do not use same version file as release-please; use mb_version.txt instead ([2a98a40](https://github.com/MassBank/MassBank3/commit/2a98a40b8d4defbcfb498d1dd6d4eae70fe11e3d))
+
+
+### Miscellaneous Chores
+
+* release v2025.8.9 ([a3c1321](https://github.com/MassBank/MassBank3/commit/a3c1321d096859f0bb5986f68a457646162a01ee))
+
 ## [2025.8.8](https://github.com/MassBank/MassBank3/compare/v2025.8.7...v2025.8.8) (2025-08-26)
 
 
