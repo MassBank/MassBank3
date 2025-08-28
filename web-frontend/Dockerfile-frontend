@@ -10,7 +10,7 @@ COPY src/ ./src/
 COPY public/ ./public/
 RUN npm run build
 
-COPY version.txt ./
+COPY mb_version.txt ./
 
 FROM node:23-alpine
 WORKDIR /app
@@ -19,7 +19,7 @@ COPY --from=build /app/dist ./dist/
 COPY --from=build /app/src ./src/
 COPY --from=build /app/public ./public/
 COPY --from=build /app/package.json /app/package-lock.json /app/server.ts /app/server-utils.ts /app/entrypoint.sh ./
-COPY --from=build /app/version.txt ./
+COPY --from=build /app/mb_version.txt ./
 
 ENTRYPOINT sh entrypoint.sh "${MB3_API_URL}" "${MB3_FRONTEND_URL}" "${MB3_FRONTEND_BASE_URL}" "${EXPORT_SERVICE_URL}" "${MB3_API_URL_INTERNAL}" "${EXPORT_SERVICE_URL_INTERNAL}" "${DISTRIBUTOR_TEXT}" "${DISTRIBUTOR_URL}" "${MB3_FRONTEND_BROWSER_TAB_TITLE}" "${MB3_FRONTEND_HOMEPAGE_INTRO_TEXT}" "${MB3_FRONTEND_HOMEPAGE_NEWS_SECTION_TEXT}" "${MB3_FRONTEND_HOMEPAGE_FUNDING_SECTION_TEXT}" "${MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_NAME}" "${MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_TEXT}" "${HTML_HEAD_FILE}" "${HTML_BODY_FILE}"
 EXPOSE 3000

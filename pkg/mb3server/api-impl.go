@@ -548,7 +548,7 @@ func GetRecords(contributor []string, instrumentType []string, msType []string, 
 
 func GetVersion() (string, error) {
 
-	content, err := os.ReadFile("version.txt")
+	content, err := os.ReadFile("mb_version.txt")
 	if err != nil {
 		return "v1.0.0 (default)", nil
 	}
