@@ -1,8 +1,9 @@
 name: Create Docker Container
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - dev
 
 jobs:
   build-and-push-images:
@@ -38,10 +39,9 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ matrix.image }}
-
-      - name: Output tags
-        run: |
-          echo "Tags: ${{ steps.meta.outputs.tags }}"
+          tags: |
+            # set dev tag for dev branch
+            type=raw,value=dev
 
       - name: Build and push
         uses: docker/build-push-action@v6
