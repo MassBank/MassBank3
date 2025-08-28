@@ -7,20 +7,6 @@
 
 * release v2025.8.12 ([40a5fd0](https://github.com/MassBank/MassBank3/commit/40a5fd087a84fa89cd620d405e071d6c52542a95))
 
-## [2025.8.11](https://github.com/MassBank/MassBank3/compare/v2025.8.10...v2025.8.11) (2025-08-28)
-
-
-### Miscellaneous Chores
-
-* release v2025.8.11 ([d473c72](https://github.com/MassBank/MassBank3/commit/d473c723ac79c208a8c44fb4628d26bb14e908b4))
-
-## [2025.8.10](https://github.com/MassBank/MassBank3/compare/v2025.8.9...v2025.8.10) (2025-08-28)
-
-
-### Miscellaneous Chores
-
-* release v2025.8.10 ([c34160d](https://github.com/MassBank/MassBank3/commit/c34160dc231f1e1d61e7097d9a2827e8ce1651d1))
-
 ## [2025.8.9](https://github.com/MassBank/MassBank3/compare/v2025.8.8...v2025.8.9) (2025-08-28)
 
 
@@ -34,26 +20,12 @@
 
 * release v2025.8.9 ([a3c1321](https://github.com/MassBank/MassBank3/commit/a3c1321d096859f0bb5986f68a457646162a01ee))
 
-## [2025.8.8](https://github.com/MassBank/MassBank3/compare/v2025.8.7...v2025.8.8) (2025-08-26)
-
-
-### Miscellaneous Chores
-
-* release v2025.8.8 ([ba37321](https://github.com/MassBank/MassBank3/commit/ba37321acb2173c8e15f8114e3f3621dd26b37b9))
-
 ## [2025.8.7](https://github.com/MassBank/MassBank3/compare/v2025.8.6...v2025.8.7) (2025-08-25)
 
 
 ### Bug Fixes
 
 * do not import deprecated MassBank records into Postgres database; close [#108](https://github.com/MassBank/MassBank3/issues/108) ([0724a23](https://github.com/MassBank/MassBank3/commit/0724a23cb19f56513119c655fc5a9c95f30deb45))
-
-## [2025.8.5](https://github.com/MassBank/MassBank3/compare/v2025.8.4...v2025.8.5) (2025-08-25)
-
-
-### Miscellaneous Chores
-
-* release 2025.8.5 ([c83ce20](https://github.com/MassBank/MassBank3/commit/c83ce20941ea3e2dc6625c12ae5c7561d020f398))
 
 ## [2025.8.4](https://github.com/MassBank/MassBank3/compare/v2025.8.3...v2025.8.4) (2025-08-25)
 
@@ -72,10 +44,7 @@
 
 ### Miscellaneous Chores
 
-* **main:** release 2025.8.3 ([d279a7e](https://github.com/MassBank/MassBank3/commit/d279a7e48c71e68da28f31247823bc9ee61dfa65))
-* **main:** release v2025.8.2 ([bca4e80](https://github.com/MassBank/MassBank3/commit/bca4e80c9bb6f53d4cfe00bc43d0cb623f301383))
-* **main:** release v2025.8.3 ([1055070](https://github.com/MassBank/MassBank3/commit/1055070e1e9bdb898e419be60d05d472b7889b55))
-* **main:** release v2025.8.3 ([6d52c70](https://github.com/MassBank/MassBank3/commit/6d52c70c5a2b7fd8f88bc80973c144e81c36e284))
+* release 2025.8.3 ([d279a7e](https://github.com/MassBank/MassBank3/commit/d279a7e48c71e68da28f31247823bc9ee61dfa65))
 
 ## [2025.8.2](https://github.com/MassBank/MassBank3/compare/v2025.8.1...v2025.8.2) (2025-08-21)
 
@@ -104,16 +73,4 @@
 
 ### Miscellaneous Chores
 
-* release v2025.08.0 ([89a8e07](https://github.com/MassBank/MassBank3/commit/89a8e077209feb12fe922401f9062357258487b4))
 * release v2025.8.1 ([a41124c](https://github.com/MassBank/MassBank3/commit/a41124cfee5ece233803631243395b58aeb7f23d))
-
-## [2025.8.0](https://github.com/MassBank/MassBank3/compare/v2025.7.1...v2025.8.0) (2025-08-18)
-
-
-### Miscellaneous Chores
-
-* release v2025.08.0 ([26460db](https://github.com/MassBank/MassBank3/commit/26460db31b726ac9452ee8f5c201e068720b191e))
-* release v2025.08.0 ([0999531](https://github.com/MassBank/MassBank3/commit/09995318e262fc0acf30f54290742582aedc91f8))
-* release v2025.08.0 ([71acd75](https://github.com/MassBank/MassBank3/commit/71acd7522fcb332c53b41beefc7b75b45dd30e11))
-* release v2025.08.0 ([5d5bc58](https://github.com/MassBank/MassBank3/commit/5d5bc5873ac3384e88fe111b0c00b3cae0adc710))
-* release v2025.08.0 ([10ef4e7](https://github.com/MassBank/MassBank3/commit/10ef4e7834f74a990a59e85d3aab48e21b964ab7))
