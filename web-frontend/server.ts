@@ -56,7 +56,7 @@ const homepageAdditionalSectionName =
 const homepageAdditionalSectionText =
   process.env.MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_TEXT ?? '';
 
-const versionFileContent = readFileSync('version.txt', 'utf-8');
+const versionFileContent = readFileSync('mb_version.txt', 'utf-8');
 const version =
   !versionFileContent || versionFileContent.trim().length === 0
     ? 'v3.0.0'

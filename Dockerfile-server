@@ -14,7 +14,7 @@ COPY api/openapi.yaml ./swagger-ui/openapi.yaml
 COPY api/openapi.json ./swagger-ui/openapi.json
 COPY api/schemas ./swagger-ui/schemas
 COPY entrypoint-mb3server.sh ./entrypoint-mb3server.sh
-COPY version.txt ./version.txt
+COPY mb_version.txt ./mb_version.txt
 
 EXPOSE 8080
 ENTRYPOINT sh entrypoint-mb3server.sh "${MB3_API_URL}" "${MB3_API_BASE_URL}"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version=$(head -n 1 version.txt)
+version=$(head -n 1 mb_version.txt)
 # Push the changes to the main branch (remote)
 git checkout main
 git pull origin main

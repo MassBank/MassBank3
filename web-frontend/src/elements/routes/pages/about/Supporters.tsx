@@ -10,6 +10,8 @@ import fnrLogo from '../../../../assets/fnr_logo.png';
 import hbm4euLogo from '../../../../assets/HBM4EU_logo.png';
 import nfdi4chemLogo from '../../../../assets/nfdi4chem_logo.png';
 import ufzLogo from '../../../../assets/UFZ.png';
+import kakenhiLogo from '../../../../assets/KAKENHIlogo_L.jpg';
+import mssjLogo from '../../../../assets/logo-mssj.png';
 
 const logos: { name: string; src: string }[] = [
   { name: 'deNBI', src: denbiLogo },
@@ -21,6 +23,8 @@ const logos: { name: string; src: string }[] = [
   { name: 'UniLux', src: uniLuxLogo },
   { name: 'HBM4EU', src: hbm4euLogo },
   { name: 'NFDI4Chem', src: nfdi4chemLogo },
+  { name: 'KAKENHI', src: kakenhiLogo },
+  { name: 'MSSJ', src: mssjLogo },
 ];
 
 function Supporters() {
