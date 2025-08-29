@@ -8,5 +8,5 @@ git merge dev --no-ff -m "chore: release $version" -m "release-as: $version"
 git push origin main
 # Switch back to the development branch
 git checkout dev
-git merge main
+git rebase main
 git push origin dev
