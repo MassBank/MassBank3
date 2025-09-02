@@ -13,7 +13,7 @@ import { usePropertiesContext } from '../../context/properties/properties';
 import buildSearchUrl from '../../utils/buildSearchUrl';
 import NotAvailableLabel from '../basic/NotAvailableLabel';
 
-const titleHeight = 50;
+const titleHeight = 100;
 const labelWidth = 120;
 
 type HeaderTableType = {
@@ -342,6 +342,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
             maxHeight: titleHeight,
             fontSize: 18,
             fontWeight: 'bold',
+            textAlign: 'center',
             width: '100%',
             justifyContent: 'center',
           }}
