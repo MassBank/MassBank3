@@ -455,6 +455,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
     handleOnCopy,
     height,
     imageWidth,
+    record.accession,
     record.compound.classes,
     record.compound.formula,
     record.compound.inchi,
