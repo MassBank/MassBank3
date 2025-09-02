@@ -4,15 +4,22 @@ import { CSSProperties, useMemo } from 'react';
 import { usePropertiesContext } from '../../context/properties/properties';
 import routes from '../../constants/routes';
 import SearchFields from '../../types/filterOptions/SearchFields';
+import { ImportOutlined } from '@ant-design/icons';
 
 type InputProps = {
   hit: Hit;
   searchFormData?: SearchFields;
   width?: CSSProperties['width'];
   height?: CSSProperties['height'];
+  showLinkAsSymbol?: boolean;
 };
 
-function ResultLink({ hit, width = '100%', height = '100%' }: InputProps) {
+function ResultLink({
+  hit,
+  width = '100%',
+  height = '100%',
+  showLinkAsSymbol = false,
+}: InputProps) {
   const { baseUrl, frontendUrl } = usePropertiesContext();
 
   const url = useMemo(
@@ -48,11 +55,15 @@ function ResultLink({ hit, width = '100%', height = '100%' }: InputProps) {
             }}
             title="Click to view the record"
           >
-            {hit.accession}
+            {!showLinkAsSymbol ? (
+              hit.accession
+            ) : (
+              <ImportOutlined color="darkblue" />
+            )}
           </a>
         </Content>
       ),
-    [height, hit.accession, hit.record, url, width],
+    [height, hit.accession, hit.record, showLinkAsSymbol, url, width],
   );
 }
 

@@ -43,6 +43,7 @@ function ResultInfo({
       >
         {hit.accession}
       </p>
+      <ResultLink hit={hit} height={50} showLinkAsSymbol />
       <Content
         style={{
           width: '100%',
@@ -70,6 +71,21 @@ function ResultInfo({
           <Placeholder child="" style={{ height: 20 }} />
         )}
       </Content>
+      <p
+        style={{
+          width: '100%',
+          minHeight: 200,
+          textWrap: 'pretty',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          margin: 0,
+          overflowY: 'scroll',
+        }}
+      >
+        {hit.record.title}
+      </p>
+
       <Content
         style={{
           width: '100%',
@@ -93,22 +109,6 @@ function ResultInfo({
           />
         )}
       </Content>
-
-      <p
-        style={{
-          width: '100%',
-          height: 600,
-          textWrap: 'pretty',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          margin: 0,
-          overflowY: 'scroll',
-        }}
-      >
-        {hit.record.title}
-      </p>
-      <ResultLink hit={hit} height={100} />
     </Content>
   );
 }
