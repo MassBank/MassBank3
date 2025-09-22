@@ -152,6 +152,9 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
     // Add ChemOnt classes
     const chemontClasses: string[] = [];
     const treeNodes: JSX.Element[] = [];
+    if (record.compound.link === undefined) {
+      record.compound.link = [];
+    }
     record.compound.link
       .filter((l) => l.database === 'ChemOnt')
       .forEach((l) => {
@@ -457,13 +460,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
     height,
     imageWidth,
     record.accession,
-    record.compound.classes,
-    record.compound.formula,
-    record.compound.inchi,
-    record.compound.link,
-    record.compound.mass,
-    record.compound.names,
-    record.compound.smiles,
+    record.compound,
     record.peak.splash,
     record.title,
     width,
