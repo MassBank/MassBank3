@@ -52,8 +52,9 @@ function StructureView({
         }
 
         return { molfile: modMolfile, rGroupLabel: '' };
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
-        console.error('Invalid SMILES string:', error);
+        // console.error('Invalid SMILES string:', error);
       }
 
       return { molfile: '', rGroupLabel: '' };

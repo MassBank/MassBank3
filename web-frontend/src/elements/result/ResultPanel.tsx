@@ -1,31 +1,23 @@
 import './Pagination.scss';
 
-import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import ResultTable from './ResultTable';
 import Hit from '../../types/Hit';
 import Peak from '../../types/peak/Peak';
 import Record from '../../types/record/Record';
 import Placeholder from '../basic/Placeholder';
 import fetchData from '../../utils/request/fetchData';
-import {
-  Button,
-  Dropdown,
-  MenuProps,
-  Modal,
-  Pagination,
-  Select,
-  Spin,
-} from 'antd';
+import { Button, Dropdown, Modal, Pagination, Select, Spin } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import SpectralHitsCarouselView from '../routes/pages/search/SpectralHitsCarouselView';
 import ResultTableSortOptionType from '../../types/ResultTableSortOptionType';
-import axios from 'axios';
-import FileSaver from 'file-saver';
 import { usePropertiesContext } from '../../context/properties/properties';
 import ResultTableSortOption from '../../types/ResultTableSortOption';
 import Tooltip from '../basic/Tooltip';
 import { QuestionCircleTwoTone } from '@ant-design/icons';
-const { saveAs } = FileSaver;
+import DownloadFormat from '../../types/DownloadFormat';
+import downloadRecords from '../../utils/request/downloadRecords';
+import DownloadMenuItems from '../common/DownloadMenuItems';
 
 type InputProps = {
   reference?: Peak[];
@@ -213,74 +205,29 @@ function ResultPanel({
   );
 
   const handleOnDownloadResult = useCallback(
-    async (format: string) => {
+    async (format: DownloadFormat) => {
       setIsRequestingDownload(true);
       const host = exportServiceUrl;
       const url = `${host}/convert`;
 
-      const resp = await axios.post(
+      await downloadRecords(
         url,
-        {
-          record_list: hits.map((h) => h.accession),
-          format,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/octet-stream',
-          },
-        },
+        format,
+        hits.map((h) => h.accession),
       );
-      if (resp.status === 200) {
-        const data = await resp.data;
-        const fileType = format.split('_')[1];
-        const filename = `massbank_result.${format}.${fileType}`;
-        const blob = new Blob([data], {
-          type: 'application/octet-stream',
-        });
-        saveAs(blob, filename);
-      }
 
       setIsRequestingDownload(false);
     },
     [exportServiceUrl, hits],
   );
 
-  const buildDownloadOptionLabel = useCallback(
-    (label: string, format: string) => (
-      <label
-        onClick={(e: MouseEvent<HTMLLabelElement>) => {
-          e.preventDefault();
-          handleOnDownloadResult(format);
-        }}
-        style={{
-          width: 100,
-          marginLeft: 10,
-          marginRight: 10,
-        }}
-      >
-        {label}
-      </label>
-    ),
+  const downloadMenuItems = useMemo(
+    () => DownloadMenuItems({ onDownload: handleOnDownloadResult }),
     [handleOnDownloadResult],
   );
 
-  const items: MenuProps['items'] = useMemo(
-    () => [
-      {
-        key: '0_nist_msp_download',
-        label: buildDownloadOptionLabel('NIST MSP', 'nist_msp'),
-      },
-      {
-        key: '1_riken_msp_download',
-        label: buildDownloadOptionLabel('RIKEN MSP', 'riken_msp'),
-      },
-    ],
-    [buildDownloadOptionLabel],
-  );
-
-  const paginationContainer = useMemo(() => {
-    return (
+  const paginationContainer = useMemo(
+    () => (
       <Content
         style={{
           width: '100%',
@@ -339,7 +286,7 @@ function ResultPanel({
             onSelect={handleOnSelect}
           />
         )}
-        <Dropdown menu={{ items }} trigger={['click']}>
+        <Dropdown menu={{ items: downloadMenuItems }} trigger={['click']}>
           <Button
             style={{
               width: 100,
@@ -368,16 +315,17 @@ function ResultPanel({
           />
         </Tooltip>
       </Content>
-    );
-  }, [
-    hits.length,
-    handleOnSelectPage,
-    resultPageIndex,
-    sortOptions,
-    selectedSortOption,
-    handleOnSelect,
-    items,
-  ]);
+    ),
+    [
+      hits.length,
+      handleOnSelectPage,
+      resultPageIndex,
+      sortOptions,
+      selectedSortOption,
+      handleOnSelect,
+      downloadMenuItems,
+    ],
+  );
 
   return useMemo(
     () =>

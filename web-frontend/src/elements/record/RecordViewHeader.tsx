@@ -2,9 +2,9 @@ import './Table.scss';
 
 import { Content } from 'antd/es/layout/layout';
 import ExportableContent from '../common/ExportableContent';
-import { CSSProperties, JSX, useCallback, useMemo } from 'react';
+import { CSSProperties, JSX, useCallback, useMemo, useState } from 'react';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
-import { Table, Tree, TreeDataNode } from 'antd';
+import { Button, Dropdown, Table, Tree, TreeDataNode } from 'antd';
 import Record from '../../types/record/Record';
 import { MF } from 'react-mf';
 import StructureView from '../basic/StructureView';
@@ -12,8 +12,11 @@ import LabelWrapper from '../basic/LabelWrapper';
 import { usePropertiesContext } from '../../context/properties/properties';
 import buildSearchUrl from '../../utils/buildSearchUrl';
 import NotAvailableLabel from '../basic/NotAvailableLabel';
+import downloadRecords from '../../utils/request/downloadRecords';
+import DownloadFormat from '../../types/DownloadFormat';
+import DownloadMenuItems from '../common/DownloadMenuItems';
 
-const titleHeight = 100;
+const titleHeight = 80;
 const labelWidth = 120;
 
 type HeaderTableType = {
@@ -44,10 +47,32 @@ type InputProps = {
 };
 
 function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
-  const { baseUrl, frontendUrl } = usePropertiesContext();
+  const { baseUrl, exportServiceUrl, frontendUrl } = usePropertiesContext();
+
+  const [isRequestingDownload, setIsRequestingDownload] =
+    useState<boolean>(false);
+
   const handleOnCopy = useCallback((label: string, text: string) => {
     copyTextToClipboard(label, text);
   }, []);
+
+  const handleOnDownloadResult = useCallback(
+    async (format: DownloadFormat) => {
+      setIsRequestingDownload(true);
+      const host = exportServiceUrl;
+      const url = `${host}/convert`;
+
+      await downloadRecords(url, format, [record.accession]);
+
+      setIsRequestingDownload(false);
+    },
+    [exportServiceUrl, record.accession],
+  );
+
+  const downloadMenuItems = useMemo(
+    () => DownloadMenuItems({ onDownload: handleOnDownloadResult }),
+    [handleOnDownloadResult],
+  );
 
   return useMemo(() => {
     const dataSource: HeaderTableType[] = [];
@@ -348,21 +373,62 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
           backgroundColor: 'white',
         }}
       >
-        <ExportableContent
-          component={<LabelWrapper value={record.title} />}
-          componentContainerStyle={{
-            minHeight: titleHeight,
-            maxHeight: titleHeight,
-            fontSize: 18,
-            fontWeight: 'bold',
-            textAlign: 'center',
+        <Content
+          style={{
             width: '100%',
+            height: titleHeight,
+            display: 'flex',
             justifyContent: 'center',
+            alignItems: 'center',
           }}
-          mode="copy"
-          onClick={() => handleOnCopy('Title', record.title)}
-          title="Copy title to clipboard"
-        />
+        >
+          <ExportableContent
+            component={
+              <LabelWrapper
+                value={record.title}
+                style={{
+                  minWidth: '100%',
+                  maxWidth: '100%',
+                  paddingLeft: '100px',
+                }}
+              />
+            }
+            componentContainerStyle={{
+              fontSize: 18,
+              fontWeight: 'bold',
+              textAlign: 'center',
+              minWidth: '100%',
+              maxWidth: '100%',
+            }}
+            mode="copy"
+            onClick={() => handleOnCopy('Title', record.title)}
+            title="Copy title to clipboard"
+            style={{
+              minWidth: 'calc(100% - 140px)',
+              maxWidth: 'calc(100% - 140px)',
+              paddingRight: 50,
+            }}
+          />
+          <Dropdown
+            menu={{
+              items: downloadMenuItems,
+            }}
+            trigger={['click']}
+          >
+            <Button
+              style={{
+                width: '100px',
+                marginLeft: 20,
+                marginRight: 20,
+                color: 'blue',
+                borderColor: 'blue',
+              }}
+              disabled={isRequestingDownload}
+            >
+              {isRequestingDownload ? 'Preparing...' : 'Download'}
+            </Button>
+          </Dropdown>
+        </Content>
         <Content
           style={{
             width: '100%',
@@ -466,10 +532,12 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
     );
   }, [
     baseUrl,
+    downloadMenuItems,
     frontendUrl,
     handleOnCopy,
     height,
     imageWidth,
+    isRequestingDownload,
     record.accession,
     record.compound,
     record.peak.splash,
