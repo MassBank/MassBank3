@@ -268,7 +268,12 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
       label: 'SMILES',
       value: (
         <ExportableContent
-          component={<LabelWrapper value={record.compound.smiles} />}
+          component={
+            <LabelWrapper
+              value={record.compound.smiles}
+              style={{ wordBreak: 'break-all' }}
+            />
+          }
           mode="copy"
           onClick={() => handleOnCopy('SMILES', record.compound.smiles)}
           title="Copy SMILES to clipboard"
@@ -289,7 +294,12 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
       label: 'InChI',
       value: (
         <ExportableContent
-          component={<LabelWrapper value={record.compound.inchi} />}
+          component={
+            <LabelWrapper
+              value={record.compound.inchi}
+              style={{ wordBreak: 'break-all' }}
+            />
+          }
           mode="copy"
           onClick={() => handleOnCopy('InChI', record.compound.inchi)}
           title="Copy InChi to clipboard"
@@ -365,8 +375,8 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
         >
           <Table<HeaderTableType>
             style={{
-              minWidth: `calc(100% - ${imageWidth})`,
-              maxWidth: `calc(100% - ${imageWidth})`,
+              minWidth: `calc(100% - ${(imageWidth as number) + 30}px)`, // plus the download button width is 30px
+              maxWidth: `calc(100% - ${(imageWidth as number) + 30}px)`, // plus the download button width is 30px
               height: '100%',
             }}
             className="table"
@@ -379,7 +389,6 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
           <Content
             style={{
               minWidth: imageWidth,
-              maxWidth: imageWidth,
               height: '100%',
               display: 'flex',
               flexDirection: 'column',
@@ -391,14 +400,16 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
               <StructureView
                 smiles={record.compound.smiles}
                 imageWidth={imageWidth as number}
-                imageHeight={(height as number) - titleHeight - 80}
+                imageHeight={height as number}
               />
-            ) : undefined}
+            ) : (
+              'No structure available'
+            )}
 
             <Content
               style={{
                 width: imageWidth,
-                height: `calc(100% - ${height} - ${titleHeight} - 80px)`,
+                height: `calc(100% - ${height})`,
                 display: 'grid',
                 gridTemplateColumns: '75px auto 55px auto',
                 alignItems: 'center',
