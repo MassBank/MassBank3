@@ -207,11 +207,9 @@ function ResultPanel({
   const handleOnDownloadResult = useCallback(
     async (format: DownloadFormat) => {
       setIsRequestingDownload(true);
-      const host = exportServiceUrl;
-      const url = `${host}/convert`;
 
       await downloadRecords(
-        url,
+        exportServiceUrl,
         format,
         hits.map((h) => h.accession),
       );

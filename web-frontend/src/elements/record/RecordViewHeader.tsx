@@ -12,9 +12,11 @@ import LabelWrapper from '../basic/LabelWrapper';
 import { usePropertiesContext } from '../../context/properties/properties';
 import buildSearchUrl from '../../utils/buildSearchUrl';
 import NotAvailableLabel from '../basic/NotAvailableLabel';
-import downloadRecords from '../../utils/request/downloadRecords';
-import DownloadFormat from '../../types/DownloadFormat';
 import DownloadMenuItems from '../common/DownloadMenuItems';
+import routes from '../../constants/routes';
+import downloadRawMassBankRecord from '../../utils/request/downloadRawMassBankRecord';
+import DownloadFormat from '../../types/DownloadFormat';
+import downloadRecords from '../../utils/request/downloadRecords';
 
 const titleHeight = 80;
 const labelWidth = 120;
@@ -59,10 +61,11 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
   const handleOnDownloadResult = useCallback(
     async (format: DownloadFormat) => {
       setIsRequestingDownload(true);
-      const host = exportServiceUrl;
-      const url = `${host}/convert`;
 
-      await downloadRecords(url, format, [record.accession]);
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      format === 'massbank'
+        ? await downloadRawMassBankRecord(exportServiceUrl, record.accession)
+        : await downloadRecords(exportServiceUrl, format, [record.accession]);
 
       setIsRequestingDownload(false);
     },
@@ -404,11 +407,34 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
             onClick={() => handleOnCopy('Title', record.title)}
             title="Copy title to clipboard"
             style={{
-              minWidth: 'calc(100% - 140px)',
-              maxWidth: 'calc(100% - 140px)',
+              minWidth: 'calc(100% - 240px)',
+              maxWidth: 'calc(100% - 240px)',
               paddingRight: 50,
             }}
           />
+          <Button
+            style={{
+              width: '100px',
+              marginLeft: 20,
+              color: 'blue',
+              borderColor: 'blue',
+            }}
+          >
+            <a
+              href={
+                frontendUrl +
+                baseUrl +
+                '/' +
+                routes.accession.path +
+                '?id=' +
+                record.accession +
+                '&raw'
+              }
+              target="_blank"
+            >
+              View Raw
+            </a>
+          </Button>
           <Dropdown
             menu={{
               items: downloadMenuItems,
@@ -418,7 +444,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
             <Button
               style={{
                 width: '100px',
-                marginLeft: 20,
+                marginLeft: 5,
                 marginRight: 20,
                 color: 'blue',
                 borderColor: 'blue',

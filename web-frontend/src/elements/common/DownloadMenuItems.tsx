@@ -28,6 +28,16 @@ function DownloadMenuItems({ onDownload }: InputProps) {
         />
       ),
     },
+    {
+      key: '2_massbank_download',
+      label: (
+        <DownloadOptionLabel
+          label="MassBank"
+          format="massbank"
+          onDownload={onDownload}
+        />
+      ),
+    },
   ];
 
   return items;

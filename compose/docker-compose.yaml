@@ -73,7 +73,7 @@ services:
 
   export-service:
     platform: linux/amd64
-    image: quay.io/massbank/massbank3-export-service:latest
+    image: quay.io/massbank/massbank-export-api:latest
     restart: always
     ports:
       - "${EXPORT_SERVICE_PORT}:8080"
