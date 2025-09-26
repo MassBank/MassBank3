@@ -173,12 +173,28 @@ paths:
               schema:
                 type: object
                 properties:
+                  api:
+                    description: The status of the API.
+                    type: object
+                    properties:
+                      status:
+                        description: The status of the API.
+                        type: string
+                      version: 
+                        description: The version of the API.
+                        type: string
+                      error:
+                        description: The error message if the API is not running.
+                        type: string
                   postgres:
                     description: The status of the postgres database.
                     type: object
                     properties:
                       status:
                         description: The status of the postgres database.
+                        type: string
+                      version: 
+                        description: The version of the postgres database.
                         type: string
                       error:
                         description: The error message if the postgres database is not running.
@@ -190,6 +206,9 @@ paths:
                       status:
                         description: The status of the export service.
                         type: string
+                      version: 
+                        description: The version of the export service.
+                        type: string
                       error:
                         description: The error message if the export service is not running.
                         type: string
@@ -199,6 +218,9 @@ paths:
                     properties:
                       status:
                         description: The status of the similarity service.
+                        type: string
+                      version: 
+                        description: The version of the similarity service.
                         type: string
                       error:
                         description: The error message if the similarity service is not running.

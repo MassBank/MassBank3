@@ -13,6 +13,7 @@ pkg/mb3server/model_authors_inner.go
 pkg/mb3server/model_browse_options.go
 pkg/mb3server/model_database_object.go
 pkg/mb3server/model_get_status_200_response.go
+pkg/mb3server/model_get_status_200_response_api.go
 pkg/mb3server/model_get_status_200_response_export_service.go
 pkg/mb3server/model_get_status_200_response_postgres.go
 pkg/mb3server/model_get_status_200_response_similarity_service.go

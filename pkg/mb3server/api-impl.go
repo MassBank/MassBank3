@@ -3,6 +3,7 @@ package mb3server
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 	"os"
 	"sort"
@@ -560,22 +561,46 @@ func GetVersion() (string, error) {
 }
 
 func GetStatus() (GetStatus200Response, error) {
+	apiStatus := GetStatus200ResponseApi{
+		Status:  "OK",
+		Version: "unknown",
+		Error:   "",
+	}
 	postgresStatus := GetStatus200ResponsePostgres{
-		Status: "OK",
-		Error:  "",
+		Status:  "OK",
+		Version: "unknown",
+		Error:   "",
 	}
 	export_service_status := GetStatus200ResponseExportService{
-		Status: "OK",
-		Error:  "",
+		Status:  "OK",
+		Version: "unknown",
+		Error:   "",
 	}
 	similarity_service_status := GetStatus200ResponseSimilarityService{
-		Status: "OK",
-		Error:  "",
+		Status:  "OK",
+		Version: "unknown",
+		Error:   "",
+	}
+
+	apiVersion, err := GetVersion()
+	if err != nil {
+		apiStatus.Status = "ERROR"
+		apiStatus.Error = err.Error()
+	} else {
+		apiStatus.Version = apiVersion
 	}
 
 	if err := initDB(); err != nil {
 		postgresStatus.Status = "ERROR"
 		postgresStatus.Error = err.Error()
+	} else {
+		version, err := db.GetVersion()
+		if err != nil {
+			postgresStatus.Status = "ERROR"
+			postgresStatus.Error = err.Error()
+		} else {
+			postgresStatus.Version = version
+		}
 	}
 
 	exportServiceUrl := getEnv("EXPORT_SERVICE_URL", "http://export-service:8080")
@@ -588,6 +613,9 @@ func GetStatus() (GetStatus200Response, error) {
 		if res.StatusCode != 200 {
 			export_service_status.Status = "ERROR"
 			export_service_status.Error = "Export service returned status code " + strconv.Itoa(res.StatusCode)
+		} else {
+			body, _ := io.ReadAll(res.Body)
+			export_service_status.Version = string(body)
 		}
 	}
 
@@ -601,10 +629,14 @@ func GetStatus() (GetStatus200Response, error) {
 		if res.StatusCode != 200 {
 			similarity_service_status.Status = "ERROR"
 			similarity_service_status.Error = "Similarity service returned status code " + strconv.Itoa(res.StatusCode)
+		} else {
+			body, _ := io.ReadAll(res.Body)
+			similarity_service_status.Version = string(body)
 		}
 	}
 
 	return GetStatus200Response{
+		Api:               apiStatus,
 		Postgres:          postgresStatus,
 		ExportService:     export_service_status,
 		SimilarityService: similarity_service_status,

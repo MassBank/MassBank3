@@ -171,6 +171,8 @@ type MB3Database interface {
 	GetUniqueValues(filters Filters) (MB3Values, error)
 
 	GetMetadata() (*massbank.MbMetaData, error)
+	// GetVersion returns the version of the MassBank PostGres database.
+	GetVersion() (string, error)
 
 	// UpdateMetadata updates the metadata describing the MassBank version.
 	// Provides the database id of an existing entry if it is already in the

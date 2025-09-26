@@ -343,6 +343,21 @@ func (p *PostgresSQLDB) GetMetadata() (*massbank.MbMetaData, error) {
 	return result, nil
 }
 
+func (p *PostgresSQLDB) GetVersion() (string, error) {
+	var version string
+	query := "SELECT version();"
+	stmt, err := p.database.Prepare(query)
+	if err != nil {
+		return "", err
+	}
+	err = stmt.QueryRow().Scan(&version)
+	stmt.Close()
+	if err != nil {
+		return "", err
+	}
+	return version, nil
+}
+
 func (p *PostgresSQLDB) GetRecords(s *[]string) (*[]string, error) {
 
 	var query = "SELECT record_text FROM records WHERE accession = ANY ($1);"

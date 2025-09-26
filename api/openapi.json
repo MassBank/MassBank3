@@ -1,6 +1,7 @@
 {
   "openapi" : "3.0.3",
   "info" : {
+    "description" : "The MassBank3 API allows retrieval and filtering of records by chemical or experimental parameters, similarity search on peak lists, and access to individual record details, metadata, service status, and available filter options.",
     "title" : "MassBank3 API",
     "version" : "3.0"
   },
@@ -1055,11 +1056,33 @@
         },
         "type" : "array"
       },
+      "getStatus_200_response_api" : {
+        "description" : "The status of the API.",
+        "properties" : {
+          "status" : {
+            "description" : "The status of the API.",
+            "type" : "string"
+          },
+          "version" : {
+            "description" : "The version of the API.",
+            "type" : "string"
+          },
+          "error" : {
+            "description" : "The error message if the API is not running.",
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
       "getStatus_200_response_postgres" : {
         "description" : "The status of the postgres database.",
         "properties" : {
           "status" : {
             "description" : "The status of the postgres database.",
+            "type" : "string"
+          },
+          "version" : {
+            "description" : "The version of the postgres database.",
             "type" : "string"
           },
           "error" : {
@@ -1076,6 +1099,10 @@
             "description" : "The status of the export service.",
             "type" : "string"
           },
+          "version" : {
+            "description" : "The version of the export service.",
+            "type" : "string"
+          },
           "error" : {
             "description" : "The error message if the export service is not running.",
             "type" : "string"
@@ -1090,6 +1117,10 @@
             "description" : "The status of the similarity service.",
             "type" : "string"
           },
+          "version" : {
+            "description" : "The version of the similarity service.",
+            "type" : "string"
+          },
           "error" : {
             "description" : "The error message if the similarity service is not running.",
             "type" : "string"
@@ -1099,6 +1130,9 @@
       },
       "getStatus_200_response" : {
         "properties" : {
+          "api" : {
+            "$ref" : "#/components/schemas/getStatus_200_response_api"
+          },
           "postgres" : {
             "$ref" : "#/components/schemas/getStatus_200_response_postgres"
           },

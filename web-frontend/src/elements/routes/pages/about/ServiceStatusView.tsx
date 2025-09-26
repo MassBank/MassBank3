@@ -14,49 +14,54 @@ function ServiceStatusView() {
   const { backendUrl } = usePropertiesContext();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [errorApi, setErrorApi] = useState<string | null>(null);
-  const [errorPostgres, setErrorPostgres] = useState<string | null>(null);
-  const [errorSimilarityService, setErrorSimilarityService] = useState<
-    string | null
-  >(null);
-  const [errorExportService, setErrorExportService] = useState<string | null>(
-    null,
-  );
+  const [status, setStatus] = useState<StatusResult | null>(null);
 
   const handleOnCheckServiceStatus = useCallback(async () => {
     setIsLoading(true);
 
+    const _status: StatusResult = {
+      api: { status: 'Unknown', version: undefined, error: undefined },
+      postgres: { status: 'Unknown', version: undefined, error: undefined },
+      similarity_service: {
+        status: 'Unknown',
+        version: undefined,
+        error: undefined,
+      },
+      export_service: {
+        status: 'Unknown',
+        version: undefined,
+        error: undefined,
+      },
+    };
+
     try {
       const response = await axios.get(`${backendUrl}/status`);
+
       if (response.status === 200) {
-        setErrorApi(null);
         const statusResult = response.data as StatusResult;
-        setErrorPostgres(
-          statusResult.postgres.error ? statusResult.postgres.error : null,
-        );
-        setErrorSimilarityService(
-          statusResult.similarity_service.error
-            ? statusResult.similarity_service.error
-            : null,
-        );
-        setErrorExportService(
-          statusResult.export_service.error
-            ? statusResult.export_service.error
-            : null,
-        );
-      } else {
-        setErrorApi(response.statusText);
-        setErrorPostgres("Couldn't connect to the API");
-        setErrorSimilarityService("Couldn't connect to the API");
-        setErrorExportService("Couldn't connect to the API");
+        _status.api = statusResult.api;
+        _status.postgres = statusResult.postgres;
+        _status.postgres.version =
+          statusResult.postgres.version?.split(' (')[0]; // Only keep the version number, not the build date
+        _status.similarity_service = statusResult.similarity_service;
+        _status.similarity_service.version =
+          statusResult.similarity_service.version?.replace(/"/g, '');
+        _status.export_service = statusResult.export_service;
+        _status.export_service.version =
+          statusResult.export_service.version?.replace(/"/g, '');
       }
     } catch (error: unknown) {
-      setErrorApi((error as Error).message);
-      setErrorPostgres("Couldn't connect to the API");
-      setErrorSimilarityService("Couldn't connect to the API");
-      setErrorExportService("Couldn't connect to the API");
-      console.error(error);
+      _status.api.status = "Couldn't connect to the API";
+      _status.api.error = (error as Error).message;
+      _status.postgres.status = "Couldn't connect to the API";
+      _status.postgres.error = "Couldn't connect to the API";
+      _status.similarity_service.status = "Couldn't connect to the API";
+      _status.similarity_service.error = "Couldn't connect to the API";
+      _status.export_service.status = "Couldn't connect to the API";
+      _status.export_service.error = "Couldn't connect to the API";
     }
+
+    setStatus(_status);
 
     setIsLoading(false);
   }, [backendUrl]);
@@ -93,40 +98,75 @@ function ServiceStatusView() {
             <Result
               title="MassBank API"
               subTitle={
-                <p style={{ color: 'black' }}>
-                  {errorApi && errorApi.length > 0
-                    ? errorApi
-                    : 'Successfully connected'}
-                </p>
+                <div>
+                  <label style={{ color: 'black' }}>
+                    {status?.api.error && status?.api.error.length > 0
+                      ? status?.api.error
+                      : 'Successfully connected'}
+                  </label>
+                  <br />
+                  {!status?.api.error || status?.api.error?.length === 0 ? (
+                    <label style={{ color: 'darkslategrey' }}>
+                      ({status?.api.version?.trim() ?? 'Unknown'})
+                    </label>
+                  ) : null}
+                </div>
               }
-              status={errorApi && errorApi.length > 0 ? 'error' : 'success'}
+              status={
+                status?.api.error && status?.api.error.length > 0
+                  ? 'error'
+                  : 'success'
+              }
               style={resultStyle}
             />
             <Result
               title="Postgres Database"
               subTitle={
-                <p style={{ color: 'black' }}>
-                  {errorPostgres && errorPostgres.length > 0
-                    ? errorPostgres
-                    : 'Successfully connected'}
-                </p>
+                <div>
+                  <label style={{ color: 'black' }}>
+                    {status?.postgres.error && status?.postgres.error.length > 0
+                      ? status?.postgres.error
+                      : 'Successfully connected'}
+                  </label>
+                  <br />
+                  {!status?.postgres.error ||
+                  status?.postgres.error?.length === 0 ? (
+                    <label style={{ color: 'darkslategrey' }}>
+                      ({status?.postgres.version?.trim() ?? 'Unknown'})
+                    </label>
+                  ) : null}
+                </div>
               }
               status={
-                errorPostgres && errorPostgres.length > 0 ? 'error' : 'success'
+                status?.postgres.error && status?.postgres.error.length > 0
+                  ? 'error'
+                  : 'success'
               }
               style={resultStyle}
             />
             <Result
               title="Similarity Service"
               subTitle={
-                <p style={{ color: 'black' }}>
-                  {errorSimilarityService && errorSimilarityService.length > 0
-                    ? errorSimilarityService
-                    : 'Successfully connected'}
-                </p>
+                <div>
+                  <label style={{ color: 'black' }}>
+                    {status?.similarity_service.error &&
+                    status?.similarity_service.error.length > 0
+                      ? status?.similarity_service.error
+                      : 'Successfully connected'}
+                  </label>
+                  <br />
+                  {!status?.similarity_service.error ||
+                  status?.similarity_service.error?.length === 0 ? (
+                    <label style={{ color: 'darkslategrey' }}>
+                      ({status?.similarity_service.version?.trim() ?? 'Unknown'}
+                      )
+                    </label>
+                  ) : null}
+                </div>
               }
               status={
-                errorSimilarityService && errorSimilarityService.length > 0
+                status?.similarity_service.error &&
+                status?.similarity_service.error.length > 0
                   ? 'error'
                   : 'success'
               }
@@ -135,14 +175,25 @@ function ServiceStatusView() {
             <Result
               title="Export Service"
               subTitle={
-                <p style={{ color: 'black' }}>
-                  {errorExportService && errorExportService.length > 0
-                    ? errorExportService
-                    : 'Successfully connected'}
-                </p>
+                <div>
+                  <label style={{ color: 'black' }}>
+                    {status?.export_service.error &&
+                    status?.export_service.error.length > 0
+                      ? status?.export_service.error
+                      : 'Successfully connected'}
+                  </label>
+                  <br />
+                  {!status?.export_service.error ||
+                  status?.export_service.error?.length === 0 ? (
+                    <label style={{ color: 'darkslategrey' }}>
+                      ({status?.export_service.version?.trim() ?? 'Unknown'})
+                    </label>
+                  ) : null}
+                </div>
               }
               status={
-                errorExportService && errorExportService.length > 0
+                status?.export_service.error &&
+                status?.export_service.error.length > 0
                   ? 'error'
                   : 'success'
               }
@@ -164,14 +215,7 @@ function ServiceStatusView() {
         </Button>
       </Content>
     ),
-    [
-      errorApi,
-      errorExportService,
-      errorPostgres,
-      errorSimilarityService,
-      handleOnCheckServiceStatus,
-      isLoading,
-    ],
+    [handleOnCheckServiceStatus, isLoading, status],
   );
 }
 
