@@ -24,37 +24,65 @@ function AccessionView() {
   const accession = searchParams.get('id');
   const showRaw = searchParams.get('raw') !== null;
 
+  const notFoundElement = useMemo(
+    () => (
+      <div
+        key={'no-record-found-' + requestedAccession}
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <p style={{ fontWeight: 'bolder', fontSize: 'larger' }}>
+          No database entry found for "{requestedAccession}".
+        </p>
+      </div>
+    ),
+    [requestedAccession],
+  );
+
   const handleOnSearch = useCallback(
     async (acc: string, raw: boolean) => {
       setIsRequesting(true);
       setRequestedAccession(acc);
 
       if (raw) {
-        const rawMassBankRecordText = await fetchRawMassBankRecord(
-          exportServiceUrl,
-          acc,
-        );
-        if (rawMassBankRecordText) {
-          setRawTextElements(
-            rawMassBankRecordText.split(/\n/g).map((line: string) => (
-              <label key={line}>
-                {line}
-                <br />
-              </label>
-            )),
+        let _rawTextElements: JSX.Element[] = [];
+        try {
+          const rawMassBankRecordText = await fetchRawMassBankRecord(
+            exportServiceUrl,
+            acc,
           );
-        } else {
-          setRawTextElements([
-            <label>No raw MassBank record found for accession "{acc}"</label>,
-          ]);
+          if (rawMassBankRecordText) {
+            _rawTextElements = (rawMassBankRecordText as string)
+              .split(/\n/g)
+              .map((line: string, i: number) => (
+                <label key={line + '_' + i}>
+                  {line}
+                  <br />
+                </label>
+              ));
+          } else {
+            _rawTextElements = [notFoundElement];
+          }
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+          // console.error('Error fetching raw MassBank record:', error);
+          _rawTextElements = [notFoundElement];
         }
+        console.log(_rawTextElements);
+
+        setRawTextElements(_rawTextElements);
       } else {
         setRecord(await getRecord(acc, backendUrl));
       }
 
       setIsRequesting(false);
     },
-    [backendUrl, exportServiceUrl],
+    [backendUrl, exportServiceUrl, notFoundElement],
   );
 
   useEffect(() => {
@@ -77,21 +105,34 @@ function AccessionView() {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            padding: 10,
           }}
         >
-          <Text style={{ width, height, overflow: 'scroll' }}>
+          <Text
+            style={{
+              width,
+              height,
+              overflow: 'scroll',
+              padding: 10,
+              backgroundColor: 'white',
+            }}
+          >
             {rawTextElements}
           </Text>
         </Content>
       ) : record ? (
         <RecordView record={record} width={width} height={height} />
       ) : requestedAccession !== '' ? (
-        <p style={{ fontWeight: 'bolder', fontSize: 'larger' }}>
-          No database entry found for "{requestedAccession}"
-        </p>
+        notFoundElement
       ) : undefined,
-    [showRaw, rawTextElements, width, height, record, requestedAccession],
+    [
+      showRaw,
+      rawTextElements,
+      width,
+      height,
+      record,
+      requestedAccession,
+      notFoundElement,
+    ],
   );
 
   return useMemo(

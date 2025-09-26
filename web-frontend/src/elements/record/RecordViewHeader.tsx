@@ -416,8 +416,8 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
             style={{
               width: '100px',
               marginLeft: 20,
-              color: 'blue',
-              borderColor: 'blue',
+              color: 'black',
+              borderColor: 'black',
             }}
           >
             <a
@@ -446,8 +446,8 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
                 width: '100px',
                 marginLeft: 5,
                 marginRight: 20,
-                color: 'blue',
-                borderColor: 'blue',
+                color: 'black',
+                borderColor: 'black',
               }}
               disabled={isRequestingDownload}
             >
