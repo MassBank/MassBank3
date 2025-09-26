@@ -73,8 +73,6 @@ function AccessionView() {
           // console.error('Error fetching raw MassBank record:', error);
           _rawTextElements = [notFoundElement];
         }
-        console.log(_rawTextElements);
-
         setRawTextElements(_rawTextElements);
       } else {
         setRecord(await getRecord(acc, backendUrl));
