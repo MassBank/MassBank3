@@ -1,14 +1,26 @@
 import { JSX, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import RecordView from '../../../record/RecordView';
 import Record from '../../../../types/record/Record';
-import { Spin } from 'antd';
+import { Button, Spin } from 'antd';
 import useContainerDimensions from '../../../../utils/useContainerDimensions';
 import { Content } from 'antd/es/layout/layout';
 import { useSearchParams } from 'react-router-dom';
 import { usePropertiesContext } from '../../../../context/properties/properties';
 import getRecord from '../../../../utils/request/fetchRecord';
 import Text from 'antd/es/typography/Text';
+import { CopyOutlined } from '@ant-design/icons';
 import fetchRawMassBankRecord from '../../../../utils/request/fetchRawMassBankRecord';
+import copyTextToClipboard from '../../../../utils/copyTextToClipboard';
+
+const toolButtonStyle = {
+  width: '40px',
+  border: 'none',
+  boxShadow: 'none',
+  backgroundColor: 'rgb(225, 231, 245)',
+  marginLeft: 5,
+  marginRight: 5,
+  overallWidth: '50px',
+};
 
 function AccessionView() {
   const ref = useRef(null);
@@ -18,7 +30,7 @@ function AccessionView() {
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [requestedAccession, setRequestedAccession] = useState<string>('');
   const [record, setRecord] = useState<Record | undefined>();
-  const [rawTextElements, setRawTextElements] = useState<JSX.Element[]>([]);
+  const [rawText, setRawText] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
 
   const accession = searchParams.get('id');
@@ -50,37 +62,30 @@ function AccessionView() {
       setRequestedAccession(acc);
 
       if (raw) {
-        let _rawTextElements: JSX.Element[] = [];
+        let _rawText: string | null = null;
         try {
           const rawMassBankRecordText = await fetchRawMassBankRecord(
             exportServiceUrl,
             acc,
           );
           if (rawMassBankRecordText) {
-            _rawTextElements = (rawMassBankRecordText as string)
-              .split(/\n/g)
-              .map((line: string, i: number) => (
-                <label key={line + '_' + i}>
-                  {line}
-                  <br />
-                </label>
-              ));
+            _rawText = rawMassBankRecordText as string;
           } else {
-            _rawTextElements = [notFoundElement];
+            _rawText = null;
           }
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
           // console.error('Error fetching raw MassBank record:', error);
-          _rawTextElements = [notFoundElement];
+          _rawText = null;
         }
-        setRawTextElements(_rawTextElements);
+        setRawText(_rawText);
       } else {
         setRecord(await getRecord(acc, backendUrl));
       }
 
       setIsRequesting(false);
     },
-    [backendUrl, exportServiceUrl, notFoundElement],
+    [backendUrl, exportServiceUrl],
   );
 
   useEffect(() => {
@@ -93,45 +98,68 @@ function AccessionView() {
     }
   }, [accession, handleOnSearch, showRaw]);
 
-  const recordView = useMemo(
-    () =>
-      showRaw && rawTextElements.length > 0 ? (
-        <Content
+  const handleOnCopy = useCallback(() => {
+    copyTextToClipboard('Record Text', rawText ? rawText : '');
+  }, [rawText]);
+
+  const recordView = useMemo(() => {
+    let rawTextElements: JSX.Element[] = [];
+    if (rawText) {
+      rawTextElements = (rawText as string)
+        .split(/\n/g)
+        .map((line: string, i: number) => (
+          <label key={line + '_' + i}>
+            {line}
+            <br />
+          </label>
+        ));
+    } else {
+      rawTextElements = [notFoundElement];
+    }
+    return showRaw && rawText && rawText.length > 0 ? (
+      <Content
+        style={{
+          width,
+          height,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Button
+          children={
+            <CopyOutlined title="Copy MassBank record data to clipboard" />
+          }
+          onClick={() => handleOnCopy()}
+          style={toolButtonStyle}
+        />
+        <Text
           style={{
-            width,
+            width: `calc(100% - ${toolButtonStyle.overallWidth})`,
             height,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            overflow: 'scroll',
+            padding: 10,
+            backgroundColor: 'white',
           }}
         >
-          <Text
-            style={{
-              width,
-              height,
-              overflow: 'scroll',
-              padding: 10,
-              backgroundColor: 'white',
-            }}
-          >
-            {rawTextElements}
-          </Text>
-        </Content>
-      ) : record ? (
-        <RecordView record={record} width={width} height={height} />
-      ) : requestedAccession !== '' ? (
-        notFoundElement
-      ) : undefined,
-    [
-      showRaw,
-      rawTextElements,
-      width,
-      height,
-      record,
-      requestedAccession,
-      notFoundElement,
-    ],
-  );
+          {rawTextElements}
+        </Text>
+      </Content>
+    ) : record ? (
+      <RecordView record={record} width={width} height={height} />
+    ) : requestedAccession !== '' ? (
+      notFoundElement
+    ) : undefined;
+  }, [
+    rawText,
+    showRaw,
+    width,
+    height,
+    record,
+    requestedAccession,
+    notFoundElement,
+    handleOnCopy,
+  ]);
 
   return useMemo(
     () => (
