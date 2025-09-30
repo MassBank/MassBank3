@@ -1,0 +1,269 @@
+import { MouseEvent, useCallback, useMemo, useState } from 'react';
+import { Button, Collapse, CollapseProps, UploadProps } from 'antd';
+import TextArea from 'antd/es/input/TextArea';
+import { Content } from 'antd/es/layout/layout';
+import Dragger from 'antd/es/upload/Dragger';
+import Text from 'antd/es/typography/Text';
+import { RcFile } from 'antd/es/upload';
+
+const rawTextPlaceholder =
+  'ACCESSION: MSBNK-IPB_Halle-PB001341\n\
+RECORD_TITLE: Rutin; LC-ESI-QTOF; MS2; CE:10 eV; [M+H]+\n\
+DATE: 2016.01.19 (Created 2008.05.22, modified 2013.06.04)\n\
+AUTHORS: Boettcher C, Institute of Plant Biochemistry, Halle, Germany\n\
+LICENSE: CC BY-SA\n\
+COMMENT: IPB_RECORD: 541\n\
+COMMENT: CONFIDENCE confident structure\n\
+CH$NAME: Rutin\n\
+CH$NAME: 2-(3,4-dihydroxyphenyl)-5,7-dihydroxy-3-[(2S,3R,4S,5S,6R)-3,4,5-trihydroxy-6-[[(2R,3R,4R,5R,6S)-3,4,5-trihydroxy-6-methyloxan-2-yl]oxymethyl]oxan-2-yl]oxychromen-4-one\n\
+CH$COMPOUND_CLASS: Natural Product; Flavonol\n\
+CH$FORMULA: C27H30O16\n\
+CH$EXACT_MASS: 610.15338\n\
+CH$SMILES: C[C@H]1[C@@H]([C@H]([C@H]([C@@H](O1)OC[C@@H]2[C@H]([C@@H]([C@H]([C@@H](O2)OC3=C(OC4=CC(=CC(=C4C3=O)O)O)C5=CC(=C(C=C5)O)O)O)O)O)O)O)O\n\
+CH$IUPAC: InChI=1S/C27H30O16/c1-8-17(32)20(35)22(37)26(40-8)39-7-15-18(33)21(36)23(38)27(42-15)43-25-19(34)16-13(31)5-10(28)6-14(16)41-24(25)9-2-3-11(29)12(30)4-9/h2-6,8,15,17-18,20-23,26-33,35-38H,7H2,1H3/t8-,15+,17-,18+,20+,21-,22+,23+,26+,27-/m0/s1\n\
+CH$LINK: INCHIKEY IKGXIBQEEMLURG-NVPNHPEKSA-N\n\
+CH$LINK: KEGG C05625\n\
+CH$LINK: PUBCHEM CID:5280805\n\
+CH$LINK: COMPTOX DTXSID3022326\n\
+CH$LINK: ChemOnt CHEMONTID:0001111; Organic compounds; Phenylpropanoids and polyketides; Flavonoids; Flavonoid glycosides\n\
+AC$INSTRUMENT: API QSTAR Pulsar i\n\
+AC$INSTRUMENT_TYPE: LC-ESI-QTOF\n\
+AC$MASS_SPECTROMETRY: MS_TYPE MS2\n\
+AC$MASS_SPECTROMETRY: ION_MODE POSITIVE\n\
+AC$MASS_SPECTROMETRY: COLLISION_ENERGY 10 eV\n\
+AC$MASS_SPECTROMETRY: IONIZATION ESI\n\
+MS$FOCUSED_ION: PRECURSOR_TYPE [M+H]+\n\
+PK$SPLASH: splash10-0wmi-0009506000-98ca7f7c8f3072af4481\n\
+PK$NUM_PEAK: 5\n\
+PK$PEAK: m/z int. rel.int.\n\
+  147.063 121.684 11\n\
+  303.050 10000.000 999\n\
+  449.108 657.368 64\n\
+  465.102 5884.210 587\n\
+  611.161 6700.000 669\n\
+//\n\
+';
+
+function Validation() {
+  const [rawText, setRawText] = useState<string>('');
+  const [validationResult, setValidationResult] = useState<string>('');
+  const [isRequesting, setIsRequesting] = useState<boolean>(false);
+
+  const insertPlaceholder = useCallback((e: MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setRawText(rawTextPlaceholder);
+    setValidationResult('');
+  }, []);
+
+  const handleOnDrop = useCallback((files: File[]) => {
+    const file = files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      const buffer = reader.result as ArrayBuffer;
+      const _rawText = new TextDecoder().decode(buffer);
+
+      setRawText(_rawText);
+      setValidationResult('');
+    };
+    reader.readAsArrayBuffer(file);
+  }, []);
+
+  const props: UploadProps = useMemo(() => {
+    return {
+      name: 'file',
+      style: {
+        minWidth: '200px',
+        maxWidth: '200px',
+        minHeight: 40,
+        maxHeight: 40,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      multiple: false,
+      showUploadList: false,
+      accept: '.txt',
+      onDrop: (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        handleOnDrop(Array.from(e.dataTransfer.files));
+      },
+      beforeUpload: async (file: RcFile) => {
+        handleOnDrop([file]);
+
+        return false;
+      },
+    };
+  }, [handleOnDrop]);
+
+  const handleOnValidate = useCallback(
+    async (e: MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      setIsRequesting(true);
+
+      console.log(rawText);
+
+      const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+      await delay(3000);
+
+      setValidationResult('It is a valid MassBank record format.');
+
+      setIsRequesting(false);
+    },
+    [rawText],
+  );
+
+  const handleOnChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setRawText(e.target.value);
+      setValidationResult('');
+    },
+    [],
+  );
+
+  const activeKey = useMemo(() => {
+    const keys: string[] = [];
+    keys.push('1');
+    if (!isRequesting && validationResult.trim().length > 0) {
+      keys.push('2');
+    }
+    return keys;
+  }, [isRequesting, validationResult]);
+
+  const collapse = useMemo(() => {
+    const items: CollapseProps['items'] = [
+      {
+        key: '1',
+        label: 'Input MassBank Record Text',
+        showArrow: false,
+        children: (
+          <TextArea
+            style={{ width: '100%', height: '100%' }}
+            placeholder={rawTextPlaceholder}
+            autoSize={{ minRows: 10 }}
+            allowClear
+            value={rawText}
+            onChange={handleOnChange}
+          />
+        ),
+      },
+      {
+        key: '2',
+        label: 'Validation Result',
+        showArrow: false,
+        children: (
+          <p style={{ color: isRequesting ? 'gray' : 'black' }}>
+            {isRequesting ? 'Validating...' : validationResult}
+          </p>
+        ),
+      },
+    ];
+
+    return (
+      <Collapse
+        items={items}
+        defaultActiveKey={['1']}
+        activeKey={activeKey}
+        style={{ width: '100%', height: '100%' }}
+      />
+    );
+  }, [activeKey, handleOnChange, isRequesting, rawText, validationResult]);
+
+  return useMemo(
+    () => (
+      <Content
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Content
+          style={{
+            width: '100%',
+            height: 40,
+            display: 'flex',
+            justifyContent: 'left',
+            alignItems: 'center',
+          }}
+        >
+          <p
+            style={{
+              fontWeight: 'bold',
+              width: '400px',
+              height: 40,
+              textAlign: 'center',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            Upload or paste your MassBank record file to validate it.
+          </p>
+          <Content
+            style={{
+              width: '300px',
+              height: 40,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginLeft: 10,
+            }}
+          >
+            <Dragger {...props}>
+              <Text
+                style={{
+                  width: '200px',
+                  height: 40,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  textAlign: 'center',
+                }}
+              >
+                <label>Drag&Drop or click here</label>
+              </Text>
+            </Dragger>
+          </Content>
+          <Button
+            style={{
+              width: '100px',
+              height: 40,
+              marginLeft: 10,
+            }}
+            onClick={insertPlaceholder}
+          >
+            <label>Load Example</label>
+          </Button>
+        </Content>
+        {collapse}
+        <Button
+          disabled={rawText.trim().length === 0 || isRequesting}
+          type="primary"
+          style={{ marginTop: 10 }}
+          onClick={handleOnValidate}
+        >
+          {isRequesting ? 'Validating...' : 'Validate'}
+        </Button>
+      </Content>
+    ),
+    [
+      collapse,
+      handleOnValidate,
+      insertPlaceholder,
+      isRequesting,
+      props,
+      rawText,
+    ],
+  );
+}
+
+export default Validation;

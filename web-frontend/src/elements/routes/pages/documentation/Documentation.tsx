@@ -6,6 +6,7 @@ import remarkGfm from 'remark-gfm';
 import Placeholder from '../../../basic/Placeholder';
 import Segmented from '../../../basic/Segmented';
 import SectionDivider from '../../../basic/SectionDivider';
+import Validation from '../../../basic/Validation';
 
 type LabelValueType = {
   label: string;
@@ -63,20 +64,30 @@ function Documentation() {
 
   const elements = useMemo(
     () =>
-      markDowns.map((entry) => (
-        <Content
-          key={'markdown-entry-' + entry.label}
-          style={{ width: '100%', height: '100%', padding: 10 }}
-        >
-          <SectionDivider label={entry.label} />
-          <Markdown remarkPlugins={[remarkGfm]} children={entry.value} />
-        </Content>
-      )),
+      markDowns
+        .map((entry) => (
+          <Content
+            key={'markdown-entry-' + entry.label}
+            style={{ width: '100%', height: '100%', padding: 10 }}
+          >
+            <SectionDivider label={entry.label} />
+            <Markdown remarkPlugins={[remarkGfm]} children={entry.value} />
+          </Content>
+        ))
+        .concat(
+          <Content
+            key={'markdown-entry-validation'}
+            style={{ width: '100%', height: '100%', padding: 10 }}
+          >
+            <SectionDivider label="Validation (Test)" />
+            <Validation />
+          </Content>,
+        ),
     [markDowns],
   );
 
   const elementLabels = useMemo(
-    () => markDowns.map((entry) => entry.label),
+    () => markDowns.map((entry) => entry.label).concat(['Validation (Test)']),
     [markDowns],
   );
 
