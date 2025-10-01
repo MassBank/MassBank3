@@ -3,7 +3,6 @@ import { Button, Collapse, CollapseProps, UploadProps } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { Content } from 'antd/es/layout/layout';
 import Dragger from 'antd/es/upload/Dragger';
-import Text from 'antd/es/typography/Text';
 import { RcFile } from 'antd/es/upload';
 
 const rawTextPlaceholder =
@@ -74,8 +73,8 @@ function Validation() {
     return {
       name: 'file',
       style: {
-        minWidth: '200px',
-        maxWidth: '200px',
+        minWidth: 210,
+        maxWidth: 210,
         minHeight: 40,
         maxHeight: 40,
         display: 'flex',
@@ -193,12 +192,13 @@ function Validation() {
             display: 'flex',
             justifyContent: 'left',
             alignItems: 'center',
+            marginBottom: 10,
           }}
         >
           <p
             style={{
               fontWeight: 'bold',
-              width: '400px',
+              minWidth: 400,
               height: 40,
               textAlign: 'center',
               display: 'flex',
@@ -210,39 +210,26 @@ function Validation() {
           </p>
           <Content
             style={{
-              width: '300px',
+              width: '100%',
               height: 40,
               display: 'flex',
-              justifyContent: 'center',
+              justifyContent: 'left',
               alignItems: 'center',
               marginLeft: 10,
             }}
           >
-            <Dragger {...props}>
-              <Text
-                style={{
-                  width: '200px',
-                  height: 40,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                }}
-              >
-                <label>Drag&Drop or click here</label>
-              </Text>
-            </Dragger>
+            <Dragger {...props}>Drag&Drop or click here</Dragger>
+            <Button
+              style={{
+                width: 100,
+                height: 40,
+                marginLeft: 10,
+              }}
+              onClick={insertPlaceholder}
+            >
+              <label>Load Example</label>
+            </Button>
           </Content>
-          <Button
-            style={{
-              width: '100px',
-              height: 40,
-              marginLeft: 10,
-            }}
-            onClick={insertPlaceholder}
-          >
-            <label>Load Example</label>
-          </Button>
         </Content>
         {collapse}
         <Button
