@@ -39,8 +39,8 @@ func main() {
 	r := mb3server.NewRouter(DefaultApiController)
 	addSwaggerEndpoint(r)
 
-	router := chi.NewRouter()    
-    router.Mount(mb3server.ServerConfig.BaseUrl, r)
+	router := chi.NewRouter()
+	router.Mount(mb3server.ServerConfig.BaseUrl, r)
 
 	log.Fatal(http.ListenAndServe(":"+strconv.FormatUint(uint64(mb3server.ServerConfig.ServerPort), 10), router))
 
