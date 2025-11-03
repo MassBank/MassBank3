@@ -385,7 +385,7 @@ function SearchPanelMenuItems({
                     })
                   }
                 />,
-                'Search by InChI or InChIKey of a compound (e.g. IKGXIBQEEMLURG-NVPNHPEKSA-N).' +
+                'Search by InChI or InChIKey of a compound (e.g. IKGXIBQEEMLURG-NVPNHPEKSA-N). In case of InChIKey search, the system checks for a partial match starting at the beginning (e.g. to find the first InChIKey block only).' +
                   ' ' +
                   defaultTooltipText,
               ),

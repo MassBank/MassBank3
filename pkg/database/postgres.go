@@ -1026,7 +1026,7 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) (string, []stri
 
 	if filters.InchiKey != "" {
 		parameters = append(parameters, filters.InchiKey)
-		subQuery := "inchikey = $" + strconv.Itoa(len(parameters))
+		subQuery := "LOWER(inchikey) LIKE LOWER(CONCAT($" + strconv.Itoa(len(parameters)) + "::text,'%%'))"
 		if addedWhere || addedAnd {
 			query = query + " AND " + subQuery
 			addedAnd = true
