@@ -1,5 +1,17 @@
 # Changelog
 
+## [2025.10.6](https://github.com/MassBank/MassBank3/compare/v2025.10.4...v2025.10.6) (2025-11-03)
+
+
+### Features
+
+* allowed partial search for InChiKey starting at the beginning ([ca43b49](https://github.com/MassBank/MassBank3/commit/ca43b49a1f60f2d3a98f0cc47a770d2ea0d70fe7))
+
+
+### Miscellaneous Chores
+
+* release v2025.10.6 ([0a76ea1](https://github.com/MassBank/MassBank3/commit/0a76ea1e1675db1a6f0c5a761ec7e9e1f674108c))
+
 ## [2025.10.4](https://github.com/MassBank/MassBank3/compare/v2025.10.3...v2025.10.4) (2025-10-29)
 
 
