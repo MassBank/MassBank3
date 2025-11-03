@@ -23,7 +23,7 @@ authors:
     given-names: David
     orcid: https://orcid.org/0000-0001-7499-1693
 
-version: v2025.10.5
+version: v2025.10.6
 identifiers:
   - type: doi
     value: 10.5281/zenodo.16923315
