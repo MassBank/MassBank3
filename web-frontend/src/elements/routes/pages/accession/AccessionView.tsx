@@ -30,7 +30,7 @@ function AccessionView() {
 
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [requestedAccession, setRequestedAccession] = useState<string>('');
-  const [record, setRecord] = useState<Record | undefined>();
+  const [record, setRecord] = useState<Record | null>(null);
   const [rawText, setRawText] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
@@ -85,10 +85,14 @@ function AccessionView() {
         const response = await getRecord(acc, backendUrl);
         if (response.status !== 'success') {
           setErrorMessage(response.message);
-          setRecord(undefined);
+          setRecord(null);
         } else {
           setErrorMessage(null);
-          setRecord(response.data ?? undefined);
+          if (typeof response.data === 'object') {
+            setRecord(response.data);
+          } else {
+            setRecord(null);
+          }
         }
       }
 
