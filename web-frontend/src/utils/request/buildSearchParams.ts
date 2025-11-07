@@ -2,7 +2,7 @@ import ContentFilterOptions from '../../types/filterOptions/ContentFilterOtions'
 import SearchParams from '../../types/SearchParams';
 import ValueCount from '../../types/ValueCount';
 
-function buildSearchParams(cont: ContentFilterOptions | undefined) {
+function buildSearchParams(cont: ContentFilterOptions | null) {
   const searchParams: SearchParams = {};
   if (cont) {
     Object.keys(cont)

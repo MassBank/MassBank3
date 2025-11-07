@@ -11,6 +11,7 @@ import Text from 'antd/es/typography/Text';
 import { CopyOutlined } from '@ant-design/icons';
 import fetchRawMassBankRecord from '../../../../utils/request/fetchRawMassBankRecord';
 import copyTextToClipboard from '../../../../utils/copyTextToClipboard';
+import ErrorElement from '../../../basic/ErrorElement';
 
 const toolButtonStyle = {
   width: '40px',
@@ -31,6 +32,7 @@ function AccessionView() {
   const [requestedAccession, setRequestedAccession] = useState<string>('');
   const [record, setRecord] = useState<Record | undefined>();
   const [rawText, setRawText] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
 
   const accession = searchParams.get('id');
@@ -80,7 +82,14 @@ function AccessionView() {
         }
         setRawText(_rawText);
       } else {
-        setRecord(await getRecord(acc, backendUrl));
+        const response = await getRecord(acc, backendUrl);
+        if (response.status !== 'success') {
+          setErrorMessage(response.message);
+          setRecord(undefined);
+        } else {
+          setErrorMessage(null);
+          setRecord(response.data ?? undefined);
+        }
       }
 
       setIsRequesting(false);
@@ -173,10 +182,18 @@ function AccessionView() {
           alignItems: 'center',
         }}
       >
-        {isRequesting ? <Spin size="large" /> : recordView}
+        {isRequesting ? (
+          <Spin size="large" />
+        ) : errorMessage ? (
+          <ErrorElement
+            message={`An error occurred while trying to fetch the record for "${requestedAccession}".`}
+          />
+        ) : (
+          recordView
+        )}
       </Content>
     ),
-    [isRequesting, recordView],
+    [isRequesting, errorMessage, requestedAccession, recordView],
   );
 }
 

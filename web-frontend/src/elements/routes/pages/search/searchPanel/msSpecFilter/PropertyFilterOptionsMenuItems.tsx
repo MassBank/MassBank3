@@ -4,7 +4,7 @@ import SearchFields from '../../../../../../types/filterOptions/SearchFields';
 import ContentFilterOptions from '../../../../../../types/filterOptions/ContentFilterOtions';
 
 type InputProps = {
-  propertyFilterOptions: ContentFilterOptions | undefined;
+  propertyFilterOptions: ContentFilterOptions | null;
   showCounts?: boolean;
 };
 

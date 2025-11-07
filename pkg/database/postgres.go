@@ -186,6 +186,9 @@ func (p *PostgresSQLDB) Connect() error {
 }
 
 func (p *PostgresSQLDB) Ping() error {
+	if err := p.checkDatabase(); err != nil {
+		return err
+	}
 	return p.database.Ping()
 }
 
@@ -2220,7 +2223,7 @@ func (p *PostgresSQLDB) Init() error {
 
 func (p *PostgresSQLDB) checkDatabase() error {
 	if p.database == nil {
-		return errors.New("database not ready")
+		return errors.New("checkDatabase(): database not set")
 	}
 	return p.database.Ping()
 }

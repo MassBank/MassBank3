@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Metadata from './src/types/Metadata';
 import fetchData from './src/utils/request/fetchData';
+import RequestResponse from './src/types/RequestResponse';
 
 const buildRecordMetadata = async (
   accession: string,
@@ -39,12 +40,15 @@ async function getLastmodDate(
   exportServiceUrlInternal: string,
 ) {
   let url = backendUrlInternal + '/metadata';
-  const searchResultMetadata: Metadata | undefined = await fetchData(url);
+  const response: RequestResponse<Metadata> = (await fetchData(
+    url,
+  )) as RequestResponse<Metadata>;
+  const searchResultMetadata: Metadata | null = response?.data;
   const timestampMetadata = searchResultMetadata?.timestamp;
   url = exportServiceUrlInternal + '/version';
-  const searchResultExportServiceVersion: string | undefined =
-    await fetchData(url);
-  const timestampExportService = searchResultExportServiceVersion
+  const searchResultExportServiceVersion: RequestResponse<string> =
+    (await fetchData(url)) as RequestResponse<string>;
+  const timestampExportService = searchResultExportServiceVersion?.data
     ?.split(',')[1]
     .trim();
 

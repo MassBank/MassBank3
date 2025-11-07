@@ -212,11 +212,13 @@ func InitDb(dbConfig DBConfig) (MB3Database, error) {
 			db, err = NewPostgresSQLDb(dbConfig)
 			log.Println(dd.Dump(db))
 			if err != nil {
-				panic(err)
+				db = nil
+				return nil, err
 			}
 		}
 		if err = db.Connect(); err != nil {
-			panic(err)
+			db = nil
+			return nil, err
 		}
 	}
 	err := db.Ping()

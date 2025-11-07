@@ -31,7 +31,7 @@ type HeaderTableType = {
 };
 
 type InputProps = {
-  metadata: Metadata | undefined;
+  metadata: Metadata | null;
   width?: CSSProperties['width'];
   height?: CSSProperties['height'];
 };

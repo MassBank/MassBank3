@@ -22,9 +22,10 @@ type InputProps = {
   width: CSSProperties['width'];
   height: CSSProperties['height'];
   collapsed: boolean;
-  propertyFilterOptions: ContentFilterOptions | undefined;
+  propertyFilterOptions: ContentFilterOptions | null;
   onCollapse: (collapsed: boolean) => void;
   onSubmit: (data: SearchFields) => void;
+  disableActiveKeys?: boolean;
 };
 
 function CommonSearchPanel({
@@ -36,6 +37,7 @@ function CommonSearchPanel({
   propertyFilterOptions,
   onCollapse,
   onSubmit,
+  disableActiveKeys = false,
 }: InputProps) {
   const [form] = useForm<SearchFields>();
   const { setFieldValue, setFieldsValue } = form;
@@ -68,8 +70,8 @@ function CommonSearchPanel({
   ]);
 
   const activeKeys = useMemo(
-    () => getActiveKeysFromFormData(initialValues),
-    [initialValues],
+    () => (disableActiveKeys ? [] : getActiveKeysFromFormData(initialValues)),
+    [disableActiveKeys, initialValues],
   );
 
   const handleOnSubmit: FormProps<SearchFields>['onFinish'] = useCallback(
