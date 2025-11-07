@@ -401,7 +401,7 @@ function SearchPanelMenuItems({
               key: 'structure',
               style: {
                 width: '100%',
-                height: 750,
+                height: 650,
                 marginLeft: 0,
                 overflow: 'scroll',
               },
@@ -409,6 +409,8 @@ function SearchPanelMenuItems({
                 <StructuralEditor
                   initialSMILES={initialStructure}
                   insertPlaceholder={insertPlaceholder}
+                  width={'100%'}
+                  height={650}
                 />
               ),
             },

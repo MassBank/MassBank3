@@ -1,6 +1,6 @@
 import { Molecule, SmilesParser } from 'openchemlib';
 import { useCallback, useMemo } from 'react';
-import { MolfileSvgRenderer } from 'react-ocl/minimal';
+import { MolfileSvgRenderer } from 'react-ocl';
 import ExportableContent from '../common/ExportableContent';
 import { Content } from 'antd/es/layout/layout';
 import FileSaver from 'file-saver';
