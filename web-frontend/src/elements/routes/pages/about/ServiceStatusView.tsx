@@ -27,7 +27,8 @@ function ServiceStatusView() {
 
   useEffect(() => {
     handleOnCheckServiceStatus();
-  }, [handleOnCheckServiceStatus]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return useMemo(
     () => (
