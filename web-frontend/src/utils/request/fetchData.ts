@@ -5,12 +5,14 @@ import Record from '../../types/record/Record';
 import Metadata from '../../types/Metadata';
 import SearchResult from '../../types/SearchResult';
 import ContentFilterOptions from '../../types/filterOptions/ContentFilterOtions';
+import StatusResult from '../../types/StatusResult';
 
 type responseType =
   | Record
   | SearchResult
   | Metadata
   | ContentFilterOptions
+  | StatusResult
   | string
   | number;
 

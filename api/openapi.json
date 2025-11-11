@@ -1081,6 +1081,10 @@
             "description" : "The status of the postgres database.",
             "type" : "string"
           },
+          "updateStatus" : {
+            "description" : "The status of the database update process.",
+            "type" : "string"
+          },
           "version" : {
             "description" : "The version of the postgres database.",
             "type" : "string"

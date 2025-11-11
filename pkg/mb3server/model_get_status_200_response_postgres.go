@@ -19,6 +19,9 @@ type GetStatus200ResponsePostgres struct {
 	// The status of the postgres database.
 	Status string `json:"status,omitempty"`
 
+	// The status of the database update process.
+	UpdateStatus string `json:"updateStatus,omitempty"`
+
 	// The version of the postgres database.
 	Version string `json:"version,omitempty"`
 

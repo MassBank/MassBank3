@@ -9,6 +9,7 @@ import MassBankInfo from './MassBankInfo';
 import FeaturesOverview from './FeaturesOverview';
 import { usePropertiesContext } from '../../../../context/properties/properties';
 import FreeText from '../../../basic/FreeText';
+import StatusMessage from './StatusMessage';
 
 function HomeView() {
   const {
@@ -20,6 +21,9 @@ function HomeView() {
 
   const elements: JSX.Element[] = [];
   const elementLabels: string[] = [];
+
+  const statusMessage = <StatusMessage />;
+  elements.push(statusMessage);
 
   elements.push(<MassBankInfo />);
   elementLabels.push('MassBank');
@@ -111,6 +115,7 @@ function HomeView() {
         justifyContent: 'center',
       }}
     >
+      {/* <StatusMessage /> */}
       <Segmented elements={elements} elementLabels={elementLabels} />
     </Layout>
   );

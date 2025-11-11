@@ -181,6 +181,13 @@ type MB3Database interface {
 	// Returns the id of the database entry as string.
 	UpdateMetadata(meta *massbank.MbMetaData) (string, error)
 
+	// Set status
+	SetStatus(param string, status string) error
+	// Delete status
+	DeleteStatus(param string) error
+	// Get status
+	GetStatus(param string) (string, error)
+
 	// RemoveIndexes removes all indexes from the database.
 	RemoveIndexes() error
 
