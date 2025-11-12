@@ -27,6 +27,8 @@ import segmentedWidth from '../../../../constants/segmentedWidth';
 import buildClassificationData from '../../../../utils/buildClassificationData';
 import ClassificationPanel from './ClassificationPanel';
 import NotAvailableLabel from '../../../basic/NotAvailableLabel';
+import RequestResponse from '../../../../types/RequestResponse';
+import ErrorElement from '../../../basic/ErrorElement';
 
 const ContentChart = lazy(() => import('./ContentChart'));
 
@@ -40,37 +42,61 @@ function ContentView() {
   const [isFetchingContent, setIsFetchingContent] = useState<boolean>(false);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
-  const [hits, setHits] = useState<Hit[]>([]);
-  const [propertyFilterOptions, setPropertyFilterOptions] = useState<
-    ContentFilterOptions | undefined
-  >();
-  const [metadata, setMetadata] = useState<Metadata | undefined>();
+  const [hits, setHits] = useState<Hit[] | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [propertyFilterOptions, setPropertyFilterOptions] =
+    useState<ContentFilterOptions | null>(null);
+  const [metadata, setMetadata] = useState<Metadata | null>(null);
   const [searchPanelWidth, setSearchPanelWidth] = useState<number>(
     defaultSearchPanelWidth,
   );
 
   const handleOnFetchContent = useCallback(
-    async (formDataContent: ContentFilterOptions | undefined) => {
+    async (formDataContent: ContentFilterOptions | null) => {
       setIsFetchingContent(true);
 
-      let _browseContent: ContentFilterOptions | undefined = formDataContent;
+      let _browseContent: ContentFilterOptions | null = formDataContent;
       if (!_browseContent) {
         const url = backendUrl + '/filter/browse';
-        _browseContent = (await fetchData(url)) as ContentFilterOptions;
+        const response = (await fetchData(
+          url,
+        )) as RequestResponse<ContentFilterOptions>;
+
+        if (response.status === 'error') {
+          setErrorMessage(
+            'An error occurred while trying to check for filter options.',
+          );
+          _browseContent = null;
+        } else {
+          setErrorMessage(null);
+          _browseContent = response.data;
+        }
       } else {
         const searchParams = buildSearchParams(_browseContent);
         const url = backendUrl + '/filter/browse';
-        _browseContent = (await fetchData(
+        const response = (await fetchData(
           url,
           searchParams,
-        )) as ContentFilterOptions;
+        )) as RequestResponse<ContentFilterOptions>;
+        if (response.status === 'error') {
+          setErrorMessage(
+            'An error occurred while trying to check for filter options.',
+          );
+          _browseContent = null;
+        } else {
+          setErrorMessage(null);
+          _browseContent = response.data;
+        }
       }
-      initFlags(_browseContent);
+      if (_browseContent) {
+        initFlags(_browseContent);
+      }
+
       setPropertyFilterOptions(_browseContent);
 
       const url = backendUrl + '/metadata';
-      const metadata = (await fetchData(url)) as Metadata;
-      setMetadata(metadata);
+      const response = (await fetchData(url)) as RequestResponse<Metadata>;
+      setMetadata(response.data ?? null);
 
       setIsFetchingContent(false);
     },
@@ -78,22 +104,33 @@ function ContentView() {
   );
 
   const handleOnSearch = useCallback(
-    async (formDataContent: ContentFilterOptions | undefined) => {
+    async (formDataContent: ContentFilterOptions | null) => {
       setIsSearching(true);
 
       const searchParams = buildSearchParams(formDataContent);
       const url = backendUrl + '/records/search';
-      const searchResult = (await fetchData(url, searchParams)) as SearchResult;
+      const response = (await fetchData(
+        url,
+        searchParams,
+      )) as RequestResponse<SearchResult>;
+      const searchResult = response.data;
 
-      let _hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
-      _hits = _hits.map((hit, i) => {
-        return {
-          ...hit,
-          index: i,
-        };
-      });
+      if (response.status === 'success') {
+        let _hits: Hit[] =
+          searchResult && searchResult.data ? (searchResult.data as Hit[]) : [];
+        _hits = _hits.map((hit, i) => {
+          return {
+            ...hit,
+            index: i,
+          };
+        });
+        setHits(_hits);
+        setErrorMessage(null);
+      } else {
+        setHits(null);
+        setErrorMessage(response.message);
+      }
 
-      setHits(_hits);
       setIsSearching(false);
     },
     [backendUrl],
@@ -116,8 +153,8 @@ function ContentView() {
   );
 
   useEffect(() => {
-    handleOnFetchContent(undefined);
-    handleOnSearch(undefined);
+    handleOnFetchContent(null);
+    handleOnSearch(null);
   }, [handleOnFetchContent, handleOnSearch]);
 
   const heights = useMemo(() => {
@@ -183,7 +220,7 @@ function ContentView() {
 
   const handleOnSelectSort = useCallback(
     (sortValue: ResultTableSortOption) => {
-      const _hits = sortHits(hits, sortValue);
+      const _hits = hits ? sortHits(hits, sortValue) : null;
       setHits(_hits);
     },
     [hits],
@@ -215,8 +252,9 @@ function ContentView() {
           ...(JSON.parse(
             JSON.stringify(defaultSearchFieldValues),
           ) as SearchFields),
-          propertyFilterOptions,
+          propertyFilterOptions: propertyFilterOptions ?? undefined,
         }}
+        disableActiveKeys={true}
       />
     );
 
@@ -295,6 +333,22 @@ function ContentView() {
       'Information',
     ];
 
+    const content = (
+      <Content
+        style={{
+          width: '100%',
+          height: '100%',
+          display: isFetchingContent ? 'none' : 'block',
+          overflow: 'scroll',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'white',
+        }}
+      >
+        <Segmented elements={elements} elementLabels={elementLabels} />
+      </Content>
+    );
+
     return (
       <Layout
         ref={ref}
@@ -307,24 +361,20 @@ function ContentView() {
           userSelect: 'none',
         }}
       >
-        <Spin size="large" spinning={isFetchingContent} />
-        <Content
-          style={{
-            width: '100%',
-            height: '100%',
-            display: isFetchingContent ? 'none' : 'block',
-            overflow: 'scroll',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'white',
-          }}
-        >
-          <Segmented elements={elements} elementLabels={elementLabels} />
-        </Content>
+        {isFetchingContent ? (
+          <Spin size="large" />
+        ) : errorMessage ? (
+          <ErrorElement
+            message={'An error occurred while trying to fetch the content.'}
+          />
+        ) : (
+          content
+        )}
       </Layout>
     );
   }, [
     charts,
+    errorMessage,
     heights.classificationPanelHeight,
     isFetchingContent,
     metadata,

@@ -1,12 +1,20 @@
 import Record from '../../types/record/Record';
+import RequestResponse from '../../types/RequestResponse';
 import fetchData from './fetchData';
 
-async function getRecord(id: string, backendUrl: string) {
+async function getRecord(
+  id: string,
+  backendUrl: string,
+): Promise<RequestResponse<Record | null>> {
   const url = backendUrl + '/records/' + id;
 
-  const record = await fetchData(url);
+  const response = (await fetchData(url)) as RequestResponse<Record | null>;
+  if (response.status !== 'success') {
+    return response;
+  }
+  const record = response.data;
   if (!record || typeof record !== 'object') {
-    return undefined;
+    return response;
   }
   const rec = record as Record;
   rec.peak.peak.values = rec.peak.peak.values.map((p) => {
@@ -22,8 +30,9 @@ async function getRecord(id: string, backendUrl: string) {
       return _nl;
     });
   }
+  response.data = rec;
 
-  return rec;
+  return response;
 }
 
 export default getRecord;

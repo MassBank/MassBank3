@@ -18,10 +18,12 @@ import { QuestionCircleTwoTone } from '@ant-design/icons';
 import DownloadFormat from '../../types/DownloadFormat';
 import downloadRecords from '../../utils/request/downloadRecords';
 import DownloadMenuItems from '../common/DownloadMenuItems';
+import RequestResponse from '../../types/RequestResponse';
+import ErrorElement from '../basic/ErrorElement';
 
 type InputProps = {
   reference?: Peak[];
-  hits: Hit[];
+  hits: Hit[] | null;
   width: number;
   height: number;
   sortOptions?: ResultTableSortOptionType[];
@@ -45,19 +47,23 @@ function ResultPanel({
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [isRequestingDownload, setIsRequestingDownload] =
     useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [slideIndex, setSlideIndex] = useState<number>(0);
   const [resultPageIndex, setResultPageIndex] = useState<number>(0);
   const [selectedSortOption, setSelectedSortOption] = useState<
     ResultTableSortOption | undefined
   >();
-  const [hitsWithRecords, setHitsWithRecords] = useState<Hit[] | undefined>();
+  const [hitsWithRecords, setHitsWithRecords] = useState<Hit[] | null>(null);
 
   const pageLimit = 20;
   const paginationHeight = 50;
 
   const resultTableData = useMemo(() => {
     const _resultTableData: Hit[][] = [];
+    if (!hits) {
+      return _resultTableData;
+    }
     let counter = 0;
     let resultHits: Hit[] = [];
 
@@ -97,13 +103,21 @@ function ResultPanel({
         .slice(from, from + range)
         .map((h) => h.accession);
 
-      const records: (Record | undefined)[] = [];
+      const records: (Record | null)[] = [];
       for (const accession of accessions) {
         const url = backendUrl + '/records/' + accession + '/simple';
 
-        const record = await fetchData(url);
+        const response = (await fetchData(url)) as RequestResponse<Record>;
+        if (response.status === 'error') {
+          setErrorMessage(
+            `Error fetching record for accession ${accession}: ${response.message}`,
+          );
+          records.push(null);
+          break;
+        }
+        const record = response.data;
 
-        if (record !== undefined && typeof record === 'object') {
+        if (record && typeof record === 'object') {
           record.peak.peak.values = record.peak.peak.values.map((p: Peak) => {
             return {
               mz: p.mz,
@@ -115,7 +129,7 @@ function ResultPanel({
 
           records.push(record);
         } else {
-          records.push(undefined);
+          records.push(null);
         }
       }
 
@@ -142,7 +156,7 @@ function ResultPanel({
     () => (
       <ResultTable
         reference={reference}
-        hits={hitsWithRecords || []}
+        hits={hitsWithRecords ?? []}
         height={height - paginationHeight}
         onDoubleClick={handleOnDoubleClick}
         rowHeight={150}
@@ -186,14 +200,17 @@ function ResultPanel({
   const handleOnSelectPage = useCallback(
     (pageIndex: number | null) => {
       if (
+        hits &&
         pageIndex &&
         pageIndex > 0 &&
         pageIndex <= Math.ceil(hits.length / pageLimit)
       ) {
         setResultPageIndex(pageIndex - 1);
+      } else {
+        setResultPageIndex(0);
       }
     },
-    [hits.length],
+    [hits],
   );
 
   const handleOnSelect = useCallback(
@@ -208,11 +225,13 @@ function ResultPanel({
     async (format: DownloadFormat) => {
       setIsRequestingDownload(true);
 
-      await downloadRecords(
-        exportServiceUrl,
-        format,
-        hits.map((h) => h.accession),
-      );
+      if (hits) {
+        await downloadRecords(
+          exportServiceUrl,
+          format,
+          hits.map((h) => h.accession),
+        );
+      }
 
       setIsRequestingDownload(false);
     },
@@ -237,7 +256,7 @@ function ResultPanel({
       >
         <Pagination
           className="result-panel-pagination"
-          total={hits.length}
+          total={hits ? hits.length : 0}
           pageSize={pageLimit}
           showTotal={(total) => (
             <Content
@@ -315,7 +334,7 @@ function ResultPanel({
       </Content>
     ),
     [
-      hits.length,
+      hits,
       handleOnSelectPage,
       resultPageIndex,
       sortOptions,
@@ -373,6 +392,8 @@ function ResultPanel({
             </Content>
           )}
         </Content>
+      ) : errorMessage ? (
+        <ErrorElement message={errorMessage} />
       ) : (
         <Placeholder
           child={'No results'}
@@ -386,6 +407,7 @@ function ResultPanel({
         />
       ),
     [
+      errorMessage,
       height,
       isRequesting,
       isRequestingDownload,

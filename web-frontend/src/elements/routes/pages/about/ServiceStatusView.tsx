@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { usePropertiesContext } from '../../../../context/properties/properties';
 import { Content } from 'antd/es/layout/layout';
 import { Button, Result, Spin } from 'antd';
-import axios from 'axios';
 import StatusResult from '../../../../types/StatusResult';
+import fetchServiceStatus from '../../../../utils/request/fetchServiceStatus';
 
 const resultStyle = {
   width: 250,
@@ -12,63 +12,23 @@ const resultStyle = {
 
 function ServiceStatusView() {
   const { backendUrl } = usePropertiesContext();
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [status, setStatus] = useState<StatusResult | null>(null);
 
   const handleOnCheckServiceStatus = useCallback(async () => {
     setIsLoading(true);
 
-    const _status: StatusResult = {
-      api: { status: 'Unknown', version: undefined, error: undefined },
-      postgres: { status: 'Unknown', version: undefined, error: undefined },
-      similarity_service: {
-        status: 'Unknown',
-        version: undefined,
-        error: undefined,
-      },
-      export_service: {
-        status: 'Unknown',
-        version: undefined,
-        error: undefined,
-      },
-    };
-
-    try {
-      const response = await axios.get(`${backendUrl}/status`);
-
-      if (response.status === 200) {
-        const statusResult = response.data as StatusResult;
-        _status.api = statusResult.api;
-        _status.postgres = statusResult.postgres;
-        _status.postgres.version =
-          statusResult.postgres.version?.split(' (')[0]; // Only keep the version number, not the build date
-        _status.similarity_service = statusResult.similarity_service;
-        _status.similarity_service.version =
-          statusResult.similarity_service.version?.replace(/"/g, '');
-        _status.export_service = statusResult.export_service;
-        _status.export_service.version =
-          statusResult.export_service.version?.replace(/"/g, '');
-      }
-    } catch (error: unknown) {
-      _status.api.status = "Couldn't connect to the API";
-      _status.api.error = (error as Error).message;
-      _status.postgres.status = "Couldn't connect to the API";
-      _status.postgres.error = "Couldn't connect to the API";
-      _status.similarity_service.status = "Couldn't connect to the API";
-      _status.similarity_service.error = "Couldn't connect to the API";
-      _status.export_service.status = "Couldn't connect to the API";
-      _status.export_service.error = "Couldn't connect to the API";
-    }
+    const url = `${backendUrl}/status`;
+    const _status = await fetchServiceStatus(url);
 
     setStatus(_status);
-
     setIsLoading(false);
   }, [backendUrl]);
 
   useEffect(() => {
     handleOnCheckServiceStatus();
-  }, [handleOnCheckServiceStatus]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return useMemo(
     () => (
@@ -135,12 +95,26 @@ function ServiceStatusView() {
                       ({status?.postgres.version?.trim() ?? 'Unknown'})
                     </label>
                   ) : null}
+                  {
+                    <>
+                      <br />
+                      {(!status?.postgres.error ||
+                        status?.postgres.error?.length === 0) &&
+                      status?.postgres.updateStatus !== 'done' ? (
+                        <label style={{ color: 'blue' }}>
+                          ({status?.postgres.updateStatus ?? 'Unknown'})
+                        </label>
+                      ) : null}
+                    </>
+                  }
                 </div>
               }
               status={
                 status?.postgres.error && status?.postgres.error.length > 0
                   ? 'error'
-                  : 'success'
+                  : status?.postgres.updateStatus !== 'done'
+                    ? 'warning'
+                    : 'success'
               }
               style={resultStyle}
             />

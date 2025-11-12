@@ -6,7 +6,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { StructureEditor } from 'react-ocl/full';
+import { CanvasEditorOnChangeMolecule, CanvasMoleculeEditor } from 'react-ocl';
 import { Molecule } from 'openchemlib';
 
 import { QuestionCircleTwoTone, UploadOutlined } from '@ant-design/icons';
@@ -19,10 +19,19 @@ import Dragger from 'antd/es/upload/Dragger';
 import Tooltip from './Tooltip';
 import Text from 'antd/es/typography/Text';
 import defaultTooltipText from '../../constants/defaultTooltipText';
+import Placeholder from './Placeholder';
+
+const heights = {
+  divider: 25,
+  input: 35,
+  uploadButton: 30,
+  uploadError: 30,
+  marginTopBottomDivider: 5,
+};
 
 interface InputProps {
   initialSMILES?: string;
-  width?: number;
+  width?: number | string;
   height?: number;
   insertPlaceholder?: (
     e: KeyboardEvent<HTMLElement>,
@@ -39,21 +48,21 @@ function StructuralEditor({
   const formInstance = Form.useFormInstance<SearchFields>();
   const { getFieldValue, setFieldValue } = formInstance;
 
-  const [smiles, setSmiles] = useState<string | undefined>();
-  const [molfile, setMolfile] = useState<string | undefined>();
+  const [smiles, setSmiles] = useState<string | null>(null);
+  const [molfile, setMolfile] = useState<string | null>(null);
   const [structureKey, setStructureKey] = useState<number>(Math.random());
-  const [errorSmiles, setErrorSmiles] = useState<string | undefined>();
-  const [errorMolfileImport, setErrorMolfileImport] = useState<
-    string | undefined
-  >();
+  const [errorSmiles, setErrorSmiles] = useState<string | null>(null);
+  const [errorMolfileImport, setErrorMolfileImport] = useState<string | null>(
+    null,
+  );
 
   const handleOnChangeStructure = useCallback(
-    (_molfile: string, molecule: Molecule) => {
-      const _smiles = molecule.toIsomericSmiles();
-      setSmiles(_smiles);
+    (_molfile: string) => {
       setMolfile(_molfile);
-      setFieldValue(['compoundSearchFilterOptions', 'structure'], _smiles);
-      setErrorMolfileImport(undefined);
+      const smi = Molecule.fromMolfile(_molfile).toIsomericSmiles();
+      setSmiles(smi);
+      setFieldValue(['compoundSearchFilterOptions', 'structure'], smi);
+      setErrorMolfileImport(null);
     },
     [setFieldValue],
   );
@@ -62,11 +71,11 @@ function StructuralEditor({
     const _smiles = getFieldValue(['compoundSearchFilterOptions', 'structure']);
     if (_smiles && _smiles.trim().length > 0) {
       try {
-        const molecule = Molecule.fromSmiles(_smiles);
-        const _molfile = molecule.toMolfileV3();
-        handleOnChangeStructure(_molfile, molecule);
+        const mol = Molecule.fromSmiles(_smiles);
+        const _molfile = mol.toMolfileV3();
+        handleOnChangeStructure(_molfile);
         setStructureKey(Math.random());
-        setErrorMolfileImport(undefined);
+        setErrorMolfileImport(null);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         /* empty */
@@ -94,35 +103,45 @@ function StructuralEditor({
     }
   }, [handleOnSetSmiles, initialSMILES, setFieldValue]);
 
-  const structureEditor = useMemo(
-    () => (
+  const structureEditor = useMemo(() => {
+    const editorHeight = height
+      ? height -
+        3 * heights.divider -
+        heights.input -
+        heights.uploadButton -
+        heights.uploadError -
+        6 * heights.marginTopBottomDivider
+      : undefined;
+    return (
       <Content
         style={{
           width: '100%',
-          height: '100%',
+          height: editorHeight,
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
         }}
       >
-        <StructureEditor
+        <CanvasMoleculeEditor
           width={width}
-          height={height}
-          onChange={handleOnChangeStructure}
-          initialMolfile={molfile}
+          height={editorHeight}
+          inputFormat="molfile"
+          inputValue={molfile ?? ''}
+          onChange={(e: CanvasEditorOnChangeMolecule) =>
+            handleOnChangeStructure(e.getMolfile())
+          }
           key={structureKey}
         />
       </Content>
-    ),
-    [handleOnChangeStructure, height, molfile, structureKey, width],
-  );
+    );
+  }, [handleOnChangeStructure, height, molfile, structureKey, width]);
 
   const input = useMemo(
     () => (
       <Content
         style={{
           width: '100%',
-          height: '100%',
+          height: heights.input,
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -142,7 +161,7 @@ function StructuralEditor({
                   if (value && value.trim().length > 0) {
                     try {
                       Molecule.fromSmiles(value);
-                      setErrorSmiles(undefined);
+                      setErrorSmiles(null);
                       // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     } catch (err) {
                       setErrorSmiles('Invalid SMILES');
@@ -156,23 +175,11 @@ function StructuralEditor({
           >
             <Input
               type="text"
-              addonAfter={
-                <Button
-                  children={'Set'}
-                  onClick={handleOnClickSetSmiles}
-                  style={{
-                    width: '100%',
-                    height: 30,
-                    backgroundColor: 'transparent',
-                    border: 'none',
-                  }}
-                  disabled={errorSmiles !== undefined}
-                />
-              }
-              value={smiles}
+              value={smiles ?? undefined}
               placeholder="C[C@H]([C@H]([C@@H]([C@H]1O)O)O)O[C@H]1OC1=C(c(cc2O)ccc2O)Oc2cc(O)cc(O)c2C1=O"
               style={{
                 width: '100%',
+                height: heights.input,
                 backgroundColor: 'transparent',
               }}
               allowClear
@@ -187,6 +194,16 @@ function StructuralEditor({
             />
           </Form.Item>
         </Content>
+        <Button
+          children={'Set'}
+          onClick={handleOnClickSetSmiles}
+          style={{
+            width: 50,
+            height: heights.input,
+            backgroundColor: 'transparent',
+          }}
+          disabled={errorSmiles !== null}
+        />
         <Tooltip
           title={
             'Enter a SMILES to be used during a substructure search.' +
@@ -218,12 +235,13 @@ function StructuralEditor({
 
         try {
           const mol = Molecule.fromMolfile(_molfile);
-          if (mol.toSmiles().trim() === '') {
+          const _smiles = mol.toIsomericSmiles();
+          if (_smiles.trim() === '') {
             throw 'Invalid MOL or SD file';
           }
-          handleOnChangeStructure(mol.toMolfileV3(), mol);
+          handleOnChangeStructure(_molfile);
           setStructureKey(Math.random());
-          setErrorMolfileImport(undefined);
+          setErrorMolfileImport(null);
         } catch (error: unknown) {
           setErrorMolfileImport(error as string);
         }
@@ -238,7 +256,11 @@ function StructuralEditor({
       name: 'file',
       style: {
         width: '100%',
-        height: 30,
+        maxHeight: heights.uploadButton,
+        minHeight: heights.uploadButton,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
       },
       multiple: false,
       showUploadList: false,
@@ -259,32 +281,72 @@ function StructuralEditor({
 
   return useMemo(
     () => (
-      <Content style={{ width: '100%', height: '100%' }}>
-        <Divider style={{ borderColor: 'grey', marginTop: 0 }}>
+      <Content style={{ width, height, overflowY: 'scroll' }}>
+        <Divider
+          style={{
+            borderColor: 'grey',
+            marginTop: heights.marginTopBottomDivider,
+            marginBottom: heights.marginTopBottomDivider,
+            height: heights.divider,
+          }}
+        >
           Draw Structure
         </Divider>
         {structureEditor}
-        <Divider style={{ borderColor: 'grey' }}>Enter SMILES</Divider>
+        <Divider
+          style={{
+            borderColor: 'grey',
+            marginTop: heights.marginTopBottomDivider,
+            marginBottom: heights.marginTopBottomDivider,
+            height: heights.divider,
+          }}
+        >
+          Enter SMILES
+        </Divider>
         {input}
-        <Divider style={{ borderColor: 'grey' }}>Upload MOL/SDF</Divider>
+        <Divider
+          style={{
+            borderColor: 'grey',
+            marginTop: heights.marginTopBottomDivider,
+            marginBottom: heights.marginTopBottomDivider,
+            height: heights.divider,
+          }}
+        >
+          Upload MOL/SDF
+        </Divider>
         <Content
           style={{
             width: '100%',
-            height: '100%',
-            textAlign: 'center',
+            height: heights.uploadButton + heights.uploadError,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
           <Dragger {...props}>
             <UploadOutlined />
             <Text>Drag&Drop or click here</Text>
           </Dragger>
-          {errorMolfileImport && (
-            <label style={{ color: 'red' }}>{errorMolfileImport}</label>
-          )}
+          <Placeholder
+            style={{
+              height: heights.uploadError,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            child={
+              errorMolfileImport ? (
+                <label style={{ color: 'red' }}>{errorMolfileImport}</label>
+              ) : (
+                ''
+              )
+            }
+          />
         </Content>
       </Content>
     ),
-    [errorMolfileImport, input, props, structureEditor],
+    [errorMolfileImport, height, input, props, structureEditor, width],
   );
 }
 

@@ -6,6 +6,7 @@ interface StatusResult {
   };
   postgres: {
     status: string;
+    updateStatus?: string;
     version?: string;
     error?: string;
   };

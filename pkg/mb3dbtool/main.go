@@ -65,6 +65,14 @@ func main() {
 			}
 		}
 		fmt.Println("Start updating database with", len(mbfiles), "MassBank records...")
+
+		// set status to updating
+		err = db.SetStatus("database_update", "updating")
+		if err != nil {
+			println("Could not set status to \"updating\": " + err.Error())
+			panic(err)
+		}
+
 		println("Updating metadata...")
 		metaId, err := db.UpdateMetadata(versionData)
 		if err != nil {
@@ -114,6 +122,12 @@ func main() {
 		println("Finished database update.")
 	} else {
 		println("Database initialisation was skipped.")
+	}
+
+	err = db.SetStatus("database_update", "done")
+	if err != nil {
+		println("Could not set status to \"done\": " + err.Error())
+		panic(err)
 	}
 
 	fmt.Println("Disconnecting to database...")

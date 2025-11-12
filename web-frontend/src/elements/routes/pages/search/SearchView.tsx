@@ -40,6 +40,8 @@ import defaultSearchFieldValues from '../../../../constants/defaultSearchFieldVa
 import ResultTableSortOption from '../../../../types/ResultTableSortOption';
 import collapseButtonWidth from '../../../../constants/collapseButtonWidth';
 import generateID from '../../../../utils/generateID';
+import RequestResponse from '../../../../types/RequestResponse';
+import ErrorElement from '../../../basic/ErrorElement';
 
 const defaultSearchPanelWidth = 450;
 
@@ -54,35 +56,55 @@ function SearchView() {
   const [isFetchingContent, setIsFetchingContent] = useState<boolean>(false);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
-  const [hits, setHits] = useState<Hit[]>([]);
-  const [propertyFilterOptions, setPropertyFilterOptions] = useState<
-    ContentFilterOptions | undefined
-  >();
+  const [hits, setHits] = useState<Hit[] | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [propertyFilterOptions, setPropertyFilterOptions] =
+    useState<ContentFilterOptions | null>(null);
   const [searchParams] = useSearchParams();
-  const [initialValues, setInitialValues] = useState<
-    SearchFields | undefined
-  >();
+  const [initialValues, setInitialValues] = useState<SearchFields | null>(null);
   const [searchPanelWidth, setSearchPanelWidth] = useState<number>(
     defaultSearchPanelWidth,
   );
 
   const handleOnFetchContent = useCallback(
-    async (formDataContent: ContentFilterOptions | undefined) => {
+    async (formDataContent: ContentFilterOptions | null) => {
       setIsFetchingContent(true);
 
-      let _browseContent: ContentFilterOptions | undefined = formDataContent;
+      let _browseContent: ContentFilterOptions | null = formDataContent;
       if (!_browseContent) {
         const url = backendUrl + '/filter/browse';
-        _browseContent = (await fetchData(url)) as ContentFilterOptions;
+        const response = (await fetchData(
+          url,
+        )) as RequestResponse<ContentFilterOptions>;
+        if (response.status === 'error') {
+          setErrorMessage(
+            'An error occurred while trying to check for filter options.',
+          );
+          _browseContent = null;
+        } else {
+          setErrorMessage(null);
+          _browseContent = response.data;
+        }
       } else {
         const builtSearchParams = buildSearchParams(_browseContent);
         const url = backendUrl + '/filter/browse';
-        _browseContent = (await fetchData(
+        const response = (await fetchData(
           url,
           builtSearchParams,
-        )) as ContentFilterOptions;
+        )) as RequestResponse<ContentFilterOptions>;
+        if (response.status === 'error') {
+          setErrorMessage(
+            'An error occurred while trying to check for filter options.',
+          );
+          _browseContent = null;
+        } else {
+          setErrorMessage(null);
+          _browseContent = response.data;
+        }
       }
-      initFlags(_browseContent);
+      if (_browseContent) {
+        initFlags(_browseContent);
+      }
       setPropertyFilterOptions(_browseContent);
 
       setIsFetchingContent(false);
@@ -123,25 +145,36 @@ function SearchView() {
       }
 
       const url = backendUrl + '/records/search';
-      const searchResult = (await fetchData(
+      const response = (await fetchData(
         url,
         builtSearchParams,
-      )) as SearchResult;
+      )) as RequestResponse<SearchResult>;
 
-      let _hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
-      _hits = _hits.map((hit, i) => {
-        return {
-          ...hit,
-          index: i,
-        };
-      });
+      if (response.status === 'error') {
+        setHits(null);
+        setErrorMessage(
+          'An error occurred while trying to search for results.',
+        );
+      } else {
+        const searchResult = response.data;
 
-      const smiles = formData.compoundSearchFilterOptions?.structure;
-      if (smiles && smiles.trim().length > 0) {
-        _hits = sortHits(_hits, 'atom_count');
+        let _hits: Hit[] =
+          searchResult && searchResult.data ? (searchResult.data as Hit[]) : [];
+        _hits = _hits.map((hit, i) => {
+          return {
+            ...hit,
+            index: i,
+          };
+        });
+
+        const smiles = formData.compoundSearchFilterOptions?.structure;
+        if (smiles && smiles.trim().length > 0) {
+          _hits = sortHits(_hits, 'atom_count');
+        }
+        setHits(_hits);
+        setErrorMessage(null);
       }
 
-      setHits(_hits);
       setIsSearching(false);
     },
     [backendUrl],
@@ -186,7 +219,7 @@ function SearchView() {
     if (runSubmit) {
       handleOnSubmit(_initialValues, false);
     } else {
-      handleOnFetchContent(undefined);
+      handleOnFetchContent(null);
       setInitialValues(_initialValues);
       setHits([]);
     }
@@ -255,7 +288,7 @@ function SearchView() {
 
   const handleOnSelectSort = useCallback(
     (sortValue: ResultTableSortOption) => {
-      const _hits = sortHits(hits, sortValue);
+      const _hits = hits ? sortHits(hits, sortValue) : null;
       setHits(_hits);
     },
     [hits],
@@ -274,8 +307,11 @@ function SearchView() {
           alignItems: 'center',
         }}
       >
-        <Spin size="large" spinning={isFetchingContent} />
-        {!isFetchingContent && (
+        {isFetchingContent ? (
+          <Spin size="large" />
+        ) : errorMessage ? (
+          <ErrorElement message={errorMessage} />
+        ) : (
           <Content
             style={{
               width: '100%',
@@ -303,6 +339,7 @@ function SearchView() {
       </Layout>
     ),
     [
+      errorMessage,
       handleOnResize,
       handleOnSelectSort,
       height,

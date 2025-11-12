@@ -13,6 +13,11 @@
     "isolatedModules": true,
     "moduleDetection": "force",
 
+    /* Emit declaration files only */
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": true,
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

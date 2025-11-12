@@ -24,7 +24,7 @@ const peakListPattern: RegExp =
   /^(\d+(\.\d+){0,1} \d+(\.\d+){0,1}( \d+(\.\d+){0,1}){0,1})(\n\d+(\.\d+){0,1} \d+(\.\d+){0,1}( \d+(\.\d+){0,1}){0,1})*$/;
 
 type InputProps = {
-  propertyFilterOptions?: ContentFilterOptions | undefined;
+  propertyFilterOptions?: ContentFilterOptions | null;
   initialStructure?: string;
   insertPlaceholder?: (
     e: KeyboardEvent<HTMLElement>,
@@ -401,7 +401,7 @@ function SearchPanelMenuItems({
               key: 'structure',
               style: {
                 width: '100%',
-                height: 750,
+                height: 650,
                 marginLeft: 0,
                 overflow: 'scroll',
               },
@@ -409,6 +409,8 @@ function SearchPanelMenuItems({
                 <StructuralEditor
                   initialSMILES={initialStructure}
                   insertPlaceholder={insertPlaceholder}
+                  width={'100%'}
+                  height={650}
                 />
               ),
             },

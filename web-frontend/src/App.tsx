@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Routing from './elements/routes/Routing';
 import { HighlightProvider } from './context/highlight/HighlightProvider';
 import { ConfigProvider } from 'antd';
+import '@ant-design/v5-patch-for-react-19';
 
 function App() {
   const [hydrated, setHydrated] = useState(false);
