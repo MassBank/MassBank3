@@ -84,14 +84,14 @@ function StructureView({
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          width: imageWidth - defaultButtonWidth,
+          width: imageWidth - (disableExport ? 0 : defaultButtonWidth),
           height: imageHeight,
         }}
       >
         {molfile && molfile.length > 0 ? (
           <MolfileSvgRenderer
             molfile={molfile}
-            width={imageWidth - defaultButtonWidth}
+            width={imageWidth - (disableExport ? 0 : defaultButtonWidth)}
             height={
               imageHeight -
               (rGroupLabel && rGroupLabel.trim().length > 0

@@ -109,7 +109,8 @@ function AccessionView() {
         handleOnSearch(accession, false);
       }
     }
-  }, [accession, handleOnSearch, showRaw]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accession, showRaw]);
 
   const handleOnCopy = useCallback(() => {
     copyTextToClipboard('Record Text', rawText ? rawText : '');
