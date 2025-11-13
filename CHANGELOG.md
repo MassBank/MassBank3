@@ -1,5 +1,19 @@
 # Changelog
 
+## [2025.11.0](https://github.com/MassBank/MassBank3/compare/v2025.10.6...v2025.11.0) (2025-11-13)
+
+
+### Features
+
+* added an status table in Postgres & show a notification at homepage in case of a database update or errors in backend services (close [#131](https://github.com/MassBank/MassBank3/issues/131)) ([c896aed](https://github.com/MassBank/MassBank3/commit/c896aedec3939e4aaa8fbc719dfe57af8ea7d7ba))
+* display structure from SMILES in peak annotation if available ([f416950](https://github.com/MassBank/MassBank3/commit/f416950dfb32628a785c9c81e01ad3b8dea4e2e3))
+
+
+### Bug Fixes
+
+* crash in frontend when entering a non-existing accession ([db351b6](https://github.com/MassBank/MassBank3/commit/db351b6862d919b89632e7985d3138871fd309b3))
+* crash in mb3server when Postgres database is down (close [#91](https://github.com/MassBank/MassBank3/issues/91)) & adjustments in frontend ([fad5a00](https://github.com/MassBank/MassBank3/commit/fad5a0010130771701bb51c0ef4f0c1227dc0f31))
+
 ## [2025.10.6](https://github.com/MassBank/MassBank3/compare/v2025.10.4...v2025.10.6) (2025-11-03)
 
 
