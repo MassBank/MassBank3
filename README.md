@@ -9,6 +9,12 @@ This software is running at https://massbank.eu. It also provides a [graphical i
 
 There is a parallel instance at https://msbi.ipb-halle.de/MassBank. You can find the API's graphical interface [here](https://msbi.ipb-halle.de/MassBank-api/ui/).
 
+# Citation
+
+Please cite MassBank using the following reference:
+
+    Steffen Neumann, René Meier, Michael Wenk, Anjana Elapavalore, Takaaki Nishioka, Tobias Schulze, Michael Stravs, Hiroshi Tsugawa, Fumio Matsuda, Emma L Schymanski, MassBank: an open and FAIR mass spectral data resource, Nucleic Acids Research, 2025;, gkaf1193, https://doi.org/10.1093/nar/gkaf1193
+
 # Installation
 
 There are currently two ways to run MassBank:

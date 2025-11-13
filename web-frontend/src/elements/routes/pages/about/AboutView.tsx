@@ -9,6 +9,7 @@ import Acknowledgement from './Acknowledgement';
 import InfoText from './InfoText';
 import Supporters from './Supporters';
 import Accessibility from './Accessibility';
+import CitationText from './CitationText';
 
 function AboutView() {
   const elements = useMemo(() => {
@@ -18,6 +19,13 @@ function AboutView() {
       <Content>
         <SectionDivider label="Service Status" />
         <ServiceStatusView />
+      </Content>
+    );
+
+    const citation = (
+      <Content>
+        <SectionDivider label="Citation" />
+        <CitationText />
       </Content>
     );
 
@@ -52,6 +60,7 @@ function AboutView() {
     return [
       infoText,
       serviceStatus,
+      citation,
       acknowledgement,
       supporters,
       accessibilty,
@@ -63,6 +72,7 @@ function AboutView() {
     () => [
       'Information',
       'Service Status',
+      'Citation',
       'Acknowledgement',
       'Supporters',
       'Accessibilty',
