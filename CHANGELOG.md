@@ -1,5 +1,47 @@
 # Changelog
 
+## [2025.10.6](https://github.com/MassBank/MassBank3/compare/v2025.10.4...v2025.10.6) (2025-11-03)
+
+
+### Features
+
+* allowed partial search for InChiKey starting at the beginning ([ca43b49](https://github.com/MassBank/MassBank3/commit/ca43b49a1f60f2d3a98f0cc47a770d2ea0d70fe7))
+
+
+### Miscellaneous Chores
+
+* release v2025.10.6 ([0a76ea1](https://github.com/MassBank/MassBank3/commit/0a76ea1e1675db1a6f0c5a761ec7e9e1f674108c))
+
+## [2025.10.4](https://github.com/MassBank/MassBank3/compare/v2025.10.3...v2025.10.4) (2025-10-29)
+
+
+### Miscellaneous Chores
+
+* release v2025.10.4 ([fdf1713](https://github.com/MassBank/MassBank3/commit/fdf17138b7297abf946d0dbc3cf1b1ea0f4f95be))
+
+## [2025.10.2](https://github.com/MassBank/MassBank3/compare/v2025.8.12...v2025.10.2) (2025-10-29)
+
+
+### Features
+
+* allow download of a single MassBank record from record page (close [#118](https://github.com/MassBank/MassBank3/issues/118)) ([ce46278](https://github.com/MassBank/MassBank3/commit/ce462785f8b640763541cba087619bba7dc2b0d3))
+* enable downloads in Massbank record file format (closes [#119](https://github.com/MassBank/MassBank3/issues/119)) & enable view of raw record data in new tab from single record page (close [#116](https://github.com/MassBank/MassBank3/issues/116)) ([9b4f7af](https://github.com/MassBank/MassBank3/commit/9b4f7afe7f7b2a1d8e39a570a148c718d271cd63))
+* new copy button in case of raw record view in AccessionView ([8ce141f](https://github.com/MassBank/MassBank3/commit/8ce141f45093d639f6e74eb8638d2b8fe6406af4))
+* show service versions on About page as well ([3eb6b96](https://github.com/MassBank/MassBank3/commit/3eb6b966301c2b53cea653a7f066a9a8e1b66f89))
+
+
+### Bug Fixes
+
+* added a missing dependency in useMemo in RecordViewHeader.tsx ([8505afd](https://github.com/MassBank/MassBank3/commit/8505afdfbc175317a978e7aab8c43a8e3726bebf))
+* avoid crash in recordViewHeader in case of no ChemOnt classifications ([5187794](https://github.com/MassBank/MassBank3/commit/5187794fde77a599cf541421ceeb31061c5f0680))
+* incorrect rendering of extended SMILES in StructureView (close [#117](https://github.com/MassBank/MassBank3/issues/117)) & force breaks of long SMILES and InChIs in RecordViewHeader ([f209ee9](https://github.com/MassBank/MassBank3/commit/f209ee94dab4dcd7d25b63cbe3adf253557ba08e))
+* increase height of title in RecordViewHeader and align it central ([8f22f32](https://github.com/MassBank/MassBank3/commit/8f22f327179e731df18109e2117afc46d8b91c12))
+
+
+### Miscellaneous Chores
+
+* release v2025.10.2 ([1e5e9c3](https://github.com/MassBank/MassBank3/commit/1e5e9c3a9fd6f03d91f45c2112b10ea7b48f55dd))
+
 ## [2025.8.12](https://github.com/MassBank/MassBank3/compare/v2025.8.11...v2025.8.12) (2025-08-28)
 
 

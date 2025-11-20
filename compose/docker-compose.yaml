@@ -9,9 +9,11 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+      DB_NAME_EXPORT_SERVICE: ${DB_NAME_EXPORT_SERVICE}
     volumes:
       - "${DB_LOCAL_PATH}:/var/lib/postgresql/data"
       - "./bingo-postgres/init_ALLOW_NON_UNIQUE_DEAROMATIZATION.sh:/docker-entrypoint-initdb.d/init_ALLOW_NON_UNIQUE_DEAROMATIZATION.sh"
+      - "./export-postgres/init_db.sh:/docker-entrypoint-initdb.d/init_db.sh"
     healthcheck:
       test:
         [
@@ -79,7 +81,12 @@ services:
       - "${EXPORT_SERVICE_PORT}:8080"
     environment:
       MB_DATA_DIRECTORY: "/MassBank-data"
-      CORS_ALLOWED_ORIGINS: ${MB3_FRONTEND_URL}"
+      CORS_ALLOWED_ORIGINS: ${EXPORT_SERVICE_CORS_ALLOWED_ORIGINS} 
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME_EXPORT_SERVICE}
     volumes:
       - "${MB_DATA_DIRECTORY}:/MassBank-data"
 

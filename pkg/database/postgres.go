@@ -185,7 +185,17 @@ func (p *PostgresSQLDB) Connect() error {
 	return nil
 }
 
+func (p *PostgresSQLDB) checkDatabase() error {
+	if p.database == nil {
+		return errors.New("checkDatabase(): database not set")
+	}
+	return p.database.Ping()
+}
+
 func (p *PostgresSQLDB) Ping() error {
+	if err := p.checkDatabase(); err != nil {
+		return err
+	}
 	return p.database.Ping()
 }
 
@@ -225,6 +235,64 @@ func (p *PostgresSQLDB) IsEmpty() (bool, error) {
 		return false, err
 	}
 	return count == 0, nil
+}
+
+func (p *PostgresSQLDB) SetStatus(name string, value string) error {
+	if err := p.checkDatabase(); err != nil {
+		return err
+	}
+	query := "INSERT INTO status (name, value) VALUES ($1, $2) ON CONFLICT (name) DO UPDATE SET value = EXCLUDED.value;"
+	stmt, err := p.database.Prepare(query)
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(name, value)
+	stmt.Close()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *PostgresSQLDB) DeleteStatus(name string) error {
+	if err := p.checkDatabase(); err != nil {
+		return err
+	}
+	query := "DELETE FROM status WHERE name = $1;"
+	stmt, err := p.database.Prepare(query)
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(name)
+	stmt.Close()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *PostgresSQLDB) GetStatus(name string) (string, error) {
+	if err := p.checkDatabase(); err != nil {
+		return "", err
+	}
+	query := "SELECT value FROM status WHERE name = $1;"
+	stmt, err := p.database.Prepare(query)
+	if err != nil {
+		return "", err
+	}
+	var status string
+	err = stmt.QueryRow(name).Scan(&status)
+	stmt.Close()
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "No status found for '" + name + "'", nil
+		}
+		return "", err
+	}
+
+	return status, nil
 }
 
 func (p *PostgresSQLDB) GetMetadata() (*massbank.MbMetaData, error) {
@@ -1026,7 +1094,7 @@ func (p *PostgresSQLDB) BuildBrowseOptionsWhere(filters Filters) (string, []stri
 
 	if filters.InchiKey != "" {
 		parameters = append(parameters, filters.InchiKey)
-		subQuery := "inchikey = $" + strconv.Itoa(len(parameters))
+		subQuery := "LOWER(inchikey) LIKE LOWER(CONCAT($" + strconv.Itoa(len(parameters)) + "::text,'%%'))"
 		if addedWhere || addedAnd {
 			query = query + " AND " + subQuery
 			addedAnd = true
@@ -2210,17 +2278,19 @@ func (p *PostgresSQLDB) Init() error {
 		);
 
 		TRUNCATE molecules CASCADE;
+
+		CREATE TABLE IF NOT EXISTS status (
+			id SERIAL PRIMARY KEY,
+			name TEXT NOT NULL,
+			value TEXT NOT NULL,
+			UNIQUE (name)
+		);
+
+		TRUNCATE status CASCADE;
 		`
 
 	if _, err = p.database.Exec(query); err != nil {
 		return err
 	}
 	return nil
-}
-
-func (p *PostgresSQLDB) checkDatabase() error {
-	if p.database == nil {
-		return errors.New("database not ready")
-	}
-	return p.database.Ping()
 }

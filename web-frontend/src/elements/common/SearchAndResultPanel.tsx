@@ -16,7 +16,7 @@ type InputProps = {
   searchPanelWidth: number;
   widthOverview: number;
   heightOverview: number;
-  hits: Hit[];
+  hits: Hit[] | null;
   isRequesting: boolean;
   reference?: Peak[];
   onSort: (sortValue: ResultTableSortOption) => void;

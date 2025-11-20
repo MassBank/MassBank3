@@ -1,6 +1,6 @@
 import { Molecule, SmilesParser } from 'openchemlib';
 import { useCallback, useMemo } from 'react';
-import { MolfileSvgRenderer } from 'react-ocl/minimal';
+import { MolfileSvgRenderer } from 'react-ocl';
 import ExportableContent from '../common/ExportableContent';
 import { Content } from 'antd/es/layout/layout';
 import FileSaver from 'file-saver';
@@ -84,14 +84,14 @@ function StructureView({
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          width: imageWidth - defaultButtonWidth,
+          width: imageWidth - (disableExport ? 0 : defaultButtonWidth),
           height: imageHeight,
         }}
       >
         {molfile && molfile.length > 0 ? (
           <MolfileSvgRenderer
             molfile={molfile}
-            width={imageWidth - defaultButtonWidth}
+            width={imageWidth - (disableExport ? 0 : defaultButtonWidth)}
             height={
               imageHeight -
               (rGroupLabel && rGroupLabel.trim().length > 0

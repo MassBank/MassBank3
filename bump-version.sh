@@ -16,7 +16,7 @@ mv CITATION2.cff CITATION.cff
 
 echo "Set version in mb_version.txt, web-frontend/mb_version.txt, and CITATION.cff to $NEW_VERSION."
 
-Add the version files to git and commit the changes
+# Add the version files to git and commit the changes
 git add mb_version.txt
 git add web-frontend/mb_version.txt
 git add CITATION.cff

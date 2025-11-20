@@ -567,9 +567,10 @@ func GetStatus() (GetStatus200Response, error) {
 		Error:   "",
 	}
 	postgresStatus := GetStatus200ResponsePostgres{
-		Status:  "OK",
-		Version: "unknown",
-		Error:   "",
+		Status:       "OK",
+		UpdateStatus: "unknown",
+		Version:      "unknown",
+		Error:        "",
 	}
 	export_service_status := GetStatus200ResponseExportService{
 		Status:  "OK",
@@ -600,6 +601,14 @@ func GetStatus() (GetStatus200Response, error) {
 			postgresStatus.Error = err.Error()
 		} else {
 			postgresStatus.Version = version
+		}
+
+		postgresUpdateStatus, err := db.GetStatus("database_update")
+		if err != nil {
+			postgresStatus.Status = "ERROR"
+			postgresStatus.Error = err.Error()
+		} else {
+			postgresStatus.UpdateStatus = postgresUpdateStatus
 		}
 	}
 

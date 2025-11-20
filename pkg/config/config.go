@@ -30,7 +30,7 @@ const (
 	dbUserDefault          = "massbank3"
 	dbPasswordDefault      = "massbank3password"
 	dbHostDefault          = "localhost"
-	dbPortDefault          = "0"
+	dbPortDefault          = "5432"
 	dbNameDefault          = "massbank3"
 	dbConnStringDefault    = ""
 	mbGitRepoDefault       = "https://github.com/MassBank/MassBank-data"

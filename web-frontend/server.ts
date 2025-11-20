@@ -12,6 +12,7 @@ import {
   convertMassBank2QueryParams,
   getLastmodDate,
 } from './server-utils.js';
+import RequestResponse from './src/types/RequestResponse.js';
 
 // Constants
 const port = 3000;
@@ -142,11 +143,10 @@ baseRouter.get('/robots.txt', (req: Request, res: Response) => {
 baseRouter.get('/sitemap.xml', async (req: Request, res: Response) => {
   try {
     const url: string = backendUrlInternal + '/records/count';
-    const searchResultRecordCount: number | undefined = await fetchData(url);
-    const hitsCount: number = searchResultRecordCount
-      ? searchResultRecordCount
-      : 0;
-
+    const searchResultRecordCount: RequestResponse<number> = (await fetchData(
+      url,
+    )) as RequestResponse<number>;
+    const hitsCount: number = searchResultRecordCount.data ?? 0;
     const lastmodDate = await getLastmodDate(
       backendUrlInternal,
       exportServiceUrlInternal,
@@ -214,8 +214,12 @@ baseRouter.get(/\/sitemap_\d+\.xml/, async (req: Request, res: Response) => {
     const index = Number(req.originalUrl.split('_')[1].split('.')[0]);
 
     const url = backendUrlInternal + '/records/search';
-    const searchResult = (await fetchData(url)) as SearchResult;
-    const hits: Hit[] = searchResult.data ? (searchResult.data as Hit[]) : [];
+    const searchResponse = (await fetchData(
+      url,
+    )) as RequestResponse<SearchResult>;
+    const searchResult = searchResponse.data;
+    const hits: Hit[] =
+      searchResult && searchResult.data ? (searchResult.data as Hit[]) : [];
 
     if (index * nRecords >= hits.length) {
       res.sendStatus(404);

@@ -11,6 +11,7 @@ import Text from 'antd/es/typography/Text';
 import { CopyOutlined } from '@ant-design/icons';
 import fetchRawMassBankRecord from '../../../../utils/request/fetchRawMassBankRecord';
 import copyTextToClipboard from '../../../../utils/copyTextToClipboard';
+import ErrorElement from '../../../basic/ErrorElement';
 
 const toolButtonStyle = {
   width: '40px',
@@ -29,8 +30,9 @@ function AccessionView() {
 
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
   const [requestedAccession, setRequestedAccession] = useState<string>('');
-  const [record, setRecord] = useState<Record | undefined>();
+  const [record, setRecord] = useState<Record | null>(null);
   const [rawText, setRawText] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
 
   const accession = searchParams.get('id');
@@ -80,7 +82,18 @@ function AccessionView() {
         }
         setRawText(_rawText);
       } else {
-        setRecord(await getRecord(acc, backendUrl));
+        const response = await getRecord(acc, backendUrl);
+        if (response.status !== 'success') {
+          setErrorMessage(response.message);
+          setRecord(null);
+        } else {
+          setErrorMessage(null);
+          if (typeof response.data === 'object') {
+            setRecord(response.data);
+          } else {
+            setRecord(null);
+          }
+        }
       }
 
       setIsRequesting(false);
@@ -96,7 +109,8 @@ function AccessionView() {
         handleOnSearch(accession, false);
       }
     }
-  }, [accession, handleOnSearch, showRaw]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accession, showRaw]);
 
   const handleOnCopy = useCallback(() => {
     copyTextToClipboard('Record Text', rawText ? rawText : '');
@@ -173,10 +187,18 @@ function AccessionView() {
           alignItems: 'center',
         }}
       >
-        {isRequesting ? <Spin size="large" /> : recordView}
+        {isRequesting ? (
+          <Spin size="large" />
+        ) : errorMessage ? (
+          <ErrorElement
+            message={`An error occurred while trying to fetch the record for "${requestedAccession}".`}
+          />
+        ) : (
+          recordView
+        )}
       </Content>
     ),
-    [isRequesting, recordView],
+    [isRequesting, errorMessage, requestedAccession, recordView],
   );
 }
 

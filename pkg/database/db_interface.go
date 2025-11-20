@@ -181,6 +181,13 @@ type MB3Database interface {
 	// Returns the id of the database entry as string.
 	UpdateMetadata(meta *massbank.MbMetaData) (string, error)
 
+	// Set status
+	SetStatus(param string, status string) error
+	// Delete status
+	DeleteStatus(param string) error
+	// Get status
+	GetStatus(param string) (string, error)
+
 	// RemoveIndexes removes all indexes from the database.
 	RemoveIndexes() error
 
@@ -212,11 +219,13 @@ func InitDb(dbConfig DBConfig) (MB3Database, error) {
 			db, err = NewPostgresSQLDb(dbConfig)
 			log.Println(dd.Dump(db))
 			if err != nil {
-				panic(err)
+				db = nil
+				return nil, err
 			}
 		}
 		if err = db.Connect(); err != nil {
-			panic(err)
+			db = nil
+			return nil, err
 		}
 	}
 	err := db.Ping()

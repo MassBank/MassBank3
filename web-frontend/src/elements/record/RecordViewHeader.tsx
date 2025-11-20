@@ -330,7 +330,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
           }
           mode="copy"
           onClick={() => handleOnCopy('InChI', record.compound.inchi)}
-          title="Copy InChi to clipboard"
+          title="Copy InChI to clipboard"
           enableSearch
           searchTitle="Search for InChI"
           searchUrl={buildSearchUrl(
