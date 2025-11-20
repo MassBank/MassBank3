@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" -c "CREATE DATABASE $DB_NAME_EXPORT_SERVICE OWNER $POSTGRES_USER;"
