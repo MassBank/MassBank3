@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Content } from 'antd/es/layout/layout';
 import { Layout, Spin } from 'antd';
 import Segmented from '../../../basic/Segmented';
@@ -10,29 +10,28 @@ const templateUrlNewsArchive =
   'https://massbank.github.io/MassBank-documentation/news_archive.html';
 
 function NewsView() {
-  const ref = useRef(null);
   const [htmlTemplateNews, setHtmlTemplateNews] = useState<string>('');
   const [htmlTemplateNewsArchive, setHtmlTemplateNewsArchive] =
     useState<string>('');
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
-  const fetchHtml = useCallback(async () => {
-    setIsFetching(true);
-
-    let response = await fetch(templateUrlNews);
-    let html = await response.text();
-    setHtmlTemplateNews(html);
-
-    response = await fetch(templateUrlNewsArchive);
-    html = await response.text();
-    setHtmlTemplateNewsArchive(html);
-
-    setIsFetching(false);
-  }, []);
-
   useEffect(() => {
+    async function fetchHtml() {
+      setIsFetching(true);
+
+      let response = await fetch(templateUrlNews);
+      let html = await response.text();
+      setHtmlTemplateNews(html);
+
+      response = await fetch(templateUrlNewsArchive);
+      html = await response.text();
+      setHtmlTemplateNewsArchive(html);
+
+      setIsFetching(false);
+    }
+
     fetchHtml();
-  }, [fetchHtml]);
+  }, []);
 
   const segmented = useMemo(() => {
     const elements = [
@@ -89,7 +88,6 @@ function NewsView() {
   return useMemo(
     () => (
       <Layout
-        ref={ref}
         style={{
           width: '100%',
           height: '100%',

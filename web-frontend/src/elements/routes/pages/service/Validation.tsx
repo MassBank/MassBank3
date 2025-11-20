@@ -235,7 +235,7 @@ function Validation() {
         <Button
           disabled={rawText.trim().length === 0 || isRequesting}
           type="primary"
-          style={{ marginTop: 10 }}
+          style={{ marginTop: 10, marginBottom: 10 }}
           onClick={handleOnValidate}
         >
           {isRequesting ? 'Validating...' : 'Validate'}
