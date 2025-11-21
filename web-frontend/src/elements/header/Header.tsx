@@ -94,7 +94,8 @@ function Header({ height }: InputProps) {
         .concat([
           {
             key: 'more',
-            label: <CaretDownOutlined />,
+            label: 'More',
+            icon: <CaretDownOutlined />,
             style: {
               backgroundColor,
               height:
@@ -120,7 +121,7 @@ function Header({ height }: InputProps) {
                     <Button
                       type="link"
                       key={path + '-li'}
-                      style={{ padding: 0, margin: 0 }}
+                      style={{ padding: 0, margin: 0, color: 'black' }}
                     >
                       <a href={path} target="_self">
                         {route.label}
