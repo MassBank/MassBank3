@@ -37,11 +37,7 @@ function StatusMessage() {
     <Alert
       style={{ width: '100%' }}
       message="Status Warning"
-      description={
-        status.postgres.updateStatus === 'updating'
-          ? 'The database is currently being updated. Some features and records may be not available yet.'
-          : 'The database update status is unknown. Some features and records may be unavailable.'
-      }
+      description={`The database is currently being updated with following status "${status.postgres.updateStatus}". Some features and records may be not available yet.`}
       type="warning"
       showIcon
     />

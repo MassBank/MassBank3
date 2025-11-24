@@ -36,10 +36,23 @@ func main() {
 	}
 
 	if userConfig.Init {
+		// set status to removing indexes
+		err = db.SetStatus("database_update", "remove indexes")
+		if err != nil {
+			println("Could not set status to \"remove indexes\": " + err.Error())
+			panic(err)
+		}
 		println("Removing indexes...")
 		err = db.RemoveIndexes()
 		if err != nil {
 			println("Could not remove indexes: " + err.Error())
+			panic(err)
+		}
+
+		// set status to initialising
+		err = db.SetStatus("database_update", "initialising")
+		if err != nil {
+			println("Could not set status to \"initialising\": " + err.Error())
 			panic(err)
 		}
 
@@ -51,6 +64,13 @@ func main() {
 		var mbfiles []*massbank.MassBank2
 		var versionData *massbank.MbMetaData
 		if len(userConfig.DataDir) > 0 {
+			// set status to reading data from directory
+			err = db.SetStatus("database_update", "reading data from directory")
+			if err != nil {
+				println("Could not set status to \"reading data from directory\": " + err.Error())
+				panic(err)
+			}
+
 			fmt.Println("Reading data from directory...")
 			mbfiles, versionData, err = readDirectoryData(userConfig.DataDir)
 			if err != nil {
@@ -58,6 +78,13 @@ func main() {
 			}
 		}
 		if mbfiles == nil && len(userConfig.GitRepo) > 0 {
+			// set status to reading data from git
+			err = db.SetStatus("database_update", "reading data from git")
+			if err != nil {
+				println("Could not set status to \"reading data from git\": " + err.Error())
+				panic(err)
+			}
+
 			fmt.Println("Reading data from git repository...")
 			mbfiles, versionData, err = readGitData(userConfig.GitRepo, userConfig.GitBranch)
 			if err != nil {
@@ -66,10 +93,10 @@ func main() {
 		}
 		fmt.Println("Start updating database with", len(mbfiles), "MassBank records...")
 
-		// set status to updating
-		err = db.SetStatus("database_update", "updating")
+		// set status to updating metadata
+		err = db.SetStatus("database_update", "updating metadata")
 		if err != nil {
-			println("Could not set status to \"updating\": " + err.Error())
+			println("Could not set status to \"updating metadata\": " + err.Error())
 			panic(err)
 		}
 
@@ -79,6 +106,14 @@ func main() {
 			println("Could not update metadata: " + err.Error())
 			panic(err)
 		}
+
+		// set status to updating records
+		err = db.SetStatus("database_update", "updating records")
+		if err != nil {
+			println("Could not set status to \"updating records\": " + err.Error())
+			panic(err)
+		}
+
 		println("Updating records...")
 
 		mb3RecordStrings := []string{}
@@ -111,6 +146,13 @@ func main() {
 		}
 
 		println("Database filling was successful. ", count, " records in database.")
+
+		// set status to adding indexes
+		err = db.SetStatus("database_update", "adding indexes")
+		if err != nil {
+			println("Could not set status to \"adding indexes\": " + err.Error())
+			panic(err)
+		}
 
 		println("Adding indexes...")
 		err = db.AddIndexes()
