@@ -36,29 +36,24 @@ func main() {
 	}
 
 	if userConfig.Init {
+		fmt.Println("Start initialising database...")
+		if err := db.Init(); err != nil {
+			println(err.Error())
+		}
+		fmt.Println("Database initialisation finished.")
+
 		// set status to removing indexes
 		err = db.SetStatus("database_update", "remove indexes")
 		if err != nil {
 			println("Could not set status to \"remove indexes\": " + err.Error())
 			panic(err)
 		}
+
 		println("Removing indexes...")
 		err = db.RemoveIndexes()
 		if err != nil {
 			println("Could not remove indexes: " + err.Error())
 			panic(err)
-		}
-
-		// set status to initialising
-		err = db.SetStatus("database_update", "initialising")
-		if err != nil {
-			println("Could not set status to \"initialising\": " + err.Error())
-			panic(err)
-		}
-
-		fmt.Println("Start initialising database...")
-		if err := db.Init(); err != nil {
-			println(err.Error())
 		}
 
 		var mbfiles []*massbank.MassBank2
@@ -165,7 +160,7 @@ func main() {
 	} else {
 		println("Database initialisation was skipped.")
 	}
-
+	// set status to done
 	err = db.SetStatus("database_update", "done")
 	if err != nil {
 		println("Could not set status to \"done\": " + err.Error())
