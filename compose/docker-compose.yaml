@@ -1,13 +1,21 @@
 volumes:
   massbank-pgdata:
+  bingo-postgres:
 
 services:
+  bingo-init:
+    platform: linux/amd64
+    image: quay.io/massbank/postgres-bingo-init:v17-bingo-1.36.0
+    command: /bin/sh -c "cp -rp /bingo-postgres/* /opt/bingo-postgres/"
+    volumes:
+      - "bingo-postgres:/opt/bingo-postgres"
   postgres:
     platform: linux/amd64
-    image: quay.io/massbank/postgres-bingo:v17-bingo-1.36.0
-    restart: always
-    ports:
-      - "${DB_PORT}:5432"
+    image: postgres:17
+    pull_policy: always
+    restart: unless-stopped
+#    ports:
+#      - "${DB_PORT}:5432"
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -15,8 +23,13 @@ services:
       DB_NAME_EXPORT_SERVICE: ${DB_NAME_EXPORT_SERVICE}
     volumes:
       - "massbank-pgdata:/var/lib/postgresql/data"
-      - "./initdb.d/init_ALLOW_NON_UNIQUE_DEAROMATIZATION.sh:/docker-entrypoint-initdb.d/init_ALLOW_NON_UNIQUE_DEAROMATIZATION.sh"
+      - "bingo-postgres:/opt/bingo-postgres"
+      - "./initdb.d/000_bingo_install.sh:/docker-entrypoint-initdb.d/000_bingo_install.sh"
+      - "./initdb.d/00_init_ALLOW_NON_UNIQUE_DEAROMATIZATION.sh:/docker-entrypoint-initdb.d/00_init_ALLOW_NON_UNIQUE_DEAROMATIZATION.sh"
       - "./initdb.d/init_export-service_db.sh:/docker-entrypoint-initdb.d/init_export-service_db.sh"
+    depends_on:
+      bingo-init:
+        condition: service_completed_successfully
     healthcheck:
       test:
         [
@@ -33,21 +46,23 @@ services:
       start_period: 40s
 
   mb3server:
+    image: quay.io/massbank/massbank-api:latest
+    pull_policy: always
     build:
       context: ..
       dockerfile: Dockerfile-server
-    restart: always
+    restart: unless-stopped
     ports:
       - "${MB3_API_PORT}:${MB3_SERVER_PORT}"
     depends_on:
       postgres:
         condition: service_healthy
     environment:
-      DB_PORT: ${DB_PORT}
-      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: 5432
       DB_HOST: postgres
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
       MB3_SERVER_PORT: ${MB3_SERVER_PORT}
       SIMILARITY_SERVICE_COSINE_URL: http://similarity-service:8080      
       EXPORT_SERVICE_URL: http://export-service:8080      
@@ -57,7 +72,8 @@ services:
   similarity-service:
     platform: linux/amd64
     image: quay.io/massbank/massbank-similarity-api:latest
-    restart: always    
+    pull_policy: always
+    restart: unless-stopped
     environment:
       DATA_DIR: "/MassBank-data"
       VERBOSE: ${SIMILARITY_SERVICE_VERBOSE}
@@ -68,7 +84,8 @@ services:
 
   nginx:
     image: nginx:latest
-    restart: always
+    pull_policy: always
+    restart: unless-stopped
     ports:
       - "8082:80"
     volumes:
@@ -79,14 +96,15 @@ services:
   export-service:
     platform: linux/amd64
     image: quay.io/massbank/massbank-export-api:latest
-    restart: always
+    pull_policy: always
+    restart: unless-stopped
     ports:
       - "${EXPORT_SERVICE_PORT}:8080"
     environment:
       MB_DATA_DIRECTORY: "/MassBank-data"
       CORS_ALLOWED_ORIGINS: ${EXPORT_SERVICE_CORS_ALLOWED_ORIGINS} 
       DB_HOST: postgres
-      DB_PORT: ${DB_PORT}
+      DB_PORT: 5432
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME_EXPORT_SERVICE}
@@ -94,9 +112,12 @@ services:
       - "${MB_DATA_DIRECTORY}:/MassBank-data"
 
   mb3frontend:
+    image: quay.io/massbank/massbank-frontend:latest
+    pull_policy: always
     build:
       context: ../web-frontend
       dockerfile: Dockerfile-frontend
+    restart: unless-stopped
     environment:
       MB3_API_URL: "${MB3_API_URL}"
       MB3_API_URL_INTERNAL: "http://${MB3_SERVER_HOST}:${MB3_SERVER_PORT}${MB3_API_BASE_URL}"
@@ -114,13 +135,14 @@ services:
       MB3_FRONTEND_HOMEPAGE_FUNDING_SECTION_TEXT: "${MB3_FRONTEND_HOMEPAGE_FUNDING_SECTION_TEXT}"
       MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_NAME: "${MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_NAME}"
       MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_TEXT: "${MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_TEXT}"
-    restart: always
     ports:
       - "${MB3_FRONTEND_PORT}:3000"
     # volumes:
     #   - "${HTML_LOCAL_DIR}:/app/analytics-html"
 
   mb3tool:
+    image: quay.io/massbank/massbank-dbtool:latest
+    pull_policy: always
     build:
       context: ..
       dockerfile: Dockerfile-dbtool
@@ -128,7 +150,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      - DB_PORT
+      - DB_PORT=5432
       - DB_PASSWORD
       - DB_HOST=postgres
       - DB_NAME
