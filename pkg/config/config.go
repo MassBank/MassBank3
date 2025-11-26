@@ -93,8 +93,11 @@ func GetServerConfig() *ServerConfig {
 	serverConfig.ApiUrl = getEnv("MB3_API_URL", apiUrlDefault)
 	serverConfig.BaseUrl = getEnv("MB3_API_BASE_URL", baseUrlDefault)
 
+	if len(serverConfig.BaseUrl) == 0 {
+		serverConfig.BaseUrl = "/"
+	}
 	lastChar := serverConfig.BaseUrl[len(serverConfig.BaseUrl)-1:]
-	if lastChar == "/" {
+	if lastChar == "/" && len(serverConfig.BaseUrl) > 1 {
 		serverConfig.BaseUrl = serverConfig.BaseUrl[:len(serverConfig.BaseUrl)-1]
 	}
 

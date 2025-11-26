@@ -65,7 +65,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       MB3_SERVER_PORT: 8080
       SIMILARITY_SERVICE_COSINE_URL: http://similarity-service:8080${SIMILARITY_SERVICE_BASE_URL}
-      EXPORT_SERVICE_URL: http://export-service:8080      
+      EXPORT_SERVICE_URL: http://export-service:8080${EXPORT_SERVICE_BASE_URL}      
       MB3_API_URL: http://${MB3_API_HOST}:${MB3_API_PORT}
       MB3_API_BASE_URL: ${MB3_API_BASE_URL}
 

@@ -24,11 +24,12 @@ const backendUrl =
     ? process.env.MB3_API_URL.replace(/\/$/, '')
     : 'http://localhost:8081/MassBank-api';
 const frontendUrl = process.env.MB3_FRONTEND_URL ?? 'http://localhost:8080';
-const frontendBaseUrl =
+const frontendBaseUrlTemp =
   process.env.MB3_FRONTEND_BASE_URL &&
   process.env.MB3_FRONTEND_BASE_URL.trim().length > 0
-    ? process.env.MB3_FRONTEND_BASE_URL.replace(/\/$/, '')
-    : '/MassBank3';
+    ? process.env.MB3_FRONTEND_BASE_URL
+    : '/';
+const frontendBaseUrl = frontendBaseUrlTemp.replace(/\/$/, '');
 const exportServiceUrl =
   process.env.EXPORT_SERVICE_URL ?? 'http://localhost:8083';
 const pathToHtmlHeadFile = process.env.HTML_HEAD_FILE ?? '';
@@ -106,11 +107,13 @@ if (!isProduction) {
   app.use(frontendBaseUrl, sirv('./dist/client', { extensions: [] }));
 }
 
-// Create router for redirecting to the frontend in case of hostname is given without base URL
-app.get('', (req: Request, res: Response) => {
-  const redirectUrl = frontendUrl + frontendBaseUrl + '/';
-  res.redirect(301, redirectUrl);
-});
+if (frontendBaseUrl.trim().length > 0) {
+  // Create router for redirecting to the frontend in case of hostname is given without base URL
+  app.get('', (req: Request, res: Response) => {
+    const redirectUrl = frontendUrl + frontendBaseUrl + '/';
+    res.redirect(301, redirectUrl);
+  });
+}
 
 // Create router for redirecting to the frontend with base URL in case slash is missing
 const regexBaseUrlWithoutSlash = new RegExp(`^${frontendBaseUrl}$`);
@@ -121,7 +124,10 @@ app.get(regexBaseUrlWithoutSlash, (req: Request, res: Response) => {
 
 // Create router for base URL
 const baseRouter = express.Router();
-app.use(frontendBaseUrl + '/', baseRouter);
+app.use(
+  frontendBaseUrl.trim().length === 0 ? '/' : frontendBaseUrl + '/',
+  baseRouter,
+);
 
 const nRecords = 40000;
 const prefixUrl = frontendUrl + frontendBaseUrl;
