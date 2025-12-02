@@ -31,7 +31,7 @@ const frontendBaseUrlTemp =
     : '/';
 const frontendBaseUrl = frontendBaseUrlTemp.replace(/\/$/, '');
 const exportServiceUrl =
-  process.env.EXPORT_SERVICE_URL ?? 'http://localhost:8083';
+  process.env.EXPORT_SERVICE_URL ?? 'http://localhost:8083/MassBank-export';
 const pathToHtmlHeadFile = process.env.HTML_HEAD_FILE ?? '';
 const pathToHtmlBodyFile = process.env.HTML_BODY_FILE ?? '';
 const backendUrlInternal =
@@ -40,7 +40,8 @@ const backendUrlInternal =
     ? process.env.MB3_API_URL_INTERNAL.replace(/\/$/, '')
     : 'http://mb3server:8080/MassBank-api';
 const exportServiceUrlInternal =
-  process.env.EXPORT_SERVICE_URL_INTERNAL ?? 'http://export-service:8080';
+  process.env.EXPORT_SERVICE_URL_INTERNAL ??
+  'http://export-service:8080/MassBank-export';
 const distributorText =
   process.env.DISTRIBUTOR_TEXT ??
   'This website is hosted and distributed by ...';

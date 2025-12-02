@@ -1,9 +1,11 @@
-import { MouseEvent, useCallback, useMemo, useState } from 'react';
+import { MouseEvent, ReactNode, useCallback, useMemo, useState } from 'react';
 import { Button, Collapse, CollapseProps, UploadProps } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { Content } from 'antd/es/layout/layout';
 import Dragger from 'antd/es/upload/Dragger';
 import { RcFile } from 'antd/es/upload';
+import { usePropertiesContext } from '../../../../context/properties/properties';
+import validateRecord from '../../../../utils/request/validateRecord';
 
 const rawTextPlaceholder =
   'ACCESSION: MSBNK-IPB_Halle-PB001341\n\
@@ -44,8 +46,12 @@ PK$PEAK: m/z int. rel.int.\n\
 ';
 
 function Validation() {
+  const { exportServiceUrl } = usePropertiesContext();
+
   const [rawText, setRawText] = useState<string>('');
-  const [validationResult, setValidationResult] = useState<string>('');
+  const [validationResult, setValidationResult] = useState<ReactNode | null>(
+    null,
+  );
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
 
   const insertPlaceholder = useCallback((e: MouseEvent<HTMLElement>) => {
@@ -105,16 +111,51 @@ function Validation() {
 
       setIsRequesting(true);
 
-      console.log(rawText);
+      const result = await validateRecord(exportServiceUrl, rawText);
+      if (result.line !== null) {
+        result.line = result.line - 1;
+      }
 
-      const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
-      await delay(3000);
+      const resultText = `${result.message}${
+        result.line !== null && result.line >= 0
+          ? ` at line ${result.line + 1}`
+          : ''
+      }${result.column !== null && result.column >= 0 ? `, column ${result.column + 1}` : ''}`;
 
-      setValidationResult('It is a valid MassBank record format.');
+      const lines = rawText.split(/\r\n|\r|\n/);
+      if (
+        result.line !== null &&
+        result.line >= 0 &&
+        result.line <= lines.length &&
+        result.column !== null &&
+        result.column >= 0 &&
+        result.column <= lines[result.line].length + 1
+      ) {
+        const errorLine = lines[result.line];
+        const errorLineWithPointer = `${errorLine}\n${' '.repeat(result.column)}^`;
+
+        setValidationResult(
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              fontFamily: 'monospace',
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            <label>{resultText}</label>
+            <br />
+            <br />
+            <label>{errorLineWithPointer}</label>
+          </div>,
+        );
+      } else {
+        setValidationResult(<>{resultText}</>);
+      }
 
       setIsRequesting(false);
     },
-    [rawText],
+    [exportServiceUrl, rawText],
   );
 
   const handleOnChange = useCallback(
@@ -128,7 +169,7 @@ function Validation() {
   const activeKey = useMemo(() => {
     const keys: string[] = [];
     keys.push('1');
-    if (!isRequesting && validationResult.trim().length > 0) {
+    if (!isRequesting && validationResult !== null) {
       keys.push('2');
     }
     return keys;
@@ -155,10 +196,10 @@ function Validation() {
         key: '2',
         label: 'Validation Result',
         showArrow: false,
-        children: (
-          <p style={{ color: isRequesting ? 'gray' : 'black' }}>
-            {isRequesting ? 'Validating...' : validationResult}
-          </p>
+        children: isRequesting ? (
+          <p style={{ color: 'gray' }}>Validating...</p>
+        ) : (
+          (validationResult ?? <p style={{ color: 'gray' }}>No result</p>)
         ),
       },
     ];
