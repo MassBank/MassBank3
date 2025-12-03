@@ -5,8 +5,6 @@ async function validateRecord(
   exportServiceUrl: string,
   rawText: string,
 ): Promise<ValidationResult> {
-  console.log(exportServiceUrl);
-
   try {
     const resp = await axios.post(
       exportServiceUrl + '/validate',
