@@ -1,5 +1,6 @@
 import { MouseEvent, ReactNode, useCallback, useMemo, useState } from 'react';
 import { Button, Collapse, CollapseProps, UploadProps } from 'antd';
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import TextArea from 'antd/es/input/TextArea';
 import { Content } from 'antd/es/layout/layout';
 import Dragger from 'antd/es/upload/Dragger';
@@ -131,8 +132,13 @@ function Validation() {
         result.column >= 0 &&
         result.column <= lines[result.line].length + 1
       ) {
+        const preLines = lines.slice(Math.max(0, result.line - 5), result.line);
         const errorLine = lines[result.line];
         const errorLineWithPointer = `${errorLine}\n${' '.repeat(result.column)}^`;
+        const postLines = lines.slice(
+          result.line + 1,
+          Math.min(lines.length, result.line + 6),
+        );
 
         setValidationResult(
           <div
@@ -143,14 +149,54 @@ function Validation() {
               whiteSpace: 'pre-wrap',
             }}
           >
-            <label>{resultText}</label>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'left',
+                alignItems: 'center',
+              }}
+            >
+              <CloseCircleOutlined
+                style={{ color: 'red', fontSize: 25, marginRight: 15 }}
+              />
+              {resultText}
+            </div>
             <br />
+            <br />
+            {result.line - 6 >= 0 ? (
+              <>
+                <label>...</label>
+                <br />
+              </>
+            ) : null}
+            <label>{preLines.join('\n')}</label>
             <br />
             <label>{errorLineWithPointer}</label>
+            <br />
+            <label>{postLines.join('\n')}</label>
+            {result.line + 6 < lines.length ? (
+              <>
+                <br />
+                <label>...</label>
+              </>
+            ) : null}
           </div>,
         );
       } else {
-        setValidationResult(<>{resultText}</>);
+        setValidationResult(
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'left',
+              alignItems: 'center',
+            }}
+          >
+            <CheckCircleOutlined
+              style={{ color: 'green', fontSize: 25, marginRight: 15 }}
+            />
+            {resultText}
+          </div>,
+        );
       }
 
       setIsRequesting(false);
