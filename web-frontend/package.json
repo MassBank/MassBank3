@@ -18,7 +18,7 @@
     "prettier-write": "prettier --write src"
   },
   "dependencies": {
-    "antd": "6.0.1",
+    "antd": "6.1.0",
     "axios": "1.13.2",
     "compression": "1.8.1",
     "d3": "7.9.0",
@@ -31,7 +31,7 @@
     "react-mf": "3.1.1",
     "react-ocl": "8.4.0",
     "react-plotly.js": "2.6.0",
-    "react-router-dom": "7.10.0",
+    "react-router-dom": "7.10.1",
     "remark-gfm": "4.0.1",
     "sirv": "3.0.2",
     "xml-formatter": "3.6.7"
@@ -49,9 +49,9 @@
     "@types/react-dom": "19.2.3",
     "@types/react-modal": "3.16.3",
     "@types/react-plotly.js": "2.6.3",
-    "@typescript-eslint/eslint-plugin": "8.48.1",
-    "@typescript-eslint/parser": "8.48.1",
-    "@vitejs/plugin-react": "5.1.1",
+    "@typescript-eslint/eslint-plugin": "8.49.0",
+    "@typescript-eslint/parser": "8.49.0",
+    "@vitejs/plugin-react": "5.1.2",
     "eslint": "9.39.1",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.4",
@@ -65,8 +65,8 @@
     "sass": "1.94.2",
     "tsx": "4.21.0",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.48.1",
-    "vite": "7.2.6",
+    "typescript-eslint": "8.49.0",
+    "vite": "7.2.7",
     "vitest": "4.0.15"
   }
 }
