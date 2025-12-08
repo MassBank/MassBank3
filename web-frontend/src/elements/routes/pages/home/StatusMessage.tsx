@@ -26,7 +26,7 @@ function StatusMessage() {
       status.export_service.error) ? (
     <Alert
       style={{ width: '100%' }}
-      message="Status Warning"
+      title="Status Warning"
       description={
         'Some of the backend services are not available. Not all features may work.'
       }
@@ -36,7 +36,7 @@ function StatusMessage() {
   ) : status && status.postgres.updateStatus !== 'done' ? (
     <Alert
       style={{ width: '100%' }}
-      message="Status Warning"
+      title="Status Warning"
       description={`The database is currently being updated with following status "${status.postgres.updateStatus}". Some features and records may be not available yet.`}
       type="warning"
       showIcon
