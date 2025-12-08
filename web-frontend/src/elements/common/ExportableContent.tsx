@@ -7,8 +7,8 @@ import {
 } from '@ant-design/icons';
 import {
   CSSProperties,
-  JSX,
   MouseEvent,
+  ReactNode,
   useCallback,
   useMemo,
   useRef,
@@ -39,7 +39,7 @@ interface InputProps {
   width?: CSSProperties['width'];
   height?: CSSProperties['height'];
   style?: CSSProperties;
-  component?: JSX.Element | string;
+  component?: ReactNode;
   componentContainerStyle?: CSSProperties;
   buttonContainerStyle?: CSSProperties;
   permanentButton?: boolean;

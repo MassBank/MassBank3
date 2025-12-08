@@ -364,6 +364,30 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
       ),
     });
 
+    let formulaComponent = <MF mf={record.compound.formula} />;
+    if (
+      record.compound.formula.length >= 4 &&
+      record.compound.formula[0] === '[' &&
+      record.compound.formula.includes(']') &&
+      (record.compound.formula[record.compound.formula.length - 1] === '+' ||
+        record.compound.formula[record.compound.formula.length - 1] === '-')
+    ) {
+      const formula = record.compound.formula.split('[')[1].split(']')[0];
+      const count = record.compound.formula.split(']')[1].slice(0, -1);
+      const sign = record.compound.formula[record.compound.formula.length - 1];
+      formulaComponent = (
+        <div>
+          <label>
+            <MF mf={formula} />
+            <sup>
+              {count}
+              {sign}
+            </sup>
+          </label>
+        </div>
+      );
+    }
+
     return (
       <Content
         style={{
@@ -510,7 +534,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
             >
               <label>Formula: </label>
               <ExportableContent
-                component={<MF mf={record.compound.formula} />}
+                component={formulaComponent}
                 componentContainerStyle={{
                   fontWeight: 'bolder',
                 }}
