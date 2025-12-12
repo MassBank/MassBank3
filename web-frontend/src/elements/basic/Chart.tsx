@@ -628,7 +628,7 @@ function Chart({
                 >
                   <Button
                     children={
-                      <CopyOutlined title="Copy peak list of current spectrum view to clipboard" />
+                      <CopyOutlined title="Copy peak list of current spectrum view to clipboard (input format for similarity search)" />
                     }
                     onClick={() => handleOnCopy(filteredPeakData)}
                     style={toolButtonStyle}

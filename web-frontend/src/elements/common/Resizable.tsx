@@ -1,4 +1,4 @@
-import PeakTable from '../record/PeakTable';
+import PeakTable from '../basic/PeakTable';
 import Chart from '../basic/Chart';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -6,7 +6,7 @@ import Peak from '../../types/peak/Peak';
 import Record from '../../types/record/Record';
 import { Content } from 'antd/es/layout/layout';
 import { Splitter, Tabs, TabsProps } from 'antd';
-import NeutralLossTable from '../record/NeutralLossTable';
+import NeutralLossTable from '../basic/NeutralLossTable';
 import NeutralLoss from '../../types/peak/NeutralLoss';
 import getRecordPeakListWithPrecursor from '../../utils/getRecordPeakListWithPrecursor';
 

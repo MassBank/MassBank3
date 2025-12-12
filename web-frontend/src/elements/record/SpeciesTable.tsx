@@ -1,8 +1,6 @@
-import './Table.scss';
-
+import Table from '../basic/Table';
 import { CSSProperties, useMemo } from 'react';
 import Species from '../../types/record/Species';
-import { Table } from 'antd';
 import LinksTable from './LinksTable';
 import { Content } from 'antd/es/layout/layout';
 import ExportableContent from '../common/ExportableContent';
@@ -120,12 +118,11 @@ function SpeciesTable({ species, width, height }: InputProps) {
         }}
       >
         <Table
-          className="table"
-          style={{ width, height: 'auto', marginBottom: 10 }}
-          sticky
+          tableName="Species Table"
           columns={columns}
           dataSource={dataSource}
-          pagination={false}
+          style={{ width, height: 'auto', marginBottom: 10 }}
+          enableExport
         />
 
         {species?.link && species.link.length > 0 && (

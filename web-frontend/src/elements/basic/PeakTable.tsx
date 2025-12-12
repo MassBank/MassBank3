@@ -1,8 +1,6 @@
-import './PeakTable.scss';
-
+import Table from './Table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Peak from '../../types/peak/Peak';
-import { Table } from 'antd';
 import PeakTableDataType from '../../types/PeakTableDataType';
 import { useHighlightData } from '../../context/highlight/useHighlightData';
 
@@ -38,11 +36,14 @@ function PeakTable({ peaks, width, height }: InputProps) {
   const [activeKey, setActiveKey] = useState<string | undefined>();
 
   useEffect(() => {
+    function setKey(value: string | undefined) {
+      setActiveKey(value);
+    }
     const p = peaks.find((p) => highlightData.highlight.highlighted.has(p.id));
     if (p) {
-      setActiveKey(p.id);
+      setKey(p.id);
     } else {
-      setActiveKey(undefined);
+      setKey(undefined);
     }
   }, [activeKey, highlightData.highlight.highlighted, peaks]);
 
@@ -84,13 +85,12 @@ function PeakTable({ peaks, width, height }: InputProps) {
 
   return useMemo(
     () => (
-      <Table<PeakTableDataType>
-        className="peak-table"
+      <Table
+        tableName="Peak Table"
+        isPeakTable
         style={{ width, height }}
-        sticky
         columns={columns}
         dataSource={dataSource}
-        pagination={false}
         onRow={(record) => {
           return {
             onMouseEnter: () => handleOnMouseEnter(record.key.toString()),
@@ -100,6 +100,7 @@ function PeakTable({ peaks, width, height }: InputProps) {
         rowClassName={(record) => {
           return record.key === activeKey ? 'table-row-highlight' : '';
         }}
+        enableExport
       />
     ),
     [

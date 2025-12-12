@@ -1,7 +1,5 @@
-import './PeakTable.scss';
-
+import Table from './Table';
 import { useCallback, useMemo, useState } from 'react';
-import { Table } from 'antd';
 import { useHighlightData } from '../../context/highlight/useHighlightData';
 import NeutralLoss from '../../types/peak/NeutralLoss';
 import NeutralLossTableDataType from '../../types/NeutralLossTableDataType';
@@ -89,13 +87,12 @@ function NeutralLossTable({ neutralLosses, peaks, width, height }: InputProps) {
     ];
 
     return (
-      <Table<NeutralLossTableDataType>
-        className="peak-table"
+      <Table
+        tableName="Neutral Loss Table"
+        isPeakTable
         style={{ width, height }}
-        sticky
         columns={columns}
         dataSource={dataSource}
-        pagination={false}
         onRow={(record) => {
           return {
             onMouseEnter: () => handleOnMouseEnter(record.key.toString()),
@@ -105,6 +102,7 @@ function NeutralLossTable({ neutralLosses, peaks, width, height }: InputProps) {
         rowClassName={(record) => {
           return record.key === activeKey ? 'table-row-highlight' : '';
         }}
+        enableExport
       />
     );
   }, [

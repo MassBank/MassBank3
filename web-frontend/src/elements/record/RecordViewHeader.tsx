@@ -1,10 +1,9 @@
-import './Table.scss';
-
+import Table from '../basic/Table';
 import { Content } from 'antd/es/layout/layout';
 import ExportableContent from '../common/ExportableContent';
 import { CSSProperties, JSX, useCallback, useMemo, useState } from 'react';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
-import { Button, Dropdown, Table, Tree, TreeDataNode } from 'antd';
+import { Button, Dropdown, Tree, TreeDataNode } from 'antd';
 import Record from '../../types/record/Record';
 import { MF } from 'react-mf';
 import StructureView from '../basic/StructureView';
@@ -489,15 +488,13 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
             alignItems: 'center',
           }}
         >
-          <Table<HeaderTableType>
+          <Table
+            tableName="Record View Header Table"
             style={{
               minWidth: `calc(100% - ${(imageWidth as number) + 30}px)`, // plus the download button width is 30px
               maxWidth: `calc(100% - ${(imageWidth as number) + 30}px)`, // plus the download button width is 30px
               height: '100%',
             }}
-            className="table"
-            sticky
-            pagination={false}
             showHeader={false}
             columns={columns}
             dataSource={dataSource}
