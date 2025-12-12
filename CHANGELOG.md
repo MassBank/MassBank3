@@ -1,5 +1,26 @@
 # Changelog
 
+## [2025.12.1](https://github.com/MassBank/MassBank3/compare/v2025.10.6...v2025.12.1) (2025-12-12)
+
+
+### Features
+
+* added an status table in Postgres & show a notification at homepage in case of a database update or errors in backend services (close [#131](https://github.com/MassBank/MassBank3/issues/131)) ([c896aed](https://github.com/MassBank/MassBank3/commit/c896aedec3939e4aaa8fbc719dfe57af8ea7d7ba))
+* display structure from SMILES in peak annotation if available ([f416950](https://github.com/MassBank/MassBank3/commit/f416950dfb32628a785c9c81e01ad3b8dea4e2e3))
+* enable data copy for different tables in single record view and peak tables (close [#137](https://github.com/MassBank/MassBank3/issues/137)) ([a26b0b9](https://github.com/MassBank/MassBank3/commit/a26b0b9ef8d70f20471bef2ef6518f0094473008))
+
+
+### Bug Fixes
+
+* crash in frontend when entering a non-existing accession ([db351b6](https://github.com/MassBank/MassBank3/commit/db351b6862d919b89632e7985d3138871fd309b3))
+* crash in mb3server when Postgres database is down (close [#91](https://github.com/MassBank/MassBank3/issues/91)) & adjustments in frontend ([fad5a00](https://github.com/MassBank/MassBank3/commit/fad5a0010130771701bb51c0ef4f0c1227dc0f31))
+* incorrect display of molecular formula with charges ([987c0bc](https://github.com/MassBank/MassBank3/commit/987c0bc49d22e283fb28885fa3d0c4e52928111c))
+
+
+### Miscellaneous Chores
+
+* release v2025.12.1 ([69d7395](https://github.com/MassBank/MassBank3/commit/69d73957e6f597afcc8d537272e67cc206249513))
+
 ## [2025.10.6](https://github.com/MassBank/MassBank3/compare/v2025.10.4...v2025.10.6) (2025-11-03)
 
 
