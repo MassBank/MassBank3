@@ -93,7 +93,6 @@ function PropertyFilterOptionsMenuItems({
                 filterOptions={propertyFilterOptions?.ms_type ?? []}
                 filterName="propertyFilterOptions"
                 label="ms_type"
-                height={80}
                 showCounts={showCounts}
               />
             </Form.Item>
@@ -126,7 +125,6 @@ function PropertyFilterOptionsMenuItems({
                 filterOptions={propertyFilterOptions?.ion_mode ?? []}
                 filterName="propertyFilterOptions"
                 label="ion_mode"
-                height={30}
                 showCounts={showCounts}
               />
             </Form.Item>

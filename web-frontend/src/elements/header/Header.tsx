@@ -1,13 +1,13 @@
-import './Header.scss';
-
 import routes from '../../constants/routes';
-import { Button, Menu, MenuProps } from 'antd';
-import { Header as HeaderAntD } from 'antd/es/layout/layout';
+import { Button } from 'antd';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { usePropertiesContext } from '../../context/properties/properties';
 import { CSSProperties, useMemo } from 'react';
 import logo from '../../assets/logo.svg';
 import AccessionSearchInputField from '../common/AccessionSearchInputField';
+import HeaderTemplate from '../basic/HeaderTemplate';
+import MenuItem from '../../types/MenuItem';
+import { CaretDownOutlined } from '@ant-design/icons';
 
 const backgroundColor: CSSProperties['backgroundColor'] = 'rgb(223, 223, 223)';
 
@@ -21,8 +21,6 @@ function Header({ height }: InputProps) {
 
   const [searchParams] = useSearchParams();
   const accession = searchParams.get('id');
-
-  type MenuItem = Required<MenuProps>['items'][number];
 
   const logoLink: MenuItem = useMemo(() => {
     return {
@@ -64,10 +62,9 @@ function Header({ height }: InputProps) {
       Object.values(routes)
         .filter(
           (route) =>
-            route.id !== routes.notFound.id &&
-            route.id !== routes.home.id &&
-            route.id !== routes.accession.id &&
-            route.id !== routes.accessionNext.id,
+            route.id === routes.search.id ||
+            route.id === routes.content.id ||
+            route.id === routes.service.id,
         )
         .map((route) => {
           const path = baseUrl + '/' + route.path;
@@ -94,55 +91,72 @@ function Header({ height }: InputProps) {
             ),
           } as MenuItem;
         })
-        .concat({
-          key: 'accession-search-field',
-          style: { cursor: 'default' },
-          label: (
-            <AccessionSearchInputField
-              accession={accession ?? ''}
-              disableLabel
-              placeholderText="Search by Accession ID"
-              inputStyle={{ width: '300px' }}
-              style={{
-                width: '350px',
-                backgroundColor: 'transparent',
-              }}
-            />
-          ),
-        }) as MenuItem[],
+        .concat([
+          {
+            key: 'more',
+            label: 'More',
+            icon: <CaretDownOutlined />,
+            style: {
+              backgroundColor,
+              height:
+                typeof height === 'number'
+                  ? height - 5
+                  : `calc(${height} - 5px)`,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            },
+            children: Object.values(routes)
+              .filter(
+                (route) =>
+                  route.id === routes.documentation.id ||
+                  route.id === routes.news.id ||
+                  route.id === routes.about.id,
+              )
+              .map((route) => {
+                const path = baseUrl + '/' + route.path;
+                return {
+                  key: path,
+                  label: (
+                    <Button
+                      type="link"
+                      key={path + '-li'}
+                      style={{ padding: 0, margin: 0, color: 'black' }}
+                    >
+                      <a href={path} target="_self">
+                        {route.label}
+                      </a>
+                    </Button>
+                  ),
+                } as MenuItem;
+              }),
+          },
+        ])
+        .concat([
+          {
+            key: 'accession-search-field',
+            style: { cursor: 'default' },
+            label: (
+              <AccessionSearchInputField
+                accession={accession ?? ''}
+                disableLabel
+                placeholderText="Search by Accession ID"
+                inputStyle={{ width: '300px' }}
+                style={{
+                  width: '350px',
+                  backgroundColor: 'transparent',
+                }}
+              />
+            ),
+          },
+        ]) as MenuItem[],
     [accession, baseUrl, height, location.pathname],
   );
 
   return useMemo(() => {
     const items = [logoLink, ...routeLinks];
-    return (
-      <HeaderAntD
-        style={{
-          width: '100%',
-          height,
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor,
-          padding: 0,
-        }}
-      >
-        <Menu
-          mode="horizontal"
-          defaultSelectedKeys={['logo-link']}
-          items={items}
-          style={{
-            width: '100%',
-            height,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor,
-          }}
-        />
-      </HeaderAntD>
-    );
+
+    return <HeaderTemplate height={height} items={items} />;
   }, [height, logoLink, routeLinks]);
 }
 

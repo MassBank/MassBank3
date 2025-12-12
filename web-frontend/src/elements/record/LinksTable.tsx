@@ -1,6 +1,4 @@
-import './Table.scss';
-
-import { Table } from 'antd';
+import Table from '../basic/Table';
 import Link from '../../types/Link';
 import { CSSProperties, JSX, useMemo } from 'react';
 import ExportableContent from '../common/ExportableContent';
@@ -46,7 +44,7 @@ function LinksTable({ links, width, height, title }: InputProps) {
         Identifier: (
           <ExportableContent
             mode="copy"
-            title={`Copy '${link.identifier}' to clipboard`}
+            title={`Copy '${link.database}' to clipboard`}
             component={link.identifier}
             onClick={() => copyTextToClipboard(link.database, link.identifier)}
             enableSearch={link.database === 'INCHIKEY'}
@@ -64,13 +62,12 @@ function LinksTable({ links, width, height, title }: InputProps) {
 
     return (
       <Table
-        className="table"
-        style={{ width, height }}
-        sticky
+        tableName="Links Table"
         columns={columns}
         dataSource={dataSource}
-        pagination={false}
-        title={title ? () => title : undefined}
+        style={{ width, height }}
+        title={title}
+        enableExport
       />
     );
   }, [baseUrl, frontendUrl, height, links, title, width]);

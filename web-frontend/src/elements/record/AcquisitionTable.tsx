@@ -1,6 +1,4 @@
-import './Table.scss';
-
-import { Table } from 'antd';
+import Table from '../basic/Table';
 import { CSSProperties, JSX, useMemo } from 'react';
 import { splitStringAndCapitaliseFirstLetter } from '../../utils/stringUtils';
 import ExportableContent from '../common/ExportableContent';
@@ -161,14 +159,14 @@ function AcquisitionTable({ acquisition, width, height }: InputProps) {
         });
       });
     }
+
     return (
       <Table
-        className="table"
-        style={{ width, height }}
-        sticky
+        tableName="Acquisition Table"
         columns={columns}
         dataSource={dataSource}
-        pagination={false}
+        style={{ width, height }}
+        enableExport
       />
     );
   }, [acquisition, baseUrl, frontendUrl, height, width]);

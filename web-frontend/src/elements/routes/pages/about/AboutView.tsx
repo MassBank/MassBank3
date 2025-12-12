@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { Layout } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import SectionDivider from '../../../basic/SectionDivider';
-import ServiceStatusView from './ServiceStatusView';
 import Segmented from '../../../basic/Segmented';
 import Imprint from './Imprint';
 import Acknowledgement from './Acknowledgement';
@@ -14,13 +13,6 @@ import CitationText from './CitationText';
 function AboutView() {
   const elements = useMemo(() => {
     const infoText = <InfoText />;
-
-    const serviceStatus = (
-      <Content>
-        <SectionDivider label="Service Status" />
-        <ServiceStatusView />
-      </Content>
-    );
 
     const citation = (
       <Content>
@@ -59,7 +51,6 @@ function AboutView() {
 
     return [
       infoText,
-      serviceStatus,
       citation,
       acknowledgement,
       supporters,
@@ -71,7 +62,6 @@ function AboutView() {
   const elementLabels = useMemo(
     () => [
       'Information',
-      'Service Status',
       'Citation',
       'Acknowledgement',
       'Supporters',

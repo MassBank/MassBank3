@@ -1,6 +1,6 @@
 import { Content } from 'antd/es/layout/layout';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Layout, Spin } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
+import { Spin } from 'antd';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Placeholder from '../../../basic/Placeholder';
@@ -34,32 +34,32 @@ const markDownUrls: LabelValueType[] = [
   },
 ];
 
-function Documentation() {
+function DocumentationView() {
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [markDowns, setMarkDowns] = useState<LabelValueType[]>([]);
 
-  const fetchMarkDowns = useCallback(async () => {
-    setIsFetching(true);
+  useEffect(() => {
+    async function fetchMarkDowns() {
+      setIsFetching(true);
 
-    try {
-      const _markDowns: LabelValueType[] = [];
-      for (const entry of markDownUrls) {
-        const response = await fetch(entry.value);
-        const md = await response.text();
+      try {
+        const _markDowns: LabelValueType[] = [];
+        for (const entry of markDownUrls) {
+          const response = await fetch(entry.value);
+          const md = await response.text();
 
-        _markDowns.push({ label: entry.label, value: md });
+          _markDowns.push({ label: entry.label, value: md });
+        }
+        setMarkDowns(_markDowns);
+      } catch (e) {
+        console.error(e);
       }
-      setMarkDowns(_markDowns);
-    } catch (e) {
-      console.error(e);
+
+      setIsFetching(false);
     }
 
-    setIsFetching(false);
-  }, []);
-
-  useEffect(() => {
     fetchMarkDowns();
-  }, [fetchMarkDowns]);
+  }, []);
 
   const elements = useMemo(
     () =>
@@ -82,45 +82,38 @@ function Documentation() {
 
   return useMemo(
     () => (
-      <Layout
+      <Content
         style={{
           width: '100%',
           height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
-        <Content
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          {isFetching ? (
-            <Spin
-              style={{
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-              size="large"
-            />
-          ) : markDowns.length > 0 ? (
-            <Segmented elements={elements} elementLabels={elementLabels} />
-          ) : (
-            <Placeholder
-              child="Could not fetch documentation data"
-              style={{ width: '100%', height: '100%' }}
-            />
-          )}
-        </Content>
-      </Layout>
+        {isFetching ? (
+          <Spin
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            size="large"
+          />
+        ) : markDowns.length > 0 ? (
+          <Segmented elements={elements} elementLabels={elementLabels} />
+        ) : (
+          <Placeholder
+            child="Could not fetch documentation data"
+            style={{ width: '100%', height: '100%' }}
+          />
+        )}
+      </Content>
     ),
     [elementLabels, elements, isFetching, markDowns.length],
   );
 }
 
-export default Documentation;
+export default DocumentationView;

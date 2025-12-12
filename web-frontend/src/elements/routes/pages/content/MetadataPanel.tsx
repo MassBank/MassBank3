@@ -43,120 +43,138 @@ function MetadataPanel({ metadata, width = '100%', height }: InputProps) {
     }
 
     const dataSource: HeaderTableType[] = [];
-    dataSource.push({
-      key: 'metadata-panel-table-commit',
-      label: 'Git Commit',
-      value: (
-        <ExportableContent
-          component={<LabelWrapper value={metadata.git_commit} />}
-          mode="copy"
-          onClick={() => copyTextToClipboard('Git Commit', metadata.git_commit)}
-          title="Copy Git Commit to clipboard"
-        />
-      ),
-    });
-    dataSource.push({
-      key: 'metadata-panel-table-version',
-      label: 'Data Version',
-      value: (
-        <ExportableContent
-          component={<LabelWrapper value={metadata.version} />}
-          mode="copy"
-          onClick={() => copyTextToClipboard('Data Version', metadata.version)}
-          title="Copy Data Version to clipboard"
-        />
-      ),
-    });
-    dataSource.push({
-      key: 'metadata-panel-table-timestamp',
-      label: 'Timestamp',
-      value: (
-        <ExportableContent
-          component={<LabelWrapper value={metadata.timestamp} />}
-          mode="copy"
-          onClick={() => copyTextToClipboard('Timestamp', metadata.timestamp)}
-          title="Copy Timestamp to clipboard"
-        />
-      ),
-    });
-    dataSource.push({
-      key: 'metadata-panel-table-spectra-count',
-      label: 'Unique Spectra (SPLASH)',
-      value: (
-        <ExportableContent
-          component={<LabelWrapper value={String(metadata.spectra_count)} />}
-          mode="copy"
-          onClick={() =>
-            copyTextToClipboard(
-              'Unique Spectra',
-              String(metadata.spectra_count),
-            )
-          }
-          title="Copy Unique Spectra to clipboard"
-        />
-      ),
-    });
-    dataSource.push({
-      key: 'metadata-panel-table-compound-count',
-      label: 'Unique Compounds (InChI)',
-      value: (
-        <ExportableContent
-          component={<LabelWrapper value={String(metadata.compound_count)} />}
-          mode="copy"
-          onClick={() =>
-            copyTextToClipboard(
-              'Unique Compounds',
-              String(metadata.compound_count),
-            )
-          }
-          title="Copy Unique Compound to clipboard"
-        />
-      ),
-    });
-    dataSource.push({
-      key: 'metadata-panel-table-compound-class-count-chemont',
-      label: 'Compound Classes (ChemOnt)',
-      value:
-        metadata.compound_class_chemont &&
-        metadata.compound_class_chemont.length > 0 ? (
+    if (metadata.git_commit) {
+      dataSource.push({
+        key: 'metadata-panel-table-commit',
+        label: 'Git Commit',
+        value: (
+          <ExportableContent
+            component={<LabelWrapper value={metadata.git_commit} />}
+            mode="copy"
+            onClick={() =>
+              copyTextToClipboard('Git Commit', metadata.git_commit)
+            }
+            title="Copy Git Commit to clipboard"
+          />
+        ),
+      });
+    }
+    if (metadata.version) {
+      dataSource.push({
+        key: 'metadata-panel-table-version',
+        label: 'Data Version',
+        value: (
+          <ExportableContent
+            component={<LabelWrapper value={metadata.version} />}
+            mode="copy"
+            onClick={() =>
+              copyTextToClipboard('Data Version', metadata.version)
+            }
+            title="Copy Data Version to clipboard"
+          />
+        ),
+      });
+    }
+    if (metadata.timestamp) {
+      dataSource.push({
+        key: 'metadata-panel-table-timestamp',
+        label: 'Timestamp',
+        value: (
+          <ExportableContent
+            component={<LabelWrapper value={metadata.timestamp} />}
+            mode="copy"
+            onClick={() => copyTextToClipboard('Timestamp', metadata.timestamp)}
+            title="Copy Timestamp to clipboard"
+          />
+        ),
+      });
+    }
+    if (metadata.spectra_count) {
+      dataSource.push({
+        key: 'metadata-panel-table-spectra-count',
+        label: 'Unique Spectra (SPLASH)',
+        value: (
+          <ExportableContent
+            component={<LabelWrapper value={String(metadata.spectra_count)} />}
+            mode="copy"
+            onClick={() =>
+              copyTextToClipboard(
+                'Unique Spectra',
+                String(metadata.spectra_count),
+              )
+            }
+            title="Copy Unique Spectra to clipboard"
+          />
+        ),
+      });
+    }
+    if (metadata.compound_count) {
+      dataSource.push({
+        key: 'metadata-panel-table-compound-count',
+        label: 'Unique Compounds (InChI)',
+        value: (
+          <ExportableContent
+            component={<LabelWrapper value={String(metadata.compound_count)} />}
+            mode="copy"
+            onClick={() =>
+              copyTextToClipboard(
+                'Unique Compounds',
+                String(metadata.compound_count),
+              )
+            }
+            title="Copy Unique Compound to clipboard"
+          />
+        ),
+      });
+    }
+    if (metadata.compound_class_chemont) {
+      dataSource.push({
+        key: 'metadata-panel-table-compound-class-count-chemont',
+        label: 'Compound Classes (ChemOnt)',
+        value:
+          metadata.compound_class_chemont &&
+          metadata.compound_class_chemont.length > 0 ? (
+            <ExportableContent
+              component={
+                <LabelWrapper
+                  value={String(metadata.compound_class_chemont.length)}
+                />
+              }
+              mode="copy"
+              onClick={() =>
+                copyTextToClipboard(
+                  'Compound class count (ChemOnt)',
+                  String(metadata.compound_class_chemont.length),
+                )
+              }
+              title="Copy compound class count to clipboard"
+            />
+          ) : (
+            <NotAvailableLabel />
+          ),
+      });
+    }
+    if (metadata.compound_class) {
+      dataSource.push({
+        key: 'metadata-panel-table-compound-class-count',
+        label: 'Compound classes (free text)',
+        value: (
           <ExportableContent
             component={
-              <LabelWrapper
-                value={String(metadata.compound_class_chemont.length)}
-              />
+              <LabelWrapper value={String(metadata.compound_class.length)} />
             }
             mode="copy"
             onClick={() =>
               copyTextToClipboard(
-                'Compound class count (ChemOnt)',
-                String(metadata.compound_class_chemont.length),
+                'Compound class count (free text)',
+                String(metadata.compound_class.length),
               )
             }
             title="Copy compound class count to clipboard"
           />
-        ) : (
-          <NotAvailableLabel />
         ),
-    });
-    dataSource.push({
-      key: 'metadata-panel-table-compound-class-count',
-      label: 'Compound classes (free text)',
-      value: (
-        <ExportableContent
-          component={
-            <LabelWrapper value={String(metadata.compound_class.length)} />
-          }
-          mode="copy"
-          onClick={() =>
-            copyTextToClipboard(
-              'Compound class count (free text)',
-              String(metadata.compound_class.length),
-            )
-          }
-          title="Copy compound class count to clipboard"
-        />
-      ),
-    });
+      });
+    }
 
     return (
       <Table<HeaderTableType>

@@ -1,14 +1,14 @@
-import './Table.scss';
-
-import { CSSProperties, useMemo } from 'react';
+import Table from '../basic/Table';
+import { CSSProperties, JSX, useMemo } from 'react';
 import PeakAnnotation from '../../types/peak/PeakAnnotation';
-import { Table } from 'antd';
 import StructureView from '../basic/StructureView';
 import { ColumnsType } from 'antd/es/table';
 import { Content } from 'antd/es/layout/layout';
+import ExportableContent from '../common/ExportableContent';
+import copyTextToClipboard from '../../utils/copyTextToClipboard';
 
 type AnnotationRow = {
-  [key: string]: string;
+  [key: string]: JSX.Element | string;
   key: string;
 };
 
@@ -78,7 +78,19 @@ function AnnotationTable({ annotation, width, height }: InputProps) {
         if (smilesIndex >= 0 && j === smilesIndex) {
           smiles = annotation.values[j][i];
         }
-        row[h] = annotation.values[j][i];
+        row[h] = (
+          <ExportableContent
+            mode="copy"
+            title={`Copy '${h.split('_').join(' ')} (${i + 1})' to clipboard`}
+            component={annotation.values[j][i]}
+            onClick={() =>
+              copyTextToClipboard(
+                h.split('_').join(' ') + ' (' + (i + 1) + ')',
+                annotation.values[j][i],
+              )
+            }
+          />
+        );
         key += annotation.values[j][i];
       });
       row.key = key;
@@ -90,12 +102,11 @@ function AnnotationTable({ annotation, width, height }: InputProps) {
 
     return (
       <Table
-        className="table"
-        style={{ width, height }}
-        sticky
+        tableName="Peak Annotation Table"
         columns={columns}
         dataSource={dataSource}
-        pagination={false}
+        style={{ width, height }}
+        enableExport
       />
     );
   }, [annotation, height, width]);

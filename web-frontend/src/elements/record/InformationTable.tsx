@@ -1,6 +1,4 @@
-import './Table.scss';
-
-import { Table } from 'antd';
+import Table from '../basic/Table';
 import { CSSProperties, JSX, useCallback, useMemo } from 'react';
 import Record from '../../types/record/Record';
 import ExportableContent from '../common/ExportableContent';
@@ -143,17 +141,12 @@ function InformationTable({ record, width, height }: InputProps) {
     });
 
     return (
-      <Table<InformationTableType>
-        style={{
-          width,
-          height,
-        }}
-        className="table"
-        sticky
-        pagination={false}
-        showHeader={false}
+      <Table
+        tableName="Further Information Table"
         columns={columns}
         dataSource={dataSource}
+        style={{ width, height }}
+        showHeader={false}
       />
     );
   }, [

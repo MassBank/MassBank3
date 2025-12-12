@@ -5,14 +5,14 @@ type InputProps = {
   label: string;
   componentStyle?: CSSProperties;
   labelStyle?: CSSProperties;
-  orientation?: DividerProps['orientation'];
+  titlePlacement?: DividerProps['titlePlacement'];
 };
 
 function SectionDivider({
   label,
   componentStyle = {},
   labelStyle = {},
-  orientation = 'left',
+  titlePlacement = 'left',
 }: InputProps) {
   return (
     <DividerAntD
@@ -23,7 +23,7 @@ function SectionDivider({
         marginBottom: 30,
         ...componentStyle,
       }}
-      orientation={orientation}
+      titlePlacement={titlePlacement}
     >
       <p
         style={{

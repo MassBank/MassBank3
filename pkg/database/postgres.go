@@ -2061,7 +2061,7 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId str
 func (p *PostgresSQLDB) Init() error {
 	var err error
 	var query = `
-		DROP TABLE IF EXISTS metadata, massbank, contributor, accession_contributor, author, accession_author, license, accession_license, publication, accession_publication, compound, compound_name, compound_class, compound_link, acquisition_instrument, accession_acquisition, acquisition_mass_spectrometry, acquisition_chromatography, acquisition_general, mass_spectrometry_focused_ion, mass_spectrometry_data_processing, spectrum, peak, peak_annotation, browse_options, peak_differences, records;		
+		DROP TABLE IF EXISTS metadata, massbank, contributor, accession_contributor, author, accession_author, license, accession_license, publication, accession_publication, compound, compound_name, compound_class, compound_link, acquisition_instrument, accession_acquisition, acquisition_mass_spectrometry, acquisition_chromatography, acquisition_general, mass_spectrometry_focused_ion, mass_spectrometry_data_processing, spectrum, peak, peak_annotation, browse_options, peak_differences, records, status;
 
 		CREATE TABLE metadata (
 			id SERIAL PRIMARY KEY,
@@ -2263,13 +2263,22 @@ func (p *PostgresSQLDB) Init() error {
 			rel_intensity FLOAT NOT NULL
 		);
 
-		CREATE TABLE IF NOT EXISTS records (
+		CREATE TABLE records (
 			id SERIAL NOT NULL PRIMARY KEY,
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
 			accession TEXT NOT NULL,
 			record_text TEXT NOT NULL
 		);
 
+		CREATE TABLE status (
+			id SERIAL PRIMARY KEY,
+			name TEXT NOT NULL,
+			value TEXT NOT NULL,
+			UNIQUE (name)
+		);
+
+
+		-- molecules table for postgres-bingo container
 		CREATE TABLE IF NOT EXISTS molecules (
 			id SERIAL NOT NULL PRIMARY KEY,
 			molecule TEXT NOT NULL,
@@ -2278,15 +2287,6 @@ func (p *PostgresSQLDB) Init() error {
 		);
 
 		TRUNCATE molecules CASCADE;
-
-		CREATE TABLE IF NOT EXISTS status (
-			id SERIAL PRIMARY KEY,
-			name TEXT NOT NULL,
-			value TEXT NOT NULL,
-			UNIQUE (name)
-		);
-
-		TRUNCATE status CASCADE;
 		`
 
 	if _, err = p.database.Exec(query); err != nil {

@@ -1,6 +1,4 @@
-import './Table.scss';
-
-import { Table } from 'antd';
+import Table from '../basic/Table';
 import { CSSProperties, JSX, useMemo } from 'react';
 import { splitStringAndCapitaliseFirstLetter } from '../../utils/stringUtils';
 import ExportableContent from '../common/ExportableContent';
@@ -78,12 +76,11 @@ function MassSpectrometryTable({
 
     return (
       <Table
-        className="table"
-        style={{ width, height }}
-        sticky
+        tableName="Mass Spectrometry Table"
         columns={columns}
         dataSource={dataSource}
-        pagination={false}
+        style={{ width, height }}
+        enableExport
       />
     );
   }, [height, massSpectrometry, width]);

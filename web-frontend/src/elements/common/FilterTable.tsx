@@ -9,7 +9,7 @@ type InputProps = {
   filterOptions: ValueCount[];
   filterName: string;
   label: string;
-  height?: number;
+  maxHeight?: number;
   showCounts?: boolean;
 };
 
@@ -17,7 +17,7 @@ function FilterTable({
   filterOptions,
   filterName,
   label,
-  height = 250,
+  maxHeight = 250,
   showCounts = false,
 }: InputProps) {
   const formInstance = useFormInstance<SearchFields>();
@@ -75,7 +75,7 @@ function FilterTable({
         <Content
           style={{
             width: '100%',
-            height,
+            maxHeight,
             overflow: 'scroll',
           }}
         >
@@ -109,10 +109,11 @@ function FilterTable({
 
             handleOnSelectAll();
           }}
+          style={{ marginTop: 5, marginBottom: 5, height: 25 }}
         />
       </Content>
     ),
-    [allSelected, filterName, handleOnSelectAll, height, label, options],
+    [allSelected, filterName, handleOnSelectAll, label, maxHeight, options],
   );
 }
 

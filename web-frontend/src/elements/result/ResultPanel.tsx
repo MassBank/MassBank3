@@ -292,7 +292,7 @@ function ResultPanel({
           <Select
             defaultValue={selectedSortOption}
             style={{ width: 200 }}
-            placeholder={<p style={{ color: 'black' }}>Sort by</p>}
+            placeholder={<label style={{ color: 'black' }}>Sort by</label>}
             optionFilterProp="label"
             filterSort={(optionA, optionB) =>
               (optionA?.label ?? '')

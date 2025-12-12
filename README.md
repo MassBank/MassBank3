@@ -46,10 +46,9 @@ The default structure of the _data_ folder looks like the following:
     |---/compose
     |---/data
         |---/MassBank-data
-        |---/postgres-data
     |---...
 
-The path to PostgreSQL via _DB_LOCAL_PATH_ is "/MassBank3/data/postgres-data" by default. "/MassBank3/data/MassBank-data" is the default directory to store the MassBank data in record file format needed import data to different services and can be set via _MB_DATA_DIRECTORY_.
+"/MassBank3/data/MassBank-data" is the default directory to store the MassBank data in record file format needed import data to different services and can be set via _MB_DATA_DIRECTORY_.
 
 And in order to provide the MassBank data to the services, download the latest release of MassBank data, unpack it and move the contributor's directories into _data_ directoy (default):
 
@@ -70,7 +69,10 @@ Now use _docker compose_ to start the system (in daemon mode):
 
 To stop the system use:
 
-    docker compose down -v
+    docker compose down
+
+> [!NOTE]
+> Docker volumes are used for database storage and persistency. In order to remove these volumes and hence the data, use the previous command with _-v_. Set the property _MB_DB_INIT_ to _true_ again before restarting the system after deleting the volumes and data.
 
 ### Advanced Settings
 

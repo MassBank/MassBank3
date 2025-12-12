@@ -21,19 +21,23 @@ function UserInterface({ body }: InputProps) {
     useState<JSX.Element | null>(null);
 
   useEffect(() => {
-    const container = document.getElementById('data-privacy-container');
-    if (container) {
-      setDataPrivacyContainer(
-        container.innerHTML ? (
-          <div dangerouslySetInnerHTML={{ __html: container.innerHTML }} />
-        ) : null,
-      );
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      if (window.showDataPrivacyModal === true) {
-        setShowDataPrivacyModal(true);
+    function fetchDataPrivacyInformation() {
+      const container = document.getElementById('data-privacy-container');
+      if (container) {
+        setDataPrivacyContainer(
+          container.innerHTML ? (
+            <div dangerouslySetInnerHTML={{ __html: container.innerHTML }} />
+          ) : null,
+        );
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        if (window.showDataPrivacyModal === true) {
+          setShowDataPrivacyModal(true);
+        }
       }
     }
+
+    fetchDataPrivacyInformation();
   }, []);
 
   const handleOnClickDataPrivacy = useCallback(() => {

@@ -1,10 +1,9 @@
-import './Table.scss';
-
+import Table from '../basic/Table';
 import { Content } from 'antd/es/layout/layout';
 import ExportableContent from '../common/ExportableContent';
 import { CSSProperties, JSX, useCallback, useMemo, useState } from 'react';
 import copyTextToClipboard from '../../utils/copyTextToClipboard';
-import { Button, Dropdown, Table, Tree, TreeDataNode } from 'antd';
+import { Button, Dropdown, Tree, TreeDataNode } from 'antd';
 import Record from '../../types/record/Record';
 import { MF } from 'react-mf';
 import StructureView from '../basic/StructureView';
@@ -364,6 +363,30 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
       ),
     });
 
+    let formulaComponent = <MF mf={record.compound.formula} />;
+    if (
+      record.compound.formula.length >= 4 &&
+      record.compound.formula[0] === '[' &&
+      record.compound.formula.includes(']') &&
+      (record.compound.formula[record.compound.formula.length - 1] === '+' ||
+        record.compound.formula[record.compound.formula.length - 1] === '-')
+    ) {
+      const formula = record.compound.formula.split('[')[1].split(']')[0];
+      const count = record.compound.formula.split(']')[1].slice(0, -1);
+      const sign = record.compound.formula[record.compound.formula.length - 1];
+      formulaComponent = (
+        <div>
+          <label>
+            <MF mf={formula} />
+            <sup>
+              {count}
+              {sign}
+            </sup>
+          </label>
+        </div>
+      );
+    }
+
     return (
       <Content
         style={{
@@ -465,15 +488,13 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
             alignItems: 'center',
           }}
         >
-          <Table<HeaderTableType>
+          <Table
+            tableName="Record View Header Table"
             style={{
               minWidth: `calc(100% - ${(imageWidth as number) + 30}px)`, // plus the download button width is 30px
               maxWidth: `calc(100% - ${(imageWidth as number) + 30}px)`, // plus the download button width is 30px
               height: '100%',
             }}
-            className="table"
-            sticky
-            pagination={false}
             showHeader={false}
             columns={columns}
             dataSource={dataSource}
@@ -510,7 +531,7 @@ function RecordViewHeader({ record, width, height, imageWidth }: InputProps) {
             >
               <label>Formula: </label>
               <ExportableContent
-                component={<MF mf={record.compound.formula} />}
+                component={formulaComponent}
                 componentContainerStyle={{
                   fontWeight: 'bolder',
                 }}

@@ -1,8 +1,6 @@
-import './Table.scss';
-
 import { CSSProperties, useMemo } from 'react';
 import SubTag from '../../types/record/SubTag';
-import { Table } from 'antd';
+import Table from '../basic/Table';
 
 type InputProps = {
   comments: SubTag[] | undefined;
@@ -42,11 +40,11 @@ function CommentsTable({ comments, width, height }: InputProps) {
 
     return (
       <Table
-        className="table"
-        style={{ width, height }}
+        tableName="Comments Table"
         columns={columns}
         dataSource={dataSource}
-        pagination={false}
+        style={{ width, height }}
+        enableExport
       />
     );
   }, [comments, height, width]);

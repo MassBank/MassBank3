@@ -11,6 +11,7 @@ export default () => {
         '@ant-design/cssinjs',
         '@ant-design/icons',
         /^rc-.*/, // All rc-* packages used by antd
+        /^@rc-component\/.*/, // All @rc-component/* packages used by antd
       ],
     },
   });
