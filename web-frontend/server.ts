@@ -67,6 +67,10 @@ const homepageAdditionalSectionText =
   process.env.MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_TEXT ?? '';
 
 const frontendOrigin = new URL(frontendUrl).origin;
+const cspReportUrl = new URL(
+  `${frontendBaseUrl}/csp-reports`,
+  frontendUrl,
+).toString();
 const connectSources = [
   ...new Set(
     [backendUrl, exportServiceUrl]
@@ -94,6 +98,8 @@ function createCspPolicy(nonce: string) {
     "img-src 'self' data:",
     "font-src 'self' data:",
     `connect-src 'self' ${connectSources.join(' ')}`.trim(),
+    'report-to csp-endpoint',
+    `report-uri ${cspReportUrl}`,
   ].join('; ');
 }
 
@@ -175,6 +181,54 @@ const baseRouter = express.Router();
 app.use(
   frontendBaseUrl.trim().length === 0 ? '/' : frontendBaseUrl + '/',
   baseRouter,
+);
+
+baseRouter.post(
+  '/csp-reports',
+  express.raw({
+    type: ['application/csp-report', 'application/reports+json'],
+    limit: '16kb',
+  }),
+  (req: Request, res: Response) => {
+    if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
+      res.sendStatus(400);
+      return;
+    }
+
+    let payload: unknown;
+    try {
+      payload = JSON.parse(req.body.toString('utf8'));
+    } catch {
+      res.sendStatus(400);
+      return;
+    }
+
+    const reports = Array.isArray(payload) ? payload : [payload];
+    const directives = reports.flatMap((report) => {
+      if (typeof report !== 'object' || report === null) {
+        return [];
+      }
+
+      const reportObject = report as Record<string, unknown>;
+      const details =
+        typeof reportObject['csp-report'] === 'object' &&
+        reportObject['csp-report'] !== null
+          ? (reportObject['csp-report'] as Record<string, unknown>)
+          : typeof reportObject.body === 'object' && reportObject.body !== null
+            ? (reportObject.body as Record<string, unknown>)
+            : reportObject;
+      const directive =
+        details['effective-directive'] ??
+        details.effectiveDirective ??
+        details['violated-directive'];
+      return typeof directive === 'string' ? [directive] : [];
+    });
+
+    if (directives.length > 0) {
+      console.warn('CSP violation reports:', [...new Set(directives)].join(', '));
+    }
+    res.sendStatus(204);
+  },
 );
 
 const nRecords = 40000;
@@ -434,6 +488,10 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
     // console.log('rendered', rendered);
 
     const html = template
+      .replace(
+        '<!--csp-nonce-bootstrap-->',
+        `<script src="${frontendBaseUrl}/csp-nonce-bootstrap.js"></script>`,
+      )
       .replaceAll('<!--csp-nonce-->', nonce)
       .replace(`<!--app-head-->`, rendered.head ?? '')
       .replace(`<!--app-html-->`, rendered.html ?? '');
@@ -444,6 +502,7 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       .set({
         'Cache-Control': 'no-store',
         'Content-Type': 'text/html',
+        'Reporting-Endpoints': `csp-endpoint="${cspReportUrl}"`,
         [cspMode === 'enforce'
           ? 'Content-Security-Policy'
           : 'Content-Security-Policy-Report-Only']: createCspPolicy(nonce),
