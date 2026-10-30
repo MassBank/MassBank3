@@ -20,12 +20,6 @@ const port = 3000;
 const host = '0.0.0.0';
 
 const isProduction = process.env.NODE_ENV === 'production';
-const cspMode = process.env.CSP_MODE ?? 'enforce';
-if (cspMode !== 'report-only' && cspMode !== 'enforce') {
-  throw new Error(
-    `Invalid CSP_MODE "${cspMode}". Expected "report-only" or "enforce".`,
-  );
-}
 const backendUrl =
   process.env.MB3_API_URL && process.env.MB3_API_URL.trim().length > 0
     ? process.env.MB3_API_URL.replace(/\/$/, '')
@@ -535,9 +529,7 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
         'Cache-Control': 'no-store',
         'Content-Type': 'text/html',
         'Reporting-Endpoints': `csp-endpoint="${cspReportUrl}"`,
-        [cspMode === 'enforce'
-          ? 'Content-Security-Policy'
-          : 'Content-Security-Policy-Report-Only']: createCspPolicy(nonce),
+        'Content-Security-Policy': createCspPolicy(nonce),
       })
       .send(nonceHtml);
   } catch (e) {

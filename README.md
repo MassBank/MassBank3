@@ -149,9 +149,8 @@ The frontend can by default be accessed in the webbrowser at http://localhost:80
 
 The frontend owns the CSP header because it generates the per-response nonce
 used by inline JSON data, server-rendered styles, and runtime Ant Design styles.
-The default is `CSP_MODE=enforce`; use `CSP_MODE=report-only` only while
-validating the deployment. The frontend emits either
-`Content-Security-Policy-Report-Only` or `Content-Security-Policy`, never both.
+It always emits an enforcing `Content-Security-Policy` header; there is no
+Report-Only mode or runtime switch.
 
 The policy uses the following directives (the nonce is newly generated for
 each HTML response):
@@ -175,9 +174,8 @@ is embedded as a data font in the local logo SVGs, so Google Fonts is not loaded
 and `font-src data:` is retained. News and documentation are links to
 MassBank's documentation site rather than fetched or injected HTML, so the
 browser does not need a connection exception for `massbank.github.io`.
-In Report-Only mode, violations are sent to the frontend's same-origin
-`/csp-reports` endpoint, which logs the violated directive and source location
-without query strings.
+CSP violations are sent to the frontend's same-origin `/csp-reports` endpoint,
+which logs the violated directive and source location without query strings.
 
 The Express frontend is the sole CSP-header owner. Any ingress or reverse
 proxy in front of it must remove its own CSP/CSP-Report-Only headers and pass
