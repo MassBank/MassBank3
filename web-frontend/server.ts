@@ -61,13 +61,16 @@ const homepageAdditionalSectionText =
   process.env.MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_TEXT ?? '';
 
 const frontendOrigin = new URL(frontendUrl).origin;
+const documentationOrigin = 'https://massbank.github.io';
+const googleFontsCssOrigin = 'https://fonts.googleapis.com';
+const googleFontsFontOrigin = 'https://fonts.gstatic.com';
 const cspReportUrl = new URL(
   `${frontendBaseUrl}/csp-reports`,
   frontendUrl,
 ).toString();
 const connectSources = [
   ...new Set(
-    [backendUrl, exportServiceUrl]
+    [backendUrl, exportServiceUrl, documentationOrigin]
       .map((url) => {
         const resource = new URL(url, frontendUrl);
         if (resource.protocol !== 'http:' && resource.protocol !== 'https:') {
@@ -87,10 +90,10 @@ function createCspPolicy(nonce: string) {
     "frame-ancestors 'self'",
     "form-action 'self'",
     `script-src 'self' 'nonce-${nonce}'`,
-    `style-src 'self' 'nonce-${nonce}'`,
+    `style-src 'self' 'nonce-${nonce}' ${documentationOrigin} ${googleFontsCssOrigin}`,
     "style-src-attr 'unsafe-inline'",
     "img-src 'self' data:",
-    "font-src 'self' data:",
+    `font-src 'self' data: ${googleFontsFontOrigin}`,
     `connect-src 'self' ${connectSources.join(' ')}`.trim(),
     'report-to csp-endpoint',
     `report-uri ${cspReportUrl}`,

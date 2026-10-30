@@ -1,15 +1,56 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Content } from 'antd/es/layout/layout';
-import { Layout } from 'antd';
+import { Layout, Spin } from 'antd';
 import Segmented from '../../../basic/Segmented';
 import SectionDivider from '../../../basic/SectionDivider';
+import { prepareDocumentationHtml } from '../../../../utils/documentationHtml';
 
-const newsUrl =
+const templateUrlNews =
   'https://massbank.github.io/MassBank-documentation/news.html';
-const newsArchiveUrl =
+const templateUrlNewsArchive =
   'https://massbank.github.io/MassBank-documentation/news_archive.html';
 
 function NewsView() {
+  const [htmlTemplateNews, setHtmlTemplateNews] = useState<string>('');
+  const [htmlTemplateNewsArchive, setHtmlTemplateNewsArchive] =
+    useState<string>('');
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+
+  useEffect(() => {
+    async function fetchHtml() {
+      setIsFetching(true);
+      try {
+        const newsResponse = await fetch(templateUrlNews);
+        if (!newsResponse.ok) {
+          throw new Error(
+            `Latest news request failed with status ${newsResponse.status}`,
+          );
+        }
+        const newsHtml = await newsResponse.text();
+        setHtmlTemplateNews(
+          prepareDocumentationHtml(newsHtml, templateUrlNews),
+        );
+
+        const archiveResponse = await fetch(templateUrlNewsArchive);
+        if (!archiveResponse.ok) {
+          throw new Error(
+            `News archive request failed with status ${archiveResponse.status}`,
+          );
+        }
+        const archiveHtml = await archiveResponse.text();
+        setHtmlTemplateNewsArchive(
+          prepareDocumentationHtml(archiveHtml, templateUrlNewsArchive),
+        );
+      } catch (error) {
+        console.error('Failed to fetch MassBank news:', error);
+      } finally {
+        setIsFetching(false);
+      }
+    }
+
+    fetchHtml();
+  }, []);
+
   const segmented = useMemo(() => {
     const elements = [
       <Content
@@ -19,11 +60,10 @@ function NewsView() {
         }}
       >
         <SectionDivider label="Latest" />
-        <Content style={{ padding: 10, fontSize: 16 }}>
-          <a href={newsUrl} target="_blank" rel="noopener noreferrer">
-            Read the latest MassBank news
-          </a>
-        </Content>
+        <Content
+          style={{ padding: 10, fontSize: 16 }}
+          dangerouslySetInnerHTML={{ __html: htmlTemplateNews }}
+        />
       </Content>,
       <Content
         style={{
@@ -32,17 +72,30 @@ function NewsView() {
         }}
       >
         <SectionDivider label="Archive" />
-        <Content style={{ padding: 10, fontSize: 16 }}>
-          <a href={newsArchiveUrl} target="_blank" rel="noopener noreferrer">
-            Browse the MassBank news archive
-          </a>
-        </Content>
+        <Content
+          style={{ padding: 10, fontSize: 16 }}
+          dangerouslySetInnerHTML={{ __html: htmlTemplateNewsArchive }}
+        />
       </Content>,
     ];
     const elementLabels = ['Latest', 'Archive'];
 
-    return <Segmented elements={elements} elementLabels={elementLabels} />;
-  }, []);
+    return isFetching ? (
+      <Spin
+        size="large"
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        spinning={isFetching}
+      />
+    ) : (
+      <Segmented elements={elements} elementLabels={elementLabels} />
+    );
+  }, [htmlTemplateNews, htmlTemplateNewsArchive, isFetching]);
 
   return useMemo(
     () => (

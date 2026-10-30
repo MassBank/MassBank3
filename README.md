@@ -158,22 +158,27 @@ each HTML response):
 ```text
 default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self';
 form-action 'self'; script-src 'self' 'nonce-{per-response}';
-style-src 'self' 'nonce-{per-response}'; style-src-attr 'unsafe-inline';
-img-src 'self' data:; font-src 'self' data:;
-connect-src 'self' {configured API origin} {configured export-service origin};
+style-src 'self' 'nonce-{per-response}' https://massbank.github.io
+https://fonts.googleapis.com; style-src-attr 'unsafe-inline';
+img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com;
+connect-src 'self' {configured API origin} {configured export-service origin}
+https://massbank.github.io;
 report-to csp-endpoint; report-uri {same-origin CSP report endpoint}
 ```
 
 Only the exact cross-origin API and export-service origins configured by
-`MB3_API_URL` and `EXPORT_SERVICE_URL` are added to `connect-src`; same-origin
-services are covered by `'self'`. The `style-src-attr` exception is needed for
-React/Ant Design's runtime `style` attributes. Script execution does not use
-`'unsafe-inline'`; script and style elements receive the response nonce,
-including runtime-created elements through the nonce bootstrap. Mulish
-is embedded as a data font in the local logo SVGs, so Google Fonts is not loaded
-and `font-src data:` is retained. News and documentation are links to
-MassBank's documentation site rather than fetched or injected HTML, so the
-browser does not need a connection exception for `massbank.github.io`.
+`MB3_API_URL` and `EXPORT_SERVICE_URL`, plus the documentation origin, are
+added to `connect-src`; same-origin services are covered by `'self'`. News and
+documentation are fetched from `https://massbank.github.io` and rendered in the
+application. The news HTML's relative resource URLs are resolved against its
+documentation URL. Script elements are removed, and any embedded style elements
+receive the response nonce. Its stylesheets load from GitHub Pages and Google
+Fonts, so those exact origins are allowed by `style-src`; Mulish font files load from
+`fonts.gstatic.com`. The `style-src-attr` exception is needed for the news
+content's inline style attributes and React/Ant Design runtime styles. Script
+execution does not use `'unsafe-inline'`; app script and style elements receive
+the response nonce, including runtime-created elements through the nonce
+bootstrap. Mulish is also embedded as a data font in local logo SVGs.
 CSP violations are sent to the frontend's same-origin `/csp-reports` endpoint,
 which logs the violated directive and source location without query strings.
 

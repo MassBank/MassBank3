@@ -1,5 +1,10 @@
 import { Content } from 'antd/es/layout/layout';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Spin } from 'antd';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import Placeholder from '../../../basic/Placeholder';
+import Segmented from '../../../basic/Segmented';
 import SectionDivider from '../../../basic/SectionDivider';
 
 type LabelValueType = {
@@ -7,7 +12,7 @@ type LabelValueType = {
   value: string;
 };
 
-const documentationLinks: LabelValueType[] = [
+const markDownUrls: LabelValueType[] = [
   {
     label: 'User',
     value:
@@ -30,6 +35,56 @@ const documentationLinks: LabelValueType[] = [
 ];
 
 function DocumentationView() {
+  const [isFetching, setIsFetching] = useState<boolean>(true);
+  const [markDowns, setMarkDowns] = useState<LabelValueType[]>([]);
+
+  useEffect(() => {
+    async function fetchMarkDowns() {
+      setIsFetching(true);
+      try {
+        const fetchedMarkDowns: LabelValueType[] = [];
+        for (const entry of markDownUrls) {
+          const response = await fetch(entry.value);
+          if (!response.ok) {
+            throw new Error(
+              `Documentation request for ${entry.label} failed with status ${response.status}`,
+            );
+          }
+          fetchedMarkDowns.push({
+            label: entry.label,
+            value: await response.text(),
+          });
+        }
+        setMarkDowns(fetchedMarkDowns);
+      } catch (error) {
+        console.error('Failed to fetch MassBank documentation:', error);
+      } finally {
+        setIsFetching(false);
+      }
+    }
+
+    fetchMarkDowns();
+  }, []);
+
+  const elements = useMemo(
+    () =>
+      markDowns.map((entry) => (
+        <Content
+          key={'markdown-entry-' + entry.label}
+          style={{ width: '100%', height: '100%', padding: 10 }}
+        >
+          <SectionDivider label={entry.label} />
+          <Markdown remarkPlugins={[remarkGfm]}>{entry.value}</Markdown>
+        </Content>
+      )),
+    [markDowns],
+  );
+
+  const elementLabels = useMemo(
+    () => markDowns.map((entry) => entry.label),
+    [markDowns],
+  );
+
   return useMemo(
     () => (
       <Content
@@ -41,19 +96,28 @@ function DocumentationView() {
           alignItems: 'center',
         }}
       >
-        <Content style={{ width: '100%', height: '100%', padding: 10 }}>
-          <SectionDivider label="Documentation" />
-          {documentationLinks.map((entry) => (
-            <p key={entry.label}>
-              <a href={entry.value} target="_blank" rel="noopener noreferrer">
-                {entry.label}
-              </a>
-            </p>
-          ))}
-        </Content>
+        {isFetching ? (
+          <Spin
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            size="large"
+          />
+        ) : markDowns.length > 0 ? (
+          <Segmented elements={elements} elementLabels={elementLabels} />
+        ) : (
+          <Placeholder
+            child="Could not fetch documentation data"
+            style={{ width: '100%', height: '100%' }}
+          />
+        )}
       </Content>
     ),
-    [],
+    [elementLabels, elements, isFetching, markDowns.length],
   );
 }
 
