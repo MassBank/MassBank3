@@ -176,7 +176,8 @@ and `font-src data:` is retained. News and documentation are links to
 MassBank's documentation site rather than fetched or injected HTML, so the
 browser does not need a connection exception for `massbank.github.io`.
 Report-Only violations are sent to the frontend's same-origin `/csp-reports`
-endpoint, which logs only the violated directive.
+endpoint, which logs the violated directive and source location without query
+strings.
 
 The Express frontend is the sole CSP-header owner. Any ingress or reverse
 proxy in front of it must remove its own CSP/CSP-Report-Only headers and pass

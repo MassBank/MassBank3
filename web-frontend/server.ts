@@ -187,7 +187,7 @@ baseRouter.post(
   '/csp-reports',
   express.raw({
     type: ['application/csp-report', 'application/reports+json'],
-    limit: '16kb',
+    limit: '128kb',
   }),
   (req: Request, res: Response) => {
     if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
@@ -221,11 +221,43 @@ baseRouter.post(
         details['effective-directive'] ??
         details.effectiveDirective ??
         details['violated-directive'];
-      return typeof directive === 'string' ? [directive] : [];
+      if (typeof directive !== 'string') {
+        return [];
+      }
+
+      const sourceFile = details['source-file'] ?? details.sourceFile;
+      const sourcePath =
+        typeof sourceFile === 'string'
+          ? (() => {
+              try {
+                const sourceUrl = new URL(sourceFile, frontendUrl);
+                return sourceUrl.protocol === 'http:' ||
+                  sourceUrl.protocol === 'https:'
+                  ? sourceUrl.pathname.slice(0, 200)
+                  : '';
+              } catch {
+                return '';
+              }
+            })()
+          : '';
+      const line = details['line-number'] ?? details.lineNumber;
+      const column = details['column-number'] ?? details.columnNumber;
+      const location =
+        typeof line === 'number' && Number.isInteger(line)
+          ? `:${line}${
+              typeof column === 'number' && Number.isInteger(column)
+                ? `:${column}`
+                : ''
+            }`
+          : '';
+      return [`${directive}${sourcePath ? ` ${sourcePath}` : ''}${location}`];
     });
 
     if (directives.length > 0) {
-      console.warn('CSP violation reports:', [...new Set(directives)].join(', '));
+      console.warn(
+        'CSP violation reports:',
+        [...new Set(directives)].join(', '),
+      );
     }
     res.sendStatus(204);
   },

@@ -4,12 +4,38 @@
     throw new Error('Missing CSP nonce.');
   }
 
-  const createElement = document.createElement.bind(document);
-  document.createElement = (tagName, options) => {
-    const element = createElement(tagName, options);
-    if (tagName.toLowerCase() === 'style' || tagName.toLowerCase() === 'script') {
-      element.setAttribute('nonce', nonce);
+  function addNonce(node) {
+    if (!node || typeof node !== 'object') {
+      return;
     }
-    return element;
-  };
+
+    if (
+      node.nodeType === 1 &&
+      (node.localName?.toLowerCase() === 'style' ||
+        node.localName?.toLowerCase() === 'script')
+    ) {
+      node.setAttribute('nonce', nonce);
+    }
+
+    node.querySelectorAll?.('style, script').forEach((element) => {
+      element.setAttribute('nonce', nonce);
+    });
+  }
+
+  for (const method of ['createElement', 'createElementNS']) {
+    const original = Document.prototype[method];
+    Document.prototype[method] = function (...args) {
+      const element = Reflect.apply(original, this, args);
+      addNonce(element);
+      return element;
+    };
+  }
+
+  for (const method of ['appendChild', 'insertBefore', 'replaceChild']) {
+    const original = Node.prototype[method];
+    Node.prototype[method] = function (...args) {
+      addNonce(args[0]);
+      return Reflect.apply(original, this, args);
+    };
+  }
 })();
