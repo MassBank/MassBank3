@@ -41,26 +41,21 @@ function DocumentationView() {
   useEffect(() => {
     async function fetchMarkDowns() {
       setIsFetching(true);
+
       try {
-        const fetchedMarkDowns: LabelValueType[] = [];
+        const _markDowns: LabelValueType[] = [];
         for (const entry of markDownUrls) {
           const response = await fetch(entry.value);
-          if (!response.ok) {
-            throw new Error(
-              `Documentation request for ${entry.label} failed with status ${response.status}`,
-            );
-          }
-          fetchedMarkDowns.push({
-            label: entry.label,
-            value: await response.text(),
-          });
+          const md = await response.text();
+
+          _markDowns.push({ label: entry.label, value: md });
         }
-        setMarkDowns(fetchedMarkDowns);
-      } catch (error) {
-        console.error('Failed to fetch MassBank documentation:', error);
-      } finally {
-        setIsFetching(false);
+        setMarkDowns(_markDowns);
+      } catch (e) {
+        console.error(e);
       }
+
+      setIsFetching(false);
     }
 
     fetchMarkDowns();
@@ -74,7 +69,7 @@ function DocumentationView() {
           style={{ width: '100%', height: '100%', padding: 10 }}
         >
           <SectionDivider label={entry.label} />
-          <Markdown remarkPlugins={[remarkGfm]}>{entry.value}</Markdown>
+          <Markdown remarkPlugins={[remarkGfm]} children={entry.value} />
         </Content>
       )),
     [markDowns],

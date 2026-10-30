@@ -61,7 +61,10 @@ function NewsView() {
       >
         <SectionDivider label="Latest" />
         <Content
-          style={{ padding: 10, fontSize: 16 }}
+          style={{
+            padding: 10,
+            fontSize: 16,
+          }}
           dangerouslySetInnerHTML={{ __html: htmlTemplateNews }}
         />
       </Content>,
@@ -73,7 +76,10 @@ function NewsView() {
       >
         <SectionDivider label="Archive" />
         <Content
-          style={{ padding: 10, fontSize: 16 }}
+          style={{
+            padding: 10,
+            fontSize: 16,
+          }}
           dangerouslySetInnerHTML={{ __html: htmlTemplateNewsArchive }}
         />
       </Content>,

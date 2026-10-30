@@ -147,50 +147,16 @@ The frontend can by default be accessed in the webbrowser at http://localhost:80
 
 ## Content Security Policy (CSP)
 
-The frontend owns the CSP header because it generates the per-response nonce
-used by inline JSON data, server-rendered styles, and runtime Ant Design styles.
-It always emits an enforcing `Content-Security-Policy` header; there is no
-Report-Only mode or runtime switch.
-
-The policy uses the following directives (the nonce is newly generated for
-each HTML response):
-
-```text
-default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self';
-form-action 'self'; script-src 'self' 'nonce-{per-response}';
-style-src 'self' 'nonce-{per-response}' https://massbank.github.io
-https://fonts.googleapis.com; style-src-attr 'unsafe-inline';
-img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com;
-connect-src 'self' {configured API origin} {configured export-service origin}
-https://massbank.github.io;
-report-to csp-endpoint; report-uri {same-origin CSP report endpoint}
-```
-
-Only the exact cross-origin API and export-service origins configured by
-`MB3_API_URL` and `EXPORT_SERVICE_URL`, plus the documentation origin, are
-added to `connect-src`; same-origin services are covered by `'self'`. News and
-documentation are fetched from `https://massbank.github.io` and rendered in the
-application. The news HTML's relative resource URLs are resolved against its
-documentation URL. Script elements are removed, and any embedded style elements
-receive the response nonce. Its stylesheets load from GitHub Pages and Google
-Fonts, so those exact origins are allowed by `style-src`; Mulish font files load from
-`fonts.gstatic.com`. The `style-src-attr` exception is needed for the news
-content's inline style attributes and React/Ant Design runtime styles. Script
-execution does not use `'unsafe-inline'`; app script and style elements receive
-the response nonce, including runtime-created elements through the nonce
-bootstrap. Mulish is also embedded as a data font in local logo SVGs.
-CSP violations are sent to the frontend's same-origin `/csp-reports` endpoint,
-which logs the violated directive and source location without query strings.
-
-The Express frontend is the sole CSP-header owner. Any ingress or reverse
-proxy in front of it must remove its own CSP/CSP-Report-Only headers and pass
-through the frontend header; multiple CSP headers are enforced together and
-an ingress nonce cannot match the frontend's per-response nonce. The test
-deployment's existing ingress policy must therefore be removed before
-validating this application-generated policy. The repository's
-`compose/nginx.conf` serves the similarity service and does not front the
-frontend. No code references `/css/w3.css` or `/css/massbank.css`; requests for
-missing file-like paths now return 404 instead of the SPA HTML fallback.
+Express always sends an enforcing `Content-Security-Policy` with a fresh nonce
+per HTML response; ingress must not add another CSP header. Scripts require
+`'self'` or that nonce (no script `'unsafe-inline'`). Dynamic styles receive the
+nonce; `style-src-attr 'unsafe-inline'` supports React and News style attributes.
+`connect-src` allows the configured API/export origins and
+`https://massbank.github.io` for embedded News and Markdown documentation.
+News stylesheets use `massbank.github.io` and `fonts.googleapis.com`; Mulish
+fonts use `fonts.gstatic.com`. Fonts embedded in local SVGs use `data:`.
+The former `/css/w3.css` and `/css/massbank.css` paths are not local resources:
+missing file requests return 404, not SPA HTML.
 
 # REST API
 

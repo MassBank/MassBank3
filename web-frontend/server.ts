@@ -64,10 +64,6 @@ const frontendOrigin = new URL(frontendUrl).origin;
 const documentationOrigin = 'https://massbank.github.io';
 const googleFontsCssOrigin = 'https://fonts.googleapis.com';
 const googleFontsFontOrigin = 'https://fonts.gstatic.com';
-const cspReportUrl = new URL(
-  `${frontendBaseUrl}/csp-reports`,
-  frontendUrl,
-).toString();
 const connectSources = [
   ...new Set(
     [backendUrl, exportServiceUrl, documentationOrigin]
@@ -95,8 +91,6 @@ function createCspPolicy(nonce: string) {
     "img-src 'self' data:",
     `font-src 'self' data: ${googleFontsFontOrigin}`,
     `connect-src 'self' ${connectSources.join(' ')}`.trim(),
-    'report-to csp-endpoint',
-    `report-uri ${cspReportUrl}`,
   ].join('; ');
 }
 
@@ -178,86 +172,6 @@ const baseRouter = express.Router();
 app.use(
   frontendBaseUrl.trim().length === 0 ? '/' : frontendBaseUrl + '/',
   baseRouter,
-);
-
-baseRouter.post(
-  '/csp-reports',
-  express.raw({
-    type: ['application/csp-report', 'application/reports+json'],
-    limit: '128kb',
-  }),
-  (req: Request, res: Response) => {
-    if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
-      res.sendStatus(400);
-      return;
-    }
-
-    let payload: unknown;
-    try {
-      payload = JSON.parse(req.body.toString('utf8'));
-    } catch {
-      res.sendStatus(400);
-      return;
-    }
-
-    const reports = Array.isArray(payload) ? payload : [payload];
-    const directives = reports.flatMap((report) => {
-      if (typeof report !== 'object' || report === null) {
-        return [];
-      }
-
-      const reportObject = report as Record<string, unknown>;
-      const details =
-        typeof reportObject['csp-report'] === 'object' &&
-        reportObject['csp-report'] !== null
-          ? (reportObject['csp-report'] as Record<string, unknown>)
-          : typeof reportObject.body === 'object' && reportObject.body !== null
-            ? (reportObject.body as Record<string, unknown>)
-            : reportObject;
-      const directive =
-        details['effective-directive'] ??
-        details.effectiveDirective ??
-        details['violated-directive'];
-      if (typeof directive !== 'string') {
-        return [];
-      }
-
-      const sourceFile = details['source-file'] ?? details.sourceFile;
-      const sourcePath =
-        typeof sourceFile === 'string'
-          ? (() => {
-              try {
-                const sourceUrl = new URL(sourceFile, frontendUrl);
-                return sourceUrl.protocol === 'http:' ||
-                  sourceUrl.protocol === 'https:'
-                  ? sourceUrl.pathname.slice(0, 200)
-                  : '';
-              } catch {
-                return '';
-              }
-            })()
-          : '';
-      const line = details['line-number'] ?? details.lineNumber;
-      const column = details['column-number'] ?? details.columnNumber;
-      const location =
-        typeof line === 'number' && Number.isInteger(line)
-          ? `:${line}${
-              typeof column === 'number' && Number.isInteger(column)
-                ? `:${column}`
-                : ''
-            }`
-          : '';
-      return [`${directive}${sourcePath ? ` ${sourcePath}` : ''}${location}`];
-    });
-
-    if (directives.length > 0) {
-      console.warn(
-        'CSP violation reports:',
-        [...new Set(directives)].join(', '),
-      );
-    }
-    res.sendStatus(204);
-  },
 );
 
 const nRecords = 40000;
@@ -531,7 +445,6 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       .set({
         'Cache-Control': 'no-store',
         'Content-Type': 'text/html',
-        'Reporting-Endpoints': `csp-endpoint="${cspReportUrl}"`,
         'Content-Security-Policy': createCspPolicy(nonce),
       })
       .send(nonceHtml);

@@ -9,15 +9,11 @@
       return;
     }
 
-    if (
-      node.nodeType === 1 &&
-      (node.localName?.toLowerCase() === 'style' ||
-        node.localName?.toLowerCase() === 'script')
-    ) {
+    if (node.nodeType === 1 && node.localName?.toLowerCase() === 'style') {
       node.setAttribute('nonce', nonce);
     }
 
-    node.querySelectorAll?.('style, script').forEach((element) => {
+    node.querySelectorAll?.('style').forEach((element) => {
       element.setAttribute('nonce', nonce);
     });
   }
