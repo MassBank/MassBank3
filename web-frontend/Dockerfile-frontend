@@ -2,8 +2,8 @@ FROM node:23-alpine AS build
 WORKDIR /app
 # Installing dependencies first can save time on rebuilds
 # We do need the full (dev) dependencies here
-COPY package.json ./
-RUN npm run clean-install
+COPY package.json package-lock.json ./
+RUN npm ci
 # Then copy in the actual sources we need and build
 COPY tsconfig.json tsconfig.node.json vite.config.ts vite-env.d.ts server.ts server-utils.ts index.html entrypoint.sh ./
 COPY src/ ./src/
