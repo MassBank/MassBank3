@@ -20,7 +20,7 @@ const port = 3000;
 const host = '0.0.0.0';
 
 const isProduction = process.env.NODE_ENV === 'production';
-const cspMode = process.env.CSP_MODE ?? 'report-only';
+const cspMode = process.env.CSP_MODE ?? 'enforce';
 if (cspMode !== 'report-only' && cspMode !== 'enforce') {
   throw new Error(
     `Invalid CSP_MODE "${cspMode}". Expected "report-only" or "enforce".`,
