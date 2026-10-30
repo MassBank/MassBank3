@@ -1,0 +1,39 @@
+name: Create CSP Hardening Frontend Image
+
+on:
+  push:
+    branches:
+      - tests/csp-hardening
+
+jobs:
+  build-and-push-frontend:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to quay.io
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: quay.io/massbank/massbank-frontend
+          tags: |
+            type=raw,value=csp-hardening
+            type=sha,format=short,prefix=csp-hardening-
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./web-frontend
+          file: ./web-frontend/Dockerfile-frontend
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: true
