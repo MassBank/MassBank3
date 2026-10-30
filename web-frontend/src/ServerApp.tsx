@@ -8,16 +8,17 @@ import App from './App';
 interface IRenderProps {
   path: string;
   props: PropertiesContextProps;
+  nonce: string;
 }
 
-export const render = ({ path, props }: IRenderProps) => {
+export const render = ({ path, props, nonce }: IRenderProps) => {
   // SSR Render
   const cache = createCache();
   const html = renderToString(
     <StyleProvider cache={cache}>
       <propertiesContext.Provider value={props ?? {}}>
         <StaticRouter location={path}>
-          <App />
+          <App nonce={nonce} />
         </StaticRouter>
       </propertiesContext.Provider>
     </StyleProvider>,

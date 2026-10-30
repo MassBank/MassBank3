@@ -1,38 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Content } from 'antd/es/layout/layout';
-import { Layout, Spin } from 'antd';
+import { Layout } from 'antd';
 import Segmented from '../../../basic/Segmented';
 import SectionDivider from '../../../basic/SectionDivider';
 
-const templateUrlNews =
+const newsUrl =
   'https://massbank.github.io/MassBank-documentation/news.html';
-const templateUrlNewsArchive =
+const newsArchiveUrl =
   'https://massbank.github.io/MassBank-documentation/news_archive.html';
 
 function NewsView() {
-  const [htmlTemplateNews, setHtmlTemplateNews] = useState<string>('');
-  const [htmlTemplateNewsArchive, setHtmlTemplateNewsArchive] =
-    useState<string>('');
-  const [isFetching, setIsFetching] = useState<boolean>(false);
-
-  useEffect(() => {
-    async function fetchHtml() {
-      setIsFetching(true);
-
-      let response = await fetch(templateUrlNews);
-      let html = await response.text();
-      setHtmlTemplateNews(html);
-
-      response = await fetch(templateUrlNewsArchive);
-      html = await response.text();
-      setHtmlTemplateNewsArchive(html);
-
-      setIsFetching(false);
-    }
-
-    fetchHtml();
-  }, []);
-
   const segmented = useMemo(() => {
     const elements = [
       <Content
@@ -42,13 +19,11 @@ function NewsView() {
         }}
       >
         <SectionDivider label="Latest" />
-        <Content
-          style={{
-            padding: 10,
-            fontSize: 16,
-          }}
-          dangerouslySetInnerHTML={{ __html: htmlTemplateNews }}
-        />
+        <Content style={{ padding: 10, fontSize: 16 }}>
+          <a href={newsUrl} target="_blank" rel="noopener noreferrer">
+            Read the latest MassBank news
+          </a>
+        </Content>
       </Content>,
       <Content
         style={{
@@ -57,33 +32,17 @@ function NewsView() {
         }}
       >
         <SectionDivider label="Archive" />
-        <Content
-          style={{
-            padding: 10,
-            fontSize: 16,
-          }}
-          dangerouslySetInnerHTML={{ __html: htmlTemplateNewsArchive }}
-        />
+        <Content style={{ padding: 10, fontSize: 16 }}>
+          <a href={newsArchiveUrl} target="_blank" rel="noopener noreferrer">
+            Browse the MassBank news archive
+          </a>
+        </Content>
       </Content>,
     ];
     const elementLabels = ['Latest', 'Archive'];
 
-    return isFetching ? (
-      <Spin
-        size="large"
-        style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-        spinning={isFetching}
-      />
-    ) : (
-      <Segmented elements={elements} elementLabels={elementLabels} />
-    );
-  }, [htmlTemplateNews, htmlTemplateNewsArchive, isFetching]);
+    return <Segmented elements={elements} elementLabels={elementLabels} />;
+  }, []);
 
   return useMemo(
     () => (
