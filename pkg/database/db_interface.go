@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"log"
 	"math"
 
@@ -230,6 +231,7 @@ func InitDb(dbConfig DBConfig) (MB3Database, error) {
 	}
 	err := db.Ping()
 	if err != nil {
+		err = errors.Join(err, db.Disconnect())
 		db = nil
 	}
 	return db, err

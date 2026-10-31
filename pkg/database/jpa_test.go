@@ -15,6 +15,7 @@ func TestDecodeJPARecord(t *testing.T) {
 		"accession":"MSBNK-Test-A1", "record_title":["Ethanol","LC-ESI-QTOF","MS2"],
 		"date":"2026.01.02 (Created 2025.01.02, modified 2025.06.01)",
 		"authors":"One, Two", "license":"CC0", "ch_name":["Ethanol"], "ch_formula":"C2H6O",
+		"comment":["CONFIDENCE Reference standard", "Free text"],
 		"ch_exact_mass":46.0419, "ch_smiles":"CCO", "ch_iupac":"InChI=1S/C2H6O",
 		"ch_link":[{"key":"INCHIKEY","value":"LFQSCWFLJHTTHZ-UHFFFAOYSA-N"}],
 		"ac_mass_spectrometry_ms_type":"MS2","ac_mass_spectrometry_ion_mode":"POSITIVE",
@@ -32,7 +33,8 @@ func TestDecodeJPARecord(t *testing.T) {
 	}
 	if (*r.Compound.Link)[0].Database != "INCHIKEY" ||
 		(*r.Acquisition.MassSpectrometry)[0].Value != "MS2" ||
-		r.Peak.Annotation.Values["formula"][0] != "CH3O+" {
+		r.Peak.Annotation.Values["formula"][0] != "CH3O+" ||
+		(*r.Comments)[0].Subtag != "CONFIDENCE" || (*r.Comments)[1].Value != "Free text" {
 		t.Fatal("lost JPA collection or annotation values")
 	}
 	for _, invalid := range []string{
@@ -118,6 +120,30 @@ func TestSharedDatabaseIntegration(t *testing.T) {
 	hits, _, err = db.GetAccessionsByFilterOptions(filters)
 	if err != nil || !containsAccession(hits, *r.Accession) {
 		t.Fatalf("JPA filters failed: %v", err)
+	}
+	if len(r.Peak.Peak.Mz) > 0 {
+		peaks := []float64{r.Peak.Peak.Mz[0]}
+		intensity := int64(0)
+		found, _, err := db.GetSearchResults(Filters{IonMode: massbank.ANY, Peaks: &peaks, Intensity: &intensity})
+		if err != nil || !containsAccession(*found, *r.Accession) {
+			t.Fatalf("peak search failed: %v", err)
+		}
+	}
+	var lossAccession string
+	var difference float64
+	if err := db.database.QueryRow(`SELECT spectrum_id, difference FROM peak_differences LIMIT 1`).
+		Scan(&lossAccession, &difference); err != nil {
+		t.Fatal(err)
+	}
+	losses, tolerance, intensity := []float64{difference}, 0.001, int64(0)
+	hits, _, pairs, err := db.NeutralLossSearch(&losses, &tolerance, &intensity)
+	if err != nil || !containsAccession(hits, lossAccession) || len(pairs[lossAccession]) == 0 {
+		t.Fatalf("neutral-loss search failed: %v", err)
+	}
+	multipleLosses := []float64{difference, difference}
+	hits, _, _, err = db.NeutralLossSearch(&multipleLosses, &tolerance, &intensity)
+	if err != nil || !containsAccession(hits, lossAccession) {
+		t.Fatalf("multiple neutral-loss search failed: %v", err)
 	}
 	if _, err := db.database.Exec(`DELETE FROM public."massbank-records"`); err == nil {
 		t.Fatal("API connection was allowed to write")

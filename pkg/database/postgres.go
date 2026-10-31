@@ -198,7 +198,7 @@ func (p *PostgresSQLDB) Connect() error {
 		return err
 	} else {
 		if err := db.Ping(); err != nil {
-			return err
+			return errors.Join(err, db.Close())
 		} else {
 			p.database = db
 		}

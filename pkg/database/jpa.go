@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/MassBank/MassBank3/pkg/massbank"
 	"github.com/lib/pq"
@@ -86,30 +85,21 @@ func decodeJPARecord(document []byte) (*massbank.MassBank2, error) {
 		return nil, fmt.Errorf("invalid JPA accession %q", r.Accession)
 	}
 	title := strings.Join(r.Title, "; ")
-	date := &massbank.RecordDate{}
-	// The DATE field retains the original MassBank syntax in JPA.
-	dates := strings.Fields(strings.NewReplacer("(Created ", "", ", modified ", " ", ")", "").Replace(r.Date))
-	if len(dates) < 1 || len(dates) > 3 {
-		return nil, fmt.Errorf("invalid DATE for %s: %q", r.Accession, r.Date)
+	date, err := massbank.ParseRecordDate(r.Date)
+	if err != nil {
+		return nil, fmt.Errorf("DATE for %s: %w", r.Accession, err)
 	}
-	targets := []*time.Time{&date.Updated, &date.Created, &date.Modified}
-	for i, value := range dates {
-		parsed, err := time.Parse("2006.01.02", value)
-		if err != nil {
-			return nil, fmt.Errorf("DATE for %s: %w", r.Accession, err)
-		}
-		*targets[i] = parsed
-	}
-	if len(dates) == 1 {
-		date.Created = date.Updated
-	}
-	authors := []massbank.RecordAuthorName{}
-	for _, name := range strings.Split(r.Authors, ",") {
-		authors = append(authors, massbank.RecordAuthorName{Name: strings.TrimSpace(name)})
+	authors, err := massbank.ParseRecordAuthorNames(r.Authors)
+	if err != nil {
+		return nil, fmt.Errorf("AUTHORS for %s: %w", r.Accession, err)
 	}
 	comments := []massbank.SubtagProperty{}
 	for _, comment := range r.Comments {
-		comments = append(comments, massbank.SubtagProperty{Value: comment})
+		value, err := massbank.ParseSubtagProperty(comment, "COMMENT")
+		if err != nil {
+			return nil, fmt.Errorf("COMMENT for %s: %w", r.Accession, err)
+		}
+		comments = append(comments, *value)
 	}
 	lineage := []string{}
 	if r.Lineage != "" {
@@ -130,7 +120,7 @@ func decodeJPARecord(document []byte) (*massbank.MassBank2, error) {
 	count := uint(len(r.Peaks))
 	result := &massbank.MassBank2{
 		Accession: &r.Accession, Contributor: &parts[1], RecordTitle: &title,
-		Date: date, Authors: &authors, License: &r.License, Copyright: r.Copyright,
+		Date: date, Authors: authors, License: &r.License, Copyright: r.Copyright,
 		Publication: r.Publication, Project: r.Project, Comments: &comments,
 		Compound: massbank.CompoundProperties{
 			Names: &r.Names, Classes: &r.Classes, Formula: &r.Formula,

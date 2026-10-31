@@ -68,7 +68,7 @@ func getDatabaseProperty(s string) (*DatabaseProperty, error) {
 	}
 }
 
-func getSubtagProperty(s string, tagname string) (*SubtagProperty, error) {
+func ParseSubtagProperty(s string, tagname string) (*SubtagProperty, error) {
 	p := SubtagProperty{}
 	ss := strings.SplitN(s, " ", 2)
 	if tagname == "COMMENT" {
@@ -87,7 +87,7 @@ func getSubtagProperty(s string, tagname string) (*SubtagProperty, error) {
 	return &p, nil
 }
 
-func getRecordDate(s string) (*RecordDate, error) {
+func ParseRecordDate(s string) (*RecordDate, error) {
 	var err error
 	var date = &RecordDate{}
 	ss := strings.SplitN(s, " ", 2)
@@ -142,7 +142,7 @@ func getDeprecated(s string) (*RecordDeprecated, error) {
 	return nil, errors.New("could not parse DEPRECATED tag")
 }
 
-func getRecordAuthornames(s string) (*[]RecordAuthorName, error) {
+func ParseRecordAuthorNames(s string) (*[]RecordAuthorName, error) {
 	names := []RecordAuthorName{}
 	ss := strings.Split(s, ",")
 	for _, s1 := range ss {
@@ -290,7 +290,7 @@ func (mb *MassBank2) addValue(tagname string, value string) error {
 	case reflect.Struct:
 		switch propertyElement {
 		case reflect.TypeOf(RecordDate{}):
-			rd, err := getRecordDate(value)
+			rd, err := ParseRecordDate(value)
 			if err != nil {
 				return errors.New(fmt.Sprintf("Error in Date: %s\nTag: %s; Value: %s", err.Error(), tagname, value))
 			}
@@ -324,13 +324,13 @@ func (mb *MassBank2) addValue(tagname string, value string) error {
 			}
 			property.Elem().Set(reflect.Append(property.Elem(), reflect.ValueOf(value)))
 		case reflect.TypeOf(RecordAuthorName{}):
-			rn, err := getRecordAuthornames(value)
+			rn, err := ParseRecordAuthorNames(value)
 			if err != nil {
 				return errors.New(fmt.Sprintf("Error in Authornames: %s\nTag: %s; Value: %s", err.Error(), tagname, value))
 			}
 			property.Set(reflect.ValueOf(rn))
 		case reflect.TypeOf(SubtagProperty{}):
-			st, _ := getSubtagProperty(value, tagname)
+			st, _ := ParseSubtagProperty(value, tagname)
 			if property.Elem().Kind() == reflect.Invalid {
 				property.Set(reflect.New(propertyElement))
 			}
