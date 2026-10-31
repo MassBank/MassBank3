@@ -24,13 +24,13 @@ type MbRecordPeakPeakValuesInner struct {
 	Id int32 `json:"id,omitempty"`
 
 	// m/z of the peak
-	Mz float64 `json:"mz,omitempty"`
+	Mz float64 `json:"mz"`
 
 	// intensity of the peak
-	Intensity float64 `json:"intensity,omitempty"`
+	Intensity float64 `json:"intensity"`
 
 	// Relative intensity of the peak
-	Rel int32 `json:"rel,omitempty"`
+	Rel int32 `json:"rel"`
 }
 
 // AssertMbRecordPeakPeakValuesInnerRequired checks if the required fields are not zero-ed

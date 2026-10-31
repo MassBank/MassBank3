@@ -235,6 +235,7 @@ properties:
             items:
               description: "Values for a single peak"
               type: object
+              required: [mz, intensity, rel]
               properties:
                 id:
                   description: "Peak identifier"

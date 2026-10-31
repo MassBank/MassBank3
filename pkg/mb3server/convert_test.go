@@ -56,3 +56,26 @@ func TestRecordConversionRejectsMissingDate(t *testing.T) {
 		}
 	}
 }
+
+func TestZeroPeakValuesAreNotOmitted(t *testing.T) {
+	for _, peak := range []MbRecordPeakPeakValuesInner{
+		{},
+		{Id: 1, Mz: 107.04, Intensity: 100, Rel: 0},
+	} {
+		body, err := json.Marshal(peak)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var got map[string]float64
+		if err := json.Unmarshal(body, &got); err != nil {
+			t.Fatal(err)
+		}
+		for key, want := range map[string]float64{
+			"mz": peak.Mz, "intensity": peak.Intensity, "rel": float64(peak.Rel),
+		} {
+			if value, ok := got[key]; !ok || value != want {
+				t.Fatalf("lost source value %s=%v in %s", key, want, body)
+			}
+		}
+	}
+}

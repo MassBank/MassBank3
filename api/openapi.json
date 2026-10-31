@@ -1353,6 +1353,7 @@
       },
       "MBRecord_peak_peak_values_inner" : {
         "description" : "Values for a single peak",
+        "required" : [ "mz", "intensity", "rel" ],
         "properties" : {
           "id" : {
             "description" : "Peak identifier",
