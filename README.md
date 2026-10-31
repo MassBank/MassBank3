@@ -151,8 +151,11 @@ The frontend can by default be accessed in the webbrowser at http://localhost:80
 ## Shared JPA database
 
 The default `DB_SCHEMA=jpa` reads the export API's `massbank-records` and
-`massbank-peaks` through live views in `massbank_api`. No second record import or
-materialized record copy is needed. The connection is read-only. Count, browse,
+`massbank-peaks` through read views in `massbank_api`. Canonical records are not
+duplicated or imported a second time. Neutral-loss, name-search and metadata
+projections are built by the export importer in that same database before
+readiness becomes true. Covering expression indexes cache atom counts.
+The connection is read-only. Count, browse,
 record retrieval, peak/neutral-loss filters and Bingo substructure searches use
 the same active records as the export API; deprecated records remain exportable
 but are excluded from search.
@@ -163,6 +166,10 @@ Provision PostgreSQL 17 with Bingo in that **database**, then run the export
 API's `/app-import.jar` before starting the APIs. The importer creates the views
 and a partial Bingo index on `ch_smiles`, excluding empty and `N/A` structures.
 It must have DDL permissions; the API does not install extensions or write data.
+The optimized Go image requires the matching export API's `shared-api.sql`
+migration (including `metadata_statistics`) before deployment. Existing data can
+be migrated transactionally without reimporting; see the export API README.
+Projection refreshes are owned by the importer, not by API requests or a timer.
 `DB_SCHEMA=legacy` retains compatibility with the old dbtool schema.
 
 For migration, use a fresh database and retain the old databases for rollback.

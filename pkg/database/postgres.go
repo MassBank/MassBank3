@@ -351,6 +351,9 @@ func (p *PostgresSQLDB) GetMetadata() (*massbank.MbMetaData, error) {
 
 	// number of unique spectra
 	query = "SELECT COUNT(DISTINCT(splash)) FROM spectrum;"
+	if p.shared {
+		query = "SELECT count FROM metadata_statistics WHERE kind = 'spectra';"
+	}
 	stmt, err = p.database.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -366,6 +369,9 @@ func (p *PostgresSQLDB) GetMetadata() (*massbank.MbMetaData, error) {
 
 	// number of unique compounds
 	query = "SELECT COUNT(DISTINCT(inchi)) FROM compound WHERE inchi != 'N/A';"
+	if p.shared {
+		query = "SELECT count FROM metadata_statistics WHERE kind = 'compound';"
+	}
 	stmt, err = p.database.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -387,6 +393,9 @@ func (p *PostgresSQLDB) GetMetadata() (*massbank.MbMetaData, error) {
 
 	// compound classes (free text)
 	query = "SELECT class, COUNT(class) as count FROM compound_class GROUP BY class ORDER BY class;"
+	if p.shared {
+		query = "SELECT value, count FROM metadata_statistics WHERE kind = 'class' ORDER BY value;"
+	}
 	stmt, err = p.database.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -414,6 +423,9 @@ func (p *PostgresSQLDB) GetMetadata() (*massbank.MbMetaData, error) {
 
 	// compound classes (ClassyFire)
 	query = "SELECT identifier, COUNT(identifier) as count FROM compound_link WHERE database = 'ChemOnt' GROUP BY identifier ORDER BY count DESC;"
+	if p.shared {
+		query = "SELECT value, count FROM metadata_statistics WHERE kind = 'chemont' ORDER BY count DESC;"
+	}
 	stmt, err = p.database.Prepare(query)
 	if err != nil {
 		return nil, err
