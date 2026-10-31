@@ -146,6 +146,19 @@ The frontend can by default be accessed in the webbrowser at http://localhost:80
 
     http://${MB3_FRONTEND_HOST}:${MB3_FRONTEND_PORT}${MB3_FRONTEND_BASE_URL}
 
+## Content Security Policy (CSP)
+
+Express always sends an enforcing `Content-Security-Policy` with a fresh nonce
+per HTML response; ingress must not add another CSP header. Scripts require
+`'self'` or that nonce (no script `'unsafe-inline'`). Dynamic styles receive the
+nonce; `style-src-attr 'unsafe-inline'` supports React and News style attributes.
+`connect-src` allows the configured API/export origins and
+`https://massbank.github.io` for embedded News and Markdown documentation.
+News stylesheets use `massbank.github.io` and `fonts.googleapis.com`; Mulish
+fonts use `fonts.gstatic.com`. Fonts embedded in local SVGs use `data:`.
+The former `/css/w3.css` and `/css/massbank.css` paths are not local resources:
+missing file requests return 404, not SPA HTML.
+
 # REST API
 
 ## Source record dates

@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import { randomBytes } from 'node:crypto';
 import { readFileSync } from 'fs';
 import express, { Request, Response } from 'express';
 import { ViteDevServer } from 'vite';
@@ -58,6 +59,49 @@ const homepageAdditionalSectionName =
   process.env.MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_NAME ?? '';
 const homepageAdditionalSectionText =
   process.env.MB3_FRONTEND_HOMEPAGE_ADDITIONAL_SECTION_TEXT ?? '';
+
+const frontendOrigin = new URL(frontendUrl).origin;
+const documentationOrigin = 'https://massbank.github.io';
+const googleFontsCssOrigin = 'https://fonts.googleapis.com';
+const googleFontsFontOrigin = 'https://fonts.gstatic.com';
+const connectSources = [
+  ...new Set(
+    [backendUrl, exportServiceUrl, documentationOrigin]
+      .map((url) => {
+        const resource = new URL(url, frontendUrl);
+        if (resource.protocol !== 'http:' && resource.protocol !== 'https:') {
+          throw new Error(`Unsupported CSP connection URL: ${url}`);
+        }
+        return resource.origin;
+      })
+      .filter((origin) => origin !== frontendOrigin),
+  ),
+];
+
+function createCspPolicy(nonce: string) {
+  return [
+    "default-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "frame-ancestors 'self'",
+    "form-action 'self'",
+    `script-src 'self' 'nonce-${nonce}'`,
+    `style-src 'self' 'nonce-${nonce}' ${documentationOrigin} ${googleFontsCssOrigin}`,
+    "style-src-attr 'unsafe-inline'",
+    "img-src 'self' data:",
+    `font-src 'self' data: ${googleFontsFontOrigin}`,
+    `connect-src 'self' ${connectSources.join(' ')}`.trim(),
+  ].join('; ');
+}
+
+function addNonceToScriptAndStyleElements(html: string, nonce: string) {
+  return html.replace(/<(script|style)(?=[\s>])([^>]*)>/gi, (tag) => {
+    if (/\snonce\s*=/i.test(tag)) {
+      return tag;
+    }
+    return tag.replace(/>$/, ` nonce="${nonce}">`);
+  });
+}
 
 const versionFileContent = readFileSync('mb_version.txt', 'utf-8');
 const version =
@@ -287,6 +331,13 @@ baseRouter.get(/\/(R|r)esult\.jsp/, (req: Request, res: Response) => {
 // serve index.html for all other routes
 baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
   try {
+    const path = req.originalUrl.split('?')[0];
+    if (/\.[^/]+$/.test(path)) {
+      res.status(404).type('text/plain').send('Not found');
+      return;
+    }
+
+    const nonce = randomBytes(16).toString('base64');
     let template: string;
     let render;
     if (!isProduction) {
@@ -304,7 +355,6 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
       render = (await import('./dist/server/ServerApp.js')).render;
     }
 
-    const path = req.originalUrl.split('?')[0];
     const props = {
       baseUrl: frontendBaseUrl,
       backendUrl,
@@ -322,6 +372,7 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
     const rendered = await render({
       path,
       props,
+      nonce,
     });
 
     const tabTitle = `<title>${browserTabTitle}</title>`;
@@ -350,14 +401,22 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
         exportServiceUrlInternal,
       );
       if (metadata) {
-        const metadataScript = `<script type="application/ld+json">${metadata}</script>`;
+        const safeMetadata = metadata
+          .replace(/</g, '\\u003c')
+          .replace(/>/g, '\\u003e')
+          .replace(/&/g, '\\u0026');
+        const metadataScript = `<script type="application/ld+json">${safeMetadata}</script>`;
         rendered.head = rendered.head
           ? rendered.head.concat('\n\t').concat(metadataScript)
           : metadataScript;
       }
     }
 
-    const initDataScript = `<script> window.__INITIAL_DATA__ = ${JSON.stringify(props)}; </script>`;
+    const initialData = JSON.stringify(props)
+      .replace(/</g, '\\u003c')
+      .replace(/>/g, '\\u003e')
+      .replace(/&/g, '\\u0026');
+    const initDataScript = `<script type="application/json" id="initial-data">${initialData}</script>`;
     rendered.html = rendered.html
       ? rendered.html.concat('\n').concat(initDataScript)
       : initDataScript;
@@ -372,12 +431,23 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
     // console.log('rendered', rendered);
 
     const html = template
+      .replace(
+        '<!--csp-nonce-bootstrap-->',
+        `<script src="${frontendBaseUrl}/csp-nonce-bootstrap.js"></script>`,
+      )
+      .replaceAll('<!--csp-nonce-->', nonce)
       .replace(`<!--app-head-->`, rendered.head ?? '')
       .replace(`<!--app-html-->`, rendered.html ?? '');
+    const nonceHtml = addNonceToScriptAndStyleElements(html, nonce);
 
-    // console.log('html', html);
-
-    res.status(200).set({ 'Content-Type': 'text/html' }).send(html);
+    res
+      .status(200)
+      .set({
+        'Cache-Control': 'no-store',
+        'Content-Type': 'text/html',
+        'Content-Security-Policy': createCspPolicy(nonce),
+      })
+      .send(nonceHtml);
   } catch (e) {
     vite?.ssrFixStacktrace(e);
     console.log(e.stack);
