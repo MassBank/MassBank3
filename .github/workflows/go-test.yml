@@ -1,50 +1,35 @@
-name: go-test
+name: Go tests
 
 on:
   push:
-    branches: ["*"]
   pull_request:
-    branches: ["*"]
+  workflow_call:
+  workflow_dispatch:
 
-env:
-  BUILD_TYPE: Release
+permissions:
+  contents: read
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: ["ubuntu-latest", "ubuntu-24.04"]
-        postgres-images: ["postgres:latest"]
-        go-version: ["1.20"]
-    runs-on: ${{ matrix.os }}
-
-    services:
-      testpostgres:
-        image: ${{matrix.postgres-images}}
-        env:
-          POSTGRES_DB: mbtestdb
-          POSTGRES_PASSWORD: mbtestpwd
-          POSTGRES_PORT: 5432
-          POSTGRES_USER: mbtestuser
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
+  unit:
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-go@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: ${{matrix.go-version}}
+          go-version-file: go.mod
+          cache: true
+      - run: go test -mod=readonly -race ./pkg/...
+      - run: go vet ./pkg/...
+      - run: go mod verify
 
-      # - name: Run all go tests
-      #   run: go test ./... -v -race -coverprofile=coverage.txt -covermode=atomic
-      #   env:
-      #     POSTGRES_HOST: localhost
-      #     TEST_DATA_DIR: /home/runner/work/MassBank3/MassBank3/
-      # - name: Upload coverage to Codecov
-      #   uses: codecov/codecov-action@v3
+  primary-regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Import original records with export-api and test the Go API
+        run: bash test/run-primary-regression.sh

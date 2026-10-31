@@ -161,11 +161,17 @@ func TestSharedDatabaseIntegration(t *testing.T) {
 	if err != nil || !containsAccession(hits, *r.Accession) {
 		t.Fatalf("JPA filters failed: %v", err)
 	}
-	if len(r.Peak.Peak.Mz) > 0 {
-		peaks := []float64{r.Peak.Peak.Mz[0]}
+	var peakAccession string
+	var mz float64
+	if err := db.database.QueryRow(`SELECT spectrum_id, mz FROM peak LIMIT 1`).
+		Scan(&peakAccession, &mz); err != nil {
+		t.Fatal(err)
+	}
+	{
+		peaks := []float64{mz}
 		intensity := int64(0)
 		found, _, err := db.GetSearchResults(Filters{IonMode: massbank.ANY, Peaks: &peaks, Intensity: &intensity})
-		if err != nil || !containsAccession(*found, *r.Accession) {
+		if err != nil || found == nil || !containsAccession(*found, peakAccession) {
 			t.Fatalf("peak search failed: %v", err)
 		}
 	}

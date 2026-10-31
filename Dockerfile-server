@@ -1,8 +1,9 @@
-FROM docker.io/golang:1.24-alpine
+FROM docker.io/golang:1.27.3-alpine
 WORKDIR /go/src
+COPY go.mod go.sum ./
+RUN go mod download
 COPY main.go .
 COPY pkg ./pkg
-COPY go.mod .
 
 RUN wget https://github.com/swagger-api/swagger-ui/archive/refs/tags/v5.21.0.tar.gz && \
     tar -xf v5.21.0.tar.gz && \
@@ -16,7 +17,7 @@ COPY api/schemas ./swagger-ui/schemas
 COPY entrypoint-mb3server.sh ./entrypoint-mb3server.sh
 COPY mb_version.txt ./mb_version.txt
 
-RUN go get -d -v ./...
+RUN go build -mod=readonly ./...
 
 EXPOSE 8080
 ENTRYPOINT ["sh", "entrypoint-mb3server.sh"]

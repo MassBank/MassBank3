@@ -1,0 +1,65 @@
+services:
+  bingo:
+    image: quay.io/massbank/postgres-bingo-init:v17-bingo-1.45.0
+    platform: linux/amd64
+    command: /bin/sh -c "cp -rp /bingo-postgres/. /opt/bingo-postgres/"
+    volumes:
+      - bingo:/opt/bingo-postgres
+
+  postgres:
+    image: postgres:17.11
+    platform: linux/amd64
+    environment:
+      POSTGRES_DB: massbank_primary_test
+      POSTGRES_USER: massbank
+      POSTGRES_PASSWORD: ${PRIMARY_TEST_PASSWORD:?set a temporary test password}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - bingo:/opt/bingo-postgres:ro
+      - ../compose/initdb.d/000_bingo_install.sh:/docker-entrypoint-initdb.d/000_bingo_install.sh:ro
+      - ../compose/initdb.d/00_init_ALLOW_NON_UNIQUE_DEAROMATIZATION.sh:/docker-entrypoint-initdb.d/001_bingo_config.sh:ro
+    depends_on:
+      bingo:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U massbank -d massbank_primary_test"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+
+  importer:
+    image: quay.io/massbank/massbank-export-api:test-shared-jpa-e4c04ef9b490114b2780c1c75ef146b5c242ba54
+    platform: linux/amd64
+    entrypoint: ["java", "-Xmx1200m", "-jar", "/app-import.jar"]
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: massbank_primary_test
+      DB_USER: massbank
+      DB_PASSWORD: ${PRIMARY_TEST_PASSWORD:?set a temporary test password}
+      MB_SHARED_DATABASE: "true"
+      MB_DATA_DIRECTORY: /primary-data
+      MB_DATA_VERSION: primary-regression-2026.03
+    volumes:
+      - ${PRIMARY_TEST_DATA:?set extracted fixture directory}:/primary-data:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  tests:
+    image: golang:1.27.3
+    working_dir: /src
+    environment:
+      MASSBANK_SHARED_TEST_DSN: postgres://massbank:${PRIMARY_TEST_PASSWORD:?set a temporary test password}@postgres:5432/massbank_primary_test?sslmode=disable
+      MASSBANK_PRIMARY_TEST_DSN: postgres://massbank:${PRIMARY_TEST_PASSWORD:?set a temporary test password}@postgres:5432/massbank_primary_test?sslmode=disable
+      MASSBANK_PRIMARY_TEST_REQUIRED: "true"
+    command: ["go", "test", "-mod=readonly", "-race", "-count=1", "-timeout=10m", "./pkg/..."]
+    volumes:
+      - ..:/src:ro
+    depends_on:
+      importer:
+        condition: service_completed_successfully
+
+volumes:
+  bingo:
+  postgres:

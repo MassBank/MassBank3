@@ -253,6 +253,86 @@ The branch workflow `shared-database-image.yml` publishes only
 To exercise the adapter against a populated isolated test database, provide
 `MASSBANK_SHARED_TEST_DSN` externally and run `go test ./pkg/database`.
 
+### Toolchain and primary-data regression tests
+
+The Go module, API/dbtool images and test runner use **Go 1.27.3**.
+`go.mod`/`go.sum` pin the updated dependency graph; container builds download
+that graph and build with `-mod=readonly`, rather than resolving dependencies
+with `go get`. The API still rebuilds at startup to embed its deployment-specific
+Swagger URLs, using the image's pinned toolchain and cached dependencies.
+
+Fast, database-free tests:
+
+```sh
+go test -mod=readonly -race ./pkg/...
+```
+
+The database-backed tests are **integration tests**, not isolated unit tests.
+They use 600 unchanged active primary records from release **2026.03**, commit
+`705afb7bccc3b2c42410a744eef73674716a60ef`, stored in
+`pkg/mb3server/testdata/primary/records.tar.gz`. The adjacent manifest records
+every original path, SHA-256, accession, selection rule and coverage category.
+Original authorship, copyright and license fields are retained in each file.
+No live API response serves as a golden reference.
+
+The corpus covers all 59 contributors, all three DATE forms, 502 comment-bearing
+records, 220 annotated records, 37 high-precision m/z cases and 32 records with
+zero-intensity peaks. It also covers compound classes, links, species, projects,
+acquisition and processing fields. `AC$GENERAL` and `AC$ION_MOBILITY` are absent
+from this release: their absence, not populated values, is covered.
+
+Run the complete isolated import and regression suite:
+
+```sh
+# Docker Engine + Compose, Go and OpenSSL; also used by GitHub Actions:
+bash test/run-primary-regression.sh
+
+# Devcontainer without Docker: use the current Kubernetes context:
+# Defaults to namespace massbank-dev; MASSBANK_TEST_NAMESPACE overrides it.
+bash test/run-primary-regression-k8s.sh
+```
+
+Both runners create a **fresh PostgreSQL 17.11 server**, install Bingo 1.45.0,
+and run the real export API `/app-import.jar` from the pinned corrected branch
+image. Only that importer creates/fills the JPA record tables and shared API
+views. Tests never use SQL inserts to fabricate the canonical dataset. Random
+test credentials and uniquely named resources are temporary; cleanup removes
+only that run's server, data and resources. No existing database or Helm release
+is used or changed. The Kubernetes runner needs permission to create/delete Pods,
+Jobs, Services, ConfigMaps and Secrets and to port-forward in the test namespace.
+
+`TestPrimaryDatabaseIntegration` exercises the actual Go HTTP router,
+database adapter and JSON serialization for **every** fixture through individual,
+simple and bulk record endpoints. An independent test-only source reader checks
+37 field groups plus rejection of unmapped source tags; it does not reuse the
+application parser/converter. Decimal equality uses exact rational arithmetic,
+without float32 conversion or rounding tolerance. Relative intensities must be
+JSON integers; zero-valued members, order, duplicate values and literal comments
+must survive. Existing database integration tests also check filters, Bingo
+queries/index use, neutral-loss search and read-only access.
+
+Two explicit boundaries remain: unfinished structured MARC-relator extraction
+is not asserted (original AUTHORS text still is); the three fixture records with
+legacy `MS$DATA_PROCESSING: INTENSITY CUTOFF ...` may use the known alternative
+subtag boundary, but **every character of the reconstructed value must match**.
+No other subtag discrepancy is exempted. Primary data and this legacy behavior
+are not changed by the test suite. Peak IDs and derived neutral losses have no
+original-field counterparts and are excluded from primary-value equality.
+
+The runners set `MASSBANK_PRIMARY_TEST_DSN`, `MASSBANK_SHARED_TEST_DSN` and
+`MASSBANK_PRIMARY_TEST_REQUIRED=true`. The last flag makes missing test database
+configuration fail instead of silently skipping the primary-data test. Without
+a DSN, ordinary unit runs validate fixture checksums, source parsing, comparison
+precision and existing conversion regressions, and explicitly skip DB tests.
+GitHub Actions runs both suites; API test-image publication requires them to pass.
+
+To reproduce the checked-in corpus byte-for-byte from a local MassBank-data Git
+clone containing the pinned commit:
+
+```sh
+python3 test/generate-primary-fixtures.py /path/to/MassBank-data
+```
+
 To access this on your running instance, just visit the API URL in the browser. By default it is http://localhost:8081/MassBank-api and is defined by the environment variable _MB3_API_URL_ and concatenated via:
 
     http://${MB3_API_HOST}:${MB3_API_PORT}${MB3_API_BASE_URL}

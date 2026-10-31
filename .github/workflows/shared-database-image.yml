@@ -9,7 +9,11 @@ permissions:
   contents: read
 
 jobs:
+  regression:
+    uses: ./.github/workflows/go-test.yml
+
   image:
+    needs: regression
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
