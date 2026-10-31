@@ -63,7 +63,7 @@ Now use _docker compose_ to start the system (in daemon mode):
     docker compose up -d
 
 > [!NOTE]
-> Initially, the property _MB_DB_INIT_ is set to _true_. Change that value to _false_ after the database was filled within the first start. The database filling takes some time (circa 30 minutes on Apple's M3 Pro chip and a Docker environment with 4 CPUs and 8GB RAM allowed). The _mb3tool_ service is responsible for that and stops running after finishing that task. Meanwhile you can check the amount of already imported data via the content page (frontend) or via following command line:
+> The export API's `data-loader` creates the JPA schema and imports the records before either API starts. Both services use `DB_NAME`; there is no separate export database and `mb3tool` must not run against this database. The importer replaces the previous imported dataset, so run it only when deliberately loading or refreshing data. Check the imported count with:
 
     curl http://localhost:8081/MassBank-api/records/count
 
@@ -72,7 +72,7 @@ To stop the system use:
     docker compose down
 
 > [!NOTE]
-> Docker volumes are used for database storage and persistency. In order to remove these volumes and hence the data, use the previous command with _-v_. Set the property _MB_DB_INIT_ to _true_ again before restarting the system after deleting the volumes and data.
+> Docker volumes persist database contents. `docker compose down -v` deletes these volumes; the next start imports the data again.
 
 ### Advanced Settings
 
@@ -146,6 +146,33 @@ The frontend can by default be accessed in the webbrowser at http://localhost:80
     http://${MB3_FRONTEND_HOST}:${MB3_FRONTEND_PORT}${MB3_FRONTEND_BASE_URL}
 
 # REST API
+
+## Shared JPA database
+
+The default `DB_SCHEMA=jpa` reads the export API's `massbank-records` and
+`massbank-peaks` through live views in `massbank_api`. No second record import or
+materialized record copy is needed. The connection is read-only. Count, browse,
+record retrieval, peak/neutral-loss filters and Bingo substructure searches use
+the same active records as the export API; deprecated records remain exportable
+but are excluded from search.
+
+Set identical `DB_HOST`, `DB_PORT`, `DB_NAME`, and appropriate credentials for both
+APIs. Defaults are database/user `massbank`; supply `DB_PASSWORD` externally.
+Provision PostgreSQL 17 with Bingo in that **database**, then run the export
+API's `/app-import.jar` before starting the APIs. The importer creates the views
+and a partial Bingo index on `ch_smiles`, excluding empty and `N/A` structures.
+It must have DDL permissions; the API does not install extensions or write data.
+`DB_SCHEMA=legacy` retains compatibility with the old dbtool schema.
+
+For migration, use a fresh database and retain the old databases for rollback.
+Do not run the old dbtool against the shared database, and disable its Helm Job.
+See the export API README for provisioning and Kubernetes test deployment.
+The branch workflow `shared-database-image.yml` publishes only
+`quay.io/massbank/massbank-api:test-shared-jpa-<full-commit-SHA>`, never `dev` or
+`latest`. Use the matching export API branch image.
+
+To exercise the adapter against a populated isolated test database, provide
+`MASSBANK_SHARED_TEST_DSN` externally and run `go test ./pkg/database`.
 
 To access this on your running instance, just visit the API URL in the browser. By default it is http://localhost:8081/MassBank-api and is defined by the environment variable _MB3_API_URL_ and concatenated via:
 

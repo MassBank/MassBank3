@@ -532,12 +532,26 @@ func GetRecords(contributor []string, instrumentType []string, msType []string, 
 	for _, searchResultDataInner := range searchResult.Data {
 		accessions = append(accessions, searchResultDataInner.Accession)
 	}
-	recordStrings, err := db.GetRecords(&accessions)
+	if ServerConfig.DbSchema != "jpa" {
+		recordStrings, err := db.GetRecords(&accessions)
+		if err != nil {
+			return nil, err
+		}
+		for _, recordString := range *recordStrings {
+			record, err := ConvertJsonStringToMb3Record(recordString)
+			if err != nil {
+				return nil, err
+			}
+			result = append(result, *record)
+		}
+		return &result, nil
+	}
+	records, err := db.ReadRecords(accessions)
 	if err != nil {
 		return nil, err
 	}
-	for _, recordString := range *recordStrings {
-		record, err := ConvertJsonStringToMb3Record(recordString)
+	for _, source := range records {
+		record, err := ConvertMb2RecordToMb3Record(source)
 		if err != nil {
 			return nil, err
 		}

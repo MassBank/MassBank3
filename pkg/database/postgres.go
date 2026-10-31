@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/url"
 	"regexp"
 	"slices"
 	"strconv"
@@ -132,6 +133,7 @@ type PostgresSQLDB struct {
 	port       uint
 	connString string
 	database   *sql.DB
+	shared     bool
 }
 
 // NewPostgresSQLDb creates a postgres database handle implementing [MB3Database] from the configuration.
@@ -139,6 +141,9 @@ type PostgresSQLDB struct {
 //
 // Returns an error if the connection data is not syntactically valid.
 func NewPostgresSQLDb(config DBConfig) (*PostgresSQLDB, error) {
+	if config.DbSchema != "" && config.DbSchema != "legacy" && config.DbSchema != "jpa" {
+		return nil, errors.New("DB_SCHEMA must be jpa or legacy")
+	}
 	if config.Database != Postgres {
 		return nil, errors.New("database type must be Postgres")
 	}
@@ -160,10 +165,26 @@ func NewPostgresSQLDb(config DBConfig) (*PostgresSQLDB, error) {
 		port:       config.DbPort,
 		connString: config.DbConnStr,
 		database:   nil,
+		shared:     config.DbSchema == "jpa",
 	}
 	if len(config.DbConnStr) < 1 {
 		postgres.connString = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 			config.DbHost, config.DbPort, config.DbUser, config.DbPwd, config.DbName)
+	}
+	if postgres.shared {
+		if strings.HasPrefix(postgres.connString, "postgres://") || strings.HasPrefix(postgres.connString, "postgresql://") {
+			u, err := url.Parse(postgres.connString)
+			if err != nil {
+				return nil, err
+			}
+			params := u.Query()
+			params.Set("search_path", "massbank_api,public")
+			params.Set("default_transaction_read_only", "on")
+			u.RawQuery = params.Encode()
+			postgres.connString = u.String()
+		} else {
+			postgres.connString += " search_path=massbank_api,public default_transaction_read_only=on"
+		}
 	}
 	return &postgres, nil
 }
@@ -196,7 +217,16 @@ func (p *PostgresSQLDB) Ping() error {
 	if err := p.checkDatabase(); err != nil {
 		return err
 	}
-	return p.database.Ping()
+	if p.shared {
+		var ready bool
+		if err := p.database.QueryRow("SELECT coalesce((SELECT ready FROM public.shared_import_metadata WHERE id = 1), false)").Scan(&ready); err != nil {
+			return fmt.Errorf("shared database has not been initialized by the export importer: %w", err)
+		}
+		if !ready {
+			return errors.New("shared database import is incomplete")
+		}
+	}
+	return nil
 }
 
 // Disconnect see [MB3Database.Disconnect]
@@ -215,7 +245,8 @@ func (p *PostgresSQLDB) Disconnect() error {
 func (p *PostgresSQLDB) Count() (int64, error) {
 	var count int64
 	err := p.database.QueryRow("SELECT COUNT(id) FROM massbank;").Scan(&count)
-	if err != nil && err.(*pq.Error).Code == "42P01" {
+	var pgErr *pq.Error
+	if !p.shared && errors.As(err, &pgErr) && pgErr.Code == "42P01" {
 		return 0, nil
 	}
 	if err != nil {
@@ -453,6 +484,16 @@ func (p *PostgresSQLDB) GetRecords(s *[]string) (*[]string, error) {
 
 // GetRecord see [MB3Database.GetRecord]
 func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
+	if p.shared {
+		records, err := p.ReadRecords([]string{*s})
+		if err != nil {
+			return nil, err
+		}
+		if len(records) == 0 {
+			return nil, sql.ErrNoRows
+		}
+		return records[0], nil
+	}
 
 	var result = massbank.MassBank2{}
 
@@ -896,6 +937,9 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 
 // GetSimpleRecord see [MB3Database.GetSimpleRecord]
 func (p *PostgresSQLDB) GetSimpleRecord(s *string) (*massbank.MassBank2, error) {
+	if p.shared {
+		return p.GetRecord(s)
+	}
 	var result = massbank.MassBank2{}
 
 	var massbankId uint

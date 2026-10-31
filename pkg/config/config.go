@@ -27,11 +27,11 @@ type ServerConfig struct {
 
 const (
 	dbDefault              = "postgres"
-	dbUserDefault          = "massbank3"
-	dbPasswordDefault      = "massbank3password"
+	dbUserDefault          = "massbank"
+	dbPasswordDefault      = ""
 	dbHostDefault          = "localhost"
 	dbPortDefault          = "5432"
-	dbNameDefault          = "massbank3"
+	dbNameDefault          = "massbank"
 	dbConnStringDefault    = ""
 	mbGitRepoDefault       = "https://github.com/MassBank/MassBank-data"
 	mbGitBranchDefault     = "main"
@@ -112,6 +112,8 @@ func getDBConfig() database.DBConfig {
 	c.DbHost = getEnv("DB_HOST", dbHostDefault)
 	c.DbName = getEnv("DB_NAME", dbNameDefault)
 	c.DbConnStr = getEnv("DB_CONN_STRING", dbConnStringDefault)
+	c.DbSchema = getEnv("DB_SCHEMA", "jpa")
+	flag.StringVar(&c.DbSchema, "db_schema", c.DbSchema, "Database schema: jpa (export importer) or legacy (dbtool)")
 	var databaseType = getEnv("DB_TYPE", dbDefault)
 	var dbPortEnv = getEnv("DB_PORT", dbPortDefault)
 	var dbPort uint64

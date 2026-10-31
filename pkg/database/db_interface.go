@@ -4,8 +4,6 @@ import (
 	"log"
 	"math"
 
-	"github.com/Code-Hex/dd"
-
 	"github.com/MassBank/MassBank3/pkg/massbank"
 )
 
@@ -47,6 +45,7 @@ type DBConfig struct {
 	DbName    string
 	DbPort    uint
 	DbConnStr string
+	DbSchema  string
 }
 
 var DefaultValues = struct {
@@ -142,6 +141,7 @@ type MB3Database interface {
 	GetRecord(*string) (*massbank.MassBank2, error)
 
 	GetRecords(*[]string) (*[]string, error)
+	ReadRecords([]string) ([]*massbank.MassBank2, error)
 
 	// GetSimpleRecord gets a single simple MassBank record by the Accession string.
 	// It should return nil and a [NotFoundError] if the record is not in the
@@ -217,7 +217,7 @@ func InitDb(dbConfig DBConfig) (MB3Database, error) {
 		var err error
 		if dbConfig.Database == Postgres {
 			db, err = NewPostgresSQLDb(dbConfig)
-			log.Println(dd.Dump(db))
+			log.Printf("Database backend: postgres (%s schema)", dbConfig.DbSchema)
 			if err != nil {
 				db = nil
 				return nil, err
