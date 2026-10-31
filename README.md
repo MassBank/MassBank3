@@ -193,6 +193,14 @@ To check every active record's DATE in a local snapshot, additionally set
 
 ## Shared JPA database
 
+### Peak values
+
+The spectrum peak table renders numerical zero explicitly (`0.00` for intensity,
+`0.0000` for m/z); zero is not an absent value. Full records require the export
+API's corrected `massbank_api.record_data` view, which retains every stored peak
+instead of applying positive-intensity search filters. Existing databases only
+need that view replaced, not a record reimport.
+
 ### Comments
 
 `comments` is an optional array of complete strings, in source order. Each
