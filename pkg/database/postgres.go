@@ -540,11 +540,8 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	result.RecordTitle = &title
 	result.Date = &massbank.RecordDate{Created: date, Updated: date, Modified: date}
 	result.Accession = &accession
-	result.Comments = &[]massbank.SubtagProperty{}
-	for _, comment := range comments {
-		parts := strings.Split(comment, "---")
-		*result.Comments = append(*result.Comments, massbank.SubtagProperty{Subtag: parts[0], Value: parts[1]})
-	}
+	decodedComments := decodeLegacyComments(comments)
+	result.Comments = &decodedComments
 
 	// contributors
 	var contributor string
@@ -1678,6 +1675,30 @@ func getAtomCount(formula string) int {
 	return count
 }
 
+// Legacy tables encode comments as subtag---value; JPA comments are plain strings.
+func decodeLegacyComments(values []string) []string {
+	result := make([]string, len(values))
+	for i, value := range values {
+		prefix, text, encoded := strings.Cut(value, "---")
+		if !encoded {
+			result[i] = value
+		} else if prefix == "" {
+			result[i] = text
+		} else {
+			result[i] = prefix + " " + text
+		}
+	}
+	return result
+}
+
+func encodeLegacyComments(values []string) []string {
+	result := make([]string, len(values))
+	for i, value := range values {
+		result[i] = "---" + value
+	}
+	return result
+}
+
 // AddRecord see [MB3Database.AddRecord]
 func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string, mb3RecordJson string) error {
 	if err := p.checkDatabase(); err != nil {
@@ -1704,9 +1725,7 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string,
 			VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id;`
 	var comments = []string{}
 	if record.Comments != nil {
-		for _, comment := range *record.Comments {
-			comments = append(comments, "\""+strings.ReplaceAll(comment.Subtag, "\"", "'")+"---"+strings.ReplaceAll(comment.Value, "\"", "'")+"\"")
-		}
+		comments = encodeLegacyComments(*record.Comments)
 	}
 	var massbankId int
 	legacyDate := record.Date.Created
@@ -1717,7 +1736,7 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string,
 		record.Metadata.FileName,
 		record.Accession,
 		record.RecordTitle,
-		"{"+strings.Join(comments, ",")+"}",
+		pq.Array(comments),
 		record.Copyright,
 		legacyDate,
 		mid).Scan(&massbankId)

@@ -193,6 +193,26 @@ To check every active record's DATE in a local snapshot, additionally set
 
 ## Shared JPA database
 
+### Comments
+
+`comments` is an optional array of complete strings, in source order. Each
+`COMMENT: ` line contributes one value; prefixes such as `CONFIDENCE`,
+`NATIVE_RUN_ID` and `[MS2]` remain part of that string. Values are not split
+into subtags, trimmed, deduplicated or interpreted as HTML. For example:
+
+```json
+{"comments":["CONFIDENCE Predicted","NATIVE_RUN_ID file.mzML"]}
+```
+
+JPA already stores these values in `comment`; the API copies them into its
+response and the frontend displays one complete comment per row. Full-record
+and filtered bulk responses use the same conversion. With no source comments,
+the optional field is omitted. No migration or reimport is needed. The legacy
+database adapter also reconstructs historical `subtag---value` entries as plain
+strings and uses PostgreSQL array encoding to preserve quotes and backslashes.
+
+### Database configuration
+
 The default `DB_SCHEMA=jpa` reads the export API's `massbank-records` and
 `massbank-peaks` through read views in `massbank_api`. Canonical records are not
 duplicated or imported a second time. Neutral-loss, name-search and metadata

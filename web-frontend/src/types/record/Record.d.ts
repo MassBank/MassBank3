@@ -4,7 +4,6 @@ import Compound from './Compound';
 import Date from '../Date';
 import MassSpectrometry from './MassSpectrometry';
 import Species from './Species';
-import SubTag from './SubTag';
 
 export default interface Record {
   accession: string;
@@ -19,5 +18,5 @@ export default interface Record {
   acquisition: Acquisition;
   mass_spectrometry: MassSpectrometry;
   peak: PeakData;
-  comments: SubTag[];
+  comments?: string[];
 }

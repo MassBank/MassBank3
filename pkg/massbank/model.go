@@ -84,7 +84,7 @@ type MassBank2 struct {
 	Copyright        *string               `mb2:"COPYRIGHT" optional:"true" json:"copyright"`
 	Publication      *string               `mb2:"PUBLICATION" optional:"true" json:"publication"`
 	Project          *string               `mb2:"PROJECT" optional:"true" bson:"project,omitempty" json:"project"`
-	Comments         *[]SubtagProperty     `mb2:"COMMENT" optional:"true" json:"comments"`
+	Comments         *[]string             `mb2:"COMMENT" optional:"true" json:"comments"`
 	Compound         CompoundProperties    `json:"compound"`
 	Species          SpeciesProperties     `json:"species"`
 	Acquisition      AcquisitionProperties `json:"acquisition"`

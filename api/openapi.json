@@ -873,9 +873,9 @@
             "type" : "string"
           },
           "comments" : {
-            "description" : "Comments",
+            "description" : "Complete COMMENT values in source order, without subtag parsing",
             "items" : {
-              "$ref" : "#/components/schemas/MBRecord_comments_inner"
+              "type" : "string"
             },
             "type" : "array"
           },
@@ -1184,29 +1184,6 @@
           }
         },
         "type" : "object"
-      },
-      "MBRecord_comments_inner_oneOf" : {
-        "description" : "A annotated comment",
-        "properties" : {
-          "subtag" : {
-            "description" : "The subtag to describe the comment",
-            "enum" : [ "[MS2]", "[Merging]", "[Merged]", "[Mass spectrometry]", "[Chromatography]", "[Profile]", "CONFIDENCE", "INTERNAL_ID" ],
-            "type" : "string"
-          },
-          "value" : {
-            "description" : "The comment",
-            "type" : "string"
-          }
-        },
-        "type" : "object"
-      },
-      "MBRecord_comments_inner" : {
-        "oneOf" : [ {
-          "description" : "A pure comment string",
-          "type" : "string"
-        }, {
-          "$ref" : "#/components/schemas/MBRecord_comments_inner_oneOf"
-        } ]
       },
       "MBRecord_compound" : {
         "description" : "Information of Chemical Compound Analyzed",

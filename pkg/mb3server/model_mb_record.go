@@ -10,9 +10,6 @@
 
 package mb3server
 
-
-
-
 type MbRecord struct {
 
 	// Record identifier
@@ -40,7 +37,7 @@ type MbRecord struct {
 	Project string `json:"project,omitempty"`
 
 	// Comments
-	Comments []MbRecordCommentsInner `json:"comments,omitempty"`
+	Comments []string `json:"comments,omitempty"`
 
 	Compound MbRecordCompound `json:"compound,omitempty"`
 
@@ -57,10 +54,10 @@ type MbRecord struct {
 func AssertMbRecordRequired(obj MbRecord) error {
 	elements := map[string]interface{}{
 		"accession": obj.Accession,
-		"title": obj.Title,
-		"date": obj.Date,
-		"authors": obj.Authors,
-		"license": obj.License,
+		"title":     obj.Title,
+		"date":      obj.Date,
+		"authors":   obj.Authors,
+		"license":   obj.License,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {
@@ -76,11 +73,6 @@ func AssertMbRecordRequired(obj MbRecord) error {
 	}
 	for _, el := range obj.Authors {
 		if err := AssertAuthorsInnerRequired(el); err != nil {
-			return err
-		}
-	}
-	for _, el := range obj.Comments {
-		if err := AssertMbRecordCommentsInnerRequired(el); err != nil {
 			return err
 		}
 	}
@@ -112,11 +104,6 @@ func AssertMbRecordConstraints(obj MbRecord) error {
 	}
 	for _, el := range obj.Authors {
 		if err := AssertAuthorsInnerConstraints(el); err != nil {
-			return err
-		}
-	}
-	for _, el := range obj.Comments {
-		if err := AssertMbRecordCommentsInnerConstraints(el); err != nil {
 			return err
 		}
 	}

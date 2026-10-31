@@ -17,7 +17,7 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-      - run: go test ./pkg/massbank ./pkg/database ./pkg/config ./pkg/mb3server
+      - run: go test ./pkg/...
       - uses: docker/login-action@v3
         with:
           registry: quay.io
@@ -34,6 +34,13 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '23'
+          cache: npm
+          cache-dependency-path: web-frontend/package-lock.json
+      - run: npm ci && npm run compile && npx --no-install vitest run
+        working-directory: web-frontend
       - uses: docker/login-action@v3
         with:
           registry: quay.io

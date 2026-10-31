@@ -183,7 +183,14 @@ func (mb *MassBank2) readLine(line string) error {
 		s := strings.SplitN(line, ":", 2)
 		if len(s) == 2 {
 			tag := strings.TrimSpace(s[0])
-			err := mb.addValue(tag, strings.TrimSpace(s[1]))
+			value := strings.TrimSpace(s[1])
+			if tag == "COMMENT" {
+				if !strings.HasPrefix(s[1], " ") {
+					return fmt.Errorf("COMMENT must be followed by a space: %q", line)
+				}
+				value = strings.TrimPrefix(s[1], " ")
+			}
+			err := mb.addValue(tag, value)
 			if err != nil {
 				return errors.Join(errors.New("Error while adding Value "+tag+" record:\n "+line), err)
 			}

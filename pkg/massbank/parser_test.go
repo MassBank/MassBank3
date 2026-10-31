@@ -5,9 +5,24 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 )
+
+func TestCommentLinesPreserveValues(t *testing.T) {
+	buildTags()
+	record := &MassBank2{}
+	want := []string{"CONFIDENCE  Predicted", "[MS2] A1", "  spaces  ", `quoted "text", \ slash`, "same", "same"}
+	for _, value := range want {
+		if err := record.readLine("COMMENT: " + value); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if record.Comments == nil || !reflect.DeepEqual(*record.Comments, want) {
+		t.Fatalf("changed source comments: %+v", record.Comments)
+	}
+}
 
 func TestParseRecordDate(t *testing.T) {
 	for _, tt := range []struct {

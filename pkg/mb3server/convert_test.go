@@ -22,13 +22,7 @@ func TestSourceDatesInRecordJSON(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			text, names, mass, count := "test", []string{"test"}, 1.0, uint(0)
-			record, err := ConvertMb2RecordToMb3Record(&massbank.MassBank2{
-				Accession: &text, RecordTitle: &text, Date: date,
-				Compound:    massbank.CompoundProperties{Names: &names, Formula: &text, Mass: &mass, Smiles: &text, InChI: &text},
-				Acquisition: massbank.AcquisitionProperties{Instrument: &text, InstrumentType: &text},
-				Peak:        massbank.PeakProperties{Splash: &text, NumPeak: &count, Peak: &massbank.PkPeak{}},
-			})
+			record, err := ConvertMb2RecordToMb3Record(minimalRecord(date))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -53,6 +47,63 @@ func TestRecordConversionRejectsMissingDate(t *testing.T) {
 	for _, date := range []*massbank.RecordDate{nil, {}} {
 		if _, err := ConvertMb2RecordToMb3Record(&massbank.MassBank2{Date: date}); err == nil {
 			t.Fatal("accepted a record without DATE")
+		}
+	}
+}
+
+func minimalRecord(date *massbank.RecordDate) *massbank.MassBank2 {
+	text, names, mass, count := "test", []string{"test"}, 1.0, uint(0)
+	return &massbank.MassBank2{
+		Accession: &text, RecordTitle: &text, Date: date,
+		Compound:    massbank.CompoundProperties{Names: &names, Formula: &text, Mass: &mass, Smiles: &text, InChI: &text},
+		Acquisition: massbank.AcquisitionProperties{Instrument: &text, InstrumentType: &text},
+		Peak:        massbank.PeakProperties{Splash: &text, NumPeak: &count, Peak: &massbank.PkPeak{}},
+	}
+}
+
+func TestCommentsInRecordJSON(t *testing.T) {
+	date, err := massbank.ParseRecordDate("2025.01.17")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, comments := range [][]string{
+		nil, {},
+		{"CONFIDENCE  Predicted", "NATIVE_RUN_ID file.mzML", "  spaces  ", `quotes " and \ slash`, "\u00b5", "same", "same"},
+	} {
+		want := append([]string(nil), comments...)
+		source := minimalRecord(date)
+		source.Comments = &comments
+		got, err := ConvertMb2RecordToMb3Record(source)
+		if err != nil {
+			t.Fatal(err)
+		}
+		body, err := json.Marshal(got)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var decoded struct {
+			Comments []string `json:"comments"`
+		}
+		if err := json.Unmarshal(body, &decoded); err != nil {
+			t.Fatal(err)
+		}
+		if len(want) > 0 && !reflect.DeepEqual(decoded.Comments, want) {
+			t.Fatalf("comments changed in %s", body)
+		}
+		if len(want) == 0 {
+			var fields map[string]json.RawMessage
+			if err := json.Unmarshal(body, &fields); err != nil {
+				t.Fatal(err)
+			}
+			if _, present := fields["comments"]; present {
+				t.Fatalf("empty optional comments were not omitted: %s", body)
+			}
+		}
+		if len(want) > 0 {
+			got.Comments[0] = "changed output"
+			if !reflect.DeepEqual(*source.Comments, want) {
+				t.Fatal("converter aliased or mutated input comments")
+			}
 		}
 	}
 }

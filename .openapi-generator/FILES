@@ -19,8 +19,6 @@ pkg/mb3server/model_get_status_200_response_postgres.go
 pkg/mb3server/model_get_status_200_response_similarity_service.go
 pkg/mb3server/model_mb_record.go
 pkg/mb3server/model_mb_record_acquisition.go
-pkg/mb3server/model_mb_record_comments_inner.go
-pkg/mb3server/model_mb_record_comments_inner_one_of.go
 pkg/mb3server/model_mb_record_compound.go
 pkg/mb3server/model_mb_record_date.go
 pkg/mb3server/model_mb_record_deprecated.go

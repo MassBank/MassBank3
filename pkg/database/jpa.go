@@ -93,14 +93,6 @@ func decodeJPARecord(document []byte) (*massbank.MassBank2, error) {
 	if err != nil {
 		return nil, fmt.Errorf("AUTHORS for %s: %w", r.Accession, err)
 	}
-	comments := []massbank.SubtagProperty{}
-	for _, comment := range r.Comments {
-		value, err := massbank.ParseSubtagProperty(comment, "COMMENT")
-		if err != nil {
-			return nil, fmt.Errorf("COMMENT for %s: %w", r.Accession, err)
-		}
-		comments = append(comments, *value)
-	}
 	lineage := []string{}
 	if r.Lineage != "" {
 		lineage = strings.Split(r.Lineage, "; ")
@@ -121,7 +113,7 @@ func decodeJPARecord(document []byte) (*massbank.MassBank2, error) {
 	result := &massbank.MassBank2{
 		Accession: &r.Accession, Contributor: &parts[1], RecordTitle: &title,
 		Date: date, Authors: authors, License: &r.License, Copyright: r.Copyright,
-		Publication: r.Publication, Project: r.Project, Comments: &comments,
+		Publication: r.Publication, Project: r.Project, Comments: &r.Comments,
 		Compound: massbank.CompoundProperties{
 			Names: &r.Names, Classes: &r.Classes, Formula: &r.Formula,
 			Mass: &r.Mass, Smiles: &r.Smiles, InChI: &r.Inchi,

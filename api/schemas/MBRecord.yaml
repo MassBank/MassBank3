@@ -63,30 +63,10 @@ properties:
     description: "Information on a related project"
     type: string
   comments:
-    description: "Comments"
+    description: "Complete COMMENT values in source order, without subtag parsing"
     type: array
     items:
-      oneOf:
-        - description: "A pure comment string"
-          type: string
-        - description: "A annotated comment"
-          type: object
-          properties:
-            subtag:
-              description: "The subtag to describe the comment"
-              type: string
-              enum:
-                - "[MS2]"
-                - "[Merging]"
-                - "[Merged]"
-                - "[Mass spectrometry]"
-                - "[Chromatography]"
-                - "[Profile]"
-                - "CONFIDENCE"
-                - "INTERNAL_ID"
-            value:
-              description: "The comment"
-              type: string
+      type: string
   compound:
     description: "Information of Chemical Compound Analyzed"
     type: object

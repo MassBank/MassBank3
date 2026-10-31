@@ -2,12 +2,15 @@ package database
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/MassBank/MassBank3/pkg/massbank"
+	"github.com/lib/pq"
 )
 
 func TestDecodeJPARecord(t *testing.T) {
@@ -34,7 +37,7 @@ func TestDecodeJPARecord(t *testing.T) {
 	if (*r.Compound.Link)[0].Database != "INCHIKEY" ||
 		(*r.Acquisition.MassSpectrometry)[0].Value != "MS2" ||
 		r.Peak.Annotation.Values["formula"][0] != "CH3O+" ||
-		(*r.Comments)[0].Subtag != "CONFIDENCE" || (*r.Comments)[1].Value != "Free text" {
+		(*r.Comments)[0] != "CONFIDENCE Reference standard" || (*r.Comments)[1] != "Free text" {
 		t.Fatal("lost JPA collection or annotation values")
 	}
 	for _, invalid := range []string{
@@ -45,6 +48,43 @@ func TestDecodeJPARecord(t *testing.T) {
 		if _, err := decodeJPARecord([]byte(invalid)); err == nil {
 			t.Fatalf("accepted invalid JPA data: %s", invalid)
 		}
+	}
+}
+
+func TestJPACommentsAreLiteralValues(t *testing.T) {
+	want := []string{"CONFIDENCE  Predicted", "[MS2] A1", "  spaces  ", `quoted "text", \ slash`, "a---b", "same", "same"}
+	document, err := json.Marshal(map[string]any{
+		"accession": "MSBNK-Test-A1", "date": "2025.01.17", "comment": want,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	record, err := decodeJPARecord(document)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if record.Comments == nil || !reflect.DeepEqual(*record.Comments, want) {
+		t.Fatalf("changed JPA comments: %+v", record.Comments)
+	}
+}
+
+func TestLegacyCommentCompatibility(t *testing.T) {
+	encoded := []string{"CONFIDENCE---Predicted", "---Free---text", "[MS2]---A1", "plain"}
+	want := []string{"CONFIDENCE Predicted", "Free---text", "[MS2] A1", "plain"}
+	if got := decodeLegacyComments(encoded); !reflect.DeepEqual(got, want) {
+		t.Fatalf("legacy comments=%v", got)
+	}
+	want = append(want, `quotes " and \ and ,`, "  spaces  ", "same", "same")
+	wire, err := pq.Array(encodeLegacyComments(want)).Value()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var stored pq.StringArray
+	if err := stored.Scan(wire); err != nil {
+		t.Fatal(err)
+	}
+	if got := decodeLegacyComments(stored); !reflect.DeepEqual(got, want) {
+		t.Fatalf("legacy roundtrip=%v", got)
 	}
 }
 

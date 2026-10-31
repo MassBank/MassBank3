@@ -1,9 +1,8 @@
 import { CSSProperties, useMemo } from 'react';
-import SubTag from '../../types/record/SubTag';
 import Table from '../basic/Table';
 
 type InputProps = {
-  comments: SubTag[] | undefined;
+  comments: string[] | undefined;
   width: CSSProperties['width'];
   height: CSSProperties['height'];
 };
@@ -17,15 +16,10 @@ function CommentsTable({ comments, width, height }: InputProps) {
     const columns = [
       {
         title: 'Comment',
-        dataIndex: 'Comment',
+        dataIndex: 'Text',
         key: 'comment',
         align: 'center' as const,
-      },
-      {
-        title: 'Text',
-        dataIndex: 'Text',
-        key: 'text',
-        align: 'center' as const,
+        onCell: () => ({ style: { whiteSpace: 'pre-wrap' as const } }),
       },
     ];
 
@@ -33,8 +27,7 @@ function CommentsTable({ comments, width, height }: InputProps) {
     comments.forEach((comment, i) =>
       dataSource.push({
         key: `comments-key-${i}`,
-        Comment: comment.subtag,
-        Text: comment.value,
+        Text: comment,
       }),
     );
 
