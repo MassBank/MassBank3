@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/MassBank/MassBank3/pkg/massbank"
 )
@@ -31,16 +32,26 @@ func ConvertJsonStringToMb3Record(recordJson string) (*MbRecord, error) {
 	return &record, nil
 }
 
+func formatRecordDate(date time.Time) string {
+	if date.IsZero() {
+		return ""
+	}
+	return date.Format("2006-01-02")
+}
+
 func ConvertMb2RecordToMb3Record(record *massbank.MassBank2) (*MbRecord, error) {
+	if record.Date == nil || record.Date.Updated.IsZero() {
+		return nil, fmt.Errorf("record has no DATE")
+	}
 
 	result := MbRecord{
 		Accession:  *record.Accession,
 		Deprecated: MbRecordDeprecated{},
 		Title:      *record.RecordTitle,
 		Date: MbRecordDate{
-			Updated:  record.Date.Updated.String(),
-			Created:  record.Date.Created.String(),
-			Modified: record.Date.Modified.String(),
+			Updated:  formatRecordDate(record.Date.Updated),
+			Created:  formatRecordDate(record.Date.Created),
+			Modified: formatRecordDate(record.Date.Modified),
 		},
 		Authors:     nil,
 		License:     "",

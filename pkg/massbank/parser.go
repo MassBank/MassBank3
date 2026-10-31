@@ -56,6 +56,8 @@ func ScanMbFile(mb2Reader io.Reader, fileName string) (*MassBank2, error) {
 const dateFormat = "2006.01.02"
 const deprecatedDateFormat = "2006-01-02"
 
+var recordDatePattern = regexp.MustCompile(`^([0-9]{4}\.[0-9]{2}\.[0-9]{2})(?: \(Created ([0-9]{4}\.[0-9]{2}\.[0-9]{2})(?:, modified ([0-9]{4}\.[0-9]{2}\.[0-9]{2}))?\))?$`)
+
 func getDatabaseProperty(s string) (*DatabaseProperty, error) {
 	ss := strings.SplitN(s, " ", 2)
 	if len(ss) > 1 {
@@ -88,40 +90,20 @@ func ParseSubtagProperty(s string, tagname string) (*SubtagProperty, error) {
 }
 
 func ParseRecordDate(s string) (*RecordDate, error) {
-	var err error
-	var date = &RecordDate{}
-	ss := strings.SplitN(s, " ", 2)
-	if len(ss) > 1 {
-		re := regexp.MustCompile("\\(Created (.*)\\)")
-		ss2 := re.FindStringSubmatch(ss[1])
-		if len(ss2) == 2 {
-			ss3 := strings.SplitN(ss2[1], ",", 2)
-			if len(ss3) > 1 {
-				if date.Created, err = time.Parse(dateFormat, ss3[0]); err != nil {
-					return nil, err
-				}
-				ss4 := strings.SplitN(strings.TrimSpace(ss3[1]), " ", 2)
-				if len(ss4) > 1 {
-					if date.Modified, err = time.Parse(dateFormat, ss4[1]); strings.TrimSpace(ss4[0]) != "modified" || err != nil {
-						return nil, err
-					}
-				} else {
-					return nil, err
-				}
-			} else {
-				if date.Created, err = time.Parse(dateFormat, ss2[1]); err != nil {
-					return nil, err
-				}
-			}
-		}
-	} else {
-		if date.Created, err = time.Parse(dateFormat, ss[0]); err != nil {
-			return nil, err
-		}
+	parts := recordDatePattern.FindStringSubmatch(s)
+	if parts == nil {
+		return nil, fmt.Errorf("invalid DATE syntax %q", s)
 	}
-	date.Updated, err = time.Parse(dateFormat, ss[0])
-	if err != nil {
-		return nil, err
+	date := &RecordDate{}
+	for i, target := range []*time.Time{&date.Updated, &date.Created, &date.Modified} {
+		if parts[i+1] == "" {
+			continue
+		}
+		parsed, err := time.Parse(dateFormat, parts[i+1])
+		if err != nil {
+			return nil, fmt.Errorf("invalid DATE %q: %w", s, err)
+		}
+		*target = parsed
 	}
 	return date, nil
 }

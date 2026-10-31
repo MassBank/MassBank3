@@ -1165,20 +1165,20 @@
         "type" : "object"
       },
       "MBRecord_date" : {
-        "description" : "Date of creation or last modification of record",
+        "description" : "Dates from the source DATE line, represented as YYYY-MM-DD. Missing historical dates are omitted, not inferred.",
         "properties" : {
           "updated" : {
-            "description" : "Date of last update to record",
+            "description" : "Leading date in the source DATE line (creation or last modification)",
             "format" : "date",
             "type" : "string"
           },
           "created" : {
-            "description" : "Date of record creation",
+            "description" : "Explicit Created date, omitted when absent from the source",
             "format" : "date",
             "type" : "string"
           },
           "modified" : {
-            "description" : "Date of last (automatic) modification to record",
+            "description" : "Explicit modified date, omitted when absent from the source",
             "format" : "date",
             "type" : "string"
           }

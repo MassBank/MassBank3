@@ -17,7 +17,7 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-      - run: go test ./pkg/database ./pkg/config ./pkg/mb3server
+      - run: go test ./pkg/massbank ./pkg/database ./pkg/config ./pkg/mb3server
       - uses: docker/login-action@v3
         with:
           registry: quay.io

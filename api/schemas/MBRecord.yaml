@@ -26,19 +26,19 @@ properties:
       'compound.names[0]; acquisition.instrument_type; acquisition.mass_spectrometry.ms_type'"
     type: string
   date:
-    description: "Date of creation or last modification of record"
+    description: "Dates from the source DATE line, represented as YYYY-MM-DD. Missing historical dates are omitted, not inferred."
     type: object
     properties:
       updated:
-        description: "Date of last update to record"
+        description: "Leading date in the source DATE line (creation or last modification)"
         type: string
         format: date
       created:
-        description: "Date of record creation"
+        description: "Explicit Created date, omitted when absent from the source"
         type: string
         format: date
       modified:
-        description: "Date of last (automatic) modification to record"
+        description: "Explicit modified date, omitted when absent from the source"
         type: string
         format: date
   authors:

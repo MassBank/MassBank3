@@ -1709,13 +1709,17 @@ func (p *PostgresSQLDB) AddRecord(record *massbank.MassBank2, metaDataId string,
 		}
 	}
 	var massbankId int
+	legacyDate := record.Date.Created
+	if legacyDate.IsZero() {
+		legacyDate = record.Date.Updated
+	}
 	err = tx.QueryRow(q,
 		record.Metadata.FileName,
 		record.Accession,
 		record.RecordTitle,
 		"{"+strings.Join(comments, ",")+"}",
 		record.Copyright,
-		record.Date.Created,
+		legacyDate,
 		mid).Scan(&massbankId)
 	if err != nil {
 		if err2 := tx.Rollback(); err2 != nil {

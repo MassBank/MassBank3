@@ -148,6 +148,32 @@ The frontend can by default be accessed in the webbrowser at http://localhost:80
 
 # REST API
 
+## Source record dates
+
+The shared API uses the original JPA `DATE` text, following the
+[record format](https://github.com/MassBank/MassBank-documentation/blob/dev/MassBankRecordFormat.md).
+The leading date is returned as `date.updated`. `date.created` and
+`date.modified` are returned only for explicit `Created` and `modified` entries.
+A date without a parenthesized history does not tell us whether it denotes
+creation or a later modification; neither historical field is invented.
+Dates use the OpenAPI `date` format (`YYYY-MM-DD`), without a time or timezone.
+
+| Source DATE | API date object |
+|---|---|
+| `2012.10.22 (Created 2008.05.12)` | `{"updated":"2012-10-22","created":"2008-05-12"}` |
+| `2016.01.19 (Created 2006.12.21, modified 2011.05.06)` | `{"updated":"2016-01-19","created":"2006-12-21","modified":"2011-05-06"}` |
+| `2025.01.17` | `{"updated":"2025-01-17"}` |
+
+This intentionally replaces Go timestamp strings and year-0001 placeholders.
+Clients must tolerate missing historical fields. The original source text
+remains available from the export API's raw-text endpoint. No database reimport
+is needed. The legacy database has only one stored date and cannot reconstruct
+the original history; do not use its output as the correctness reference.
+
+Run parser/API regression tests with `go test ./pkg/massbank ./pkg/database ./pkg/mb3server`.
+To check every active record's DATE in a local snapshot, additionally set
+`MASSBANK_SOURCE_DATA=/path/to/MassBank-data`.
+
 ## Shared JPA database
 
 The default `DB_SCHEMA=jpa` reads the export API's `massbank-records` and
