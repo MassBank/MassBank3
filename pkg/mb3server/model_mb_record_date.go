@@ -13,16 +13,16 @@ package mb3server
 
 
 
-// MbRecordDate - Date of creation or last modification of record
+// MbRecordDate - Dates from the source DATE line, represented as YYYY-MM-DD. Missing historical dates are omitted, not inferred.
 type MbRecordDate struct {
 
-	// Date of last update to record
+	// Leading date in the source DATE line (creation or last modification)
 	Updated string `json:"updated,omitempty"`
 
-	// Date of record creation
+	// Explicit Created date, omitted when absent from the source
 	Created string `json:"created,omitempty"`
 
-	// Date of last (automatic) modification to record
+	// Explicit modified date, omitted when absent from the source
 	Modified string `json:"modified,omitempty"`
 }
 

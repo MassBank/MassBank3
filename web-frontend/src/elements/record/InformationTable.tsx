@@ -111,34 +111,27 @@ function InformationTable({ record, width, height }: InputProps) {
           <NotAvailableLabel />
         ),
     });
-    dataSource.push({
-      key: 'record-view-general-table-date-created',
-      label: 'Date (created)',
-      value: record.date ? (
-        <ExportableContent
-          component={record.date.created}
-          mode="copy"
-          onClick={() => handleOnCopy('Date (created)', record.date.created)}
-          title="Copy date (created) to clipboard"
-        />
-      ) : (
-        <NotAvailableLabel />
-      ),
-    });
-    dataSource.push({
-      key: 'record-view-general-table-date-modified',
-      label: 'Date (modified)',
-      value: record.date ? (
-        <ExportableContent
-          component={record.date.modified}
-          mode="copy"
-          onClick={() => handleOnCopy('Date (modified)', record.date.modified)}
-          title="Copy date (modified) to clipboard"
-        />
-      ) : (
-        <NotAvailableLabel />
-      ),
-    });
+    for (const [field, label] of [
+      ['updated', 'Date'],
+      ['created', 'Date (created)'],
+      ['modified', 'Date (modified)'],
+    ] as const) {
+      const value = record.date?.[field];
+      dataSource.push({
+        key: `record-view-general-table-date-${field}`,
+        label,
+        value: value ? (
+          <ExportableContent
+            component={value}
+            mode="copy"
+            onClick={() => handleOnCopy(label, value)}
+            title={`Copy ${label.toLowerCase()} to clipboard`}
+          />
+        ) : (
+          <NotAvailableLabel />
+        ),
+      });
+    }
 
     return (
       <Table

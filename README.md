@@ -182,6 +182,8 @@ Clients must tolerate missing historical fields. The original source text
 remains available from the export API's raw-text endpoint. No database reimport
 is needed. The legacy database has only one stored date and cannot reconstruct
 the original history; do not use its output as the correctness reference.
+The frontend displays the leading value as `Date` and unavailable historical
+values as `N/A`. Branch-image builds retain the previously deployed CSP frontend.
 
 Run parser/API regression tests with `go test ./pkg/massbank ./pkg/database ./pkg/mb3server`.
 To check every active record's DATE in a local snapshot, additionally set

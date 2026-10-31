@@ -29,3 +29,19 @@ jobs:
           file: Dockerfile-server
           push: true
           tags: quay.io/massbank/massbank-api:test-shared-jpa-${{ github.sha }}
+
+  frontend:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./web-frontend
+          file: ./web-frontend/Dockerfile-frontend
+          push: true
+          tags: quay.io/massbank/massbank-frontend:test-shared-jpa-${{ github.sha }}
