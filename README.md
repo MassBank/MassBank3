@@ -58,8 +58,9 @@ And in order to provide the MassBank data to the services, download the latest r
     mv MassBank-data-main ../data/MassBank-data/ && \
     rm main.tar.gz
 
-Now use _docker compose_ to start the system (in daemon mode):
+Import once into the shared database, then start the system:
 
+    docker compose --profile import run --rm data-loader
     docker compose up -d
 
 > [!NOTE]
@@ -72,7 +73,7 @@ To stop the system use:
     docker compose down
 
 > [!NOTE]
-> Docker volumes persist database contents. `docker compose down -v` deletes these volumes; the next start imports the data again.
+> Docker volumes persist database contents. `docker compose down -v` deletes these volumes; rerun the import command before starting the APIs again. Ordinary restarts do not rerun the importer.
 
 ### Advanced Settings
 

@@ -55,8 +55,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      data-loader:
-        condition: service_completed_successfully
     environment:
       DB_PORT: 5432
       DB_HOST: postgres
@@ -105,8 +103,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      data-loader:
-        condition: service_completed_successfully
     environment:
       DB_PORT: 5432
       DB_HOST: postgres
@@ -150,6 +146,7 @@ services:
 
   data-loader:
     image: quay.io/massbank/massbank-export-api:latest
+    profiles: ["import"]
     pull_policy: always
     entrypoint: ["java", "-Xmx1200m", "-jar", "/app-import.jar"]
     restart: "no"
