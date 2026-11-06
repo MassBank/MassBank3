@@ -90,7 +90,9 @@ function createCspPolicy(nonce: string) {
     "style-src-attr 'unsafe-inline'",
     "img-src 'self' data:",
     `font-src 'self' data: ${googleFontsFontOrigin}`,
-    `connect-src 'self' ${connectSources.join(' ')}`.trim(),
+    `connect-src 'self' ${connectSources.join(' ')}${
+      !isProduction ? ' ws://localhost:24678' : ''
+    }`.trim(),
   ].join('; ');
 }
 
@@ -433,7 +435,9 @@ baseRouter.use(/(.*)/, async (req: Request, res: Response) => {
     const html = template
       .replace(
         '<!--csp-nonce-bootstrap-->',
-        `<script src="${frontendBaseUrl}/csp-nonce-bootstrap.js"></script>`,
+        `<script src="${
+          isProduction ? frontendBaseUrl : ''
+        }/csp-nonce-bootstrap.js"></script>`,
       )
       .replaceAll('<!--csp-nonce-->', nonce)
       .replace(`<!--app-head-->`, rendered.head ?? '')
