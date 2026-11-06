@@ -1,5 +1,19 @@
 # Changelog
 
+## [2026.11.1](https://github.com/MassBank/MassBank3/compare/v2025.12.1...v2026.11.1) (2026-11-06)
+
+
+### Bug Fixes
+
+* errors in frontend when using CSP with antd ([fe25b50](https://github.com/MassBank/MassBank3/commit/fe25b50715ac9e2e953c2624278077f3a0f4fa17))
+* missing data initialisation in export service (v2.5) with docker compose ([b2a5180](https://github.com/MassBank/MassBank3/commit/b2a51801ecdf8fe7ced7683062fbc9f197ef8ac8))
+* missing import ([3e958e0](https://github.com/MassBank/MassBank3/commit/3e958e011704890403bcf8cd11d45d98fe8e7850))
+
+
+### Miscellaneous Chores
+
+* release v2026.11.1 ([02eda41](https://github.com/MassBank/MassBank3/commit/02eda41074d587c9cf36c3ac327e03fdfe6c258a))
+
 ## [2025.12.1](https://github.com/MassBank/MassBank3/compare/v2025.10.6...v2025.12.1) (2025-12-12)
 
 
