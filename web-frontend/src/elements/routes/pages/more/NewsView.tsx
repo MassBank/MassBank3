@@ -3,6 +3,7 @@ import { Content } from 'antd/es/layout/layout';
 import { Layout, Spin } from 'antd';
 import Segmented from '../../../basic/Segmented';
 import SectionDivider from '../../../basic/SectionDivider';
+import { prepareDocumentationHtml } from '../../../../utils/documentationHtml';
 
 const templateUrlNews =
   'https://massbank.github.io/MassBank-documentation/news.html';
@@ -18,16 +19,33 @@ function NewsView() {
   useEffect(() => {
     async function fetchHtml() {
       setIsFetching(true);
+      try {
+        const newsResponse = await fetch(templateUrlNews);
+        if (!newsResponse.ok) {
+          throw new Error(
+            `Latest news request failed with status ${newsResponse.status}`,
+          );
+        }
+        const newsHtml = await newsResponse.text();
+        setHtmlTemplateNews(
+          prepareDocumentationHtml(newsHtml, templateUrlNews),
+        );
 
-      let response = await fetch(templateUrlNews);
-      let html = await response.text();
-      setHtmlTemplateNews(html);
-
-      response = await fetch(templateUrlNewsArchive);
-      html = await response.text();
-      setHtmlTemplateNewsArchive(html);
-
-      setIsFetching(false);
+        const archiveResponse = await fetch(templateUrlNewsArchive);
+        if (!archiveResponse.ok) {
+          throw new Error(
+            `News archive request failed with status ${archiveResponse.status}`,
+          );
+        }
+        const archiveHtml = await archiveResponse.text();
+        setHtmlTemplateNewsArchive(
+          prepareDocumentationHtml(archiveHtml, templateUrlNewsArchive),
+        );
+      } catch (error) {
+        console.error('Failed to fetch MassBank news:', error);
+      } finally {
+        setIsFetching(false);
+      }
     }
 
     fetchHtml();

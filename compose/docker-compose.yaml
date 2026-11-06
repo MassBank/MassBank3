@@ -166,3 +166,30 @@ services:
       MB_DATA_DIRECTORY: "/MassBank-data"
     volumes:
       - "${MB_DATA_DIRECTORY}:/MassBank-data:ro"
+
+  export-init:
+    platform: linux/amd64
+    image: quay.io/massbank/massbank-export-api:latest
+    pull_policy: always
+    restart: "no"
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        if [ "$${MB_DB_INIT:-false}" = "true" ]; then
+          exec java -jar app-import.jar
+        else
+          echo "Skipping export database initialization."
+        fi
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_PORT: 5432
+      DB_HOST: postgres
+      DB_NAME: ${DB_NAME_EXPORT_SERVICE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      MB_DATA_DIRECTORY: "/MassBank-data"
+      MB_DB_INIT: ${MB_DB_INIT:-false}
+    volumes:
+      - "${MB_DATA_DIRECTORY}:/MassBank-data:ro"

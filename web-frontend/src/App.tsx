@@ -3,7 +3,11 @@ import Routing from './elements/routes/Routing';
 import { HighlightProvider } from './context/highlight/HighlightProvider';
 import { ConfigProvider } from 'antd';
 
-function App() {
+type InputProps = {
+  nonce: string;
+};
+
+function App({ nonce }: InputProps) {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -19,6 +23,7 @@ function App() {
 
   return (
     <ConfigProvider
+      csp={{ nonce }}
       wave={{ disabled: true }}
       typography={{
         style: { fontSize: 15 },
