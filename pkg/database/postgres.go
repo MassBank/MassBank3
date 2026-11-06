@@ -2045,6 +2045,11 @@ func (p *PostgresSQLDB) AddRecords(records []*massbank.MassBank2, metaDataId str
 	start := time.Now()
 
 	for i, record := range records {
+		accession := "<nil>"
+		if record != nil && record.Accession != nil {
+			accession = *record.Accession
+		}
+		fmt.Printf("\n -> Persist record %s", accession)
 		err := p.AddRecord(record, metaDataId, mb3RecordJsons[i])
 		if err != nil {
 			return err
@@ -2074,7 +2079,7 @@ func (p *PostgresSQLDB) Init() error {
 		CREATE TABLE massbank (
 			id SERIAL PRIMARY KEY,
 			filename TEXT NOT NULL,
-			accession VARCHAR(40) NOT NULL UNIQUE,	
+			accession VARCHAR(103) NOT NULL UNIQUE,
 			title TEXT,
 			comments TEXT[],
 			copyright TEXT,
@@ -2236,7 +2241,7 @@ func (p *PostgresSQLDB) Init() error {
 
 		CREATE TABLE browse_options (
 			massbank_id INT NOT NULL REFERENCES massbank(id) ON UPDATE CASCADE ON DELETE CASCADE,
-			accession VARCHAR(40) NOT NULL REFERENCES massbank(accession) ON UPDATE CASCADE ON DELETE CASCADE,
+			accession VARCHAR(103) NOT NULL REFERENCES massbank(accession) ON UPDATE CASCADE ON DELETE CASCADE,
 			contributor TEXT NOT NULL REFERENCES contributor(name) ON UPDATE CASCADE ON DELETE CASCADE,
 			instrument_type TEXT NOT NULL,
 			ms_type TEXT NOT NULL,

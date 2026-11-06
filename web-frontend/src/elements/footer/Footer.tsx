@@ -73,7 +73,7 @@ function Footer({
           }}
         >
           <Col span={colSpan}>&copy; 2025 MassBank Team</Col>
-          <Col span={colSpan}>Version: {version}</Col>
+          <Col span={colSpan}>System Version: {version}</Col>
           <Col span={colSpan}>
             <a
               href="https://github.com/MassBank/MassBank3"

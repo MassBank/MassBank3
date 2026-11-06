@@ -7,6 +7,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { prepareDocumentationHtml } from '../../utils/documentationHtml';
 
 const templateUrl =
   'https://massbank.github.io/MassBank-documentation/news.html';
@@ -21,12 +22,18 @@ function News({ styles = {} }: InputProps) {
 
   const fetchHtml = useCallback(async () => {
     setIsFetching(true);
-
-    const response = await fetch(templateUrl);
-    const html = await response.text();
-    setHtmlTemplate(html);
-
-    setIsFetching(false);
+    try {
+      const response = await fetch(templateUrl);
+      if (!response.ok) {
+        throw new Error(`News request failed with status ${response.status}`);
+      }
+      const html = await response.text();
+      setHtmlTemplate(prepareDocumentationHtml(html, templateUrl));
+    } catch (error) {
+      console.error('Failed to fetch MassBank news:', error);
+    } finally {
+      setIsFetching(false);
+    }
   }, []);
 
   useEffect(() => {
