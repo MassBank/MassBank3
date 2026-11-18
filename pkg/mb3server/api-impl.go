@@ -3,6 +3,7 @@ package mb3server
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -1064,10 +1065,6 @@ func GetSimilarity(peakList []string, threshold float64, referenceSpectraList []
 	// fmt.Println("limit: ", limit)
 	// fmt.Println("threshold: ", threshold)
 
-	if err := initDB(); err != nil {
-		return nil, err
-	}
-
 	type datatype1 struct {
 		Mz        float64 `json:"mz"`
 		Intensity float64 `json:"intensity"`
@@ -1093,30 +1090,36 @@ func GetSimilarity(peakList []string, threshold float64, referenceSpectraList []
 
 	type datatype2 struct {
 		PeakList             []datatype1 `json:"peak_list"`
-		ReferenceSpectraList []string    `json:"reference_spectra_list"`
+		ReferenceSpectraList []string    `json:"reference_spectra_list,omitempty"`
 	}
 
-	data := datatype2{}
-	data.PeakList = peakListParam
-	if len(referenceSpectraList) == 1 && referenceSpectraList[0] == "" {
-		data.ReferenceSpectraList = []string{}
-	} else {
+	data := datatype2{
+		PeakList: peakListParam,
+	}
+	if len(referenceSpectraList) > 0 && !(len(referenceSpectraList) == 1 && referenceSpectraList[0] == "") {
 		data.ReferenceSpectraList = referenceSpectraList
 	}
 
 	b := new(bytes.Buffer)
-	json.NewEncoder(b).Encode(data)
-	req, err := http.NewRequest(http.MethodPost, requestURL, b)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json")
-
+	err := json.NewEncoder(b).Encode(data)
 	if err != nil {
 		return nil, err
 	}
+	req, err := http.NewRequest(http.MethodPost, requestURL, b)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("similarity service returned status code %d", res.StatusCode)
 	}
 
 	type SimilarityScoreListInner struct {
