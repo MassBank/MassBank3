@@ -1,0 +1,48 @@
+{
+  "name": "MassBank3 Go and Frontend Development",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "workspaceFolder": "/workspaces/MassBank3",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/MassBank3,type=bind,Z",
+  "mounts": [
+    "source=massbank3-go,target=/go/pkg,type=volume",
+    "source=massbank3-npm,target=/home/vscode/.npm,type=volume"
+  ],
+  "runArgs": [
+    "--userns=keep-id:uid=1000,gid=1000",
+    "--security-opt=label=disable"
+  ],
+  "remoteUser": "vscode",
+  "containerUser": "vscode",
+  "updateRemoteUserUID": false,
+  "containerEnv": {
+    "GOPATH": "/go",
+    "GOBIN": "/go/bin"
+  },
+  "forwardPorts": [3000, 8080, 8081, 5432, 40000],
+  "portsAttributes": {
+    "3000": { "label": "MassBank frontend", "onAutoForward": "notify" },
+    "8080": { "label": "MassBank API", "onAutoForward": "notify" },
+    "8081": { "label": "MassBank API (alternate)", "onAutoForward": "silent" },
+    "5432": { "label": "PostgreSQL", "onAutoForward": "silent" },
+    "40000": { "label": "Delve debugger", "onAutoForward": "silent" }
+  },
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "customizations": {
+    "jetbrains": {
+      "settings": {
+        "com.intellij:app:HttpConfigurable.use_proxy_pac": true
+      }
+    },
+    "vscode": {
+      "extensions": [
+
+      ],
+      "settings": {
+
+      }
+    }
+  }
+}
