@@ -221,3 +221,29 @@ and threshold value 0.8 looks like:
     http://localhost:8081/MassBank-api/records/search?peak_list=133.0648%3B225%2C151.0754%3B94%2C155.9743%3B112%2C161.0597%3B999%2C179.0703%3B750&peak_list_threshold=0.8
 
 The result is a set of MassBank record IDs (accessions) and the corresponding similarity score in JSON format. The calculation is done by the [matchms](https://github.com/matchms/matchms) package used in our [similarity service](https://github.com/MassBank/MassBank3-similarity-service).
+
+----------
+
+<a href="https://www.surveymonkey.de/r/denbi-service?sc=cibi&tool=massbank" target="_blank" rel="noopener noreferrer" style=" display: inline-flex; align-items: center; gap: 15px; padding: 12px 18px; background-color: #14387F; color: #ffffff; font-family: Arial, sans-serif; text-decoration: none; border-radius: 10px; border-bottom: 4px solid #009BD9; box-shadow: 0 3px 8px rgba(0,0,0,0.15); box-sizing: border-box; ">
+
+<!-- de.NBI Logo -->
+<img src="https://www.denbi.de/templates/nbimaster/img/denbi-logo-color.svg" alt="de.NBI Logo" width="110" style=" display: block; width: 110px; height: auto; padding: 8px; background-color: #ffffff; border-radius: 6px; box-sizing: border-box; ">
+
+<span style="
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #8DDEFF;
+">
+  ✓ Approved de.NBI Service
+</span>
+
+<span style="
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+">
+  Share your feedback ↗
+</span>
