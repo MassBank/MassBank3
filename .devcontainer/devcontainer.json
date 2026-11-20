@@ -8,7 +8,14 @@
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/MassBank3,type=bind,Z",
   "mounts": [
     "source=massbank3-go,target=/go/pkg,type=volume",
-    "source=massbank3-npm,target=/home/vscode/.npm,type=volume"
+    "source=massbank3-npm,target=/home/vscode/.npm,type=volume",
+    "source=codex-devcontainer,target=/home/vscode/.codex,type=volume",
+    "source=copilot-devcontainer,target=/home/vscode/.copilot,type=volume",
+    "source=copilot-auth-devcontainer,target=/home/vscode/.config/github-copilot,type=volume",
+    "source=${localWorkspaceFolder}/../MassBank-similarity-api,target=/workspaces/MassBank-similarity-api,type=bind,Z",
+    "source=${localWorkspaceFolder}/../MassBank-lib,target=/workspaces/MassBank-lib,type=bind,Z",
+    "source=${localWorkspaceFolder}/../MassBank-export-api,target=/workspaces/MassBank-export-api,type=bind,Z",
+    "source=${localWorkspaceFolder}/../MassBank-data,target=/workspaces/MassBank-data,type=bind,Z"
   ],
   "runArgs": [
     "--userns=keep-id:uid=1000,gid=1000",

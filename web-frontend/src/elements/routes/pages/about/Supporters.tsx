@@ -1,6 +1,7 @@
 import { Content } from 'antd/es/layout/layout';
 import { memo } from 'react';
 
+import denbiLogo from '../../../../assets/denbi-logo-color.svg';
 import eawagLogo from '../../../../assets/EAWAG_logo.png';
 import uniLuxLogo from '../../../../assets/UniLu-LCSB_Logo.png';
 import ipbLogo from '../../../../assets/IPB.png';
@@ -72,7 +73,7 @@ function Supporters() {
           }}
         >
           <img
-            src="https://www.denbi.de/templates/nbimaster/img/denbi-logo-color.svg"
+            src={denbiLogo}
             alt="de.NBI Logo"
             width={110}
             style={{
