@@ -176,7 +176,9 @@ func (p *PostgresSQLDB) Connect() error {
 	if db, err := sql.Open("postgres", p.connString); err != nil {
 		return err
 	} else {
+		db.SetMaxOpenConns(10)
 		if err := db.Ping(); err != nil {
+			_ = db.Close()
 			return err
 		} else {
 			p.database = db
@@ -363,6 +365,7 @@ func (p *PostgresSQLDB) GetMetadata() (*massbank.MbMetaData, error) {
 	rows, err := stmt.Query()
 	stmt.Close()
 	if err == nil {
+		defer rows.Close()
 		result.CompoundClass = []string{}
 		result.CompoundClassCount = []uint{}
 		for rows.Next() {
@@ -390,6 +393,7 @@ func (p *PostgresSQLDB) GetMetadata() (*massbank.MbMetaData, error) {
 	rows, err = stmt.Query()
 	stmt.Close()
 	if err == nil {
+		defer rows.Close()
 		result.CompoundClassChemOnt = []string{}
 		result.CompoundClassCountChemOnt = []uint{}
 		for rows.Next() {
@@ -516,6 +520,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	rows, err := stmt.Query(massbankId)
 	stmt.Close()
 	if err == nil {
+		defer rows.Close()
 		result.Authors = &[]massbank.RecordAuthorName{}
 		for rows.Next() {
 			var author string
@@ -588,6 +593,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		rows, err = stmt.Query(massbankId)
 		stmt.Close()
 		if err == nil {
+			defer rows.Close()
 			for rows.Next() {
 				var name string
 				if err := rows.Scan(&name); err != nil {
@@ -612,6 +618,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		rows, err = stmt.Query(massbankId)
 		stmt.Close()
 		if err == nil {
+			defer rows.Close()
 			for rows.Next() {
 				var class string
 				if err := rows.Scan(&class); err != nil {
@@ -636,6 +643,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		rows, err = stmt.Query(massbankId)
 		stmt.Close()
 		if err == nil {
+			defer rows.Close()
 			for rows.Next() {
 				var database string
 				var identifier string
@@ -707,6 +715,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		rows, err = stmt.Query(massbankId)
 		stmt.Close()
 		if err == nil {
+			defer rows.Close()
 			for rows.Next() {
 				var subtag string
 				var value string
@@ -732,6 +741,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		rows, err = stmt.Query(massbankId)
 		stmt.Close()
 		if err == nil {
+			defer rows.Close()
 			for rows.Next() {
 				var subtag string
 				var value string
@@ -762,6 +772,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	rows, err = stmt.Query(massbankId)
 	stmt.Close()
 	if err == nil {
+		defer rows.Close()
 		result.MassSpectrometry.FocusedIon = &[]massbank.SubtagProperty{}
 		for rows.Next() {
 			var subtag string
@@ -786,6 +797,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 	rows, err = stmt.Query(massbankId)
 	stmt.Close()
 	if err == nil {
+		defer rows.Close()
 		result.MassSpectrometry.DataProcessing = &[]massbank.SubtagProperty{}
 		for rows.Next() {
 			var subtag string
@@ -830,6 +842,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		rows, err = stmt.Query(spectrumId)
 		stmt.Close()
 		if err == nil {
+			defer rows.Close()
 			result.Peak.Peak.Id = []int32{}
 			result.Peak.Peak.Mz = []float64{}
 			result.Peak.Peak.Intensity = []float64{}
@@ -862,6 +875,7 @@ func (p *PostgresSQLDB) GetRecord(s *string) (*massbank.MassBank2, error) {
 		rows, err = stmt.Query(spectrumId)
 		stmt.Close()
 		if err == nil {
+			defer rows.Close()
 			result.Peak.Annotation = &massbank.PkAnnotation{}
 			result.Peak.Annotation.Header = []string{}
 			result.Peak.Annotation.Values = map[string][]interface{}{}

@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/MassBank/MassBank3/pkg/config"
 	"github.com/MassBank/MassBank3/pkg/database"
@@ -20,14 +21,21 @@ import (
 
 var db database.MB3Database = nil
 var ServerConfig *config.ServerConfig = nil
+var dbMutex sync.Mutex
 
 func initDB() error {
-	var err error
-	if db != nil && db.Ping() == nil {
-		return nil
+	dbMutex.Lock()
+	defer dbMutex.Unlock()
+
+	if db != nil {
+		return db.Ping()
 	}
-	db, err = database.InitDb(ServerConfig.DBConfig)
-	return err
+	initializedDB, err := database.InitDb(ServerConfig.DBConfig)
+	if err != nil {
+		return err
+	}
+	db = initializedDB
+	return nil
 }
 
 func GetBrowseOptions(contributor []string, instrumentTyoe []string, msType []string, ionMode string) (*BrowseOptions, error) {

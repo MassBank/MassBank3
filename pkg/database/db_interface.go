@@ -3,6 +3,7 @@ package database
 import (
 	"log"
 	"math"
+	"sync"
 
 	"github.com/Code-Hex/dd"
 
@@ -211,26 +212,23 @@ type MB3Database interface {
 }
 
 var db MB3Database
+var dbMutex sync.Mutex
 
 func InitDb(dbConfig DBConfig) (MB3Database, error) {
+	dbMutex.Lock()
+	defer dbMutex.Unlock()
+
 	if db == nil {
-		var err error
-		if dbConfig.Database == Postgres {
-			db, err = NewPostgresSQLDb(dbConfig)
-			log.Println(dd.Dump(db))
-			if err != nil {
-				db = nil
-				return nil, err
-			}
-		}
-		if err = db.Connect(); err != nil {
-			db = nil
+		newDB, err := NewPostgresSQLDb(dbConfig)
+		if err != nil {
 			return nil, err
 		}
+		log.Println(dd.Dump(newDB))
+		if err := newDB.Connect(); err != nil {
+			return nil, err
+		}
+		db = newDB
 	}
 	err := db.Ping()
-	if err != nil {
-		db = nil
-	}
 	return db, err
 }
