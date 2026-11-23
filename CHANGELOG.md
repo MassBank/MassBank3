@@ -1,5 +1,13 @@
 # Changelog
 
+## [2026.11.4](https://github.com/MassBank/MassBank3/compare/v2026.11.3...v2026.11.4) (2026-11-23)
+
+
+### Miscellaneous Chores
+
+* release v2026.11.3 ([9987099](https://github.com/MassBank/MassBank3/commit/9987099f7bdc615afe54358e359626880f1744cb))
+* release v2026.11.4 ([629f17d](https://github.com/MassBank/MassBank3/commit/629f17dd21ac1c84038f16ac8886b7d18c96362f))
+
 ## [2026.11.3](https://github.com/MassBank/MassBank3/compare/v2026.11.1...v2026.11.3) (2026-11-18)
 
 
